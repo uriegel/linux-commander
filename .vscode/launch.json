@@ -5,41 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "lldb",
+            "type": "by-gdb",
             "request": "launch",
-            "name": "Debug executable 'commander'",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--bin=commander",
-                    "--package=commander"
-                ],
-                "filter": {
-                    "name": "commander",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'commander'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=commander",
-                    "--package=commander"
-                ],
-                "filter": {
-                    "name": "commander",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        }
+            "name": "Launch(gdb)",
+            "program": "target/debug/commander",
+            "cwd": "${workspaceRoot}"
+        }        
     ]
 }
