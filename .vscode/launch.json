@@ -8,6 +8,7 @@
             "type": "by-gdb",
             "request": "launch",
             "name": "Launch(gdb)",
+            "preLaunchTask": "build",
             "program": "target/debug/commander",
             "cwd": "${workspaceRoot}"
         }        

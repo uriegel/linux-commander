@@ -1,9 +1,12 @@
 extern crate gtk;
 extern crate gio;
 
-use gio::{ActionMapExt, ApplicationFlags, prelude::ApplicationExt};
+use std::env;
+
+use gio::{ActionMapExt, ApplicationFlags, prelude::{ApplicationExt, ApplicationExtManual}};
 use glib::clone;
-use gtk::{Application, GtkApplicationExt};
+use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, WidgetExt, prelude::BuilderExtManual};
+use webkit2gtk::{WebView, WebViewExt};
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), ApplicationFlags::empty())
@@ -13,5 +16,24 @@ fn main() {
     action.connect_activate(clone!(@weak application => move |_,_| application.quit()));
     application.add_action(&action);
     application.set_accels_for_action("app.destroy", &["<Ctrl>Q"]);
+
+    unsafe {
+        webkit2gtk_sys::webkit_web_view_get_type();
+        webkit2gtk_sys::webkit_settings_get_type();
+    }
     
+    application.connect_startup(|application| {
+        let builder = Builder::new();
+        builder.add_from_file("main.glade").unwrap();
+        let window: gtk::Window = builder.get_object("window").unwrap();
+        let webview: WebView = builder.get_object("webview").unwrap();
+        webview.load_uri("http://roxy:9865/media/video/Verdammt%20in%20alle%20Ewigkeit");
+
+        application.add_window(&window);
+        window.set_default_size(1300, 300);
+        window.show_all();
+    });
+    
+    application.connect_activate(|_| {});
+    application.run(&env::args().collect::<Vec<_>>());
 }
