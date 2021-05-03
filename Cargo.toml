@@ -12,6 +12,8 @@ gtk = "0.9.2"
 gio = "0.9.1"
 webkit2gtk = "0.11.0"
 webkit2gtk-sys = "0.13.0"
+tokio = { version = "1.5.0", features = ["full"] }
+warp = "0.3.1"
 
 [features]
 default = ["gtk/v3_22", "webkit2gtk/v2_6"]

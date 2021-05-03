@@ -9,15 +9,17 @@ use gio::{ActionMapExt, ApplicationFlags, prelude::{ApplicationExt, ApplicationE
 use glib::clone;
 use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, WidgetExt, prelude::BuilderExtManual};
 use webkit2gtk::{WebView, WebViewExt, WebInspectorExt};
+use tokio::runtime::Runtime;
 
-use crate::server::server::test;
+use crate::server::server::start;
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), ApplicationFlags::empty())
         .expect("Application::new() failed");
 
-    let ergebnis = test("text");
-    println!("Das issses: {}", ergebnis);
+    let port = 9865;
+    let rt = Runtime::new().unwrap();
+    start(&rt, port);
 
     let action = gio::SimpleAction::new("destroy", None);
     action.connect_activate(clone!(@weak application => move |_,_| application.quit()));
@@ -29,12 +31,13 @@ fn main() {
         webkit2gtk_sys::webkit_settings_get_type();
     }
     
-    application.connect_startup(|application| {
+    application.connect_startup(move |application| {
         let builder = Builder::new();
         builder.add_from_file("main.glade").unwrap();
         let window: gtk::Window = builder.get_object("window").unwrap();
         let webview: WebView = builder.get_object("webview").unwrap();
-        webview.load_uri("http://roxy:9865/media/video/Verdammt%20in%20alle%20Ewigkeit");
+        let uri = format!("http://localhost:{}", port);
+        webview.load_uri(&uri);
 
         let action = gio::SimpleAction::new("devtools", None);
         action.connect_activate(clone!(@weak webview => move |_,_| match webview.get_inspector() {
