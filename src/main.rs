@@ -6,7 +6,7 @@ use std::env;
 use gio::{ActionMapExt, ApplicationFlags, prelude::{ApplicationExt, ApplicationExtManual}};
 use glib::clone;
 use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, WidgetExt, prelude::BuilderExtManual};
-use webkit2gtk::{WebView, WebViewExt};
+use webkit2gtk::{WebView, WebViewExt, WebInspectorExt};
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), ApplicationFlags::empty())
@@ -28,6 +28,14 @@ fn main() {
         let window: gtk::Window = builder.get_object("window").unwrap();
         let webview: WebView = builder.get_object("webview").unwrap();
         webview.load_uri("http://roxy:9865/media/video/Verdammt%20in%20alle%20Ewigkeit");
+
+        let action = gio::SimpleAction::new("devtools", None);
+        action.connect_activate(clone!(@weak webview => move |_,_| match webview.get_inspector() {
+            Some(inspector) => inspector.show(),
+            None => println!("Could not show web inspector")
+        }));
+        application.add_action(&action);
+        application.set_accels_for_action("app.devtools", &["F12"]);
 
         application.add_window(&window);
         window.set_default_size(1300, 300);
