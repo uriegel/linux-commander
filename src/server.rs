@@ -16,7 +16,7 @@ pub mod server {
                     format!("Hello, {}!", name)
                 });
         
-            let route2 = warp::fs::dir("/home/uwe/Projekte/VirtualTableComponent");
+            let route2 = warp::fs::dir(".");
             let routes = route1.or(route2);
         
             warp::serve(routes)

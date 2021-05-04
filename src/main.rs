@@ -47,8 +47,16 @@ fn main() {
         application.add_action(&action);
         application.set_accels_for_action("app.devtools", &["F12"]);
 
+        webview.connect_context_menu(|_, _, _, _| true );
+
         application.add_window(&window);
         window.set_default_size(1300, 300);
+
+        window.connect_configure_event(|_,e| {
+            println!("{:?}", e.get_size());
+            false
+        });
+
         window.show_all();
     });
     
