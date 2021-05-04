@@ -1,9 +1,11 @@
-use std::env;
+use std::{cell::RefCell, env};
 use gio::{ActionMapExt, ApplicationFlags, prelude::{ApplicationExt, ApplicationExtManual}};
 use glib::clone;
 use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, WidgetExt, prelude::BuilderExtManual};
 use webkit2gtk::{WebView, WebViewExt, WebInspectorExt};
 use tokio::runtime::Runtime;
+
+use crate::settings::{Settings, save_settings};
 
 mod server;
 mod settings;
@@ -11,8 +13,6 @@ mod settings;
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), ApplicationFlags::empty())
         .expect("Application::new() failed");
-
-    settings::initialize();
 
     let port = 9865;
     let rt = Runtime::new().unwrap();
@@ -29,6 +29,7 @@ fn main() {
     }
     
     application.connect_startup(move |application| {
+        let settings = RefCell::new(settings::initialize());
         let builder = Builder::new();
         builder.add_from_file("main.glade").unwrap();
         let window: gtk::Window = builder.get_object("window").unwrap();
@@ -47,10 +48,20 @@ fn main() {
         webview.connect_context_menu(|_, _, _, _| true );
 
         application.add_window(&window);
-        window.set_default_size(1300, 300);
+        {
+            let current_settings = settings.borrow();
+            if current_settings.width != 0 {
+                window.set_default_size(current_settings.width as i32, current_settings.height as i32);
+            }
+        }
 
-        window.connect_configure_event(|_,e| {
-            println!("{:?}", e.get_size());
+        window.connect_configure_event(move|_,e| {
+            let size = e.get_size();
+            let new_settings = Settings { width: size.0, height: size.1 };
+            let old_settings = settings.replace(new_settings);
+            if old_settings.width != size.0 || old_settings.height != size.1 {
+                save_settings(&old_settings);
+            }
             false
         });
 
