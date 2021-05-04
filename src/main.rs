@@ -1,25 +1,22 @@
-extern crate gtk;
-extern crate gio;
-
-mod server;
-
 use std::env;
-
 use gio::{ActionMapExt, ApplicationFlags, prelude::{ApplicationExt, ApplicationExtManual}};
 use glib::clone;
 use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, WidgetExt, prelude::BuilderExtManual};
 use webkit2gtk::{WebView, WebViewExt, WebInspectorExt};
 use tokio::runtime::Runtime;
 
-use crate::server::server::start;
+mod server;
+mod settings;
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), ApplicationFlags::empty())
         .expect("Application::new() failed");
 
+    settings::initialize();
+
     let port = 9865;
     let rt = Runtime::new().unwrap();
-    start(&rt, port);
+    server::start(&rt, port);
 
     let action = gio::SimpleAction::new("destroy", None);
     action.connect_activate(clone!(@weak application => move |_,_| application.quit()));
