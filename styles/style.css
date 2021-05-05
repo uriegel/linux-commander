@@ -10,20 +10,12 @@ body {
     background-color: gray;
 }
 
-#root {
-    margin: 20px;
-}
-
 #splitter {
     display: flex;
     flex-grow: 1;
 }
 
-#first {
-    background-color: yellow;
+.tableContainer {
     flex-grow: 1;
-}
-#second {
-    background-color: red;
-    flex-grow: 1;
+    position: relative;
 }

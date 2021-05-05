@@ -78,24 +78,32 @@ class GridSplitter extends HTMLElement {
 		    const size2 = isVertical ? this.second.offsetHeight : this.second.offsetWidth
 		    const initialPosition = isVertical ? evt.pageY : evt.pageX		
 
+            let timestap = performance.now()
+
             const onmousemove = evt => {
-                let delta = (isVertical ? evt.pageY : evt.pageX) - initialPosition
-                if (delta < 10 - size1)
-                    delta = 10 - size1
-                if (delta > (isVertical ? this.first.parentElement.offsetHeight : this.first.parentElement.offsetWidth) - 10 - size1 - 6)
-                    delta = (isVertical ? this.first.parentElement.offsetHeight : this.first.parentElement.offsetWidth) - 10 - size1 - 6
 
-                const newSize1 = size1 + delta
-                const newSize2 = size2 - delta
+                const newTime = performance.now()
+                const diff = newTime - timestap
+                if (diff > 20) {
+                    timestap = newTime
 
-                const procent2 = newSize2 / (newSize2 + newSize1 + 
-                    (isVertical ? this.splitter.offsetHeight : this.splitter.offsetWidth)) * 100
+                    let delta = (isVertical ? evt.pageY : evt.pageX) - initialPosition
+                    if (delta < 10 - size1)
+                        delta = 10 - size1
+                    if (delta > (isVertical ? this.first.parentElement.offsetHeight : this.first.parentElement.offsetWidth) - 10 - size1 - 6)
+                        delta = (isVertical ? this.first.parentElement.offsetHeight : this.first.parentElement.offsetWidth) - 10 - size1 - 6
 
-                const size = `0 0 ${procent2}%` 
-                this.second.style.flex = size
-            // if (positionChanged)
-            // positionChanged()
+                    const newSize1 = size1 + delta
+                    const newSize2 = size2 - delta
 
+                    const procent2 = newSize2 / (newSize2 + newSize1 + 
+                        (isVertical ? this.splitter.offsetHeight : this.splitter.offsetWidth)) * 100
+
+                    const size = `0 0 ${procent2}%` 
+                    this.second.style.flex = size
+                    // if (positionChanged)
+                    // positionChanged()
+                }
                 evt.stopPropagation()
                 evt.preventDefault()
             }

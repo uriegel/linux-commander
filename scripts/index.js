@@ -1,10 +1,6 @@
 import './components/gridsplitter.js'
-import { VERTICAL, HORIZONTAL } from './components/gridsplitter.js'
-
+import './folder.js'
 const themeChooser = document.getElementById("themeChooser")
-const gridChooser = document.getElementById("gridChooser")
-const secondInvisible = document.getElementById("secondInvisible")
-const splitter = document.querySelector('grid-splitter')
 
 themeChooser.onchange = () => {
     const changeTheme = theme => {
@@ -22,26 +18,16 @@ themeChooser.onchange = () => {
 
     switch (themeChooser.selectedIndex) {
         case 0: 
-            changeTheme("themeBlue")
-            break
-        case 1: 
             changeTheme("themeAdwaita")
             break
-        case 2: 
+        case 1: 
             changeTheme("themeAdwaitaDark")
             break
     }
 }
 
-gridChooser.onchange = () => {
-    switch (gridChooser.selectedIndex) {
-        case 0: 
-            splitter.setAttribute("orientation", HORIZONTAL)
-            break
-        case 1: 
-            splitter.setAttribute("orientation", VERTICAL)
-            break
-    }
-}
 
-secondInvisible.onchange = () => splitter.setAttribute("secondInvisible", secondInvisible.checked)
+
+
+
+
