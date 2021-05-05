@@ -1,5 +1,5 @@
 import './components/gridsplitter.js'
-import { VERTICAL, HORIZONTAL } from '/components/gridsplitter.js'
+import { VERTICAL, HORIZONTAL } from './components/gridsplitter.js'
 
 const themeChooser = document.getElementById("themeChooser")
 const gridChooser = document.getElementById("gridChooser")

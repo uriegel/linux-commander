@@ -1,0 +1,29 @@
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+    font-size: 85%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: gray;
+}
+
+#root {
+    margin: 20px;
+}
+
+#splitter {
+    display: flex;
+    flex-grow: 1;
+}
+
+#first {
+    background-color: yellow;
+    flex-grow: 1;
+}
+#second {
+    background-color: red;
+    flex-grow: 1;
+}
