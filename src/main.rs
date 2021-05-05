@@ -28,19 +28,6 @@ fn main() {
         webkit2gtk_sys::webkit_settings_get_type();
     }
 
-    let initial_state = "adwaita".to_variant();
-    let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
-    action.connect_change_state(|a, s| {
-        match s {
-            Some(val) => {
-                a.set_state(val);
-                println!("Vall: {}", val);
-            },
-            None => println!("Could not set state")
-        }
-    });
-    application.add_action(&action);
-    
     application.connect_startup(move |application| {
         let settings = RefCell::new(settings::initialize());
         let builder = Builder::new();
@@ -56,6 +43,26 @@ fn main() {
                 webview.run_javascript("var theme = 'themeAdwaitaDark'", Some(&cancellable), |_|{})
             }
         ));
+
+        let initial_state = "adwaita".to_variant();
+        let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
+        action.connect_change_state(clone!(@weak webview => move |a, s| {
+            match s {
+                Some(val) => {
+                    a.set_state(val);
+                    match val.get_str(){
+                        Some(theme) => {
+                            let cancellable = gio::Cancellable::new();
+                            let script = format!("alert('{}')", theme);
+                            webview.run_javascript(&script, Some(&cancellable), |_|{});
+                        }
+                        None => println!("Could not set theme, could not extract from variant")
+                    }
+                },
+                None => println!("Could not set theme")
+            }
+        }));
+        application.add_action(&action);
 
         let action = gio::SimpleAction::new("devtools", None);
         action.connect_activate(clone!(@weak webview => move |_,_| match webview.get_inspector() {
