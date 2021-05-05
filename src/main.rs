@@ -1,6 +1,6 @@
 use std::{cell::RefCell, env};
-use gio::{ActionMapExt, ApplicationFlags, prelude::{ApplicationExt, ApplicationExtManual}};
-use glib::clone;
+use gio::{ActionMapExt, ApplicationFlags, SimpleAction, prelude::{ApplicationExt, ApplicationExtManual}};
+use glib::{ToVariant, clone};
 use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, WidgetExt, prelude::BuilderExtManual};
 use webkit2gtk::{LoadEvent, WebInspectorExt, WebView, WebViewExt};
 use tokio::runtime::Runtime;
@@ -27,6 +27,19 @@ fn main() {
         webkit2gtk_sys::webkit_web_view_get_type();
         webkit2gtk_sys::webkit_settings_get_type();
     }
+
+    let initial_state = "adwaita".to_variant();
+    let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
+    action.connect_change_state(|a, s| {
+        match s {
+            Some(val) => {
+                a.set_state(val);
+                println!("Vall: {}", val);
+            },
+            None => println!("Could not set state")
+        }
+    });
+    application.add_action(&action);
     
     application.connect_startup(move |application| {
         let settings = RefCell::new(settings::initialize());
