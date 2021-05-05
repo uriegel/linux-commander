@@ -55,15 +55,15 @@ fn main() {
             }
         }
 
-        window.connect_configure_event(move|_,e| {
-            let size = e.get_size();
+        window.connect_configure_event(clone!(@weak window => @default-return false, move|_,_| {
+            let size = window.get_size();
             let new_settings = Settings { width: size.0, height: size.1 };
             let old_settings = settings.replace(new_settings);
             if old_settings.width != size.0 || old_settings.height != size.1 {
                 save_settings(&old_settings);
             }
             false
-        });
+        }));
 
         window.show_all();
     });

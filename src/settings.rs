@@ -3,8 +3,8 @@ use std::{fs, fs::{File}, io::{ErrorKind, Read, Write}, path::{PathBuf}};
 
 #[derive(Serialize, Deserialize)]
 pub struct Settings {
-    pub width: u32,
-    pub height: u32,
+    pub width: i32,
+    pub height: i32,
 }
 
 pub fn initialize() -> Settings {
