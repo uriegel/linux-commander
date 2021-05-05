@@ -4,7 +4,8 @@ import './folder.js'
 const folderLeft = document.getElementById("folderLeft")
 const folderRight = document.getElementById("folderRight")
 
-initializeOnTheme(onTheme)
+const theme = initializeOnTheme(onTheme)
+onTheme(theme)
 
 function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => document.body.classList.remove(n))

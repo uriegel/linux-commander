@@ -5,6 +5,12 @@ use std::{fs, fs::{File}, io::{ErrorKind, Read, Write}, path::{PathBuf}};
 pub struct Settings {
     pub width: i32,
     pub height: i32,
+    #[serde(default="get_default_theme")]
+    pub theme: String,
+}
+
+fn get_default_theme()->String {
+    "themeAdwaitaDark".to_string()
 }
 
 pub fn initialize() -> Settings {
@@ -25,12 +31,13 @@ pub fn initialize() -> Settings {
                 fs::create_dir(path).unwrap();
             }
             File::create(settings).unwrap();
-            Settings { width: 0, height: 0 }
+            Settings { width: 0, height: 0, theme: get_default_theme() }
         },
         Err(e) => panic!("Error: {:?}", e)
     }
-   
 }
+
+// TODO: save theme
 
 pub fn save_settings(settings: &Settings) {
     let settings_path = get_settings_path();

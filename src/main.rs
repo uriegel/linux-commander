@@ -10,6 +10,12 @@ use crate::settings::{Settings, save_settings};
 mod server;
 mod settings;
 
+fn set_theme(webview: WebView, theme: &str) {
+    let cancellable = gio::Cancellable::new();
+    let script = format!("setTheme('{}')", theme);
+    webview.run_javascript(&script, Some(&cancellable), |_|{});
+}
+
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), ApplicationFlags::empty())
         .expect("Application::new() failed");
@@ -37,25 +43,25 @@ fn main() {
         let uri = format!("http://localhost:{}", port);
         webview.load_uri(&uri);
 
+        let initial_theme  = settings.borrow().theme.clone();
+        let initial_state = initial_theme.to_variant();
+
         webview.connect_load_changed(clone!(@weak webview => move |_,load_event| 
             if load_event == LoadEvent::Committed {
                 let cancellable = gio::Cancellable::new();
-                webview.run_javascript("var theme = 'themeAdwaitaDark'", Some(&cancellable), |_|{})
+                let script = format!("initialTheme = '{}'", initial_theme);
+                webview.run_javascript(&script, Some(&cancellable), |_|{});
             }
         ));
 
-        let initial_state = "adwaita".to_variant();
+        
         let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
         action.connect_change_state(clone!(@weak webview => move |a, s| {
             match s {
                 Some(val) => {
                     a.set_state(val);
                     match val.get_str(){
-                        Some(theme) => {
-                            let cancellable = gio::Cancellable::new();
-                            let script = format!("setTheme('{}')", theme);
-                            webview.run_javascript(&script, Some(&cancellable), |_|{});
-                        }
+                        Some(theme) => set_theme(webview, theme),
                         None => println!("Could not set theme, could not extract from variant")
                     }
                 },
@@ -84,7 +90,7 @@ fn main() {
 
         window.connect_configure_event(clone!(@weak window => @default-return false, move|_,_| {
             let size = window.get_size();
-            let new_settings = Settings { width: size.0, height: size.1 };
+            let new_settings = Settings { width: size.0, height: size.1, theme: settings.borrow().theme.clone() };
             let old_settings = settings.replace(new_settings);
             if old_settings.width != size.0 || old_settings.height != size.1 {
                 save_settings(&old_settings);
