@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="styles/themes/adwaita-dark.css">
     </head>
 
-    <body class="adwaita">
+    <body class="themeAdwaita">
         <div>
             <select id="themeChooser">
                 <option>Adwaita</option>
@@ -17,10 +17,10 @@
 
         <grid-splitter id="splitter" orientation="HORIZONTAL">
             <div id="first" slot="first" class="tableContainer">
-                <folder-table></folder-table>
+                <folder-table id="folderLeft"></folder-table>
             </div>
             <div id="second" slot="second" class="tableContainer">
-                <folder-table></folder-table>
+                <folder-table id="folderRight"></folder-table>
             </div>
         </grid-splitter>
 

@@ -1,0 +1,24 @@
+:root .themeAdwaitaDark {
+    background-color: rgb(94, 94, 94);
+    --exif-color: rgb(255, 255, 173);
+
+    --vtc-color: white;
+    --vtc-item-img-color: white;
+    --vtc-background-color: #2f2f2f;
+    --vtc-caption-color: #dddddd;
+    --vtc-caption-background-color: #353535;
+    --vtc-caption-background-hover-color: #464646;
+    --vtc-caption-separator-color: #737373;
+    --vtc-selected-background-color: #3584e4;
+
+    --vtc-scrollbar-button-display: none;
+    --vtc-scrollbar-width: 12px;
+    --vtc-scrollbar-background-color: transparent;
+    --vtc-scrollbar-border-width: 0px;
+    --vtc-scrollbar-grip-width: 4px;
+    --vtc-scrollbar-grip-active-color: var(--vtc-selected-background-color);
+    --vtc-scrollbar-grip-radius: 999px;
+    --vtc-scrollbar-grip-right: 1px;
+    --vtc-scrollbar-right-margin: 6px;
+}
+

@@ -8,6 +8,15 @@ class Folder extends HTMLElement {
         super()
     }
     
+    changeTheme(theme) {
+        ["themeAdwaita", "themeAdwaitaDark"].forEach(n => this.table.classList.remove(n))
+        const style = getComputedStyle(document.body)
+        exifColor = style.getPropertyValue('--exif-color') 
+        selectedExifColor = style.getPropertyValue('--selected-exif-color') 
+        this.table.classList.add(theme)    
+        this.table.themeChanged()
+    }
+
     connectedCallback() {
         this.innerHTML = "<virtual-table-component></virtual-table-component>"
         this.table = this.firstChild
