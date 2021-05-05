@@ -53,7 +53,7 @@ fn main() {
                     match val.get_str(){
                         Some(theme) => {
                             let cancellable = gio::Cancellable::new();
-                            let script = format!("alert('{}')", theme);
+                            let script = format!("setTheme('{}')", theme);
                             webview.run_javascript(&script, Some(&cancellable), |_|{});
                         }
                         None => println!("Could not set theme, could not extract from variant")

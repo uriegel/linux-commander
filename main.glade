@@ -82,7 +82,7 @@
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="action-name">app.themes</property>
-            <property name="action-target">'adwaita'</property>
+            <property name="action-target">'themeAdwaita'</property>
             <property name="text" translatable="yes">_Adwaita</property>
           </object>
           <packing>
@@ -97,7 +97,7 @@
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="action-name">app.themes</property>
-            <property name="action-target">'adwaitaDark'</property>
+            <property name="action-target">'themeAdwaitaDark'</property>
             <property name="text" translatable="yes">Adwaita _dark</property>
           </object>
           <packing>
