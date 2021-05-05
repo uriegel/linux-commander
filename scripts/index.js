@@ -23,7 +23,7 @@ themeChooser.onchange = () => {
     }
 }
 
-changeTheme("themeAdwaita")
+changeTheme(theme)
 
 
 

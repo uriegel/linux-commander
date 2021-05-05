@@ -2,7 +2,7 @@ use std::{cell::RefCell, env};
 use gio::{ActionMapExt, ApplicationFlags, prelude::{ApplicationExt, ApplicationExtManual}};
 use glib::clone;
 use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, WidgetExt, prelude::BuilderExtManual};
-use webkit2gtk::{WebView, WebViewExt, WebInspectorExt};
+use webkit2gtk::{LoadEvent, WebInspectorExt, WebView, WebViewExt};
 use tokio::runtime::Runtime;
 
 use crate::settings::{Settings, save_settings};
@@ -37,6 +37,13 @@ fn main() {
         let uri = format!("http://localhost:{}", port);
         webview.load_uri(&uri);
 
+        webview.connect_load_changed(clone!(@weak webview => move |_,load_event| 
+            if load_event == LoadEvent::Committed {
+                let cancellable = gio::Cancellable::new();
+                webview.run_javascript("var theme = 'themeAdwaitaDark'", Some(&cancellable), |_|{})
+            }
+        ));
+
         let action = gio::SimpleAction::new("devtools", None);
         action.connect_activate(clone!(@weak webview => move |_,_| match webview.get_inspector() {
             Some(inspector) => inspector.show(),
@@ -51,7 +58,7 @@ fn main() {
         {
             let current_settings = settings.borrow();
             if current_settings.width != 0 {
-                window.set_default_size(current_settings.width as i32, current_settings.height as i32);
+                window.set_default_size(current_settings.width, current_settings.height);
             }
         }
 
