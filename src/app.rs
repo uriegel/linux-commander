@@ -5,7 +5,7 @@ use glib::{ToVariant, clone};
 use gtk::{Application, Builder, GtkApplicationExt, prelude::BuilderExtManual};
 use webkit2gtk::{LoadEvent, WebView, WebViewExt, WebInspectorExt};
 
-use crate::{mainwindow::MainWindow, settings};
+use crate::{mainwindow::MainWindow};
 
 fn set_theme(webview: WebView, theme: &str) {
     webview.run_javascript(&format!("setTheme('{}')", theme), Some(&gio::Cancellable::new()), |_|{});
@@ -33,44 +33,44 @@ impl App {
         }
 
         application.connect_startup(move |application| {
-            let settings = RefCell::new(settings::initialize());
-            let initial_theme;
-            {
-                initial_theme  = settings.borrow().theme.clone();
-            }
+            //let settings = RefCell::new(settings::initialize());
+            // let initial_theme;
+            // {
+            //     initial_theme  = settings.theme.clone();
+            // }
 
             let builder = Builder::new();
             builder.add_from_file("main.glade").unwrap();
-            let main_window = MainWindow::new(builder.get_object("window").unwrap(), settings);
+            let main_window = MainWindow::new(builder.get_object("window").unwrap());
             let webview: WebView = builder.get_object("webview").unwrap();
             let uri = format!("http://localhost:{}", port);
             webview.load_uri(&uri);
     
-            let initial_state = initial_theme.to_variant();
+            //let initial_state = initial_theme.to_variant();
     
             let weak_webview = webview.clone();
     
             webview.connect_load_changed(move |_,load_event| 
                 if load_event == LoadEvent::Committed {
-                    let script = format!("initialTheme = '{}'", initial_theme);
-                    weak_webview.run_javascript(&script, Some(&gio::Cancellable::new()), |_|{});
+                    // let script = format!("initialTheme = '{}'", initial_theme);
+                    // weak_webview.run_javascript(&script, Some(&gio::Cancellable::new()), |_|{});
                 }
             );
             
-            let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
-            action.connect_change_state(clone!(@weak webview => move |a, s| {
-                match s {
-                    Some(val) => {
-                        a.set_state(val);
-                        match val.get_str(){
-                            Some(theme) => set_theme(webview, theme),
-                            None => println!("Could not set theme, could not extract from variant")
-                        }
-                    },
-                    None => println!("Could not set theme")
-                }
-            }));
-            application.add_action(&action);
+            // let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
+            // action.connect_change_state(clone!(@weak webview => move |a, s| {
+            //     match s {
+            //         Some(val) => {
+            //             a.set_state(val);
+            //             match val.get_str(){
+            //                 Some(theme) => set_theme(webview, theme),
+            //                 None => println!("Could not set theme, could not extract from variant")
+            //             }
+            //         },
+            //         None => println!("Could not set theme")
+            //     }
+            // }));
+            // application.add_action(&action);
     
             let action = gio::SimpleAction::new("devtools", None);
             action.connect_activate(clone!(@weak webview => move |_,_| match webview.get_inspector() {
@@ -83,7 +83,7 @@ impl App {
             webview.connect_context_menu(|_, _, _, _| true );
     
             main_window.add_to_application(application);
-            main_window.initialize(&settings);
+            main_window.initialize();
             main_window.show_all();
         });
     
