@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{fs, fs::{File}, io::{ErrorKind, Read, Write}, path::{PathBuf}};
+use std::{fs, fs::File, io::{ErrorKind, Read, Write}, path::PathBuf};
 
 #[derive(Serialize, Deserialize)]
 pub struct Settings {
@@ -39,7 +39,7 @@ pub fn initialize() -> Settings {
 
 // TODO: save theme
 
-pub fn save_settings(settings: &Settings) {
+pub fn save_settings(settings: Settings) {
     let settings_path = get_settings_path();
     let json = serde_json::to_string(&settings).unwrap();
     let mut file = File::create(settings_path).unwrap();
