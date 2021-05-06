@@ -600,10 +600,15 @@ class VirtualTableComponent extends HTMLElement {
 		const range = this.scrollbarElement.clientHeight - gripHeight
 		const maxPosition = this.items.length - this.itemsPerPage
 		const onmove = evt => {
-			const delta = evt.y - startPos
-			const factor = Math.min(1, (Math.max(0, delta * 1.0 / range)))
-			this.scrollPosition = Math.floor(factor * maxPosition)
-            this.render()
+            const newTime = performance.now()
+            const diff = newTime - this.wheelTimestamp
+            if (diff > 20) {
+                this.wheelTimestamp = newTime
+    			const delta = evt.y - startPos
+	    		const factor = Math.min(1, (Math.max(0, delta * 1.0 / range)))
+		    	this.scrollPosition = Math.floor(factor * maxPosition)
+                this.render()
+            }
 			evt.preventDefault()
 			evt.stopPropagation()
 		}
@@ -624,7 +629,7 @@ class VirtualTableComponent extends HTMLElement {
 		if (this.items.length > this.itemsPerPage) {
             const newTime = performance.now()
             const diff = newTime - this.wheelTimestamp
-            if (diff > 10) {
+            if (diff > 20) {
                 this.wheelTimestamp = newTime
     
                 var delta = evt.deltaY / Math.abs(evt.deltaY) * 3

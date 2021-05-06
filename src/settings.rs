@@ -1,56 +1,90 @@
 use serde::{Deserialize, Serialize};
-use std::{fs, fs::File, io::{ErrorKind, Read, Write}, path::PathBuf};
+use std::{ fs, fs::File, io::{ErrorKind, Read, Write}, path::PathBuf};
+
+const SIZE_NAME: &str = "windowSize";
+const SETTINGS_NAME: &str = "settings";
+
+#[derive(Serialize, Deserialize)]
+pub struct SizeSettings {
+    pub width: i32,
+    pub height: i32,
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct Settings {
-    pub width: i32,
-    pub height: i32,
     #[serde(default="get_default_theme")]
     pub theme: String,
 }
 
-fn get_default_theme()->String {
-    "themeAdwaitaDark".to_string()
+pub fn initialize_theme() -> String {
+    match initialize(SETTINGS_NAME) {
+        Some(contents) => {
+            let settings: Settings = serde_json::from_str(&contents).unwrap();
+            settings.theme
+        }            
+        None => get_default_theme()
+    }
 }
 
-pub fn initialize() -> Settings {
-    let settings = get_settings_path();
-    println!("{:?}",settings);
-    match File::open(settings) {
+pub fn initialize_size() -> (i32, i32) {
+    match initialize(SIZE_NAME) {
+        Some(contents) => {
+            let settings: SizeSettings = serde_json::from_str(&contents).unwrap();
+            (settings.width, settings.height)
+        }            
+        None => (500, 800)
+    }
+}
+            
+pub fn save_size(size: (i32, i32)) {
+    let settings = SizeSettings {width: size.0, height: size.1};
+    let json = serde_json::to_string(&settings).unwrap();
+    save_settings(SIZE_NAME, json);
+}
+
+pub fn save_theme(theme: &str) {
+    let settings = Settings {theme: theme.to_string()};
+    let json = serde_json::to_string(&settings).unwrap();
+    save_settings(SETTINGS_NAME, json);
+}
+
+fn save_settings(name: &str, content: String) {
+    let settings_path = get_settings_path(name);
+    let mut file = File::create(settings_path).unwrap();
+    file.write(&content.into_bytes()).expect("Unable to write settings");
+}
+
+fn initialize(name: &str) -> Option<String> {
+    let settings = get_settings_path(name);
+    let result = match File::open(settings) {
         Ok(mut file) => {   
             let mut contents = String::new();
             file.read_to_string(&mut contents).unwrap();
-            let settings: Settings = serde_json::from_str(&contents).unwrap();
-            settings
+            Some(contents)
         }
         Err(e) if e.kind() == ErrorKind::NotFound => {
-            let settings = get_settings_path();
+            let settings = get_settings_path(name);
             let mut path = settings.clone();
             path.pop();
             if fs::metadata(path.clone()).is_ok() == false {
                 fs::create_dir(path).unwrap();
             }
-            File::create(settings).unwrap();
-            Settings { width: 0, height: 0, theme: get_default_theme() }
+            None
         },
         Err(e) => panic!("Error: {:?}", e)
-    }
+    };
+    result
 }
 
-// TODO: save theme
-
-pub fn save_settings(settings: Settings) {
-    let settings_path = get_settings_path();
-    let json = serde_json::to_string(&settings).unwrap();
-    let mut file = File::create(settings_path).unwrap();
-    file.write(&json.into_bytes()).expect("Unable to write settings");
-}
-
-fn get_settings_path() -> PathBuf {
+fn get_settings_path(name: &str) -> PathBuf {
     let home_dir = dirs::home_dir().unwrap();
     [ 
         home_dir.to_str().unwrap(), 
         ".config", 
         "commander",
-        "options"].iter().collect()
+        name].iter().collect()
+}
+
+fn get_default_theme()->String {
+    "themeAdwaita".to_string()
 }
