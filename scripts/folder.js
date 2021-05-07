@@ -6,20 +6,10 @@ var selectedExifColor = getComputedStyle(document.body).getPropertyValue('--sele
 class Folder extends HTMLElement {
     constructor() {
         super()
-    }
-    
-    changeTheme(theme) {
-        ["themeAdwaita", "themeAdwaitaDark"].forEach(n => this.table.classList.remove(n))
-        const style = getComputedStyle(document.body)
-        exifColor = style.getPropertyValue('--exif-color') 
-        selectedExifColor = style.getPropertyValue('--selected-exif-color') 
-        this.table.classList.add(theme)    
-        this.table.themeChanged()
-    }
-
-    connectedCallback() {
+        this.folderId = this.attributes.id
         this.innerHTML = "<virtual-table-component></virtual-table-component>"
         this.table = this.firstChild
+
 
         const widthstr = localStorage.getItem("widths")
         const widths = widthstr ? JSON.parse(widthstr) : []
@@ -68,6 +58,20 @@ class Folder extends HTMLElement {
         this.table.setRestriction((items, restrictValue) => items.filter(n => n.name.toLowerCase().startsWith(restrictValue.toLowerCase())))
 
 
+
+        
+    }
+    
+    changeTheme(theme) {
+        ["themeAdwaita", "themeAdwaitaDark"].forEach(n => this.table.classList.remove(n))
+        const style = getComputedStyle(document.body)
+        exifColor = style.getPropertyValue('--exif-color') 
+        selectedExifColor = style.getPropertyValue('--selected-exif-color') 
+        this.table.classList.add(theme)    
+        this.table.themeChanged()
+    }
+
+    connectedCallback() {
         var saveWidths = true
         this.table.addEventListener("columnwidths", e => {
             if (saveWidths) 

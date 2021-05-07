@@ -268,6 +268,7 @@ template.innerHTML = `
 class VirtualTableComponent extends HTMLElement {
     constructor() {
         super()
+        this.items = []
         this.scrollPosition = 0
         this.attachShadow({ mode: 'open'})
         this.shadowRoot.appendChild(template.content.cloneNode(true))
@@ -388,7 +389,7 @@ class VirtualTableComponent extends HTMLElement {
         }
 
         window.addEventListener('resize', () => {
-            if (!this.resizeTimer && this.items)
+            if (!this.resizeTimer)
                 this.resizeTimer = setTimeout(() => {
                     this.resizeTimer = 0
                     const lastItemsPerPage = this.itemsPerPage
@@ -564,13 +565,15 @@ class VirtualTableComponent extends HTMLElement {
     measureItemsPerPage() { this.itemsPerPage = Math.floor((this.tableroot.clientHeight - this.headRow.clientHeight) / this.itemHeight) }
     
     measureItemHeight() {
-        const tr = document.createElement('tr')
-        const td = document.createElement('td')
-        this.columns[0].render(td, this.items[0])
-        tr.appendChild(td)
-        this.tableBody.appendChild(tr)
-        this.itemHeight = tr.offsetHeight
-        this.tableBody.removeChild(tr)
+        if (this.items.length > 0) {
+            const tr = document.createElement('tr')
+            const td = document.createElement('td')
+            this.columns[0].render(td, this.items[0])
+            tr.appendChild(td)
+            this.tableBody.appendChild(tr)
+            this.itemHeight = tr.offsetHeight
+            this.tableBody.removeChild(tr)
+        }
     }
 
     onPageMouseDown(evt) {
