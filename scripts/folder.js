@@ -1,4 +1,5 @@
 import './components/virtualtablecomponent.js'
+import { getProcessor } from './processors/processor.js'
 
 var exifColor = getComputedStyle(document.body).getPropertyValue('--exif-color') 
 var selectedExifColor = getComputedStyle(document.body).getPropertyValue('--selected-exif-color') 
@@ -9,8 +10,12 @@ class Folder extends HTMLElement {
         this.folderId = this.attributes.id
         this.innerHTML = "<virtual-table-component></virtual-table-component>"
         this.table = this.firstChild
+        
+        const result = getProcessor(this.folderId)
+        this.processor = result.processor
+        this.processor.getColumns()
 
-
+        
         const widthstr = localStorage.getItem("widths")
         const widths = widthstr ? JSON.parse(widthstr) : []
         let columns = [{
