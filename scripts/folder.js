@@ -7,50 +7,17 @@ var selectedExifColor = getComputedStyle(document.body).getPropertyValue('--sele
 class Folder extends HTMLElement {
     constructor() {
         super()
-        this.folderId = this.attributes.id
+        this.folderId = this.getAttribute("id")
         this.innerHTML = "<virtual-table-component></virtual-table-component>"
         this.table = this.firstChild
         
         const result = getProcessor(this.folderId)
         this.processor = result.processor
-        this.processor.getColumns()
+        const columns = this.processor.getColumns()
+        this.table.setColumns(columns)
 
         
-        const widthstr = localStorage.getItem("widths")
-        const widths = widthstr ? JSON.parse(widthstr) : []
-        let columns = [{
-            name: "Name",
-            isSortable: true,
-            render: (td, item) => {
-                var t = document.querySelector('#folder')
-                td.appendChild(document.importNode(t.content, true))
-                const span = document.createElement('span')
-                span.innerHTML = item.name
-                td.appendChild(span)
-            }
-        }, {
-            name: "Ext.",
-            render: (td, item) => td.innerHTML = item.ext
-        }, {
-            name: "Datum",
-            isSortable: true,
-            render: (td, item) => {
-                td.innerHTML = item.date
-                td.style.color = item.isSelected ? selectedExifColor : exifColor
-            }
-        }, {
-            name: "Größe",
-            isSortable: true,
-            isRightAligned: true,
-            render: (td, item) => {
-                td.innerHTML = item.size
-                td.classList.add("rightAligned")
-            }
-        }]
-        if (widths)
-            columns = columns.map((n, i)=> ({ ...n, width: widths[i]}))
             
-        this.table.setColumns(columns)
         const items = Array.from(Array(4000).keys())
             .map(index => ({
                 name: "Eintrag " + index,
@@ -77,11 +44,7 @@ class Folder extends HTMLElement {
     }
 
     connectedCallback() {
-        var saveWidths = true
-        this.table.addEventListener("columnwidths", e => {
-            if (saveWidths) 
-                localStorage.setItem("widths", JSON.stringify(e.detail))
-        })
+        this.table.addEventListener("columnwidths", e => this.processor.saveWidths(e.detail))
         this.table.addEventListener("columclick", e => {
             console.log("columclick", e.detail)
         })
