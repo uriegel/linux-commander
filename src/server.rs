@@ -7,11 +7,16 @@ use tokio::runtime::Runtime;
 use crate::requests::get_root_items;
 
 async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
-    let items = get_root_items();
-    Ok(warp::reply::json(&items))
+    match get_root_items() {
+        Ok(items ) => Ok (warp::reply::json(&items)),
+        Err(err) => {
+            println!("Could not get root items: {}", err);
+            Err(warp::reject())
+        }
+    }
 }
 
-async fn get_items(path: String)->Result<impl warp::Reply, warp::Rejection> {
+async fn get_items(_path: String)->Result<impl warp::Reply, warp::Rejection> {
     let our_ids = vec![1, 3, 7, 77];
     Ok(warp::reply::json(&our_ids))
 }
