@@ -4,9 +4,11 @@ use chrono::Utc;
 use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{Body, HeaderMap, Response}};
 use tokio::runtime::Runtime;
 
+use crate::requests::get_root_items;
+
 async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
-    let our_ids = vec![1, 3, 7, 144];
-    Ok(warp::reply::json(&our_ids))
+    let items = get_root_items();
+    Ok(warp::reply::json(&items))
 }
 
 async fn get_items(path: String)->Result<impl warp::Reply, warp::Rejection> {

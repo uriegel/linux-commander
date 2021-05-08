@@ -1,9 +1,16 @@
-use std::time::Duration;
+use serde::{Serialize};
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RootItem {
+    pub name: String,
+    pub mount_point: String,
+    pub size: u64
+}
 
-use warp::Reply;
-
-// pub async fn get_root(reply: Reply)->Reply {
-//     //tokio::time::delay_for(Duration::from_secs(3)).await;
-//     //"Das kommt".to_string()
-//     reply
-// }
+pub fn get_root_items()->Vec<RootItem> {
+    vec![ RootItem { 
+        mount_point: "na was".to_string(), 
+        name: "dreif".to_string(),
+        size: 3456u64
+    }]
+}
