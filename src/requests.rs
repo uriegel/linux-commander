@@ -1,7 +1,7 @@
-use std::path::PathBuf;
+use core::fmt;
+use std::process::Command;
 
-use block_utils::{BlockUtilsError, FilesystemType, get_block_partitions_iter, get_device_info, get_mountpoint, is_mounted};
-use serde::{Serialize, Serializer};
+use serde::{Serialize};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -14,39 +14,53 @@ pub struct RootItem {
     pub is_mounted: bool
 }
 
-pub fn get_root_items()->Result<Vec<RootItem>, BlockUtilsError> {
-    Ok(get_block_partitions_iter()?
-        .map(|path| match get_device_info(path.clone()) {
-            Ok(item) => {
-                let (mount_point, is_mounted) = 
-                    match get_mountpoint(path.clone()) {
-                        Ok(mount_point) => 
-                            match mount_point {
-                                Some(mount_point) => (mount_point.to_string_lossy().to_string(),
-                                    match is_mounted(mount_point) {
-                                        Ok(is_mounted) => is_mounted,
-                                        _ => false
-                                    }),
-                                None => (String::new(), false)
-                            }
-                            ,
-                        _ => (String::new(), false)
-                    };
-                    (String::new(), false);
-                Some({
-                    RootItem {
-                    name: item.name, 
-                    capacity: item.capacity,
-                    mount_point,
-                    file_system: item.fs_type as i16,
-                    media_type: item.media_type as i16,
-                    is_mounted
-                }})
-            },
-            Err(_) => None
-        })
-        .filter(|item| item.is_some())
-        .map(|item|item.unwrap())
-        .collect())
+pub struct Error {
+    pub message: String
 }
-// TODO remove block_utils from toml
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({})", self.message)
+    }
+}
+
+pub fn get_root_items()->Result<Vec<RootItem>, Error> {
+    let output = Command::new("lsblk")
+        .arg("--bytes")
+        .arg("--output")
+        .arg("SIZE,NAME,LABEL,MOUNTPOINT,FSTYPE")
+        .output().map_err(|e| Error{message: e.to_string()})?;
+    if !output.status.success() {
+        Err(Error {message: "Execution of lsblk failed".to_string()})
+    }
+    else {
+        let lines = String::from_utf8(output.stdout)
+            .map_err(|e| Error{message: e.to_string()})?;
+
+        let lines: Vec<&str> = lines.lines().collect();
+
+        let first_line = lines[0];
+
+        let get_part = |key: &str| {
+            match first_line.match_indices(key).next() {
+                Some((index, _)) => index as u16,
+                None => 0
+            }
+        };
+
+        let column_positions = [
+            0u16, 
+            get_part("NAME"),
+            get_part("LABEL"),
+            get_part("MOUNT"),
+            get_part("FSTYPE")
+        ];
+
+        column_positions
+            .iter()
+            .for_each(|x| println!("{}", x));
+        
+            //.for_each(|x| println!("{}", x));
+        Err(Error {message: "Execution of lsblk failed".to_string()})
+    }
+}
