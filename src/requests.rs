@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use block_utils::{BlockUtilsError, FilesystemType, get_block_partitions_iter, get_device_info, get_mountpoint, is_mounted};
-use serde::{Serialize};
+use serde::{Serialize, Serializer};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -9,8 +9,8 @@ pub struct RootItem {
     pub name: String,
     pub mount_point: String,
     pub capacity: u64,
-    pub media_type: bool,
-    pub file_system: bool,
+    pub media_type: i16,
+    pub file_system: i16,
     pub is_mounted: bool
 }
 
@@ -32,14 +32,14 @@ pub fn get_root_items()->Result<Vec<RootItem>, BlockUtilsError> {
                             ,
                         _ => (String::new(), false)
                     };
-
+                    (String::new(), false);
                 Some({
                     RootItem {
                     name: item.name, 
                     capacity: item.capacity,
                     mount_point,
-                    file_system: true, //item.fs_type,
-                    media_type: false,
+                    file_system: item.fs_type as i16,
+                    media_type: item.media_type as i16,
                     is_mounted
                 }})
             },
