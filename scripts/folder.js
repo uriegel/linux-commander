@@ -16,8 +16,12 @@ class Folder extends HTMLElement {
         const columns = this.processor.getColumns()
         this.table.setColumns(columns)
 
-        
-            
+        ;(async () => {
+            const response = fetch('/commander/getroot');
+            const rootItems = await response.json()
+        })()
+
+                    
         const items = Array.from(Array(4000).keys())
             .map(index => ({
                 name: "Eintrag " + index,

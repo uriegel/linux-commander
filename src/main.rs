@@ -3,6 +3,7 @@ mod server;
 mod settings;
 mod mainwindow;
 mod webview;
+mod requests;
 
 use tokio::runtime::Runtime;
 use app::App;

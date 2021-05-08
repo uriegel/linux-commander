@@ -4,16 +4,22 @@ use chrono::Utc;
 use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{Body, HeaderMap, Response}};
 use tokio::runtime::Runtime;
 
+async fn schrott()->Result<impl warp::Reply, warp::Rejection> {
+    let our_ids = vec![1, 3, 7, 13];
+    Ok(warp::reply::json(&our_ids))
+}
+
 pub fn start(rt: &Runtime, port: u16)-> () {
     println!("Starting server...");
 
     rt.spawn(async move {
         println!("Running test server on http://localhost:{}", port); 
-    
-        let route1 = warp::path!("hello" / String)
-            .map(|name| {
-                format!("Hello, {}!", name)
-            });
+
+        let route1 = warp::get()
+            .and(warp::path("commander"))
+            .and(warp::path("getroot"))
+            .and(warp::path::end())
+            .and_then(schrott);
 
         fn add_headers(reply: File)->Response<Body> {
             let mut header_map = HeaderMap::new();
