@@ -59,8 +59,21 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
         column_positions
             .iter()
             .for_each(|x| println!("{}", x));
+
+        let get_string = |line: &str, pos1, pos2| {
+            line[column_positions[pos1] as usize..column_positions[pos2] as usize]
+                .to_string()
+        };
+
+        let affe = get_string(lines[9], 2, 3);
+        println!("Eins {}", lines[9]);
+        println!("2 {}", column_positions[2]);
+        println!("3 {}", lines[9][5 as usize..].to_string());
+
+            //driveString.substring(column_positions[pos1], column_positions[pos2]).trim()            
+            //driveString.substring(column_positions[pos1], column_positions[pos2]).trim()            
         
-            //.for_each(|x| println!("{}", x));
+        //.for_each(|x| println!("{}", x));
         Err(Error {message: "Execution of lsblk failed".to_string()})
     }
 }
