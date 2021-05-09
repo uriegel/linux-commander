@@ -1,5 +1,5 @@
 use core::fmt;
-use std::process::Command;
+use std::{iter::Take, process::Command};
 
 use serde::{Serialize};
 
@@ -7,12 +7,25 @@ use serde::{Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct RootItem {
     pub name: String,
+    pub display: String,
     pub mount_point: String,
     pub capacity: u64,
-    pub media_type: i16,
-    pub file_system: i16,
-    pub is_mounted: bool
+    pub file_system: String,
 }
+
+trait IteratorExt: Iterator {
+
+    fn take_option(self, n: Option<usize>) -> Take<Self>
+        where
+            Self: Sized {
+        match n {
+            Some(n ) => self.take(n),
+            None => self.take(usize::MAX)
+        }
+    }
+}
+
+impl<I: Iterator> IteratorExt for I {}
 
 pub struct Error {
     pub message: String
@@ -61,19 +74,45 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
             .for_each(|x| println!("{}", x));
 
         let get_string = |line: &str, pos1, pos2| {
-            line[column_positions[pos1] as usize..column_positions[pos2] as usize]
+            let index = column_positions[pos1] as usize;
+            let len = match pos2 {
+                | Some(pos) => Some(column_positions[pos] as usize - index),
+                | None => None
+            }; 
+            let result: String = line
+                .chars()
+                .into_iter()
+                .skip(index)
+                .take_option(len)
+                .collect();
+            result
+                .trim()
                 .to_string()
         };
 
-        let affe = get_string(lines[9], 2, 3);
-        println!("Eins {}", lines[9]);
-        println!("2 {}", column_positions[2]);
-        println!("3 {}", lines[9][5 as usize..].to_string());
+        let items: Vec<RootItem>= lines
+            .iter()
+            .skip(1)
+            .map(|n| {
+                let name = get_string(n, 1, Some(2));
+                match name.bytes().next() {
+                    Some(b) if b > 127 => {
+                        let display = get_string(n, 2, Some(3));
+                        let mount_point = get_string(n, 3, Some(4));
+                        let capacity = match str::parse::<u64>(&get_string(n, 0, Some(1))) {
+                            Ok(val) => val,
+                            _ => 0
+                        };
+                        let file_system = get_string(n, 4, None);
+                        Some(RootItem { name: name[6..].to_string(), display, mount_point, capacity, file_system })
+                    },
+                    _ => None
+                }
+            })
+            .filter(|item| item.is_some())
+            .map(|item|item.unwrap())
+            .collect();
 
-            //driveString.substring(column_positions[pos1], column_positions[pos2]).trim()            
-            //driveString.substring(column_positions[pos1], column_positions[pos2]).trim()            
-        
-        //.for_each(|x| println!("{}", x));
-        Err(Error {message: "Execution of lsblk failed".to_string()})
+        Ok(items)
     }
 }
