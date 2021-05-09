@@ -69,10 +69,6 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
             get_part("FSTYPE")
         ];
 
-        column_positions
-            .iter()
-            .for_each(|x| println!("{}", x));
-
         let get_string = |line: &str, pos1, pos2| {
             let index = column_positions[pos1] as usize;
             let len = match pos2 {
