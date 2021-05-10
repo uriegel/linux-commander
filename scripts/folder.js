@@ -17,25 +17,18 @@ class Folder extends HTMLElement {
         this.table.setColumns(columns)
 
         ;(async () => {
-            const response = fetch('/commander/getroot');
+            const response = await fetch('/commander/getroot');
             const rootItems = await response.json()
+            this.table.setItems(rootItems)
+            this.table.setRestriction((items, restrictValue) => items.filter(n => n.name.toLowerCase().startsWith(restrictValue.toLowerCase())))
         })()
-
-                    
-        const items = Array.from(Array(4000).keys())
-            .map(index => ({
-                name: "Eintrag " + index,
-                ext: "ext",
-                date: "24.03.1999 14:23",
-                size: 2344 + index
-            }))
-        
-        this.table.setItems(items)
-        this.table.setRestriction((items, restrictValue) => items.filter(n => n.name.toLowerCase().startsWith(restrictValue.toLowerCase())))
-
-
-
-        
+        // pub struct RootItem {
+        //     pub name: String,
+        //     pub display: String,
+        //     pub mount_point: String,
+        //     pub capacity: u64,
+        //     pub file_system: String,
+        // }
     }
     
     changeTheme(theme) {

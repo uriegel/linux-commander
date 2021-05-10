@@ -4,13 +4,13 @@ export const getRoot = folderId => {
         const widths = widthstr ? JSON.parse(widthstr) : []
         let columns = [{
             name: "Name",
-            render: (td, item) => td.innerHTML = item.ext
-        }, {
-            name: "Dateisystem",
-            render: (td, item) => td.innerHTML = item.ext
+            render: (td, item) => td.innerHTML = item.name
         }, {
             name: "Mountpoint",
-            render: (td, item) => td.innerHTML = item.ext
+            render: (td, item) => td.innerHTML = item.mountPoint
+        }, {
+            name: "Bezeichnung",
+            render: (td, item) => td.innerHTML = item.display
         }, {
             name: "Größe",
             isRightAligned: true,
