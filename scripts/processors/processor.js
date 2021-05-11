@@ -23,7 +23,6 @@ export const getProcessor = (folderId, path, recentProcessor) => {
             processor: null, 
             changed: false
         }
-
 }
 
   

@@ -11,16 +11,18 @@ class Folder extends HTMLElement {
         this.innerHTML = "<virtual-table-component></virtual-table-component>"
         this.table = this.firstChild
         
-        const result = getProcessor(this.folderId)
+        const result = getProcessor(this.folderId, "root")
         this.processor = result.processor
-        const columns = this.processor.getColumns()
+        const columns = this.processor.getColumns("root")
         this.table.setColumns(columns)
 
         ;(async () => {
-            const response = await fetch('/commander/getroot');
-            const rootItems = await response.json()
-            this.table.setItems(rootItems)
-            this.table.setRestriction((items, restrictValue) => items.filter(n => n.name.toLowerCase().startsWith(restrictValue.toLowerCase())))
+            const items = await this.processor.getItems("root")
+            this.table.setItems(items)
+            this.table.setRestriction((items, restrictValue) => 
+                items.filter(n => n.name.toLowerCase()
+                    .startsWith(restrictValue.toLowerCase())
+                ))
         })()
         // pub struct RootItem {
         //     pub name: String,
