@@ -222,7 +222,7 @@ template.innerHTML = `
             width: 0px;
         }
         #restrictionInput.none {
-            display: block;
+            display: none;
         }
     </style>
     <div class="tableroot" tabIndex=1>
