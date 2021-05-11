@@ -14,6 +14,11 @@ function onTheme(theme) {
     folderRight.changeTheme(theme)
 }
 
+folderLeft.setFocus()
+
+
+
+
 
 
 

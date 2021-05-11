@@ -42,6 +42,8 @@ class Folder extends HTMLElement {
         this.table.themeChanged()
     }
 
+    setFocus() { this.table.setFocus() }
+
     connectedCallback() {
         this.table.addEventListener("columnwidths", e => this.processor.saveWidths(e.detail))
         this.table.addEventListener("columclick", e => {
