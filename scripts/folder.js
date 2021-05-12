@@ -50,38 +50,38 @@ class Folder extends HTMLElement {
             console.log("columnclick", e.detail)
         })
         this.table.addEventListener("enter", evt => {
-            console.log("Enter", evt)
+            console.log("Enter", evt, this.table.items[evt.detail.currentItem])
         })
         this.table.addEventListener("keydown", evt => {
             switch (evt.which) {
                 case 35: // end
                     if (evt.shiftKey) {
-                        const pos = table.getPosition()
-                        table.items.forEach((item, i) => item.isSelected = !item.isNotSelectable && i >= pos)                     
-                        table.refresh()
+                        const pos = this.table.getPosition()
+                        this.table.items.forEach((item, i) => item.isSelected = !item.isNotSelectable && i >= pos)                     
+                        this.table.refresh()
                     }
                     break
                 case 36: // home
                     if (evt.shiftKey) {
-                        const pos = table.getPosition()
-                        table.items.forEach((item, i) => item.isSelected = !item.isNotSelectable && i <= pos)                     
-                        table.refresh()
+                        const pos = this.table.getPosition()
+                        this.table.items.forEach((item, i) => item.isSelected = !item.isNotSelectable && i <= pos)                     
+                        this.table.refresh()
                     }
                     break
                 case 45: { // Ins
-                    const pos = table.getPosition()
-                    table.items[pos].isSelected = !table.items[pos].isSelected 
-                    table.setPosition(pos + 1)
+                    const pos = this.table.getPosition()
+                    this.table.items[pos].isSelected = !this.table.items[pos].isSelected 
+                    this.table.setPosition(pos + 1)
                     break
                 }
                 case 107: { // Numlock +
-                    table.items.forEach(n => n.isSelected = true)
-                    table.refresh()
+                    this.table.items.forEach(n => n.isSelected = true)
+                    this.table.refresh()
                     break
                 }
                 case 109: { // Numlock -
-                    table.items.forEach(n => n.isSelected = false)
-                    table.refresh()
+                    this.table.items.forEach(n => n.isSelected = false)
+                    this.table.refresh()
                     break
                 }
             }
@@ -90,3 +90,7 @@ class Folder extends HTMLElement {
 }
 
 customElements.define('folder-table', Folder)
+
+// TODO: root items are selectable
+// TODO: root items sorting: 1. with mountpoint, 2. without
+// TODO: root items without mountpoint with opacity
