@@ -434,11 +434,15 @@ class VirtualTableComponent extends HTMLElement {
                      + this.scrollPosition
                 if (currentIndex != -1) {
                     this.position = currentIndex
-                    this.render()
+                    this.setFocused()
                     setTimeout(() => this.setFocus())
                 }
                     
             }		
+        }
+
+        this.tableroot.ondblclick = evt => {
+            this.dispatchEvent(new CustomEvent('enter', { detail: { currentItem: this.position } }))
         }
 
         this.restrictionInput.addEventListener("ontransitionend", evt => {
@@ -501,7 +505,7 @@ class VirtualTableComponent extends HTMLElement {
                         remove(element)
                     }
 
-                    this.dispatchEvent(new CustomEvent('columclick', { detail: { column: i, descending, subItem } }))
+                    this.dispatchEvent(new CustomEvent('columnclick', { detail: { column: i, descending, subItem } }))
                 }
             }
             if (n.isRightAligned)
@@ -692,6 +696,9 @@ class VirtualTableComponent extends HTMLElement {
             case 8: // backspace
                 restrictBack()
                 return
+            case 13: // enter
+                this.dispatchEvent(new CustomEvent('enter', { detail: { currentItem: this.position } }))
+                return
             case 27: // esc
                 restrictClose()
                 return
@@ -739,6 +746,15 @@ class VirtualTableComponent extends HTMLElement {
             if (!down && this.position - this.scrollPosition - this.itemsPerPage + 1 >= 0)
                 this.scrollPosition = this.position - this.itemsPerPage + 1
         }
+    }
+
+    setFocused() {
+        Array
+            .from(this.tableBody.children)
+            .forEach(n => n.classList.remove("isCurrent"))
+        let index = this.position - this.scrollPosition
+        if (index > 0 && index < this.items.length) 
+            this.tableBody.children[index].classList.add("isCurrent")
     }
 
     render() {

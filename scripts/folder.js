@@ -46,8 +46,11 @@ class Folder extends HTMLElement {
 
     connectedCallback() {
         this.table.addEventListener("columnwidths", e => this.processor.saveWidths(e.detail))
-        this.table.addEventListener("columclick", e => {
-            console.log("columclick", e.detail)
+        this.table.addEventListener("columnclick", e => {
+            console.log("columnclick", e.detail)
+        })
+        this.table.addEventListener("enter", evt => {
+            console.log("Enter", evt)
         })
         this.table.addEventListener("keydown", evt => {
             switch (evt.which) {
