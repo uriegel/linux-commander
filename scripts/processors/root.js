@@ -6,7 +6,7 @@ export const getRoot = folderId => {
     const getType = () => ROOT
 
     const getColumns = () => {
-        const widthstr = localStorage.getItem(`${folderId}-widths`)
+        const widthstr = localStorage.getItem(`${folderId}-root-widths`)
         const widths = widthstr ? JSON.parse(widthstr) : []
         let columns = [{
             name: "Name",
@@ -36,19 +36,33 @@ export const getRoot = folderId => {
         return columns
     }
 
+    const renderRow = (item, tr) => {
+        if (!item.mountPoint)
+            tr.style.opacity = 0.5
+    }
+
     const getPath = item => item.mountPoint
 
     const getItems = async () => {
-        const response = await fetch('/commander/getroot')
-        return await response.json()
+        const responseStr = await fetch('/commander/getroot')
+        const response = await responseStr.json()
+        const mounted = response.filter(n => n.mountPoint)
+        const unmounted = response.filter(n => !n.mountPoint)
+        return mounted
+            .concat(unmounted)
+            .map(n => { 
+                n.isNotSelectable = true
+                return n
+            })
     }
 
-    const saveWidths = widths => localStorage.setItem(`${folderId}-widths`, JSON.stringify(widths))
+    const saveWidths = widths => localStorage.setItem(`${folderId}-root-widths`, JSON.stringify(widths))
 
     return {
         getType,
         getColumns,
         getItems,
+        renderRow,
         saveWidths, 
         getPath,
     }

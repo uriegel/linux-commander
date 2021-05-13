@@ -761,6 +761,8 @@ class VirtualTableComponent extends HTMLElement {
         this.renderItems()
         this.renderScrollbarGrip()
     }
+
+    renderRow = (item, tr) => {}
     
     renderItems() {
         let last
@@ -777,6 +779,7 @@ class VirtualTableComponent extends HTMLElement {
 
     renderItem(item, index) {
         const tr = document.createElement('tr')
+        this.renderRow(item, tr)
         this.columns.forEach(col => {
             const td = document.createElement('td')
             if (col.isRightAligned)

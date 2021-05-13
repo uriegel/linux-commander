@@ -12,6 +12,8 @@ class Folder extends HTMLElement {
         this.table = this.firstChild
         
         this.changePath()
+
+        this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
     }
     
     changeTheme(theme) {
@@ -54,12 +56,12 @@ class Folder extends HTMLElement {
                     break
                 case 45: { // Ins
                     const pos = this.table.getPosition()
-                    this.table.items[pos].isSelected = !this.table.items[pos].isSelected 
+                    this.table.items[pos].isSelected = !this.table.items[pos].isNotSelectable && !this.table.items[pos].isSelected 
                     this.table.setPosition(pos + 1)
                     break
                 }
                 case 107: { // Numlock +
-                    this.table.items.forEach(n => n.isSelected = true)
+                    this.table.items.forEach(n => n.isSelected = !n.isNotSelectable)
                     this.table.refresh()
                     break
                 }
@@ -99,7 +101,5 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO: root items are selectable
-// TODO: root items sorting: 1. with mountpoint, 2. without
-// TODO: root items without mountpoint with opacity
-// TODO: changePath: mountpoint or name? => rootItem: mountPoint is name, name is 
+// TODO subItem extension in VirtualTableComponent
+// TODO clear view before showing neew column and new items
