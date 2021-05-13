@@ -32,8 +32,8 @@ class Folder extends HTMLElement {
         })
         
         this.table.addEventListener("enter", evt => {
-            const pathPart = this.table.items[evt.detail.currentItem].name
-            this.changePath(pathPart, true)
+            const path = this.processor.getPath(this.table.items[evt.detail.currentItem])
+            this.changePath(path)
         })
         
         this.table.addEventListener("keydown", evt => {
@@ -72,14 +72,14 @@ class Folder extends HTMLElement {
         })
     }
 
-    async changePath(pathPart, partialPath) {
-        const result = getProcessor(this.folderId, pathPart, partialPath, this.processor)
-        this.processor = result.processor
+    async changePath(path) {
+        const result = getProcessor(this.folderId, path, this.processor)
         if (result.changed) {
+            this.processor = result.processor
             const columns = this.processor.getColumns()
             this.table.setColumns(columns)
         }
-        const items = await this.processor.getItems("root")
+        const items = await this.processor.getItems(path)
         this.table.setItems(items)
         this.table.setRestriction((items, restrictValue) => 
             items.filter(n => n.name.toLowerCase()

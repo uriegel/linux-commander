@@ -1,6 +1,10 @@
 import { formatSize } from "./renderTools.js"
 
+export const ROOT = "root"
+
 export const getRoot = folderId => {
+    const getType = () => ROOT
+
     const getColumns = () => {
         const widthstr = localStorage.getItem(`${folderId}-widths`)
         const widths = widthstr ? JSON.parse(widthstr) : []
@@ -32,17 +36,20 @@ export const getRoot = folderId => {
         return columns
     }
 
+    const getPath = item => item.mountPoint
+
     const getItems = async () => {
         const response = await fetch('/commander/getroot')
         return await response.json()
-
     }
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-widths`, JSON.stringify(widths))
 
     return {
+        getType,
         getColumns,
         getItems,
         saveWidths, 
+        getPath,
     }
 }

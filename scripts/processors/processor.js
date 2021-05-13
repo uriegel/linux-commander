@@ -1,13 +1,13 @@
-import { getRoot } from "./root.js"
+import { DIRECTORY, getDirectory } from "./directory.js"
+import { getRoot, ROOT } from "./root.js"
 
-
-export const getProcessor = (folderId, path, partialPath, recentProcessor) => {
+export const getProcessor = (folderId, path, recentProcessor) => {
 
     if (!path)
-        path = localStorage.getItem(`${folderId}-path`) || "root"
+        path = localStorage.getItem(`${folderId}-path`) || ROOT
 
     if (path == "root") {
-        if (recentProcessor && recentProcessor.type == "root")
+        if (recentProcessor && recentProcessor.getType() == ROOT)
             return {
                 processor: recentProcessor, 
                 changed: false
@@ -18,11 +18,18 @@ export const getProcessor = (folderId, path, partialPath, recentProcessor) => {
                 changed: true
             }
     }
-    else 
-        return {
-            processor: null, 
-            changed: false
-        }
+    else {
+        if (recentProcessor && recentProcessor.getType() == DIRECTORY) 
+            return {
+                processor: recentProcessor, 
+                changed: false
+            }
+        else
+            return {
+                processor: getDirectory(folderId, path), 
+                changed: true
+            }
+    }
 }
 
   
