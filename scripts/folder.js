@@ -11,26 +11,7 @@ class Folder extends HTMLElement {
         this.innerHTML = "<virtual-table-component></virtual-table-component>"
         this.table = this.firstChild
         
-        const result = getProcessor(this.folderId, "root")
-        this.processor = result.processor
-        const columns = this.processor.getColumns("root")
-        this.table.setColumns(columns)
-
-        ;(async () => {
-            const items = await this.processor.getItems("root")
-            this.table.setItems(items)
-            this.table.setRestriction((items, restrictValue) => 
-                items.filter(n => n.name.toLowerCase()
-                    .startsWith(restrictValue.toLowerCase())
-                ))
-        })()
-        // pub struct RootItem {
-        //     pub name: String,
-        //     pub display: String,
-        //     pub mount_point: String,
-        //     pub capacity: u64,
-        //     pub file_system: String,
-        // }
+        this.changePath()
     }
     
     changeTheme(theme) {
@@ -49,9 +30,12 @@ class Folder extends HTMLElement {
         this.table.addEventListener("columnclick", e => {
             console.log("columnclick", e.detail)
         })
+        
         this.table.addEventListener("enter", evt => {
-            console.log("Enter", evt, this.table.items[evt.detail.currentItem])
+            const pathPart = this.table.items[evt.detail.currentItem].name
+            this.changePath(pathPart, true)
         })
+        
         this.table.addEventListener("keydown", evt => {
             switch (evt.which) {
                 case 35: // end
@@ -87,6 +71,30 @@ class Folder extends HTMLElement {
             }
         })
     }
+
+    async changePath(pathPart, partialPath) {
+        const result = getProcessor(this.folderId, pathPart, partialPath, this.processor)
+        this.processor = result.processor
+        if (result.changed) {
+            const columns = this.processor.getColumns()
+            this.table.setColumns(columns)
+        }
+        const items = await this.processor.getItems("root")
+        this.table.setItems(items)
+        this.table.setRestriction((items, restrictValue) => 
+            items.filter(n => n.name.toLowerCase()
+                .startsWith(restrictValue.toLowerCase())
+        ))
+       
+        // pub struct RootItem {
+        //     pub name: String,
+        //     pub display: String,
+        //     pub mount_point: String,
+        //     pub capacity: u64,
+        //     pub file_system: String,
+        // }
+
+    }
 }
 
 customElements.define('folder-table', Folder)
@@ -94,3 +102,4 @@ customElements.define('folder-table', Folder)
 // TODO: root items are selectable
 // TODO: root items sorting: 1. with mountpoint, 2. without
 // TODO: root items without mountpoint with opacity
+// TODO: changePath: mountpoint or name? => rootItem: mountPoint is name, name is 

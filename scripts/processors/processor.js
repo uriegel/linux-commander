@@ -1,7 +1,7 @@
 import { getRoot } from "./root.js"
 
 
-export const getProcessor = (folderId, path, recentProcessor) => {
+export const getProcessor = (folderId, path, partialPath, recentProcessor) => {
 
     if (!path)
         path = localStorage.getItem(`${folderId}-path`) || "root"
