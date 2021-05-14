@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{iter::Take, process::Command};
+use std::{fs, iter::Take, process::Command, time::UNIX_EPOCH};
 
 use serde::{Serialize};
 
@@ -11,6 +11,32 @@ pub struct RootItem {
     pub mount_point: String,
     pub capacity: u64,
     pub file_system: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FileItems {
+    pub files: Vec<FileItem>,
+    pub dirs: Vec<DirItem>
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DirItem {
+    name: String
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FileItem {
+    name: String,
+    time: u64,
+    size: u64
+}
+
+enum FileType {
+    Dir(DirItem),
+    File(FileItem)
 }
 
 trait IteratorExt: Iterator {
@@ -110,5 +136,47 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
             .collect();
 
         Ok(items)
+    }
+}
+
+pub fn get_directory_items(path: &str)->Result<FileItems, Error> {
+    match fs::read_dir(path) {
+        Ok(entries) => {
+            let (dirs, files): (Vec<_>, Vec<_>) = entries
+                .filter_map(|entry| {
+                    match entry {
+                        Ok(entry) => 
+                            match entry.metadata() {
+                                Ok(metadata) => Some(match metadata.is_dir() {
+                                    true => FileType::Dir(DirItem {
+                                        name: String::from(entry.file_name().to_str().unwrap()),
+                                    }),
+                                    false => FileType::File(FileItem {
+                                        name: String::from(entry.file_name().to_str().unwrap()),
+                                        time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+                                        size: metadata.len()
+                                    })
+                                }),
+                                _ => None
+                            },
+                        _ => None
+                    }
+                })
+                .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
+            let dirs = dirs
+                    .into_iter()
+                    .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
+                    .collect();
+            let files = files
+                .into_iter()
+                .filter_map(|ft|if let FileType::File(file) = ft {Some(file)} else {None})
+                .collect();
+           
+            Ok(FileItems{
+                dirs,
+                files
+            })
+        },
+        Err(err) => Err(Error {message: format!("read_dir of {} failed: {}", path, err)})
     }
 }

@@ -3,7 +3,7 @@ use chrono::Utc;
 use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{Body, HeaderMap, Response}};
 use tokio::runtime::Runtime;
 use serde::{Deserialize};
-use crate::requests::get_root_items;
+use crate::requests::{get_directory_items, get_root_items};
 
 #[derive(Deserialize)]
 struct GetItems {
@@ -21,9 +21,13 @@ async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
 }
 
 async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
-    println!("{}", param.path);
-    let our_ids = vec![1, 3, 7, 77];
-    Ok(warp::reply::json(&our_ids))
+    match get_directory_items(&param.path) {
+        Ok(items ) => Ok (warp::reply::json(&items)),
+        Err(err) => {
+            println!("Could not get root items: {}", err);
+            Err(warp::reject())
+        }
+    }
 }
 
 pub fn start(rt: &Runtime, port: u16)-> () {
