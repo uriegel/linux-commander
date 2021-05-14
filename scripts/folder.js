@@ -76,6 +76,7 @@ class Folder extends HTMLElement {
 
     async changePath(path) {
         const result = getProcessor(this.folderId, path, this.processor)
+        this.table.setItems([])
         if (result.changed) {
             this.processor = result.processor
             const columns = this.processor.getColumns()
@@ -100,6 +101,3 @@ class Folder extends HTMLElement {
 }
 
 customElements.define('folder-table', Folder)
-
-// TODO subItem extension in VirtualTableComponent
-// TODO clear view before showing neew column and new items

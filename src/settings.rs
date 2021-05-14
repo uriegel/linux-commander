@@ -39,19 +39,19 @@ pub fn initialize_size() -> (i32, i32) {
 pub fn save_size(size: (i32, i32)) {
     let settings = SizeSettings {width: size.0, height: size.1};
     let json = serde_json::to_string(&settings).unwrap();
-    save_settings(SIZE_NAME, json);
+    save_settings(SIZE_NAME, &json);
 }
 
 pub fn save_theme(theme: &str) {
     let settings = Settings {theme: theme.to_string()};
     let json = serde_json::to_string(&settings).unwrap();
-    save_settings(SETTINGS_NAME, json);
+    save_settings(SETTINGS_NAME, &json);
 }
 
-fn save_settings(name: &str, content: String) {
+fn save_settings(name: &str, content: &str) {
     let settings_path = get_settings_path(name);
     let mut file = File::create(settings_path).unwrap();
-    file.write(&content.into_bytes()).expect("Unable to write settings");
+    file.write(content.as_bytes()).expect("Unable to write settings");
 }
 
 fn initialize(name: &str) -> Option<String> {

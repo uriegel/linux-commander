@@ -8,6 +8,11 @@ export const getDirectory = (folderId, path) => {
         const widths = widthstr ? JSON.parse(widthstr) : []
         let columns = [{
             name: "Name",
+            isSortable: true,
+            subItem: {
+                name: "Ext.",
+                isSortable: true
+            },            
             render: (td, item) => {
                 var t = document.querySelector('#driveIcon')
                 td.appendChild(document.importNode(t.content, true))
