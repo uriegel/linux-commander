@@ -1,5 +1,6 @@
 use core::fmt;
 use std::{fs, iter::Take, process::Command, time::UNIX_EPOCH};
+use lexical_sort::{natural_lexical_cmp};
 
 use serde::{Serialize};
 
@@ -163,14 +164,16 @@ pub fn get_directory_items(path: &str)->Result<FileItems, Error> {
                     }
                 })
                 .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
-            let dirs = dirs
-                    .into_iter()
-                    .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
-                    .collect();
-            let files = files
+            let mut dirs: Vec<DirItem> = dirs
+                .into_iter()
+                .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
+                .collect();
+            dirs.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
+            let mut files: Vec<FileItem> = files
                 .into_iter()
                 .filter_map(|ft|if let FileType::File(file) = ft {Some(file)} else {None})
                 .collect();
+            files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
            
             Ok(FileItems{
                 dirs,
