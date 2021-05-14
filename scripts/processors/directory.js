@@ -38,11 +38,25 @@ export const getDirectory = (folderId, path) => {
         return columns
     }
 
+    const getItems = async path => {
+        const responseStr = await fetch(`/commander/getitems?path=${path}`)
+        const response = await responseStr.json()
+        const mounted = response.filter(n => n.mountPoint)
+        const unmounted = response.filter(n => !n.mountPoint)
+        return mounted
+            .concat(unmounted)
+            .map(n => { 
+                n.isNotSelectable = true
+                return n
+            })
+    }    
+
     const saveWidths = widths => localStorage.setItem(`${folderId}-directory-widths`, JSON.stringify(widths))
 
     return {
         getType,
         getColumns,
+        getItems,
         saveWidths
     }
 }

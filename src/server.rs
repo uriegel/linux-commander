@@ -1,10 +1,14 @@
 extern crate chrono;
 use chrono::Utc;
-
 use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{Body, HeaderMap, Response}};
 use tokio::runtime::Runtime;
-
+use serde::{Deserialize};
 use crate::requests::get_root_items;
+
+#[derive(Deserialize)]
+struct GetItems {
+    path: String,
+}
 
 async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
     match get_root_items() {
@@ -16,7 +20,8 @@ async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
     }
 }
 
-async fn get_items(_path: String)->Result<impl warp::Reply, warp::Rejection> {
+async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
+    println!("{}", param.path);
     let our_ids = vec![1, 3, 7, 77];
     Ok(warp::reply::json(&our_ids))
 }
@@ -36,7 +41,8 @@ pub fn start(rt: &Runtime, port: u16)-> () {
         let route_get_items = warp::get()
             .and(warp::path("commander"))
             .and(warp::path("getitems"))
-            .and(warp::path::param())
+            .and(warp::path::end())
+            .and(warp::query::query())
             .and_then(get_items);
 
         fn add_headers(reply: File)->Response<Body> {
