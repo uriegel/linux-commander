@@ -3,11 +3,16 @@ use chrono::Utc;
 use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{Body, HeaderMap, Response}};
 use tokio::runtime::Runtime;
 use serde::{Deserialize};
-use crate::requests::{get_directory_items, get_root_items};
+use crate::requests::{self, get_directory_items, get_root_items};
 
 #[derive(Deserialize)]
 struct GetItems {
     path: String,
+}
+
+#[derive(Deserialize)]
+struct GetIcon {
+    ext: String,
 }
 
 async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
@@ -30,6 +35,10 @@ async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
     }
 }
 
+async fn get_icon(param: GetIcon)->Result<impl warp::Reply, warp::Rejection> {
+    Ok(requests::get_icon(&param.ext))
+}
+
 pub fn start(rt: &Runtime, port: u16)-> () {
     println!("Starting server...");
 
@@ -49,7 +58,14 @@ pub fn start(rt: &Runtime, port: u16)-> () {
             .and(warp::query::query())
             .and_then(get_items);
 
-        fn add_headers(reply: File)->Response<Body> {
+        let route_get_icon = warp::get()
+            .and(warp::path("commander"))
+            .and(warp::path("geticon"))
+            .and(warp::path::end())
+            .and(warp::query::query())
+            .and_then(get_icon);
+
+            fn add_headers(reply: File)->Response<Body> {
             let mut header_map = HeaderMap::new();
             let now = Utc::now();
             let now_str = now.format("%a, %d %h %Y %T GMT").to_string();
@@ -68,6 +84,7 @@ pub fn start(rt: &Runtime, port: u16)-> () {
         let routes = 
             route_get_root
             .or(route_get_items)
+            .or(route_get_icon)
             .or(route_static);
     
         warp::serve(routes)
