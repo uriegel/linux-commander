@@ -753,7 +753,7 @@ class VirtualTableComponent extends HTMLElement {
             .from(this.tableBody.children)
             .forEach(n => n.classList.remove("isCurrent"))
         let index = this.position - this.scrollPosition
-        if (index > 0 && index < this.items.length) 
+        if (index >= 0 && index < this.items.length) 
             this.tableBody.children[index].classList.add("isCurrent")
     }
 

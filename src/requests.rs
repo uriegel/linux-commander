@@ -24,7 +24,8 @@ pub struct FileItems {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DirItem {
-    name: String
+    name: String,
+    is_directory: bool
 }
 
 #[derive(Serialize)]
@@ -162,6 +163,7 @@ pub fn get_directory_items(path: &str)->Result<FileItems, Error> {
                                 Ok(metadata) => Some(match metadata.is_dir() {
                                     true => FileType::Dir(DirItem {
                                         name: String::from(entry.file_name().to_str().unwrap()),
+                                        is_directory: true
                                     }),
                                     false => FileType::File(FileItem {
                                         name: String::from(entry.file_name().to_str().unwrap()),

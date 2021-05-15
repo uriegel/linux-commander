@@ -35,7 +35,8 @@ class Folder extends HTMLElement {
         
         this.table.addEventListener("enter", evt => {
             const path = this.processor.getPath(this.table.items[evt.detail.currentItem])
-            this.changePath(path)
+            if (path)
+                this.changePath(path)
         })
         
         this.table.addEventListener("keydown", evt => {

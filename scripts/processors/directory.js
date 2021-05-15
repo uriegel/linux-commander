@@ -1,9 +1,12 @@
 export const DIRECTORY = "directory"
 import { formatSize } from "./renderTools.js"
+import { ROOT } from "./root.js"
 
 export const getDirectory = (folderId, path) => {
     const getType = () => DIRECTORY
     
+    let currentPath = ""
+
     const getColumns = () => {
         const widthstr = localStorage.getItem(`${folderId}-directory-widths`)
         const widths = widthstr ? JSON.parse(widthstr) : []
@@ -30,7 +33,7 @@ export const getDirectory = (folderId, path) => {
             isSortable: true,
             isRightAligned: true,
             render: (td, item) => {
-                td.innerHTML = formatSize(item.capacity)
+                td.innerHTML = formatSize(item.size)
                 td.classList.add("rightAligned")
             }
         }]
@@ -44,17 +47,32 @@ export const getDirectory = (folderId, path) => {
             tr.style.opacity = 0.5
     }
 
-    // pub struct FileItem {
+    const getParentDir = path => {
+        let pos = path.lastIndexOf('/')
+        return pos ? path.substr(0, pos) : "/"
+    }
+
+    const getPath = item => item.isDirectory 
+        ? item.name != ".."
+            ? currentPath + '/' + item.name 
+            : currentPath != "/"
+                ? getParentDir(currentPath)
+                : ROOT
+        : null
+
+    // FileItem {
     //     name: String,
+    //     isDirectory
     //     time: u64,
     //     size: u64
     // }
-    
     const getItems = async path => {
+        currentPath = path
         const responseStr = await fetch(`/commander/getitems?path=${path}`)
         const response = await responseStr.json()
         return [{
                 name: "..",
+                isDirectory: true,
                 isNotSelectable: true
             }]
             .concat(response.dirs)
@@ -67,7 +85,12 @@ export const getDirectory = (folderId, path) => {
         getType,
         getColumns,
         renderRow,
+        getPath,
         getItems,
         saveWidths
     }
 }
+
+// TODO date
+// TODO icon
+// TODO exif date
