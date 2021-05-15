@@ -1,4 +1,5 @@
 export const DIRECTORY = "directory"
+import { formatSize } from "./renderTools.js"
 
 export const getDirectory = (folderId, path) => {
     const getType = () => DIRECTORY
@@ -38,17 +39,26 @@ export const getDirectory = (folderId, path) => {
         return columns
     }
 
+    const renderRow = (item, tr) => {
+        if (item.isHidden)
+            tr.style.opacity = 0.5
+    }
+
+    // pub struct FileItem {
+    //     name: String,
+    //     time: u64,
+    //     size: u64
+    // }
+    
     const getItems = async path => {
         const responseStr = await fetch(`/commander/getitems?path=${path}`)
         const response = await responseStr.json()
-        const mounted = response.filter(n => n.mountPoint)
-        const unmounted = response.filter(n => !n.mountPoint)
-        return mounted
-            .concat(unmounted)
-            .map(n => { 
-                n.isNotSelectable = true
-                return n
-            })
+        return [{
+                name: "..",
+                isNotSelectable: true
+            }]
+            .concat(response.dirs)
+            .concat(response.files)
     }    
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-directory-widths`, JSON.stringify(widths))
@@ -56,6 +66,7 @@ export const getDirectory = (folderId, path) => {
     return {
         getType,
         getColumns,
+        renderRow,
         getItems,
         saveWidths
     }

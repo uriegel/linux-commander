@@ -1,4 +1,6 @@
 export const formatSize = size => {
+    if (!size)
+        return ""
     let sizeStr = size.toString()
     const sep = '.'
     if (sizeStr.length > 3) {

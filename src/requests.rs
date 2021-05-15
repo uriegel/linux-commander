@@ -70,10 +70,7 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
         .arg("--output")
         .arg("SIZE,NAME,LABEL,MOUNTPOINT,FSTYPE")
         .output().map_err(|e| Error{message: e.to_string()})?;
-    if !output.status.success() {
-        Err(Error {message: "Execution of lsblk failed".to_string()})
-    }
-    else {
+    if output.status.success() {
         let lines = String::from_utf8(output.stdout)
             .map_err(|e| Error{message: e.to_string()})?;
 
@@ -113,7 +110,7 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
                 .to_string()
         };
 
-        let items: Vec<RootItem>= lines
+        let mut items: Vec<RootItem>= lines
             .iter()
             .skip(1)
             .map(|n| {
@@ -135,8 +132,22 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
             .filter(|item| item.is_some())
             .map(|item|item.unwrap())
             .collect();
-
-        Ok(items)
+        let mut result = Vec::<RootItem>::new();
+        if let Some(home) = dirs::home_dir() { 
+            let home_item = RootItem {
+                name: "~".to_string(),
+                display: "".to_string(),
+                mount_point: home.to_str().unwrap().to_string(),
+                capacity: 0,
+                file_system: "".to_string()
+            };
+            result.push(home_item);
+        }
+        result.append(&mut items);
+        Ok(result)
+    }
+    else { 
+        Err(Error {message: "Execution of lsblk failed".to_string()}) 
     }
 }
 

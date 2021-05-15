@@ -43,6 +43,13 @@ export const getRoot = folderId => {
 
     const getPath = item => item.mountPoint
 
+    // pub struct RootItem {
+    //     pub name: String,
+    //     pub display: String,
+    //     pub mountPoint: String,
+    //     pub capacity: u64,
+    //     pub fileSystem: String,
+    // }
     const getItems = async () => {
         const responseStr = await fetch('/commander/getroot')
         const response = await responseStr.json()

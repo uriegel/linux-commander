@@ -88,15 +88,6 @@ class Folder extends HTMLElement {
             items.filter(n => n.name.toLowerCase()
                 .startsWith(restrictValue.toLowerCase())
         ))
-       
-        // pub struct RootItem {
-        //     pub name: String,
-        //     pub display: String,
-        //     pub mount_point: String,
-        //     pub capacity: u64,
-        //     pub file_system: String,
-        // }
-
     }
 }
 
