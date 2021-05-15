@@ -18,7 +18,12 @@ export const getDirectory = (folderId, path) => {
                 isSortable: true
             },            
             render: (td, item) => {
-                var t = document.querySelector('#driveIcon')
+                const selector = item.name == ".." 
+                    ? '#parentIcon' 
+                    : item.isDirectory
+                        ? '#folderIcon'
+                        : '#fileIcon'
+                var t = document.querySelector(selector)
                 td.appendChild(document.importNode(t.content, true))
                 const span = document.createElement('span')
                 span.innerHTML = item.name
