@@ -15,3 +15,22 @@ export const formatSize = size => {
     }
     return sizeStr    
 }
+
+const dateFormat = Intl.DateTimeFormat("de-DE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+})
+
+const timeFormat = Intl.DateTimeFormat("de-DE", {
+    hour: "2-digit",
+    minute: "2-digit"
+})
+
+export const formatDateTime = unixDate => {
+    if (!unixDate)
+        return ''
+
+    let date = new Date(unixDate)
+    return dateFormat.format(date) + " " + timeFormat.format(date)  
+}

@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{fs, iter::Take, process::Command, time::UNIX_EPOCH};
+use std::{fs, iter::Take, process::Command, time::UNIX_EPOCH, u128};
 use lexical_sort::{natural_lexical_cmp};
 
 use serde::{Serialize};
@@ -32,7 +32,7 @@ pub struct DirItem {
 #[serde(rename_all = "camelCase")]
 pub struct FileItem {
     name: String,
-    time: u64,
+    time: u128,
     size: u64
 }
 
@@ -167,7 +167,7 @@ pub fn get_directory_items(path: &str)->Result<FileItems, Error> {
                                     }),
                                     false => FileType::File(FileItem {
                                         name: String::from(entry.file_name().to_str().unwrap()),
-                                        time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+                                        time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
                                         size: metadata.len()
                                     })
                                 }),

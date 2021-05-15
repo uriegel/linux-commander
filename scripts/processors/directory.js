@@ -1,5 +1,5 @@
 export const DIRECTORY = "directory"
-import { formatSize } from "./renderTools.js"
+import { formatDateTime, formatSize } from "./renderTools.js"
 import { ROOT } from "./root.js"
 
 export const getDirectory = (folderId, path) => {
@@ -27,7 +27,7 @@ export const getDirectory = (folderId, path) => {
         }, {
             name: "Datum",
             isSortable: true,
-            render: (td, item) => td.innerHTML = item.mountPoint
+            render: (td, item) => td.innerHTML = formatDateTime(item.time)
         }, {
             name: "Größe",
             isSortable: true,
@@ -91,6 +91,5 @@ export const getDirectory = (folderId, path) => {
     }
 }
 
-// TODO date
 // TODO icon
 // TODO exif date
