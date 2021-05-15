@@ -1,9 +1,13 @@
 extern crate chrono;
+
 use chrono::Utc;
-use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{Body, HeaderMap, Response}};
+use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{self, Body, HeaderMap, Response, StatusCode}};
 use tokio::runtime::Runtime;
+use tokio_util::codec::{BytesCodec, FramedRead};
 use serde::{Deserialize};
 use crate::requests::{self, get_directory_items, get_root_items};
+
+static NOTFOUND: &[u8] = b"Not Found";
 
 #[derive(Deserialize)]
 struct GetItems {
@@ -35,8 +39,27 @@ async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
     }
 }
 
+fn not_found() -> Response<Body> {
+    Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body(NOTFOUND.into())
+        .unwrap()
+}
+
 async fn get_icon(param: GetIcon)->Result<impl warp::Reply, warp::Rejection> {
-    Ok(requests::get_icon(&param.ext))
+    let path = requests::get_icon(&param.ext);
+
+    match tokio::fs::File::open(path).await {
+        Ok(file) => {
+            let stream = FramedRead::new(file, BytesCodec::new());
+            let body = hyper::Body::wrap_stream(stream);
+            Ok (warp::reply::Response::new(body))
+        },
+        Err(err) => {
+            println!("Could not get icon: {}", err);
+            Ok(not_found())
+        }
+    }
 }
 
 pub fn start(rt: &Runtime, port: u16)-> () {
@@ -58,14 +81,15 @@ pub fn start(rt: &Runtime, port: u16)-> () {
             .and(warp::query::query())
             .and_then(get_items);
 
-        let route_get_icon = warp::get()
-            .and(warp::path("commander"))
+        let route_get_icon = 
+            warp::path("commander")
             .and(warp::path("geticon"))
             .and(warp::path::end())
             .and(warp::query::query())
             .and_then(get_icon);
+        // TODO add img header
 
-            fn add_headers(reply: File)->Response<Body> {
+        fn add_headers(reply: File)->Response<Body> {
             let mut header_map = HeaderMap::new();
             let now = Utc::now();
             let now_str = now.format("%a, %d %h %Y %T GMT").to_string();

@@ -23,8 +23,17 @@ export const getDirectory = (folderId, path) => {
                     : item.isDirectory
                         ? '#folderIcon'
                         : '#fileIcon'
-                var t = document.querySelector(selector)
-                td.appendChild(document.importNode(t.content, true))
+                if (selector != '#fileIcon') {
+                    var t = document.querySelector(selector)
+                    td.appendChild(document.importNode(t.content, true))
+                } else {
+                    const img = document.createElement("img")
+                    const ext = ".pdf"
+                    img.src = `commander/geticon?ext=${ext}`
+                    img.classList.add("image")
+                    td.appendChild(img)
+                }
+
                 const span = document.createElement('span')
                 span.innerHTML = item.name
                 td.appendChild(span)

@@ -184,7 +184,7 @@ template.innerHTML = `
             background-color: var(--vtc-scrollbar-grip-active-color);
             transition: background-color 0s;
         }             
-        .svgImage {
+        .image {
             width: 16px;
             height: 16px;
             vertical-align: bottom;
