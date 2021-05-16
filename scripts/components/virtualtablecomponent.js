@@ -554,7 +554,9 @@ class VirtualTableComponent extends HTMLElement {
         this.render()    
     }
 
-    setFocus() { this.tableroot.focus() }
+    setFocus() { 
+        this.tableroot.blur()
+        this.tableroot.focus() }
 
     refresh() { this.render() }
 

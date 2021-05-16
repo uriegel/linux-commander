@@ -112,7 +112,6 @@ export const getDirectory = (folderId, path) => {
     }
 }
 
-// TODO focus: change with tab, set focus on table and tableItem
 // TODO restriction: esc changes path
 // TODO restriction: close on getItems
 // TODO exif date
