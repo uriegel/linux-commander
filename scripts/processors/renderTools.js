@@ -16,6 +16,14 @@ export const formatSize = size => {
     return sizeStr    
 }
 
+export const getExtension = path => {
+    let index = path.lastIndexOf(".")
+    if (index > 0)
+        return path.substr(index)
+    else
+        return ""
+}
+
 const dateFormat = Intl.DateTimeFormat("de-DE", {
     year: "numeric",
     month: "2-digit",

@@ -42,7 +42,7 @@ async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
     match get_directory_items(&param.path) {
         Ok(items ) => Ok (warp::reply::json(&items)),
         Err(err) => {
-            println!("Could not get root items: {}", err);
+            println!("Could not get items: {}", err);
             Err(warp::reject())
         }
     }
@@ -98,11 +98,11 @@ pub fn start(rt: &Runtime, port: u16)-> () {
             .and(warp::path::end())
             .and_then(get_root);
 
-        let route_get_items = warp::get()
+        let route_get_items = warp::post()
             .and(warp::path("commander"))
             .and(warp::path("getitems"))
             .and(warp::path::end())
-            .and(warp::query::query())
+            .and(warp::body::json())
             .and_then(get_items);
 
         let route_get_icon = 

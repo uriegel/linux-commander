@@ -1,5 +1,5 @@
 export const DIRECTORY = "directory"
-import { formatDateTime, formatSize } from "./renderTools.js"
+import { formatDateTime, formatSize, getExtension } from "./renderTools.js"
 import { ROOT } from "./root.js"
 
 export const getDirectory = (folderId, path) => {
@@ -28,10 +28,15 @@ export const getDirectory = (folderId, path) => {
                     td.appendChild(document.importNode(t.content, true))
                 } else {
                     const img = document.createElement("img")
-                    const ext = ".pdf"
-                    img.src = `commander/geticon?ext=${ext}`
-                    img.classList.add("image")
-                    td.appendChild(img)
+                    const ext = getExtension(item.name)
+                    if (ext) {
+                        img.src = `commander/geticon?ext=${ext}`
+                        img.classList.add("image")
+                        td.appendChild(img)
+                    } else {
+                        var t = document.querySelector(selector)
+                        td.appendChild(document.importNode(t.content, true))
+                    }
                 }
 
                 const span = document.createElement('span')
@@ -74,15 +79,17 @@ export const getDirectory = (folderId, path) => {
                 : ROOT
         : null
 
-    // FileItem {
-    //     name: String,
-    //     isDirectory
-    //     time: u64,
-    //     size: u64
-    // }
     const getItems = async path => {
         currentPath = path
-        const responseStr = await fetch(`/commander/getitems?path=${path}`)
+        const responseStr = await fetch("/commander/getitems", { 
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },            
+            body: JSON.stringify({
+                path
+            }) 
+        })
         const response = await responseStr.json()
         return [{
                 name: "..",
@@ -105,5 +112,4 @@ export const getDirectory = (folderId, path) => {
     }
 }
 
-// TODO icon
 // TODO exif date
