@@ -112,4 +112,13 @@ export const getDirectory = (folderId, path) => {
     }
 }
 
+// TODO focus: change with tab, set focus on table and tableItem
+// TODO restriction: esc changes path
+// TODO restriction: close on getItems
 // TODO exif date
+// TODO style Hidden
+// TODO show Hidden
+// TODO change parent: select last folder
+// TODO History wich backspace and ctrl backspace
+// TODO Sorting
+// TODO Restricting per sort table
