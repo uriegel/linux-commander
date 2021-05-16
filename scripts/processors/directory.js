@@ -100,11 +100,20 @@ export const getDirectory = (folderId, path) => {
             .concat(response.files)
     }    
 
+    const addExtensions = async items => {
+        const imageItems = items
+            .map((n, index) => ({ index, name: n.name}))
+            .filter((n, i) => n.name && (n.name.toLowerCase().endsWith(".jpg") || n.name.toLowerCase().endsWith(".png")))
+
+        console.log(imageItems)
+    }
+
     const saveWidths = widths => localStorage.setItem(`${folderId}-directory-widths`, JSON.stringify(widths))
 
     return {
         getType,
         getColumns,
+        addExtensions,
         renderRow,
         getPath,
         getItems,
