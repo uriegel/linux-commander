@@ -445,7 +445,7 @@ class VirtualTableComponent extends HTMLElement {
             this.dispatchEvent(new CustomEvent('enter', { detail: { currentItem: this.position } }))
         }
 
-        this.restrictionInput.addEventListener("ontransitionend", evt => {
+        this.restrictionInput.addEventListener("transitionend", evt => {
             if (this.restrictionInput.classList.contains("invisible"))
                 this.restrictionInput.classList.add("none")
         })
@@ -537,6 +537,7 @@ class VirtualTableComponent extends HTMLElement {
     }
 
     setItems(items) {
+        this.restrictClose()
         this.scrollPosition = 0
         this.items = items
         if (!this.itemHeight) 
@@ -567,6 +568,15 @@ class VirtualTableComponent extends HTMLElement {
         const delta = position - this.position
         this.adjustPosition(delta, true)
         this.render()
+    }
+
+    restrictClose() {
+        if (this.restriction) {
+            this.items = this.restriction.originalItems
+            this.setPosition(0)
+            this.restrictionInput.classList.add("invisible")
+            this.restriction = null
+        }
     }
 
     measureItemsPerPage() { this.itemsPerPage = Math.floor((this.tableroot.clientHeight - this.headRow.clientHeight) / this.itemHeight) }
@@ -669,11 +679,8 @@ class VirtualTableComponent extends HTMLElement {
 
         const restrictClose = () => {
             if (this.restriction) {
-                this.items = this.restriction.originalItems
-                this.setPosition(0)
+                this.restrictClose()
                 this.render()
-                this.restrictionInput.classList.add("invisible")
-                this.restriction = null
                 evt.preventDefault()
                 evt.stopPropagation()
             }

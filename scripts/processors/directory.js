@@ -112,8 +112,6 @@ export const getDirectory = (folderId, path) => {
     }
 }
 
-// TODO restriction: esc changes path
-// TODO restriction: close on getItems
 // TODO exif date
 // TODO style Hidden
 // TODO show Hidden
