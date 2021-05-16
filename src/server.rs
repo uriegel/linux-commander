@@ -19,6 +19,15 @@ struct GetIcon {
     ext: String,
 }
 
+fn create_headers() -> HeaderMap {
+    let mut header_map = HeaderMap::new();
+    let now = Utc::now();
+    let now_str = now.format("%a, %d %h %Y %T GMT").to_string();
+    header_map.insert("Expires", HeaderValue::from_str(now_str.as_str()).unwrap());
+    header_map.insert("Server", HeaderValue::from_str("Mein Server").unwrap());
+    header_map
+}
+
 async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
     match get_root_items() {
         Ok(items ) => Ok (warp::reply::json(&items)),
@@ -49,11 +58,26 @@ fn not_found() -> Response<Body> {
 async fn get_icon(param: GetIcon)->Result<impl warp::Reply, warp::Rejection> {
     let path = requests::get_icon(&param.ext);
 
-    match tokio::fs::File::open(path).await {
+    match tokio::fs::File::open(path.clone()).await {
         Ok(file) => {
             let stream = FramedRead::new(file, BytesCodec::new());
             let body = hyper::Body::wrap_stream(stream);
-            Ok (warp::reply::Response::new(body))
+            let mut response = Response::new(body);
+
+            let headers = response.headers_mut();
+            let mut header_map = create_headers();
+            if let Some(ext_index) = path.rfind('.') {
+
+                let ext = &path[ext_index..].to_lowercase();
+                let content_type = match ext.as_str() {
+                    ".png" => "image/png".to_string(),
+                    ".svg" => "image/svg".to_string(),
+                    _ => "image/jpg".to_string()    
+                };
+                header_map.insert("Content-Type", HeaderValue::from_str(&content_type).unwrap());
+            }
+            headers.extend(header_map);
+            Ok (response)
         },
         Err(err) => {
             println!("Could not get icon: {}", err);
@@ -87,17 +111,11 @@ pub fn start(rt: &Runtime, port: u16)-> () {
             .and(warp::path::end())
             .and(warp::query::query())
             .and_then(get_icon);
-        // TODO add img header
 
         fn add_headers(reply: File)->Response<Body> {
-            let mut header_map = HeaderMap::new();
-            let now = Utc::now();
-            let now_str = now.format("%a, %d %h %Y %T GMT").to_string();
-            header_map.insert("Expires", HeaderValue::from_str(now_str.as_str()).unwrap());
-            header_map.insert("Server", HeaderValue::from_str("Mein Server").unwrap());
-
             let mut res = reply.into_response();
             let headers = res.headers_mut();
+            let header_map = create_headers();
             headers.extend(header_map);
             res
         }

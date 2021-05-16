@@ -218,7 +218,7 @@ pub fn get_icon(ext: &str) -> String {
             DEFAULT_THEME = Some(gtk_icon_theme_get_default());
         }
         let icon_names = gio_sys::g_themed_icon_get_names(icon as *mut GThemedIcon) as *mut *const i8;
-        let icon_info = gtk_icon_theme_choose_icon(DEFAULT_THEME.unwrap(), icon_names, 48, 2);
+        let icon_info = gtk_icon_theme_choose_icon(DEFAULT_THEME.unwrap(), icon_names, 16, 2);
         let filename = gtk_icon_info_get_filename(icon_info);
         let res_str = CStr::from_ptr(filename);
         result = match res_str.to_str() {
