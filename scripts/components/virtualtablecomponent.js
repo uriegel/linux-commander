@@ -24,7 +24,6 @@ class VirtualTableComponent extends HTMLElement {
         this.attachShadow({ mode: 'open'})
 
         const template = document.createElement('template')
-        console.log("Mist", this.getAttribute('additionalStyle'))
         template.innerHTML = `  
             <style>
                 :host {
