@@ -105,7 +105,20 @@ export const getDirectory = (folderId, path) => {
             .map((n, index) => ({ index, name: n.name}))
             .filter((n, i) => n.name && (n.name.toLowerCase().endsWith(".jpg") || n.name.toLowerCase().endsWith(".png")))
 
-        console.log(imageItems)
+        if (imageItems.length) {
+            const responseStr = await fetch("/commander/getexifs", { 
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },            
+                body: JSON.stringify({
+                    path: currentPath,
+                    items: imageItems
+                }) 
+            })
+            const response = await responseStr.json()
+            console.log(response)
+        }
     }
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-directory-widths`, JSON.stringify(widths))

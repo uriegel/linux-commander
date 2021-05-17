@@ -5,13 +5,25 @@ use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{self, Body, Heade
 use tokio::runtime::Runtime;
 use tokio_util::codec::{BytesCodec, FramedRead};
 use serde::{Deserialize};
-use crate::requests::{self, get_directory_items, get_root_items};
+use crate::requests::{self, get_directory_items, get_exif_items, get_root_items};
 
 static NOTFOUND: &[u8] = b"Not Found";
 
 #[derive(Deserialize)]
 struct GetItems {
     path: String,
+}
+
+#[derive(Deserialize)]
+pub struct ExifItem {
+    index: u32,
+    name: String
+}
+
+#[derive(Deserialize)]
+struct GetExifs {
+    path: String,
+    items: Vec<ExifItem>
 }
 
 #[derive(Deserialize)]
@@ -40,6 +52,16 @@ async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
 
 async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
     match get_directory_items(&param.path) {
+        Ok(items ) => Ok (warp::reply::json(&items)),
+        Err(err) => {
+            println!("Could not get items: {}", err);
+            Err(warp::reject())
+        }
+    }
+}
+
+async fn get_exifs(param: GetExifs)->Result<impl warp::Reply, warp::Rejection> {
+    match get_exif_items(&param.path, &param.items) {
         Ok(items ) => Ok (warp::reply::json(&items)),
         Err(err) => {
             println!("Could not get items: {}", err);
@@ -92,13 +114,15 @@ pub fn start(rt: &Runtime, port: u16)-> () {
     rt.spawn(async move {
         println!("Running test server on http://localhost:{}", port); 
 
-        let route_get_root = warp::get()
+        let route_get_root = 
+            warp::get()
             .and(warp::path("commander"))
             .and(warp::path("getroot"))
             .and(warp::path::end())
             .and_then(get_root);
 
-        let route_get_items = warp::post()
+        let route_get_items = 
+            warp::post()
             .and(warp::path("commander"))
             .and(warp::path("getitems"))
             .and(warp::path::end())
@@ -112,7 +136,15 @@ pub fn start(rt: &Runtime, port: u16)-> () {
             .and(warp::query::query())
             .and_then(get_icon);
 
-        fn add_headers(reply: File)->Response<Body> {
+        let route_get_exifs = 
+            warp::post()
+            .and(warp::path("commander"))
+            .and(warp::path("getexifs"))
+            .and(warp::path::end())
+            .and(warp::body::json())
+            .and_then(get_exifs);
+
+            fn add_headers(reply: File)->Response<Body> {
             let mut res = reply.into_response();
             let headers = res.headers_mut();
             let header_map = create_headers();
@@ -126,6 +158,7 @@ pub fn start(rt: &Runtime, port: u16)-> () {
         let routes = 
             route_get_root
             .or(route_get_items)
+            .or(route_get_exifs)
             .or(route_get_icon)
             .or(route_static);
     

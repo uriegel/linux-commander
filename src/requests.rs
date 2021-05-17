@@ -6,6 +6,7 @@ use glib_sys::g_free;
 use gtk_sys::{GtkIconTheme, gtk_icon_info_get_filename, gtk_icon_theme_choose_icon, gtk_icon_theme_get_default};
 use lexical_sort::{natural_lexical_cmp};
 use serde::{Serialize};
+use crate::server::ExifItem;
 
 static mut DEFAULT_THEME: Option<*mut GtkIconTheme> = None;
 
@@ -200,6 +201,10 @@ pub fn get_directory_items(path: &str)->Result<FileItems, Error> {
         },
         Err(err) => Err(Error {message: format!("read_dir of {} failed: {}", path, err)})
     }
+}
+
+pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<FileItems, Error> {
+    Err(Error {message: format!("get_exif_items failed")})
 }
 
 pub fn get_icon(ext: &str) -> String {
