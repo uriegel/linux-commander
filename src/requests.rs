@@ -1,12 +1,12 @@
 use core::fmt;
 use std::{ffi::{CStr, CString, c_void}, fs, iter::Take, process::Command, time::UNIX_EPOCH, u128};
+use exif::{In, Tag};
 use gio_sys::GThemedIcon;
 use glib::{gobject_sys::g_object_unref, object::GObject};
 use glib_sys::g_free;
 use gtk_sys::{GtkIconTheme, gtk_icon_info_get_filename, gtk_icon_theme_choose_icon, gtk_icon_theme_get_default};
 use lexical_sort::{natural_lexical_cmp};
-use serde::{Serialize};
-use crate::server::ExifItem;
+use serde::{Serialize, Deserialize};
 
 static mut DEFAULT_THEME: Option<*mut GtkIconTheme> = None;
 
@@ -40,6 +40,14 @@ pub struct FileItem {
     name: String,
     time: u128,
     size: u64
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ExifItem {
+    index: u32,
+    name: String,
+    #[serde(default)]
+    exifdate: String
 }
 
 enum FileType {
@@ -203,8 +211,30 @@ pub fn get_directory_items(path: &str)->Result<FileItems, Error> {
     }
 }
 
-pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<FileItems, Error> {
-    Err(Error {message: format!("get_exif_items failed")})
+pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, Error> {
+    let result: Vec<ExifItem> = items.iter().filter_map(|n | {
+        let filename = format!("{}/{}", path, n.name);
+        let file = std::fs::File::open(filename).unwrap();
+        let mut bufreader = std::io::BufReader::new(&file);
+        let exifreader = exif::Reader::new();
+        if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
+            let exifdate = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+                Some(info) => Some(info.display_value().to_string()),
+                None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+                    Some(info) => Some(info.display_value().to_string()),
+                    None => None
+                } 
+            };
+            match exifdate {
+                Some(exifdate) => Some(ExifItem { name: n.name.to_string(), index: n.index, exifdate}),
+                None => None
+            }
+        }
+        else {
+            None
+        }
+    }).collect();
+    Ok(result)
 }
 
 pub fn get_icon(ext: &str) -> String {

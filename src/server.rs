@@ -5,19 +5,13 @@ use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{self, Body, Heade
 use tokio::runtime::Runtime;
 use tokio_util::codec::{BytesCodec, FramedRead};
 use serde::{Deserialize};
-use crate::requests::{self, get_directory_items, get_exif_items, get_root_items};
+use crate::requests::{self, ExifItem, get_directory_items, get_exif_items, get_root_items};
 
 static NOTFOUND: &[u8] = b"Not Found";
 
 #[derive(Deserialize)]
 struct GetItems {
     path: String,
-}
-
-#[derive(Deserialize)]
-pub struct ExifItem {
-    index: u32,
-    name: String
 }
 
 #[derive(Deserialize)]
