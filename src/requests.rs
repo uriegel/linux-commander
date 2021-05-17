@@ -1,5 +1,6 @@
 use core::fmt;
 use std::{ffi::{CStr, CString, c_void}, fs, iter::Take, process::Command, time::UNIX_EPOCH, u128};
+use chrono::{Local, NaiveDateTime, TimeZone};
 use exif::{In, Tag};
 use gio_sys::GThemedIcon;
 use glib::{gobject_sys::g_object_unref, object::GObject};
@@ -47,7 +48,7 @@ pub struct ExifItem {
     index: u32,
     name: String,
     #[serde(default)]
-    exifdate: String
+    exifdate: i64
 }
 
 enum FileType {
@@ -212,6 +213,13 @@ pub fn get_directory_items(path: &str)->Result<FileItems, Error> {
 }
 
 pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, Error> {
+
+    fn get_unix_time(str: &str)->i64 {
+        let naive_date_time = NaiveDateTime::parse_from_str(str, "%Y-%m-%d %H:%M:%S").unwrap();
+        let datetime = Local.from_local_datetime(&naive_date_time).unwrap();
+        datetime.timestamp_millis()
+    }
+
     let result: Vec<ExifItem> = items.iter().filter_map(|n | {
         let filename = format!("{}/{}", path, n.name);
         let file = std::fs::File::open(filename).unwrap();
@@ -226,7 +234,11 @@ pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, 
                 } 
             };
             match exifdate {
-                Some(exifdate) => Some(ExifItem { name: n.name.to_string(), index: n.index, exifdate}),
+                Some(exifdate) => Some(ExifItem { 
+                    name: n.name.to_string(), 
+                    index: n.index, 
+                    exifdate: get_unix_time(&exifdate)
+                }),
                 None => None
             }
         }

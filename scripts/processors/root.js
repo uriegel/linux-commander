@@ -63,7 +63,7 @@ export const getRoot = folderId => {
             })
     }
 
-    const addExtensions = async items => {}
+    const addExtensions = async items => false
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-root-widths`, JSON.stringify(widths))
 

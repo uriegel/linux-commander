@@ -2,6 +2,9 @@ export const DIRECTORY = "directory"
 import { formatDateTime, formatSize, getExtension } from "./renderTools.js"
 import { ROOT } from "./root.js"
 
+var exifColor = getComputedStyle(document.body).getPropertyValue('--exif-color') 
+var selectedExifColor = getComputedStyle(document.body).getPropertyValue('--selected-exif-color') 
+
 export const getDirectory = (folderId, path) => {
     const getType = () => DIRECTORY
     
@@ -46,7 +49,11 @@ export const getDirectory = (folderId, path) => {
         }, {
             name: "Datum",
             isSortable: true,
-            render: (td, item) => td.innerHTML = formatDateTime(item.time)
+            render: (td, item) => {
+                td.innerHTML = formatDateTime(item.exifdate || item.time)
+                if (item.exifdate)
+                    td.style.color = item.isSelected ? selectedExifColor : exifColor
+            }
         }, {
             name: "Größe",
             isSortable: true,
@@ -117,8 +124,13 @@ export const getDirectory = (folderId, path) => {
                 }) 
             })
             const response = await responseStr.json()
-            console.log(response)
+            response.forEach(n => {
+                items[n.index].exifdate = n.exifdate
+            })
+            return response.length ? true : false
         }
+        else
+            return false
     }
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-directory-widths`, JSON.stringify(widths))
@@ -134,7 +146,7 @@ export const getDirectory = (folderId, path) => {
     }
 }
 
-// TODO exif date
+// TODO exif date: inject style, set class exif
 // TODO style Hidden
 // TODO show Hidden
 // TODO change parent: select last folder

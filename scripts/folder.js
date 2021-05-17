@@ -89,7 +89,8 @@ class Folder extends HTMLElement {
             items.filter(n => n.name.toLowerCase()
                 .startsWith(restrictValue.toLowerCase())
         ))
-        this.processor.addExtensions(items)
+        if (await this.processor.addExtensions(items))
+            this.table.refresh()
     }
 }
 
