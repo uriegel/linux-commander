@@ -5,7 +5,7 @@ class Folder extends HTMLElement {
     constructor() {
         super()
         this.folderId = this.getAttribute("id")
-        const additionalStyle = ".exif {color: var(--exif-color);} .isSelected .exif {color: var(--selected-exif-color);}"
+        const additionalStyle = ".exif {color: var(--exif-color);} .isSelected .exif {color: var(--selected-exif-color); }"
         this.innerHTML = `<virtual-table-component additionalStyle='${additionalStyle}'></virtual-table-component>`
         this.table = this.firstChild
         

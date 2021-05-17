@@ -2,9 +2,6 @@ export const DIRECTORY = "directory"
 import { formatDateTime, formatSize, getExtension } from "./renderTools.js"
 import { ROOT } from "./root.js"
 
-var exifColor = getComputedStyle(document.body).getPropertyValue('--exif-color') 
-var selectedExifColor = getComputedStyle(document.body).getPropertyValue('--selected-exif-color') 
-
 export const getDirectory = (folderId, path) => {
     const getType = () => DIRECTORY
     
@@ -69,7 +66,7 @@ export const getDirectory = (folderId, path) => {
     }
 
     const renderRow = (item, tr) => {
-        if (item.isHidden)
+        if (item.name[0] == '.')
             tr.style.opacity = 0.5
     }
 
@@ -146,7 +143,6 @@ export const getDirectory = (folderId, path) => {
     }
 }
 
-// TODO style Hidden
 // TODO show Hidden
 // TODO change parent: select last folder
 // TODO History wich backspace and ctrl backspace
