@@ -52,7 +52,7 @@ export const getDirectory = (folderId, path) => {
             render: (td, item) => {
                 td.innerHTML = formatDateTime(item.exifdate || item.time)
                 if (item.exifdate)
-                    td.style.color = item.isSelected ? selectedExifColor : exifColor
+                    td.classList.add("exif")
             }
         }, {
             name: "Größe",
@@ -146,7 +146,6 @@ export const getDirectory = (folderId, path) => {
     }
 }
 
-// TODO exif date: inject style, set class exif
 // TODO style Hidden
 // TODO show Hidden
 // TODO change parent: select last folder

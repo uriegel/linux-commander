@@ -1,14 +1,12 @@
 import './components/virtualtablecomponent.js'
 import { getProcessor } from './processors/processor.js'
 
-var exifColor = getComputedStyle(document.body).getPropertyValue('--exif-color') 
-var selectedExifColor = getComputedStyle(document.body).getPropertyValue('--selected-exif-color') 
-
 class Folder extends HTMLElement {
     constructor() {
         super()
         this.folderId = this.getAttribute("id")
-        this.innerHTML = "<virtual-table-component></virtual-table-component>"
+        const additionalStyle = ".exif {color: var(--exif-color);} .isSelected .exif {color: var(--selected-exif-color);}"
+        this.innerHTML = `<virtual-table-component additionalStyle='${additionalStyle}'></virtual-table-component>`
         this.table = this.firstChild
         
         this.changePath()
@@ -18,9 +16,6 @@ class Folder extends HTMLElement {
     
     changeTheme(theme) {
         ["themeAdwaita", "themeAdwaitaDark"].forEach(n => this.table.classList.remove(n))
-        const style = getComputedStyle(document.body)
-        exifColor = style.getPropertyValue('--exif-color') 
-        selectedExifColor = style.getPropertyValue('--selected-exif-color') 
         this.table.classList.add(theme)    
         this.table.themeChanged()
     }

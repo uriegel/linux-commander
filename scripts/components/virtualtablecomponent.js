@@ -1,252 +1,3 @@
-const template = document.createElement('template')
-template.innerHTML = `  
-    <style>
-        :host {
-            --vtc-color: black;
-            --vtc-background-color: white;
-            --vtc-caption-color: white;
-            --vtc-selected-background-color: blue;
-            --vtc-caption-background-color: blue;
-            --vtc-caption-background-hover-color: #0063ff;
-            --vtc-caption-separator-color: white;
-            --vtc-selected-color:  white;
-            --vtc-selected-background-color: blue;
-            --vtc-current-color: lightgray;
-            --vtc-current-focus-color: red;
-        
-            --vtc-font-size: 100%;
-            --vtc-scrollbar-width: 16px;
-            --vtc-scrollbar-border-color: gray;
-            --vtc-scrollbar-border-width: 1px;
-            --vtc-scrollbar-background-color: white;
-            --vtc-scrollbar-button-background-color: white;
-            --vtc-scrollbar-button-color: #666;
-            --vtc-scrollbar-button-hover-color: #555
-            --vtc-scrollbar-button-active-color: #444
-            --vtc-scrollbar-button-hover-background-color: rgb(209, 209, 209);
-            --vtc-scrollbar-button-active-background-color: #aaa;
-            --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
-            --vtc-scrollbar-grip-hover-color: #bbb;
-            --vtc-scrollbar-grip-active-color: #999;
-            --vtc-scrollbar-grip-right: 0px;
-            --vtc-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
-            --vtc-scrollbar-right-margin: 15px;
-        }
-        .tableroot {
-            position: absolute;
-            height: 100%;
-            overflow: hidden;
-            background-color: var(--vtc-background-color);
-            outline-width: 0px;
-        }        
-        table {
-            width: 100%;
-            border-spacing: 0px;
-            color: var(--vtc-color);
-            font-size: var(--vtc-font-size);
-            table-layout: fixed;
-        }
-        table td {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            user-select: none;
-            transition: padding-right .4s;
-        }            
-        thead { 
-            color: var(--vtc-caption-color);
-            background-color: var(--vtc-caption-background-color);
-        }
-        th {
-            text-overflow: ellipsis;
-            user-select: none;            
-            text-align: left;
-            font-weight: normal;
-            border-left-style: solid;
-            border-left-width: 1px;
-            border-left-color: var(--vtc-caption-separator-color);
-            padding-left: 5px;
-            padding-right: 5px;
-            overflow: hidden;
-            white-space: nowrap;
-            -webkit-user-select: none;            
-            user-select: none;            
-        }
-        th:first-child {
-            border-left-width: 0px;
-        }
-        .tableroot.scrollbarActive td:last-child {
-            padding-right: calc(3px + var(--vtc-scrollbar-right-margin));
-        }
-        .isCurrent {
-            outline-color: var(--vtc-current-color);
-            outline-width: 1px;
-            outline-style: solid;
-            outline-offset: -1px;
-        }
-        .tableroot:focus .isCurrent {
-            outline-color: var(--vtc-current-focus-color);
-        }
-        .rightAligned {
-            text-align: right;  
-        }
-        .isSortable {
-            transition: background-color 0.3s; 
-        }
-        .isSortable:hover {
-            background-color: var(--vtc-caption-background-hover-color);
-        }        
-        .sortAscending:before {
-            position: relative;
-            bottom: 11px;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-bottom: 6px solid var(--vtc-caption-color);
-            content: '';
-            margin-right: 5px;
-        }
-        .sortDescending:before {
-            position: relative;
-            top: 10px;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 6px solid var(--vtc-caption-color);
-            content: '';
-            margin-right: 5px;
-        }
-        .scrollbar {
-            position: absolute;
-            width: var(--vtc-scrollbar-width); 
-            right: 0px;
-            overflow: hidden;
-            border-style: solid;
-            box-sizing: border-box;
-            border-color: var(--vtc-scrollbar-border-color);
-            border-width: var(--vtc-scrollbar-border-width);
-            user-select: none;
-            display: flex;
-            flex-direction: column;  
-            transition: transform 0.3s;  
-            transform-origin: right top;
-            bottom: 0px;
-        }
-        .scrollbar.hidden {
-            transform: scale(0)
-        }
-        .svg {
-            display: var(--vtc-scrollbar-button-display);
-            width: 100%;
-            background-color: var(--vtc-scrollbar-button-background-color);
-            transition: background-color 0.3s;
-        }
-        .svg:hover {
-            background-color: var(--vtc-scrollbar-button-hover-background-color);
-        }
-        .svg:active {
-            background-color: var(--vtc-scrollbar-button-active-background-color);
-            cursor: default;
-        }
-        .button {
-            fill: var(--vtc-scrollbar-button-color);
-            fill-opacity: 1; 
-            stroke:none;            
-        }
-        .scrollbarElement {
-            background-color: var(--vtc-scrollbar-background-color);
-            flex-grow: 1;
-            position: relative;	
-        }
-        .svg:hover .button {
-            fill: var(--vtc-scrollbar-button-hover-color); 
-        }
-        .svg:active .button {
-            fill: var(--vtc-scrollbar-button-active-color); 
-        }        
-        .grip {
-            position: absolute;
-            box-sizing: border-box;
-            border-radius: var(--vtc-scrollbar-grip-radius);
-            background-color: var(--vtc-scrollbar-grip-color);
-            width: var(--vtc-scrollbar-grip-width);
-            right: var(--vtc-scrollbar-grip-right);
-            transition: background-color 0.5s, width 0.5s;
-        }   
-        .scrollbar:hover .grip {
-            width: calc(100% - var(--vtc-scrollbar-grip-right));
-        }
-        .scrollbar:active .grip {
-            width: calc(100% - var(--vtc-scrollbar-grip-right));
-        }
-        .grip:hover {
-            background-color: var(--vtc-scrollbar-grip-hover-color);
-        }
-        .grip:active {
-            background-color: var(--vtc-scrollbar-grip-active-color);
-            transition: background-color 0s;
-        }             
-        .image {
-            width: 16px;
-            height: 16px;
-            vertical-align: bottom;
-            margin-right: 3px;	
-        }
-        .svgImagePath {
-            fill: var(--vtc-item-img-color);   
-        }
-        .isSelected {
-            color: var(--vtc-selected-color);
-            background-color: var(--vtc-selected-background-color);
-        }
-        .isSelected .svgImagePath {
-            fill: var(--vtc-selected-color);   
-        }
-        #restrictionInput {
-            width: 70%;
-            bottom: 10px;
-            height: 18px; 
-            position: absolute;
-            left: 5px;
-            box-sizing: border-box;
-            border-width: 1px;
-            border-radius: 5px;
-            padding: 1px 3px;
-            border-style: solid;
-            border-color: gray;
-            color: var(--vtc-color);
-            background-color: var(--vtc-background-color);
-            box-shadow: 3px 5px 12px 3px rgba(136, 136, 136, 0.55);    
-            transition: opacity 0.5s, width 0.5s;
-        }
-        #restrictionInput.invisible {
-            opacity: 0;
-            width: 0px;
-        }
-        #restrictionInput.none {
-            display: none;
-        }
-    </style>
-    <div class="tableroot" tabIndex=1>
-        <table>
-            <thead>
-                <tr></tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <input id="restrictionInput" class="invisible none" >
-    </div>
-    <div class="scrollbar hidden">
-        <svg class="svg" viewBox="0 0 100 100" >
-            <path class="button" d="M 20,70 50,30 80,70 Z" / >
-        </svg>
-        <div class="scrollbarElement">
-            <div class="grip"></div>
-        </div>
-        <svg class="svg" viewBox="0 0 100 100" >
-            <path class="button" d="M 80,30 50,70 20,30 Z" />
-        </svg>
-    </div>
-` 
-
 /**
  * @typedef {Object} Column
  * @property {string} title Title of column
@@ -271,6 +22,257 @@ class VirtualTableComponent extends HTMLElement {
         this.items = []
         this.scrollPosition = 0
         this.attachShadow({ mode: 'open'})
+
+        const template = document.createElement('template')
+        console.log("Mist", this.getAttribute('additionalStyle'))
+        template.innerHTML = `  
+            <style>
+                :host {
+                    --vtc-color: black;
+                    --vtc-background-color: white;
+                    --vtc-caption-color: white;
+                    --vtc-selected-background-color: blue;
+                    --vtc-caption-background-color: blue;
+                    --vtc-caption-background-hover-color: #0063ff;
+                    --vtc-caption-separator-color: white;
+                    --vtc-selected-color:  white;
+                    --vtc-selected-background-color: blue;
+                    --vtc-current-color: lightgray;
+                    --vtc-current-focus-color: red;
+                
+                    --vtc-font-size: 100%;
+                    --vtc-scrollbar-width: 16px;
+                    --vtc-scrollbar-border-color: gray;
+                    --vtc-scrollbar-border-width: 1px;
+                    --vtc-scrollbar-background-color: white;
+                    --vtc-scrollbar-button-background-color: white;
+                    --vtc-scrollbar-button-color: #666;
+                    --vtc-scrollbar-button-hover-color: #555
+                    --vtc-scrollbar-button-active-color: #444
+                    --vtc-scrollbar-button-hover-background-color: rgb(209, 209, 209);
+                    --vtc-scrollbar-button-active-background-color: #aaa;
+                    --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
+                    --vtc-scrollbar-grip-hover-color: #bbb;
+                    --vtc-scrollbar-grip-active-color: #999;
+                    --vtc-scrollbar-grip-right: 0px;
+                    --vtc-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
+                    --vtc-scrollbar-right-margin: 15px;
+                }
+                .tableroot {
+                    position: absolute;
+                    height: 100%;
+                    overflow: hidden;
+                    background-color: var(--vtc-background-color);
+                    outline-width: 0px;
+                }        
+                table {
+                    width: 100%;
+                    border-spacing: 0px;
+                    color: var(--vtc-color);
+                    font-size: var(--vtc-font-size);
+                    table-layout: fixed;
+                }
+                table td {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    user-select: none;
+                    transition: padding-right .4s;
+                }            
+                thead { 
+                    color: var(--vtc-caption-color);
+                    background-color: var(--vtc-caption-background-color);
+                }
+                th {
+                    text-overflow: ellipsis;
+                    user-select: none;            
+                    text-align: left;
+                    font-weight: normal;
+                    border-left-style: solid;
+                    border-left-width: 1px;
+                    border-left-color: var(--vtc-caption-separator-color);
+                    padding-left: 5px;
+                    padding-right: 5px;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    -webkit-user-select: none;            
+                    user-select: none;            
+                }
+                th:first-child {
+                    border-left-width: 0px;
+                }
+                .tableroot.scrollbarActive td:last-child {
+                    padding-right: calc(3px + var(--vtc-scrollbar-right-margin));
+                }
+                .isCurrent {
+                    outline-color: var(--vtc-current-color);
+                    outline-width: 1px;
+                    outline-style: solid;
+                    outline-offset: -1px;
+                }
+                .tableroot:focus .isCurrent {
+                    outline-color: var(--vtc-current-focus-color);
+                }
+                .rightAligned {
+                    text-align: right;  
+                }
+                .isSortable {
+                    transition: background-color 0.3s; 
+                }
+                .isSortable:hover {
+                    background-color: var(--vtc-caption-background-hover-color);
+                }        
+                .sortAscending:before {
+                    position: relative;
+                    bottom: 11px;
+                    border-left: 4px solid transparent;
+                    border-right: 4px solid transparent;
+                    border-bottom: 6px solid var(--vtc-caption-color);
+                    content: '';
+                    margin-right: 5px;
+                }
+                .sortDescending:before {
+                    position: relative;
+                    top: 10px;
+                    border-left: 4px solid transparent;
+                    border-right: 4px solid transparent;
+                    border-top: 6px solid var(--vtc-caption-color);
+                    content: '';
+                    margin-right: 5px;
+                }
+                .scrollbar {
+                    position: absolute;
+                    width: var(--vtc-scrollbar-width); 
+                    right: 0px;
+                    overflow: hidden;
+                    border-style: solid;
+                    box-sizing: border-box;
+                    border-color: var(--vtc-scrollbar-border-color);
+                    border-width: var(--vtc-scrollbar-border-width);
+                    user-select: none;
+                    display: flex;
+                    flex-direction: column;  
+                    transition: transform 0.3s;  
+                    transform-origin: right top;
+                    bottom: 0px;
+                }
+                .scrollbar.hidden {
+                    transform: scale(0)
+                }
+                .svg {
+                    display: var(--vtc-scrollbar-button-display);
+                    width: 100%;
+                    background-color: var(--vtc-scrollbar-button-background-color);
+                    transition: background-color 0.3s;
+                }
+                .svg:hover {
+                    background-color: var(--vtc-scrollbar-button-hover-background-color);
+                }
+                .svg:active {
+                    background-color: var(--vtc-scrollbar-button-active-background-color);
+                    cursor: default;
+                }
+                .button {
+                    fill: var(--vtc-scrollbar-button-color);
+                    fill-opacity: 1; 
+                    stroke:none;            
+                }
+                .scrollbarElement {
+                    background-color: var(--vtc-scrollbar-background-color);
+                    flex-grow: 1;
+                    position: relative;	
+                }
+                .svg:hover .button {
+                    fill: var(--vtc-scrollbar-button-hover-color); 
+                }
+                .svg:active .button {
+                    fill: var(--vtc-scrollbar-button-active-color); 
+                }        
+                .grip {
+                    position: absolute;
+                    box-sizing: border-box;
+                    border-radius: var(--vtc-scrollbar-grip-radius);
+                    background-color: var(--vtc-scrollbar-grip-color);
+                    width: var(--vtc-scrollbar-grip-width);
+                    right: var(--vtc-scrollbar-grip-right);
+                    transition: background-color 0.5s, width 0.5s;
+                }   
+                .scrollbar:hover .grip {
+                    width: calc(100% - var(--vtc-scrollbar-grip-right));
+                }
+                .scrollbar:active .grip {
+                    width: calc(100% - var(--vtc-scrollbar-grip-right));
+                }
+                .grip:hover {
+                    background-color: var(--vtc-scrollbar-grip-hover-color);
+                }
+                .grip:active {
+                    background-color: var(--vtc-scrollbar-grip-active-color);
+                    transition: background-color 0s;
+                }             
+                .image {
+                    width: 16px;
+                    height: 16px;
+                    vertical-align: bottom;
+                    margin-right: 3px;	
+                }
+                .svgImagePath {
+                    fill: var(--vtc-item-img-color);   
+                }
+                .isSelected {
+                    color: var(--vtc-selected-color);
+                    background-color: var(--vtc-selected-background-color);
+                }
+                .isSelected .svgImagePath {
+                    fill: var(--vtc-selected-color);   
+                }
+                #restrictionInput {
+                    width: 70%;
+                    bottom: 10px;
+                    height: 18px; 
+                    position: absolute;
+                    left: 5px;
+                    box-sizing: border-box;
+                    border-width: 1px;
+                    border-radius: 5px;
+                    padding: 1px 3px;
+                    border-style: solid;
+                    border-color: gray;
+                    color: var(--vtc-color);
+                    background-color: var(--vtc-background-color);
+                    box-shadow: 3px 5px 12px 3px rgba(136, 136, 136, 0.55);    
+                    transition: opacity 0.5s, width 0.5s;
+                }
+                #restrictionInput.invisible {
+                    opacity: 0;
+                    width: 0px;
+                }
+                #restrictionInput.none {
+                    display: none;
+                }
+                ${this.getAttribute('additionalStyle')}
+            </style>
+            <div class="tableroot" tabIndex=1>
+                <table>
+                    <thead>
+                        <tr></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <input id="restrictionInput" class="invisible none" >
+            </div>
+            <div class="scrollbar hidden">
+                <svg class="svg" viewBox="0 0 100 100" >
+                    <path class="button" d="M 20,70 50,30 80,70 Z" / >
+                </svg>
+                <div class="scrollbarElement">
+                    <div class="grip"></div>
+                </div>
+                <svg class="svg" viewBox="0 0 100 100" >
+                    <path class="button" d="M 80,30 50,70 20,30 Z" />
+                </svg>
+            </div>
+        ` 
         this.shadowRoot.appendChild(template.content.cloneNode(true))
         this.wheelTimestamp = performance.now()
 
