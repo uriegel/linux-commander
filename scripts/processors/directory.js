@@ -66,7 +66,7 @@ export const getDirectory = (folderId, path) => {
     }
 
     const renderRow = (item, tr) => {
-        if (item.name[0] == '.')
+        if (item.isHidden)
             tr.style.opacity = 0.5
     }
 
@@ -74,6 +74,8 @@ export const getDirectory = (folderId, path) => {
         let pos = path.lastIndexOf('/')
         return pos ? path.substr(0, pos) : "/"
     }
+
+    const getCurrentPath = () => currentPath
 
     const getPath = item => item.isDirectory 
         ? item.name != ".."
@@ -137,13 +139,13 @@ export const getDirectory = (folderId, path) => {
         getColumns,
         addExtensions,
         renderRow,
+        getCurrentPath,
         getPath,
         getItems,
         saveWidths
     }
 }
 
-// TODO show Hidden
 // TODO change parent: select last folder
 // TODO History wich backspace and ctrl backspace
 // TODO Sorting

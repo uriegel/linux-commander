@@ -20,6 +20,11 @@ class Folder extends HTMLElement {
         this.table.themeChanged()
     }
 
+    showHidden(hidden) {
+        this.showHiddenItems = hidden
+        this.changePath(this.processor.getCurrentPath())
+    }
+
     setFocus() { this.table.setFocus() }
 
     connectedCallback() {
@@ -78,7 +83,12 @@ class Folder extends HTMLElement {
             const columns = this.processor.getColumns()
             this.table.setColumns(columns)
         }
-        const items = await this.processor.getItems(path)
+        let items = (await this.processor.getItems(path)).map(n => {
+            n.isHidden = n.name && n.name[0] == '.' && n.name[1] != '.'
+            return n
+        })
+        if (!this.showHiddenItems)
+            items = items.filter(n => n.isHidden == false)
         this.table.setItems(items)
         this.table.setRestriction((items, restrictValue) => 
             items.filter(n => n.name.toLowerCase()

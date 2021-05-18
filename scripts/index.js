@@ -4,7 +4,7 @@ import './folder.js'
 const folderLeft = document.getElementById("folderLeft")
 const folderRight = document.getElementById("folderRight")
 
-const theme = initializeOnTheme(onTheme)
+const theme = initializeCallbacks(onTheme, onShowHidden)
 onTheme(theme)
 
 function onTheme(theme) {
@@ -12,6 +12,11 @@ function onTheme(theme) {
     document.body.classList.add(theme)    
     folderLeft.changeTheme(theme)
     folderRight.changeTheme(theme)
+}
+
+function onShowHidden(hidden) {
+    folderLeft.showHidden(hidden)
+    folderRight.showHidden(hidden)
 }
 
 folderLeft.setFocus()

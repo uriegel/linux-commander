@@ -1,5 +1,6 @@
-function initializeOnTheme(onTheme) {
+function initializeCallbacks(onTheme, onShowHidden) {
     onThemeCallback = onTheme
+    onShowHiddenCallback = onShowHidden
     return initialTheme
 }
 
@@ -10,7 +11,8 @@ function setTheme(theme) {
 }
 
 function showHidden(hidden) {
-    console.log("showHidden", hidden)
+    if (onShowHiddenCallback)
+        onShowHiddenCallback(hidden)
 }
 
 var onThemeCallback

@@ -41,6 +41,8 @@ export const getRoot = folderId => {
             tr.style.opacity = 0.5
     }
 
+    const getCurrentPath = () => ROOT
+
     const getPath = item => item.mountPoint
 
     // pub struct RootItem {
@@ -74,6 +76,7 @@ export const getRoot = folderId => {
         addExtensions,
         renderRow,
         saveWidths, 
+        getCurrentPath,
         getPath,
     }
 }
