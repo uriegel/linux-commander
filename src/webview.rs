@@ -36,14 +36,17 @@ impl MainWebView {
 
         let initial_bool_state = false.to_variant();
         let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
-//        let weak_webview = webview.clone();
+        let weak_webview = webview.clone();
         action.connect_change_state(move |a, s| {
             match s {
                 Some(val) => {
                     a.set_state(val);
                     match val.get::<bool>(){
-                        Some(theme) => println!("ShowHidden {}", theme),
-                        None => println!("Could not set theme, could not extract from variant")
+                        Some(show_hidden) => weak_webview.run_javascript(
+                            &format!("showHidden({})", show_hidden),
+                            Some(&gio::Cancellable::new()),
+                            |_|{}),
+                        None => println!("Could not set ShowHidden, could not extract from variant")
                     }
                 },
                 None => println!("Could not set theme")

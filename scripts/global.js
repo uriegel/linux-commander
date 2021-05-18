@@ -9,5 +9,9 @@ function setTheme(theme) {
         onThemeCallback(theme)
 }
 
+function showHidden(hidden) {
+    console.log("showHidden", hidden)
+}
+
 var onThemeCallback
 var initialTheme
