@@ -21,5 +21,9 @@
     --vtc-scrollbar-grip-radius: 999px;
     --vtc-scrollbar-grip-right: 1px;
     --vtc-scrollbar-right-margin: 6px;
+
+    --gridsplitter-grip-color : #262626;
+    --gridsplitter-grip-hover-color : #383838;
+    --gridsplitter-grip-active-color : #585858;;
 }
 

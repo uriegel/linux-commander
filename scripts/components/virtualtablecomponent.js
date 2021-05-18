@@ -63,6 +63,7 @@ class VirtualTableComponent extends HTMLElement {
                     overflow: hidden;
                     background-color: var(--vtc-background-color);
                     outline-width: 0px;
+                    outline-style: none;
                 }        
                 table {
                     width: 100%;
