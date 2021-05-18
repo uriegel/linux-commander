@@ -32,11 +32,16 @@ class Folder extends HTMLElement {
         this.table.addEventListener("columnclick", e => {
             console.log("columnclick", e.detail)
         })
-        
-        this.table.addEventListener("enter", evt => {
-            const path = this.processor.getPath(this.table.items[evt.detail.currentItem])
-            if (path)
-                this.changePath(path)
+
+        this.table.addEventListener("enter", async evt => {
+            const [path, recentFolder] = this.processor.getPath(this.table.items[evt.detail.currentItem])
+            if (path) {
+                await this.changePath(path)
+                if (recentFolder) {
+                    const index = this.table.items.findIndex(n => n.name == recentFolder)
+                    this.table.setPosition(index)
+                }
+            }
         })
         
         this.table.addEventListener("keydown", evt => {
@@ -77,18 +82,23 @@ class Folder extends HTMLElement {
 
     async changePath(path) {
         const result = getProcessor(this.folderId, path, this.processor)
+        let items = (await result.processor.getItems(path)).map(n => {
+            n.isHidden = n.name && n.name[0] == '.' && n.name[1] != '.'
+            return n
+        })
+        if (!this.showHiddenItems)
+            items = items.filter(n => n.isHidden == false)
+        if (!items)
+            return
+
+
         this.table.setItems([])
         if (result.changed) {
             this.processor = result.processor
             const columns = this.processor.getColumns()
             this.table.setColumns(columns)
         }
-        let items = (await this.processor.getItems(path)).map(n => {
-            n.isHidden = n.name && n.name[0] == '.' && n.name[1] != '.'
-            return n
-        })
-        if (!this.showHiddenItems)
-            items = items.filter(n => n.isHidden == false)
+    
         this.table.setItems(items)
         this.table.setRestriction((items, restrictValue) => 
             items.filter(n => n.name.toLowerCase()
@@ -100,3 +110,11 @@ class Folder extends HTMLElement {
 }
 
 customElements.define('folder-table', Folder)
+
+// TODO Sorting
+// TODO Restricting per sort table
+
+// TODO path in edit field
+// TODO Save last path
+
+// TODO History wich backspace and ctrl backspace

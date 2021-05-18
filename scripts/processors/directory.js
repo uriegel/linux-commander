@@ -72,21 +72,20 @@ export const getDirectory = (folderId, path) => {
 
     const getParentDir = path => {
         let pos = path.lastIndexOf('/')
-        return pos ? path.substr(0, pos) : "/"
+        return [pos ? path.substr(0, pos) : "/", path.substr(pos + 1)]
     }
 
     const getCurrentPath = () => currentPath
 
     const getPath = item => item.isDirectory 
         ? item.name != ".."
-            ? currentPath + '/' + item.name 
+            ? [currentPath + '/' + item.name, null]
             : currentPath != "/"
                 ? getParentDir(currentPath)
-                : ROOT
-        : null
+                : [ROOT, null]
+        : [null, null]
 
     const getItems = async path => {
-        currentPath = path
         const responseStr = await fetch("/commander/getitems", { 
             method: 'POST', 
             headers: {
@@ -97,13 +96,16 @@ export const getDirectory = (folderId, path) => {
             }) 
         })
         const response = await responseStr.json()
-        return [{
+        let result = [{
                 name: "..",
                 isDirectory: true,
                 isNotSelectable: true
             }]
             .concat(response.dirs)
             .concat(response.files)
+        if (result && result.length)
+            currentPath = path
+        return result
     }    
 
     const addExtensions = async items => {
@@ -145,8 +147,3 @@ export const getDirectory = (folderId, path) => {
         saveWidths
     }
 }
-
-// TODO change parent: select last folder
-// TODO History wich backspace and ctrl backspace
-// TODO Sorting
-// TODO Restricting per sort table

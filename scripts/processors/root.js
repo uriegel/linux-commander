@@ -43,7 +43,7 @@ export const getRoot = folderId => {
 
     const getCurrentPath = () => ROOT
 
-    const getPath = item => item.mountPoint
+    const getPath = item => [item.mountPoint, null]
 
     // pub struct RootItem {
     //     pub name: String,
