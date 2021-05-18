@@ -1,5 +1,5 @@
 use gio::{ActionMapExt, SimpleAction};
-use glib::{ToVariant };
+use glib::{ToVariant};
 use gtk::{Application, Builder, GtkApplicationExt, prelude::BuilderExtManual};
 use webkit2gtk::{LoadEvent, WebInspectorExt, WebView, WebViewExt};
 
@@ -33,6 +33,24 @@ impl MainWebView {
         });
         application.add_action(&action);
         application.set_accels_for_action("app.devtools", &["F12"]);
+
+        let initial_bool_state = false.to_variant();
+        let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
+//        let weak_webview = webview.clone();
+        action.connect_change_state(move |a, s| {
+            match s {
+                Some(val) => {
+                    a.set_state(val);
+                    match val.get::<bool>(){
+                        Some(theme) => println!("ShowHidden {}", theme),
+                        None => println!("Could not set theme, could not extract from variant")
+                    }
+                },
+                None => println!("Could not set theme")
+            }
+        });
+        application.add_action(&action);
+        application.set_accels_for_action("app.showhidden", &["<Ctrl>H"]);
 
         let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
         let weak_webview = webview.clone();
