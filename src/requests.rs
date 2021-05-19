@@ -48,7 +48,7 @@ pub struct ExifItem {
     index: u32,
     name: String,
     #[serde(default)]
-    exifdate: i64
+    exiftime: i64
 }
 
 enum FileType {
@@ -226,18 +226,18 @@ pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, 
         let mut bufreader = std::io::BufReader::new(&file);
         let exifreader = exif::Reader::new();
         if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
-            let exifdate = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+            let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
                 Some(info) => Some(info.display_value().to_string()),
                 None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
                     Some(info) => Some(info.display_value().to_string()),
                     None => None
                 } 
             };
-            match exifdate {
-                Some(exifdate) => Some(ExifItem { 
+            match exiftime {
+                Some(exiftime) => Some(ExifItem { 
                     name: n.name.to_string(), 
                     index: n.index, 
-                    exifdate: get_unix_time(&exifdate)
+                    exiftime: get_unix_time(&exiftime)
                 }),
                 None => None
             }

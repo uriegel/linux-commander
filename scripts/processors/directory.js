@@ -47,8 +47,8 @@ export const getDirectory = (folderId, path) => {
             name: "Datum",
             isSortable: true,
             render: (td, item) => {
-                td.innerHTML = formatDateTime(item.exifdate || item.time)
-                if (item.exifdate)
+                td.innerHTML = formatDateTime(item.exiftime || item.time)
+                if (item.exiftime)
                     td.classList.add("exif")
             }
         }, {
@@ -126,7 +126,7 @@ export const getDirectory = (folderId, path) => {
             })
             const response = await responseStr.json()
             response.forEach(n => {
-                items[n.index].exifdate = n.exifdate
+                items[n.index].exiftime = n.exiftime
             })
             return response.length ? true : false
         }

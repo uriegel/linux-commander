@@ -311,7 +311,7 @@ class VirtualTableComponent extends HTMLElement {
             document.body.style.cursor = this.draggingReady ? 'ew-resize' : 'auto'
         }
 
-        const onMouseDown = evt => {
+        const onColumnMouseDown = evt => {
             if (this.draggingReady) {
                 const th = evt.target
                 const mouseX = evt.offsetX + th.clientLeft
@@ -408,7 +408,7 @@ class VirtualTableComponent extends HTMLElement {
             this.draggingReady = false
             document.body.style.cursor = 'auto'
         })        
-        this.headRow.addEventListener('mousedown', onMouseDown)
+        this.headRow.addEventListener('mousedown', onColumnMouseDown)
 
         this.upButton.onmousedown = () => mouseRepeat(() => {
             this.scrollPosition = Math.max(this.scrollPosition - 1, 0)
@@ -466,6 +466,10 @@ class VirtualTableComponent extends HTMLElement {
     
         columns.forEach((n, i) => {
             const th = document.createElement('th')
+            th.ondblclick = evt => {
+                evt.stopPropagation()
+                evt.preventDefault()
+            }
             if (n.width)
                 th.style.width = n.width + '%'
             if (n.isSortable) {
