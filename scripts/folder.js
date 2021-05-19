@@ -34,11 +34,11 @@ class Folder extends HTMLElement {
             if (!sortfn)
                 return
             const ascDesc = sortResult => e.detail.descending ? -sortResult : sortResult
-            const sort = composeFunction(ascDesc, sortfn) 
+            this.sortFunction = composeFunction(ascDesc, sortfn) 
             this.table.restrictClose()
             const dirs = this.table.items.filter(n => n.isDirectory)
             const files = this.table.items.filter(n => !n.isDirectory)
-            this.table.items = dirs.concat(files.sort(sort))
+            this.table.items = dirs.concat(files.sort(this.sortFunction))
             this.table.refresh()
         })
 
@@ -100,12 +100,18 @@ class Folder extends HTMLElement {
         if (!items)
             return
 
-
         this.table.setItems([])
         if (result.changed) {
             this.processor = result.processor
             const columns = this.processor.getColumns()
             this.table.setColumns(columns)
+            this.sortFunction = null
+        }
+
+        if (this.sortFunction) {
+            const dirs = items.filter(n => n.isDirectory)
+            const files = items.filter(n => !n.isDirectory)
+            items = dirs.concat(files.sort(this.sortFunction))
         }
     
         this.table.setItems(items)
@@ -119,9 +125,6 @@ class Folder extends HTMLElement {
 }
 
 customElements.define('folder-table', Folder)
-
-// TODO Sorting: reset when new items
-// TODO Restricting per sort table
 
 // TODO path in edit field
 // TODO path in SubTitle 
