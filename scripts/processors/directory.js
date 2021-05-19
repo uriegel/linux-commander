@@ -134,6 +134,21 @@ export const getDirectory = (folderId, path) => {
             return false
     }
 
+    const getSortFunction = (column, isSubItem) => {
+        switch (column) {
+            case 0:
+                return isSubItem == false 
+                    ? ([a, b]) => a.name.localeCompare(b.name)
+                    : ([a, b]) => getExtension(a.name).localeCompare(getExtension(b.name))
+            case 1: 
+                return ([a, b]) => (a.exiftime ? a.exiftime : a.time) - (b.exiftime ? b.exiftime : b.time)
+            case 2: 
+                return ([a, b]) => a.size - b.size
+            default:
+                return null
+        }
+    }
+
     const saveWidths = widths => localStorage.setItem(`${folderId}-directory-widths`, JSON.stringify(widths))
 
     return {
@@ -144,6 +159,7 @@ export const getDirectory = (folderId, path) => {
         getCurrentPath,
         getPath,
         getItems,
+        getSortFunction,
         saveWidths
     }
 }

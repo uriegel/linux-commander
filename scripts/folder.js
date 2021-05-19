@@ -30,33 +30,15 @@ class Folder extends HTMLElement {
     connectedCallback() {
         this.table.addEventListener("columnwidths", e => this.processor.saveWidths(e.detail))
         this.table.addEventListener("columnclick", e => {
-
-            // [Log] columnclick – {column: 1, descending: false, subItem: false} (folder.js, line 33)
-            // [Log] columnclick – {column: 1, descending: true, subItem: false} (folder.js, line 33)
-            // [Log] columnclick – {column: 2, descending: false, subItem: false} (folder.js, line 33)
-            // [Log] columnclick – {column: 0, descending: false, subItem: false} (folder.js, line 33)
-            // [Log] columnclick – {column: 0, descending: false, subItem: true} (folder.js, line 33)
-            // [Log] columnclick – {column: 0, descending: true, subItem: true} (folder.js, line 33)
-            // [Log] columnclick – {column: 0, descending: false, subItem: true} (folder.js, line 33)
-            //console.log("columnclick", e.detail)
-
-            // TODO in processor
-            // TODO reset when new items
+            const sortfn = this.processor.getSortFunction(e.detail.column, e.detail.subItem)
+            if (!sortfn)
+                return
             const ascDesc = sortResult => e.detail.descending ? -sortResult : sortResult
-            let sortfn
-            switch (e.detail.column) {
-                case 1: 
-                    sortfn = ([a, b]) => (a.exiftime ? a.exiftime : a.time) - (b.exiftime ? b.exiftime : b.time)
-                    break
-                case 2: 
-                    sortfn = ([a, b]) => a.size - b.size
-                    break
-                default:
-                    return
-            }
             const sort = composeFunction(ascDesc, sortfn) 
             this.table.restrictClose()
-            this.table.items = this.table.items.sort(sort)
+            const dirs = this.table.items.filter(n => n.isDirectory)
+            const files = this.table.items.filter(n => !n.isDirectory)
+            this.table.items = dirs.concat(files.sort(sort))
             this.table.refresh()
         })
 
@@ -138,7 +120,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Sorting
+// TODO Sorting: reset when new items
 // TODO Restricting per sort table
 
 // TODO path in edit field
