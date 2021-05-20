@@ -6,9 +6,14 @@ class Folder extends HTMLElement {
         super()
         this.folderId = this.getAttribute("id")
         const additionalStyle = ".exif {color: var(--exif-color);} .isSelected .exif {color: var(--selected-exif-color); }"
-        this.innerHTML = `<virtual-table-component additionalStyle='${additionalStyle}'></virtual-table-component>`
-        this.table = this.firstChild
+        this.innerHTML = `
+            <div class=folder>
+                <input class=pathInput></input>
+                <virtual-table-component additionalStyle='${additionalStyle}'></virtual-table-component>
+            </div`
         
+        this.table = this.getElementsByTagName("VIRTUAL-TABLE-COMPONENT")[0]
+
         this.changePath()
 
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
@@ -126,8 +131,9 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO top: 18px adjustable in Theme;
 // TODO path in edit field
 // TODO path in SubTitle 
 // TODO Save last path
 
-// TODO History wich backspace and ctrl backspace
+// TODO History with backspace and ctrl backspace

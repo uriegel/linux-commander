@@ -7,7 +7,6 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: gray;
 }
 
 #splitter {
@@ -18,4 +17,18 @@ body {
 .tableContainer {
     flex-grow: 1;
     position: relative;
+}
+
+.folder {
+    height: 100vh;
+}
+
+.pathInput {
+    position: absolute;
+    margin-left: 3px;
+    margin-right: 3px;
+    border-style: none;
+    width: calc(100% - 6px);
+    outline-style: none;
+    font-family: sans-serif;
 }

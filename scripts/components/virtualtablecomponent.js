@@ -58,8 +58,9 @@ class VirtualTableComponent extends HTMLElement {
                     --vtc-scrollbar-right-margin: 15px;
                 }
                 .tableroot {
+                    top: 18px;
                     position: absolute;
-                    height: 100%;
+                    height: calc(100% - 18px);
                     overflow: hidden;
                     background-color: var(--vtc-background-color);
                     outline-width: 0px;
@@ -538,7 +539,7 @@ class VirtualTableComponent extends HTMLElement {
                 th.appendChild(thDiv)
             }
             this.headRow.appendChild(th)
-            this.scrollbar.style.height = `calc(100% - ${this.headRow.clientHeight}px)` 
+            this.scrollbar.style.height = `calc(100% - 18px - ${this.headRow.clientHeight}px)` 
         })
     }
 
