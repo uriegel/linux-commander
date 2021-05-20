@@ -131,7 +131,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO top: 18px adjustable in Theme;
 // TODO path in edit field
 // TODO path in SubTitle 
 // TODO Save last path
