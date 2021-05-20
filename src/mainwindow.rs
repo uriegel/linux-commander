@@ -1,6 +1,6 @@
 use std::{cell::RefCell};
 
-use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, WidgetExt, Window, prelude::BuilderExtManual};
+use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, HeaderBar, HeaderBarExt, WidgetExt, Window, prelude::BuilderExtManual};
 use crate::{settings::{initialize_size, initialize_theme, save_size}, webview::MainWebView};
 
 pub struct MainWindow {
@@ -15,6 +15,8 @@ impl MainWindow {
         let builder = Builder::new();
         builder.add_from_file("main.glade").unwrap();
         let window: Window = builder.get_object("window").unwrap();
+        let header_bar: HeaderBar = builder.get_object("headerbar").unwrap();
+        header_bar.set_subtitle(Some("Der lange Pfad wird das"));
         
         let webview = MainWebView::new(&builder, application, initial_theme);
         webview.load(port);
