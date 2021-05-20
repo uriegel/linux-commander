@@ -29,7 +29,3 @@
     --gridsplitter-grip-active-color : #585858;;
 }
 
-.pathInput {
-    background-color: var(--vtc-background-color);
-    color: white;
-}

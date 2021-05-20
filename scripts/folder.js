@@ -13,15 +13,18 @@ class Folder extends HTMLElement {
             </div`
         
         this.table = this.getElementsByTagName("VIRTUAL-TABLE-COMPONENT")[0]
-
+        this.pathInput = this.getElementsByTagName("INPUT")[0]
         this.changePath()
-
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
     }
     
     changeTheme(theme) {
-        ["themeAdwaita", "themeAdwaitaDark"].forEach(n => this.table.classList.remove(n))
+        ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {
+            this.table.classList.remove(n)
+            this.pathInput.classList.remove(n)
+        })
         this.table.classList.add(theme)    
+        this.pathInput.classList.add(theme)    
         this.table.themeChanged()
     }
 
@@ -126,12 +129,14 @@ class Folder extends HTMLElement {
         ))
         if (await this.processor.addExtensions(items))
             this.table.refresh()
+
+        this.pathInput.value = path || processot.getCurrentPath()
     }
 }
 
 customElements.define('folder-table', Folder)
 
-// TODO path in edit field
+// TODO path in edit field: changePath
 // TODO path in SubTitle 
 // TODO Save last path
 
