@@ -95,6 +95,12 @@ class Folder extends HTMLElement {
                 }
             }
         })
+
+        this.pathInput.onkeydown = evt => {
+            if (evt.which == 13)
+                this.changePath(this.pathInput.value)
+        }
+        this.pathInput.onfocus = () => setTimeout(() => this.pathInput.select())
     }
 
     async changePath(path) {
@@ -130,14 +136,15 @@ class Folder extends HTMLElement {
         if (await this.processor.addExtensions(items))
             this.table.refresh()
 
-        this.pathInput.value = path || processot.getCurrentPath()
+        this.pathInput.value = path || this.processor.getCurrentPath()
     }
 }
 
 customElements.define('folder-table', Folder)
 
-// TODO path in edit field: changePath
-// TODO path in SubTitle 
+// TODO complete path in SubTitle 
 // TODO Save last path
 
 // TODO History with backspace and ctrl backspace
+
+// TODO tab focus
