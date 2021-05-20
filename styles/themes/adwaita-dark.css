@@ -1,7 +1,9 @@
 :root .themeAdwaitaDark {
-    background-color: rgb(94, 94, 94);
+    background-color: var(--vtc-background-color);
     --exif-color: rgb(255, 255, 173);
     --selected-exif-color: yellow;
+
+    --vtc-top: 20px;
 
     --vtc-color: white;
     --vtc-item-img-color: white;
@@ -27,3 +29,7 @@
     --gridsplitter-grip-active-color : #585858;;
 }
 
+.pathInput {
+    background-color: var(--vtc-background-color);
+    color: white;
+}
