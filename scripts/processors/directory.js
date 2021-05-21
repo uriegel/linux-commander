@@ -151,6 +151,8 @@ export const getDirectory = (folderId, path) => {
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-directory-widths`, JSON.stringify(widths))
 
+    const getItem = item => currentPath == "/" ? "/" + item.name : currentPath + "/" + item.name
+
     return {
         getType,
         getColumns,
@@ -160,6 +162,7 @@ export const getDirectory = (folderId, path) => {
         getPath,
         getItems,
         getSortFunction,
-        saveWidths
+        saveWidths,
+        getItem
     }
 }

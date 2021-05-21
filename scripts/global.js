@@ -10,9 +10,11 @@ function setTheme(theme) {
         onThemeCallback(theme)
 }
 
-function showHidden(hidden) {
+function setTitle(title) {
+    alert("!!webmesg-title!!" + title)
+}
 
-    alert("!!webmesg-title!!Das ist der neue Title von ShowHidden")
+function showHidden(hidden) {
     if (onShowHiddenCallback)
         onShowHiddenCallback(hidden)
 }

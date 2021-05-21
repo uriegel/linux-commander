@@ -8,6 +8,19 @@ const splitter = document.getElementById('splitter')
 const theme = initializeCallbacks(onTheme, onShowHidden)
 onTheme(theme)
 
+
+folderLeft.addEventListener("onFocus", evt => {
+     activeFolder = folderLeft
+})
+folderRight.addEventListener("onFocus", evt => {
+     activeFolder = folderRight
+})
+
+const onPathChanged = evt => setTitle(evt.detail)
+
+folderLeft.addEventListener("pathChanged", onPathChanged)
+folderRight.addEventListener("pathChanged", onPathChanged)
+
 function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {
         document.body.classList.remove(n)
@@ -27,7 +40,7 @@ function onShowHidden(hidden) {
 
 folderLeft.setFocus()
 
-
+var activeFolder = folderLeft
 
 
 

@@ -17,6 +17,12 @@
 }
 
 class VirtualTableComponent extends HTMLElement {
+
+    get position() { return this._position }
+    set position(value) {
+        this._position = value
+        this.dispatchEvent(new CustomEvent('currentIndexChanged', { detail: this._position }))
+    }
     constructor() {
         super()
         this.items = []

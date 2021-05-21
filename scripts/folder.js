@@ -96,6 +96,19 @@ class Folder extends HTMLElement {
             }
         })
 
+        this.table.addEventListener("focusin", async evt => {
+            this.dispatchEvent(new CustomEvent('onFocus', { detail: this.id }))
+            if (this.table.items && this.table.items.length > 0) {
+                this.dispatchEvent(new CustomEvent('pathChanged', { detail: this.processor.getItem(this.table.items[this.table.getPosition()]) }))
+            }
+        })
+
+        this.table.addEventListener("currentIndexChanged", evt => {
+            if (this.table.items && this.table.items.length > 0)
+                this.dispatchEvent(new CustomEvent('pathChanged', { detail: this.processor.getItem(this.table.items[evt.detail]) }))
+        })
+            
+
         this.pathInput.onkeydown = evt => {
             if (evt.which == 13)
                 this.changePath(this.pathInput.value)
@@ -142,9 +155,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO complete path in SubTitle 
 // TODO Save last path
-
 // TODO History with backspace and ctrl backspace
-
 // TODO tab focus

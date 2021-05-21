@@ -45,13 +45,6 @@ export const getRoot = folderId => {
 
     const getPath = item => [item.mountPoint, null]
 
-    // pub struct RootItem {
-    //     pub name: String,
-    //     pub display: String,
-    //     pub mountPoint: String,
-    //     pub capacity: u64,
-    //     pub fileSystem: String,
-    // }
     const getItems = async () => {
         const responseStr = await fetch('/commander/getroot')
         const response = await responseStr.json()
@@ -69,6 +62,8 @@ export const getRoot = folderId => {
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-root-widths`, JSON.stringify(widths))
 
+    const getItem = item => item.mountPoint
+
     return {
         getType,
         getColumns,
@@ -78,5 +73,6 @@ export const getRoot = folderId => {
         saveWidths, 
         getCurrentPath,
         getPath,
+        getItem
     }
 }
