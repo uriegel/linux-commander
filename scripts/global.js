@@ -11,6 +11,8 @@ function setTheme(theme) {
 }
 
 function showHidden(hidden) {
+
+    alert("!!webmesg-title!!Das ist der neue Title von ShowHidden")
     if (onShowHiddenCallback)
         onShowHiddenCallback(hidden)
 }

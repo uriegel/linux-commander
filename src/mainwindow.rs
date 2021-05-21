@@ -3,8 +3,10 @@ use std::{cell::RefCell};
 use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, HeaderBar, HeaderBarExt, WidgetExt, Window, prelude::BuilderExtManual};
 use crate::{settings::{initialize_size, initialize_theme, save_size}, webview::MainWebView};
 
+#[derive(Debug, Clone)]
 pub struct MainWindow {
-    //window: Window
+    //window: Window,
+    header_bar: HeaderBar
 }
 
 impl MainWindow {
@@ -16,9 +18,13 @@ impl MainWindow {
         builder.add_from_file("main.glade").unwrap();
         let window: Window = builder.get_object("window").unwrap();
         let header_bar: HeaderBar = builder.get_object("headerbar").unwrap();
-        header_bar.set_subtitle(Some("Der lange Pfad wird das"));
+
+        let mainwindow = MainWindow { 
+            //window: window.clone(), 
+            header_bar: header_bar.clone() 
+        };
         
-        let webview = MainWebView::new(&builder, application, initial_theme);
+        let webview = MainWebView::new(&builder, application, mainwindow.clone(), initial_theme);
         webview.load(port);
         window.set_default_size(initial_size.0, initial_size.1);
 
@@ -35,6 +41,10 @@ impl MainWindow {
 
         application.add_window(&window);
         window.show_all();
-        MainWindow {  }
+        mainwindow
+    }
+
+    pub fn set_sub_title(&self, title: &str) {
+        self.header_bar.set_subtitle(Some(title));
     }
 }
