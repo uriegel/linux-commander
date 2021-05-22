@@ -14,6 +14,10 @@ function setTitle(title) {
     alert("!!webmesg-title!!" + title)
 }
 
+function setInitialTheme(theme) {
+    alert("!!webmesg-theme!!" + theme)
+}
+
 function showHidden(hidden) {
     if (onShowHiddenCallback)
         onShowHiddenCallback(hidden)
@@ -23,3 +27,4 @@ const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn
 
 var onThemeCallback
 var initialTheme
+

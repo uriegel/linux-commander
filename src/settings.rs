@@ -2,28 +2,11 @@ use serde::{Deserialize, Serialize};
 use std::{ fs, fs::File, io::{ErrorKind, Read, Write}, path::PathBuf};
 
 const SIZE_NAME: &str = "windowSize";
-const SETTINGS_NAME: &str = "settings";
 
 #[derive(Serialize, Deserialize)]
 pub struct SizeSettings {
     pub width: i32,
     pub height: i32,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Settings {
-    #[serde(default="get_default_theme")]
-    pub theme: String,
-}
-
-pub fn initialize_theme() -> String {
-    match initialize(SETTINGS_NAME) {
-        Some(contents) => {
-            let settings: Settings = serde_json::from_str(&contents).unwrap();
-            settings.theme
-        }            
-        None => get_default_theme()
-    }
 }
 
 pub fn initialize_size() -> (i32, i32) {
@@ -42,17 +25,12 @@ pub fn save_size(size: (i32, i32)) {
     save_settings(SIZE_NAME, &json);
 }
 
-pub fn save_theme(theme: &str) {
-    let settings = Settings {theme: theme.to_string()};
-    let json = serde_json::to_string(&settings).unwrap();
-    save_settings(SETTINGS_NAME, &json);
-}
-
 fn save_settings(name: &str, content: &str) {
     let settings_path = get_settings_path(name);
     let mut file = File::create(settings_path).unwrap();
     file.write(content.as_bytes()).expect("Unable to write settings");
 }
+
 
 fn initialize(name: &str) -> Option<String> {
     let settings = get_settings_path(name);
@@ -85,6 +63,3 @@ fn get_settings_path(name: &str) -> PathBuf {
         name].iter().collect()
 }
 
-fn get_default_theme()->String {
-    "themeAdwaita".to_string()
-}

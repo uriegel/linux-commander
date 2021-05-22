@@ -1,7 +1,8 @@
 use std::{cell::RefCell};
 
 use gtk::{Application, ApplicationWindow, Builder, GtkApplicationExt, GtkWindowExt, HeaderBar, HeaderBarExt, WidgetExt, prelude::BuilderExtManual};
-use crate::{settings::{initialize_size, initialize_theme, save_size}, webview::MainWebView};
+use webkit2gtk::WebView;
+use crate::{settings::{initialize_size, save_size}, webview::MainWebView};
 
 #[derive(Debug, Clone)]
 pub struct MainWindow {
@@ -10,8 +11,7 @@ pub struct MainWindow {
 }
 
 impl MainWindow {
-    pub fn new(application: &Application, port: u16) -> Self {
-        let initial_theme = initialize_theme();
+    pub fn new(application: &Application, port: u16, javascript_callback: fn(application: &Application, webview: &WebView)) -> Self {
         let initial_size = initialize_size();
 
         let builder = Builder::new();
@@ -24,7 +24,11 @@ impl MainWindow {
             header_bar: header_bar.clone() 
         };
         
-        let webview = MainWebView::new(&builder, application, mainwindow.clone(), initial_theme);
+        let weak_header_bar = header_bar.clone();
+        let weak_application = application.clone();
+        let webview = MainWebView::new(&builder, application, mainwindow.clone(), move |webview| {
+            javascript_callback(&weak_application, webview);
+        });
         webview.load(port);
         window.set_default_size(initial_size.0, initial_size.1);
 

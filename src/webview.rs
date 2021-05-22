@@ -1,8 +1,8 @@
 use gio::{ActionMapExt, SimpleAction};
 use glib::{ToVariant};
-use gtk::{Application, Builder, GtkApplicationExt, prelude::BuilderExtManual};
+use gtk::{Application, Builder, GtkApplicationExt, HeaderBar, prelude::BuilderExtManual};
 use webkit2gtk::{LoadEvent, WebInspectorExt, WebView, WebViewExt};
-use crate::{mainwindow::MainWindow, settings::save_theme};
+use crate::{mainwindow::MainWindow};
 
 const WEBMSG_TITLE: &str = "!!webmesg-title!!";
 
@@ -12,19 +12,11 @@ pub struct MainWebView {
 }
 
 impl MainWebView {
-    pub fn new(builder: &Builder, application: &Application, mainwindow: MainWindow, initial_theme: String) -> Self {
+    pub fn new<F: Fn(&WebView) + 'static>(builder: &Builder, application: &Application, mainwindow: MainWindow, f: F) -> Self {
         let webview: WebView = builder.get_object("webview").unwrap();
 
-        let initial_state = initial_theme.to_variant();
         let weak_webview = webview.clone();
     
-        webview.connect_load_changed(move |_,load_event| 
-            if load_event == LoadEvent::Committed {
-                let script = format!("initialTheme = '{}'", initial_theme.clone());
-                weak_webview.run_javascript(&script, Some(&gio::Cancellable::new()), |_|{});
-            }
-        );
-
         webview.connect_context_menu(|_, _, _, _| true );
 
         let weak_webview = webview.clone();
@@ -57,9 +49,8 @@ impl MainWebView {
         application.add_action(&action);
         application.set_accels_for_action("app.showhidden", &["<Ctrl>H"]);
 
-        let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
-
         let clone_mainwindow = mainwindow.clone();
+        let weak_webview = webview.clone();
         webview.connect_script_dialog(move|_, dialog | {
             let str = dialog.get_message();
             if str.starts_with(WEBMSG_TITLE) {
@@ -68,27 +59,30 @@ impl MainWebView {
                 true
             }
             else {
-                false
+                f(&weak_webview);
+                //false
+                true
             }
         });
 
-        let weak_webview = webview.clone();
-        action.connect_change_state(move |a, s| {
-            match s {
-                Some(val) => {
-                    a.set_state(val);
-                    match val.get_str(){
-                        Some(theme) => {
-                            weak_webview.run_javascript(&format!("setTheme('{}')", theme), Some(&gio::Cancellable::new()), |_|{});
-                            save_theme(theme);
-                        }
-                        None => println!("Could not set theme, could not extract from variant")
-                    }
-                },
-                None => println!("Could not set theme")
-            }
-        });
-        application.add_action(&action);
+        //let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
+        // let weak_webview = webview.clone();
+        // action.connect_change_state(move |a, s| {
+        //     match s {
+        //         Some(val) => {
+        //             a.set_state(val);
+        //             match val.get_str(){
+        //                 Some(theme) => {
+        //                     weak_webview.run_javascript(&format!("setTheme('{}')", theme), Some(&gio::Cancellable::new()), |_|{});
+        //                     save_theme(theme);
+        //                 }
+        //                 None => println!("Could not set theme, could not extract from variant")
+        //             }
+        //         },
+        //         None => println!("Could not set theme")
+        //     }
+        // });
+        // application.add_action(&action);
 
         MainWebView{ 
             webview, 

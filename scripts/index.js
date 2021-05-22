@@ -6,7 +6,8 @@ const folderRight = document.getElementById("folderRight")
 const splitter = document.getElementById('splitter')
 
 const theme = initializeCallbacks(onTheme, onShowHidden)
-onTheme(theme)
+onTheme("themeAdwaitaDark")
+setInitialTheme("themeAdwaitaDark") 
 
 
 folderLeft.addEventListener("onFocus", evt => {

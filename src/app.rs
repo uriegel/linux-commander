@@ -1,6 +1,7 @@
 use std::env;
 use gio::{ActionMapExt, ApplicationExt, ApplicationFlags, SimpleAction, prelude::ApplicationExtManual};
 use gtk::{Application, GtkApplicationExt};
+use webkit2gtk::WebView;
 use crate::mainwindow::MainWindow;
 
 pub struct App {
@@ -8,7 +9,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(port: u16) -> Self {
+    pub fn new(port: u16, javascript_callback: fn(application: &Application, webview: &WebView)) -> Self {
 
         let application = Application::new(Some("de.uriegel.commander"), ApplicationFlags::empty())
             .expect("Application::new() failed");
@@ -25,7 +26,7 @@ impl App {
         }
 
         application.connect_startup(move |application| {
-            MainWindow::new(application, port);
+            MainWindow::new(application, port, javascript_callback);
             ()
         });
     
