@@ -4,7 +4,7 @@ use chrono::Utc;
 use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{self, Body, HeaderMap, Response, StatusCode}};
 use tokio::runtime::Runtime;
 use tokio_util::codec::{BytesCodec, FramedRead};
-use serde::{Deserialize};
+use serde::{Deserialize, Serialize};
 use crate::requests::{self, ExifItem, get_directory_items, get_exif_items, get_root_items};
 
 static NOTFOUND: &[u8] = b"Not Found";
@@ -42,6 +42,11 @@ async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
             Err(warp::reject())
         }
     }
+}
+
+fn getItems<T: Serialize, F: Fn()->T>(cb: F)  {
+    let res = warp::reply::json(&cb());
+    ()
 }
 
 async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
