@@ -1,6 +1,6 @@
 use std::{cell::RefCell};
 
-use gtk::{Application, Builder, GtkApplicationExt, GtkWindowExt, HeaderBar, HeaderBarExt, WidgetExt, Window, prelude::BuilderExtManual};
+use gtk::{Application, ApplicationWindow, Builder, GtkApplicationExt, GtkWindowExt, HeaderBar, HeaderBarExt, WidgetExt, prelude::BuilderExtManual};
 use crate::{settings::{initialize_size, initialize_theme, save_size}, webview::MainWebView};
 
 #[derive(Debug, Clone)]
@@ -16,7 +16,7 @@ impl MainWindow {
 
         let builder = Builder::new();
         builder.add_from_file("main.glade").unwrap();
-        let window: Window = builder.get_object("window").unwrap();
+        let window: ApplicationWindow = builder.get_object("window").unwrap();
         let header_bar: HeaderBar = builder.get_object("headerbar").unwrap();
 
         let mainwindow = MainWindow { 

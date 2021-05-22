@@ -34,7 +34,7 @@ impl MainWebView {
             None => println!("Could not show web inspector")
         });
         application.add_action(&action);
-        application.set_accels_for_action("app.devtools", &["F12"]);
+        application.set_accels_for_action("app.devtools", &["<CTRL><SHIFT>I"]);
 
         let initial_bool_state = false.to_variant();
         let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
