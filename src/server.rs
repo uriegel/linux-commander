@@ -1,13 +1,51 @@
 use std::net::SocketAddr;
 
+use serde::{Deserialize};
 use tokio::runtime::Runtime;
 use warp::{Filter, fs::dir};
 use webview_app::headers::add_headers;
 
 #[cfg(target_os = "linux")]
 use crate::linux::requests::get_root_items;
+use crate::requests::get_directory_items;
 #[cfg(target_os = "windows")]
 use crate::windows::requests::get_root_items;
+
+#[derive(Deserialize)]
+struct GetItems {
+    path: String,
+}
+
+pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
+    rt.spawn(async move {
+
+        let route_get_root = 
+            warp::get()
+            .and(warp::path("commander"))
+            .and(warp::path("getroot"))
+            .and(warp::path::end())
+            .and_then(get_root);
+
+        let route_get_items = 
+            warp::post()
+            .and(warp::path("commander"))
+            .and(warp::path("getitems"))
+            .and(warp::path::end())
+            .and(warp::body::json())
+            .and_then(get_items);
+
+        let route_static = dir(static_dir)
+            .map(add_headers);
+
+        let routes = route_get_items
+            .or(route_get_root)
+            .or(route_static);
+
+        warp::serve(routes)
+            .run(socket_addr)
+            .await;        
+    });
+}
 
 // extern crate chrono;
 
@@ -19,11 +57,6 @@ use crate::windows::requests::get_root_items;
 // use crate::requests::{self, ExifItem, get_directory_items, get_exif_items, get_root_items};
 
 // static NOTFOUND: &[u8] = b"Not Found";
-
-// #[derive(Deserialize)]
-// struct GetItems {
-//     path: String,
-// }
 
 // #[derive(Deserialize)]
 // struct GetExifs {
@@ -45,21 +78,6 @@ use crate::windows::requests::get_root_items;
 //     header_map
 // }
 
-
-// fn getItems<T: Serialize, F: Fn()->T>(cb: F)  {
-//     let res = warp::reply::json(&cb());
-//     ()
-// }
-
-// async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
-//     match get_directory_items(&param.path) {
-//         Ok(items ) => Ok (warp::reply::json(&items)),
-//         Err(err) => {
-//             println!("Could not get items: {}", err);
-//             Err(warp::reject())
-//         }
-//     }
-// }
 
 // async fn get_exifs(param: GetExifs)->Result<impl warp::Reply, warp::Rejection> {
 //     match get_exif_items(&param.path, &param.items) {
@@ -110,13 +128,6 @@ use crate::windows::requests::get_root_items;
 // }
 
 
-//         let route_get_items = 
-//             warp::post()
-//             .and(warp::path("commander"))
-//             .and(warp::path("getitems"))
-//             .and(warp::path::end())
-//             .and(warp::body::json())
-//             .and_then(get_items);
 
 //         let route_get_icon = 
 //             warp::path("commander")
@@ -141,22 +152,6 @@ use crate::windows::requests::get_root_items;
 //             res
 //         }
 
-//         let route_static = warp::fs::dir(".")
-//             .map(add_headers);
-
-//         let routes = 
-//             route_get_root
-//             .or(route_get_items)
-//             .or(route_get_exifs)
-//             .or(route_get_icon)
-//             .or(route_static);
-    
-//         warp::serve(routes)
-//             .run(([127, 0, 0, 1], port))
-//             .await;        
-//     });
-// }
-
 async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
     match get_root_items() {
         Ok(items ) => Ok (warp::reply::json(&items)),
@@ -167,24 +162,13 @@ async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
     }
 }
 
-pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
-    rt.spawn(async move {
-
-        let route_get_root = 
-            warp::get()
-            .and(warp::path("commander"))
-            .and(warp::path("getroot"))
-            .and(warp::path::end())
-            .and_then(get_root);
-
-        let route_static = dir(static_dir)
-            .map(add_headers);
-
-        let routes = route_get_root
-            .or(route_static);
-
-        warp::serve(routes)
-            .run(socket_addr)
-            .await;        
-    });
+async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
+    match get_directory_items(&param.path) {
+        Ok(items ) => Ok (warp::reply::json(&items)),
+        Err(err) => {
+            println!("Could not get items: {}", err);
+            Err(warp::reject())
+        }
+    }
 }
+

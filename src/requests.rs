@@ -1,4 +1,6 @@
-use std::{fmt, iter::Take};
+use lexical_sort::natural_lexical_cmp;
+use serde::{Serialize};
+use std::{fmt, fs, iter::Take, time::UNIX_EPOCH};
 
 pub struct Error {
     pub message: String
@@ -7,6 +9,78 @@ pub struct Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({})", self.message)
+    }
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DirectoryItems {
+    pub files: Vec<FileItem>,
+    pub dirs: Vec<DirItem>
+}
+
+enum FileType {
+    Dir(DirItem),
+    File(FileItem)
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DirItem {
+    name: String,
+    is_directory: bool
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FileItem {
+    name: String,
+    time: u128,
+    size: u64
+}
+
+pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
+    match fs::read_dir(path) {
+        Ok(entries) => {
+            let (dirs, files): (Vec<_>, Vec<_>) = entries
+                .filter_map(|entry| {
+                    match entry {
+                        Ok(entry) => 
+                            match entry.metadata() {
+                                Ok(metadata) => Some(match metadata.is_dir() {
+                                    true => FileType::Dir(DirItem {
+                                        name: String::from(entry.file_name().to_str().unwrap()),
+                                        is_directory: true
+                                    }),
+                                    false => FileType::File(FileItem {
+                                        name: String::from(entry.file_name().to_str().unwrap()),
+                                        time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
+                                        size: metadata.len()
+                                    })
+                                }),
+                                _ => None
+                            },
+                        _ => None
+                    }
+                })
+                .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
+            let mut dirs: Vec<DirItem> = dirs
+                .into_iter()
+                .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
+                .collect();
+            dirs.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
+            let mut files: Vec<FileItem> = files
+                .into_iter()
+                .filter_map(|ft|if let FileType::File(file) = ft {Some(file)} else {None})
+                .collect();
+            files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
+           
+            Ok(DirectoryItems{
+                dirs,
+                files
+            })
+        },
+        Err(err) => Err(Error {message: format!("read_dir of {} failed: {}", path, err)})
     }
 }
 
@@ -24,27 +98,6 @@ impl fmt::Display for Error {
 // static mut DEFAULT_THEME: Option<*mut GtkIconTheme> = None;
 
 
-// #[derive(Serialize)]
-// #[serde(rename_all = "camelCase")]
-// pub struct FileItems {
-//     pub files: Vec<FileItem>,
-//     pub dirs: Vec<DirItem>
-// }
-
-// #[derive(Serialize)]
-// #[serde(rename_all = "camelCase")]
-// pub struct DirItem {
-//     name: String,
-//     is_directory: bool
-// }
-
-// #[derive(Serialize)]
-// #[serde(rename_all = "camelCase")]
-// pub struct FileItem {
-//     name: String,
-//     time: u128,
-//     size: u64
-// }
 
 // #[derive(Serialize, Deserialize)]
 // pub struct ExifItem {
@@ -54,10 +107,6 @@ impl fmt::Display for Error {
 //     exiftime: i64
 // }
 
-// enum FileType {
-//     Dir(DirItem),
-//     File(FileItem)
-// }
 
 pub trait IteratorExt: Iterator {
 
@@ -76,50 +125,6 @@ impl<I: Iterator> IteratorExt for I {}
 
 
 
-// pub fn get_directory_items(path: &str)->Result<FileItems, Error> {
-//     match fs::read_dir(path) {
-//         Ok(entries) => {
-//             let (dirs, files): (Vec<_>, Vec<_>) = entries
-//                 .filter_map(|entry| {
-//                     match entry {
-//                         Ok(entry) => 
-//                             match entry.metadata() {
-//                                 Ok(metadata) => Some(match metadata.is_dir() {
-//                                     true => FileType::Dir(DirItem {
-//                                         name: String::from(entry.file_name().to_str().unwrap()),
-//                                         is_directory: true
-//                                     }),
-//                                     false => FileType::File(FileItem {
-//                                         name: String::from(entry.file_name().to_str().unwrap()),
-//                                         time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
-//                                         size: metadata.len()
-//                                     })
-//                                 }),
-//                                 _ => None
-//                             },
-//                         _ => None
-//                     }
-//                 })
-//                 .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
-//             let mut dirs: Vec<DirItem> = dirs
-//                 .into_iter()
-//                 .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
-//                 .collect();
-//             dirs.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
-//             let mut files: Vec<FileItem> = files
-//                 .into_iter()
-//                 .filter_map(|ft|if let FileType::File(file) = ft {Some(file)} else {None})
-//                 .collect();
-//             files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
-           
-//             Ok(FileItems{
-//                 dirs,
-//                 files
-//             })
-//         },
-//         Err(err) => Err(Error {message: format!("read_dir of {} failed: {}", path, err)})
-//     }
-// }
 
 // pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, Error> {
 
