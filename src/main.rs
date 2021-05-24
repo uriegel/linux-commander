@@ -35,6 +35,7 @@ fn main() {
 }
 // TODO load html and globals.js from warp_server (with filters)
 // TODO connect Theme-action, theming must work, save theme in local storage
+// TODO Test on Windows
 
 // fn main() {
 //     let port = 9865;
