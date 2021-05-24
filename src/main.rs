@@ -1,3 +1,4 @@
+use gtk::GtkApplicationExt;
 use webview_app::app::{App, AppSettings, WarpSettings};
 #[cfg(target_os = "linux")]
 use webview_app::app::connect_msg_callback;
@@ -19,6 +20,27 @@ mod windows;
 
 #[cfg(target_os = "linux")]
 fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Builder>, webview: &WebView) {
+    let initial_bool_state = false.to_variant();
+    let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
+    let weak_webview = webview.clone();
+    action.connect_change_state(move |a, s| {
+        match s {
+            Some(val) => {
+                a.set_state(val);
+                match val.get::<bool>(){
+                    Some(show_hidden) => weak_webview.run_javascript(
+                        &format!("showHidden({})", show_hidden),
+                        Some(&gio::Cancellable::new()),
+                        |_|{}),
+                    None => println!("Could not set ShowHidden, could not extract from variant")
+                }
+            },
+            None => println!("Could not set theme")
+        }
+    });
+    application.add_action(&action);
+    application.set_accels_for_action("app.showhidden", &["<Ctrl>H"]);
+
     let initial_state = "".to_variant();
     let weak_webview = webview.clone();
     let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
@@ -76,8 +98,6 @@ fn run_app() {
 fn main() {
     run_app();
 }
-// TODO exif items
-// TODO show hidden items
 // TODO Test on Windows
 // TODO icons under linus: measure time, transform to Vec<byte>
 // TODO icons: create crate system_icons

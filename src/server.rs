@@ -7,13 +7,19 @@ use webview_app::headers::add_headers;
 
 #[cfg(target_os = "linux")]
 use crate::linux::requests::get_root_items;
-use crate::requests::get_directory_items;
+use crate::requests::{ExifItem, get_directory_items, get_exif_items};
 #[cfg(target_os = "windows")]
 use crate::windows::requests::get_root_items;
 
 #[derive(Deserialize)]
 struct GetItems {
     path: String,
+}
+
+#[derive(Deserialize)]
+struct GetExifs {
+    path: String,
+    items: Vec<ExifItem>
 }
 
 pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
@@ -34,11 +40,20 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
             .and(warp::body::json())
             .and_then(get_items);
 
+        let route_get_exifs = 
+            warp::post()
+            .and(warp::path("commander"))
+            .and(warp::path("getexifs"))
+            .and(warp::path::end())
+            .and(warp::body::json())
+            .and_then(get_exifs);
+
         let route_static = dir(static_dir)
             .map(add_headers);
 
         let routes = route_get_items
             .or(route_get_root)
+            .or(route_get_exifs)
             .or(route_static);
 
         warp::serve(routes)
@@ -47,47 +62,18 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
     });
 }
 
-// extern crate chrono;
-
-// use chrono::Utc;
 // use warp::{Filter, Reply, fs::File, http::HeaderValue, hyper::{self, Body, HeaderMap, Response, StatusCode}};
 // use tokio::runtime::Runtime;
 // use tokio_util::codec::{BytesCodec, FramedRead};
 // use serde::{Deserialize, Serialize};
 // use crate::requests::{self, ExifItem, get_directory_items, get_exif_items, get_root_items};
 
-// static NOTFOUND: &[u8] = b"Not Found";
-
-// #[derive(Deserialize)]
-// struct GetExifs {
-//     path: String,
-//     items: Vec<ExifItem>
-// }
 
 // #[derive(Deserialize)]
 // struct GetIcon {
 //     ext: String,
 // }
 
-// fn create_headers() -> HeaderMap {
-//     let mut header_map = HeaderMap::new();
-//     let now = Utc::now();
-//     let now_str = now.format("%a, %d %h %Y %T GMT").to_string();
-//     header_map.insert("Expires", HeaderValue::from_str(now_str.as_str()).unwrap());
-//     header_map.insert("Server", HeaderValue::from_str("Mein Server").unwrap());
-//     header_map
-// }
-
-
-// async fn get_exifs(param: GetExifs)->Result<impl warp::Reply, warp::Rejection> {
-//     match get_exif_items(&param.path, &param.items) {
-//         Ok(items ) => Ok (warp::reply::json(&items)),
-//         Err(err) => {
-//             println!("Could not get items: {}", err);
-//             Err(warp::reject())
-//         }
-//     }
-// }
 
 // fn not_found() -> Response<Body> {
 //     Response::builder()
@@ -136,21 +122,6 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
 //             .and(warp::query::query())
 //             .and_then(get_icon);
 
-//         let route_get_exifs = 
-//             warp::post()
-//             .and(warp::path("commander"))
-//             .and(warp::path("getexifs"))
-//             .and(warp::path::end())
-//             .and(warp::body::json())
-//             .and_then(get_exifs);
-
-//             fn add_headers(reply: File)->Response<Body> {
-//             let mut res = reply.into_response();
-//             let headers = res.headers_mut();
-//             let header_map = create_headers();
-//             headers.extend(header_map);
-//             res
-//         }
 
 async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
     match get_root_items() {
@@ -171,4 +142,15 @@ async fn get_items(param: GetItems)->Result<impl warp::Reply, warp::Rejection> {
         }
     }
 }
+
+async fn get_exifs(param: GetExifs)->Result<impl warp::Reply, warp::Rejection> {
+    match get_exif_items(&param.path, &param.items) {
+        Ok(items ) => Ok (warp::reply::json(&items)),
+        Err(err) => {
+            println!("Could not get items: {}", err);
+            Err(warp::reject())
+        }
+    }
+}
+
 

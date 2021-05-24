@@ -1,5 +1,7 @@
+use chrono::{Local, NaiveDateTime, TimeZone};
+use exif::{In, Tag};
 use lexical_sort::natural_lexical_cmp;
-use serde::{Serialize};
+use serde::{Serialize, Deserialize};
 use std::{fmt, fs, iter::Take, time::UNIX_EPOCH};
 
 pub struct Error {
@@ -37,6 +39,14 @@ pub struct FileItem {
     name: String,
     time: u128,
     size: u64
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ExifItem {
+    index: u32,
+    name: String,
+    #[serde(default)]
+    exiftime: i64
 }
 
 pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
@@ -84,29 +94,42 @@ pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
     }
 }
 
-// use core::fmt;
-// use std::{ffi::{CStr, CString, c_void}, fs, iter::Take, process::Command, time::UNIX_EPOCH, u128};
-// use chrono::{Local, NaiveDateTime, TimeZone};
-// use exif::{In, Tag};
-// use gio_sys::GThemedIcon;
-// use glib::{gobject_sys::g_object_unref, object::GObject};
-// use glib_sys::g_free;
-// use gtk_sys::{GtkIconTheme, gtk_icon_info_get_filename, gtk_icon_theme_choose_icon, gtk_icon_theme_get_default};
-// use lexical_sort::{natural_lexical_cmp};
-// use serde::{Serialize, Deserialize};
+pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, Error> {
 
-// static mut DEFAULT_THEME: Option<*mut GtkIconTheme> = None;
+    fn get_unix_time(str: &str)->i64 {
+        let naive_date_time = NaiveDateTime::parse_from_str(str, "%Y-%m-%d %H:%M:%S").unwrap();
+        let datetime = Local.from_local_datetime(&naive_date_time).unwrap();
+        datetime.timestamp_millis()
+    }
 
-
-
-// #[derive(Serialize, Deserialize)]
-// pub struct ExifItem {
-//     index: u32,
-//     name: String,
-//     #[serde(default)]
-//     exiftime: i64
-// }
-
+    let result: Vec<ExifItem> = items.iter().filter_map(|n | {
+        let filename = format!("{}/{}", path, n.name);
+        let file = std::fs::File::open(filename).unwrap();
+        let mut bufreader = std::io::BufReader::new(&file);
+        let exifreader = exif::Reader::new();
+        if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
+            let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+                Some(info) => Some(info.display_value().to_string()),
+                None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+                    Some(info) => Some(info.display_value().to_string()),
+                    None => None
+                } 
+            };
+            match exiftime {
+                Some(exiftime) => Some(ExifItem { 
+                    name: n.name.to_string(), 
+                    index: n.index, 
+                    exiftime: get_unix_time(&exiftime)
+                }),
+                None => None
+            }
+        }
+        else {
+            None
+        }
+    }).collect();
+    Ok(result)
+}
 
 pub trait IteratorExt: Iterator {
 
@@ -121,47 +144,6 @@ pub trait IteratorExt: Iterator {
 }
 
 impl<I: Iterator> IteratorExt for I {}
-
-
-
-
-
-// pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, Error> {
-
-//     fn get_unix_time(str: &str)->i64 {
-//         let naive_date_time = NaiveDateTime::parse_from_str(str, "%Y-%m-%d %H:%M:%S").unwrap();
-//         let datetime = Local.from_local_datetime(&naive_date_time).unwrap();
-//         datetime.timestamp_millis()
-//     }
-
-//     let result: Vec<ExifItem> = items.iter().filter_map(|n | {
-//         let filename = format!("{}/{}", path, n.name);
-//         let file = std::fs::File::open(filename).unwrap();
-//         let mut bufreader = std::io::BufReader::new(&file);
-//         let exifreader = exif::Reader::new();
-//         if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
-//             let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
-//                 Some(info) => Some(info.display_value().to_string()),
-//                 None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
-//                     Some(info) => Some(info.display_value().to_string()),
-//                     None => None
-//                 } 
-//             };
-//             match exiftime {
-//                 Some(exiftime) => Some(ExifItem { 
-//                     name: n.name.to_string(), 
-//                     index: n.index, 
-//                     exiftime: get_unix_time(&exiftime)
-//                 }),
-//                 None => None
-//             }
-//         }
-//         else {
-//             None
-//         }
-//     }).collect();
-//     Ok(result)
-// }
 
 // pub fn get_icon(ext: &str) -> String {
 //     let result: String;
