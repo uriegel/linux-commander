@@ -1,6 +1,6 @@
 use webview_app::app::{App, AppSettings, WarpSettings};
 #[cfg(target_os = "linux")]
-use webview_app::connect_msg_callback;
+use webview_app::app::connect_msg_callback;
 
 #[cfg(target_os = "linux")]
 use gio::{ActionMapExt, SimpleAction};
