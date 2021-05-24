@@ -8,12 +8,12 @@ use gio::{ActionMapExt, SimpleAction};
 use gtk::{Application, ApplicationWindow, Builder, HeaderBar, HeaderBarExt, prelude::{BuilderExtManual, ToVariant}};
 #[cfg(target_os = "linux")]
 use webkit2gtk::{WebView, WebViewExt};
+use crate::server::server;
 
-//mod app;
-//mod server;
-//mod mainwindow;
-//mod webview;
-//mod requests;
+mod server;
+mod requests;
+#[cfg(target_os = "linux")]
+mod linux;
 
 #[cfg(target_os = "linux")]
 fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Builder>, webview: &WebView) {
@@ -37,10 +37,9 @@ fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Bu
 
     if let Some(builder) = builder {
         let headerbar: HeaderBar = builder.get_object("headerbar").unwrap();
-        headerbar.set_subtitle(Some("The subtitle initially set by on_init method"));
         connect_msg_callback(webview, move|cmd: &str, payload: &str|{ 
             match cmd {
-                "subtitle" => headerbar.set_subtitle(Some(payload)),
+                "title" => headerbar.set_subtitle(Some(payload)),
                 "theme" => action.set_state(&payload.to_variant()),
                 _ => {}
             }
@@ -56,7 +55,7 @@ fn run_app() {
             enable_dev_tools: true,
             warp_settings: Some(WarpSettings{
                 port: 9865,
-                init_fn: None
+                init_fn: Some(server)
             }),
             window_pos_storage_path: Some("commander".to_string()),
             #[cfg(target_os = "linux")]

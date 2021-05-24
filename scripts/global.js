@@ -10,7 +10,7 @@ function setTheme(theme) {
 }
 
 function setTitle(title) {
-    //alert("!!webmesg-title!!" + title)
+    sendMessageToWebView("title", title)
 }
 
 function setInitialTheme(theme) {
