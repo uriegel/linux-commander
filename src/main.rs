@@ -19,6 +19,10 @@ fn run_app() {
         AppSettings{
             title: "Commander".to_string(),
             url: "https://crates.io".to_string(), 
+            enable_dev_tools: true,
+            window_pos_storage_path: Some("commander".to_string()),
+            #[cfg(target_os = "linux")]
+            application_id: "de.uriegel.commander".to_string(),
             #[cfg(target_os = "linux")]
             use_glade: true,
             ..Default::default()
