@@ -1,8 +1,7 @@
-function setLinuxOs() {
-    _isLinux = true
-}
 
 function isLinux() {
+    if (_isLinux == undefined)
+        _isLinux = location.search.endsWith("linux")
     return _isLinux
 }
 
@@ -34,4 +33,4 @@ const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn
 
 var onThemeCallback
 var onShowHiddenCallback
-var _isLinux = false
+var _isLinux = undefined

@@ -19,9 +19,6 @@ mod windows;
 
 #[cfg(target_os = "linux")]
 fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Builder>, webview: &WebView) {
-
-    webview.run_javascript(&format!("setLinuxOs()"), Some(&gio::Cancellable::new()), |_|{});
-
     let initial_state = "".to_variant();
     let weak_webview = webview.clone();
     let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
@@ -54,15 +51,18 @@ fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Bu
 
 
 fn run_app() {
+    let port = 9865;
     let app = App::new(
         AppSettings{
             title: "Commander".to_string(),
             enable_dev_tools: true,
             warp_settings: Some(WarpSettings{
-                port: 9865,
+                port: port,
                 init_fn: Some(server)
             }),
             window_pos_storage_path: Some("commander".to_string()),
+            #[cfg(target_os = "linux")]
+            url: format!("http://localhost:{}?os=linux", port),
             #[cfg(target_os = "linux")]
             on_app_init: Some(on_init),
             #[cfg(target_os = "linux")]
