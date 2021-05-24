@@ -77,8 +77,6 @@ fn run_app() {
 fn main() {
     run_app();
 }
-// TODO body theme themeWindows on Windows
-// TODO Icon in MainWindow in Windows
 // TODO get items
 // TODO Test on Windows
 // TODO Theming on Windows
