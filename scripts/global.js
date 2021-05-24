@@ -1,3 +1,11 @@
+function setLinuxOs() {
+    _isLinux = true
+}
+
+function isLinux() {
+    return _isLinux
+}
+
 function initializeCallbacks(onTheme, onShowHidden) {
     onThemeCallback = onTheme
     onShowHiddenCallback = onShowHidden
@@ -26,4 +34,4 @@ const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn
 
 var onThemeCallback
 var onShowHiddenCallback
-
+var _isLinux = false

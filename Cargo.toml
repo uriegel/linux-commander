@@ -27,6 +27,12 @@ gtk = "0.9"
 gio = "0.9"
 webkit2gtk = "0.11"
 
+[target.'cfg(target_os="windows")'.dependencies]
+winapi = { version = "0.3.9", features = ["winuser"]}
+
+[target.'cfg(target_os="windows")'.build-dependencies]
+winres = "0.1"
+
 [features]
 #default = ["gtk/v3_22", "webkit2gtk/v2_6"]
 

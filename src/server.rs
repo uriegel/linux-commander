@@ -4,7 +4,10 @@ use tokio::runtime::Runtime;
 use warp::{Filter, fs::dir};
 use webview_app::headers::add_headers;
 
+#[cfg(target_os = "linux")]
 use crate::linux::requests::get_root_items;
+#[cfg(target_os = "windows")]
+use crate::windows::requests::get_root_items;
 
 // extern crate chrono;
 

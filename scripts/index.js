@@ -7,7 +7,7 @@ const splitter = document.getElementById('splitter')
 
 initializeCallbacks(onTheme, onShowHidden)
 ;(() => {
-    const initialTheme = localStorage.getItem("theme") || "themeAdwaita"
+    const initialTheme = isLinux() ? localStorage.getItem("theme") || "themeAdwaita" : "themeWindows"
     onTheme(initialTheme)
     setInitialTheme(initialTheme) 
 })()

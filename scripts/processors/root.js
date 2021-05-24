@@ -31,19 +31,22 @@ export const getRoot = folderId => {
                 td.classList.add("rightAligned")
             }
         }]
+
+        if (!isLinux())
+            columns = columns.filter(n => n.name != "Mountpoint")
         if (widths)
             columns = columns.map((n, i)=> ({ ...n, width: widths[i]}))
         return columns
     }
 
     const renderRow = (item, tr) => {
-        if (!item.mountPoint)
+        if (isLinux() && !item.mountPoint)
             tr.style.opacity = 0.5
     }
 
     const getCurrentPath = () => ROOT
 
-    const getPath = item => [item.mountPoint, null]
+    const getPath = item => [isLinux() ? item.mountPoint : item.name, null]
 
     const getItems = async () => {
         const responseStr = await fetch('/commander/getroot')
