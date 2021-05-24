@@ -49,7 +49,6 @@ fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Bu
     }    
 }
 
-
 fn run_app() {
     let port = 9865;
     let app = App::new(
@@ -77,9 +76,12 @@ fn run_app() {
 fn main() {
     run_app();
 }
-// TODO get items
+// TODO exif items
+// TODO show hidden items
 // TODO Test on Windows
-// TODO Theming on Windows
+// TODO icons under linus: measure time, transform to Vec<byte>
+// TODO icons: create crate system_icons
+
 
 
 
