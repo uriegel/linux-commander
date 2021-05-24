@@ -1,8 +1,8 @@
-use gtk::GtkApplicationExt;
 use webview_app::app::{App, AppSettings, WarpSettings};
 #[cfg(target_os = "linux")]
 use webview_app::app::connect_msg_callback;
-
+#[cfg(target_os = "linux")]
+use gtk::GtkApplicationExt;
 #[cfg(target_os = "linux")]
 use gio::{ActionMapExt, SimpleAction};
 #[cfg(target_os = "linux")]
@@ -98,7 +98,6 @@ fn run_app() {
 fn main() {
     run_app();
 }
-// TODO Test on Windows
 // TODO icons under linus: measure time, transform to Vec<byte>
 // TODO icons: create crate system_icons
 
