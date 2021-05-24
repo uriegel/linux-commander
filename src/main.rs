@@ -1,7 +1,13 @@
+use webview_app::app::{App, AppSettings, WarpSettings};
+#[cfg(target_os = "linux")]
+use webview_app::connect_msg_callback;
+
+#[cfg(target_os = "linux")]
 use gio::{ActionMapExt, SimpleAction};
+#[cfg(target_os = "linux")]
 use gtk::{Application, ApplicationWindow, Builder, HeaderBar, HeaderBarExt, prelude::{BuilderExtManual, ToVariant}};
+#[cfg(target_os = "linux")]
 use webkit2gtk::{WebView, WebViewExt};
-use webview_app::app::{App, AppSettings, WarpSettings, connect_msg_callback};
 
 //mod app;
 //mod server;
@@ -67,8 +73,9 @@ fn run_app() {
 fn main() {
     run_app();
 }
-// TODO Test on Windows
 // TODO with route filters
+// TODO Test on Windows
+// TODO Theming on Windows
 
 // fn main() {
 //     let port = 9865;
