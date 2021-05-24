@@ -5,10 +5,12 @@ const folderLeft = document.getElementById("folderLeft")
 const folderRight = document.getElementById("folderRight")
 const splitter = document.getElementById('splitter')
 
-const theme = initializeCallbacks(onTheme, onShowHidden)
-onTheme("themeAdwaitaDark")
-setInitialTheme("themeAdwaitaDark") 
-
+initializeCallbacks(onTheme, onShowHidden)
+;(() => {
+    const initialTheme = localStorage.getItem("theme") || "themeAdwaita"
+    onTheme(initialTheme)
+    setInitialTheme(initialTheme) 
+})()
 
 folderLeft.addEventListener("onFocus", evt => {
      activeFolder = folderLeft
@@ -32,6 +34,7 @@ function onTheme(theme) {
     splitter.classList.add(theme)    
     folderLeft.changeTheme(theme)
     folderRight.changeTheme(theme)
+    localStorage.setItem("theme", theme)
 }
 
 function onShowHidden(hidden) {

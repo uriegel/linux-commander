@@ -1,7 +1,6 @@
 function initializeCallbacks(onTheme, onShowHidden) {
     onThemeCallback = onTheme
     onShowHiddenCallback = onShowHidden
-    return initialTheme
 }
 
 function setTheme(theme) {
@@ -11,11 +10,11 @@ function setTheme(theme) {
 }
 
 function setTitle(title) {
-    alert("!!webmesg-title!!" + title)
+    //alert("!!webmesg-title!!" + title)
 }
 
 function setInitialTheme(theme) {
-    alert("!!webmesg-theme!!" + theme)
+    sendMessageToWebView("theme", theme)
 }
 
 function showHidden(hidden) {
@@ -26,5 +25,5 @@ function showHidden(hidden) {
 const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn(acc), args);
 
 var onThemeCallback
-var initialTheme
+var onShowHiddenCallback
 
