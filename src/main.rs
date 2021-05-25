@@ -98,7 +98,6 @@ fn run_app() {
 fn main() {
     run_app();
 }
-// TODO icons: Windows
 
 
 
