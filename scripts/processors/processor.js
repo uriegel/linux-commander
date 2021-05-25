@@ -4,7 +4,7 @@ import { getRoot, ROOT } from "./root.js"
 export const getProcessor = (folderId, path, recentProcessor) => {
 
     if (!path)
-        path = localStorage.getItem(`${folderId}-path`) || ROOT
+        path = ROOT
 
     if (path == "root") {
         if (recentProcessor && recentProcessor.getType() == ROOT)

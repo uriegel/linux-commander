@@ -150,13 +150,13 @@ class Folder extends HTMLElement {
         if (await this.processor.addExtensions(items))
             this.table.refresh()
 
-        this.pathInput.value = path || this.processor.getCurrentPath()
-        localStorage.setItem(`${this.folderId}-lastPath`, path)
+        const newPath = path || this.processor.getCurrentPath()
+        this.pathInput.value = newPath
+        localStorage.setItem(`${this.folderId}-lastPath`, newPath)
     }
 }
 
 customElements.define('folder-table', Folder)
 
-// TODO Save last path
 // TODO History with backspace and ctrl backspace
 // TODO tab focus
