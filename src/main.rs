@@ -98,9 +98,7 @@ fn run_app() {
 fn main() {
     run_app();
 }
-// TODO icons under linus: measure time, transform to Vec<byte>
-// TODO icons: create crate system_icons
-
+// TODO icons: Windows
 
 
 

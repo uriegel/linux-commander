@@ -1,8 +1,11 @@
-use chrono::{Local, NaiveDateTime, TimeZone};
+use chrono::{Local, NaiveDateTime, TimeZone, Utc};
 use exif::{In, Tag};
 use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
+use warp::{http::HeaderValue, hyper::{self, HeaderMap, Response}};
 use std::{fmt, fs, iter::Take, time::UNIX_EPOCH};
+
+const ICON_SIZE: i32 = 16;
 
 pub struct Error {
     pub message: String
@@ -19,6 +22,11 @@ impl fmt::Display for Error {
 pub struct DirectoryItems {
     pub files: Vec<FileItem>,
     pub dirs: Vec<DirItem>
+}
+
+#[derive(Deserialize)]
+pub struct GetIcon {
+    ext: String,
 }
 
 enum FileType {
@@ -131,6 +139,26 @@ pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, 
     Ok(result)
 }
 
+pub async fn get_icon(param: GetIcon) -> Result<impl warp::Reply, warp::Rejection> {
+    let bytes = systemicons::get_icon(&param.ext, ICON_SIZE).unwrap();
+    let body = hyper::Body::from(bytes);
+    let mut response = Response::new(body);
+    let headers = response.headers_mut();
+    let mut header_map = create_headers();
+    header_map.insert("Content-Type", HeaderValue::from_str("image/png").unwrap());
+    headers.extend(header_map);
+    Ok (response)        
+}
+
+fn create_headers() -> HeaderMap {
+    let mut header_map = HeaderMap::new();
+    let now = Utc::now();
+    let now_str = now.format("%a, %d %h %Y %T GMT").to_string();
+    header_map.insert("Expires", HeaderValue::from_str(now_str.as_str()).unwrap());
+    header_map.insert("Server", HeaderValue::from_str("My Server").unwrap());
+    header_map
+}
+
 pub trait IteratorExt: Iterator {
 
     fn take_option(self, n: Option<usize>) -> Take<Self>
@@ -145,33 +173,3 @@ pub trait IteratorExt: Iterator {
 
 impl<I: Iterator> IteratorExt for I {}
 
-// pub fn get_icon(ext: &str) -> String {
-//     let result: String;
-//     unsafe {
-//         let filename = CString::new(ext).unwrap();
-//         let null: u8 = 0;
-//         let p_null = &null as *const u8;
-//         let nullsize: usize = 0;
-//         let mut res = 0;
-//         let p_res = &mut res as *mut i32;
-//         let p_res = gio_sys::g_content_type_guess(filename.as_ptr(), p_null, nullsize, p_res);
-//         let icon = gio_sys::g_content_type_get_icon(p_res);
-//         g_free(p_res as *mut c_void);
-//         if DEFAULT_THEME.is_none() {
-//             DEFAULT_THEME = Some(gtk_icon_theme_get_default());
-//         }
-//         let icon_names = gio_sys::g_themed_icon_get_names(icon as *mut GThemedIcon) as *mut *const i8;
-//         let icon_info = gtk_icon_theme_choose_icon(DEFAULT_THEME.unwrap(), icon_names, 16, 2);
-//         let filename = gtk_icon_info_get_filename(icon_info);
-//         let res_str = CStr::from_ptr(filename);
-//         result = match res_str.to_str() {
-//             Ok(str) => str.to_string(),
-//             Err(err) => {
-//                 println!("Could not expand icon file name: {}", err);
-//                 "".to_string()
-//             }
-//         };
-//         g_object_unref(icon as *mut GObject);
-//     }
-//     result
-// }
