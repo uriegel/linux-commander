@@ -14,7 +14,8 @@ class Folder extends HTMLElement {
         
         this.table = this.getElementsByTagName("VIRTUAL-TABLE-COMPONENT")[0]
         this.pathInput = this.getElementsByTagName("INPUT")[0]
-        this.changePath()
+        const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
+        this.changePath(lastPath)
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
     }
     
@@ -150,6 +151,7 @@ class Folder extends HTMLElement {
             this.table.refresh()
 
         this.pathInput.value = path || this.processor.getCurrentPath()
+        localStorage.setItem(`${this.folderId}-lastPath`, path)
     }
 }
 
