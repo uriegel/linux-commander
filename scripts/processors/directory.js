@@ -74,17 +74,33 @@ export const getDirectory = (folderId, path) => {
 
     const getParentDir = path => {
         let pos = path.lastIndexOf(pathDelimiter)
-        return [pos ? path.substr(0, pos) : pathDelimiter, path.substr(pos + 1)]
+        let parent = pos ? path.substr(0, pos) : pathDelimiter
+        if (!isLinux() && parent.indexOf("\\") == -1)
+            parent += pathDelimiter
+        return [parent, path.substr(pos + 1)]
     }
 
     const getCurrentPath = () => currentPath
 
+    const parentIsRoot = () => {
+        if (isLinux()) {
+            return currentPath == pathDelimiter
+        } else 
+            return currentPath.endsWith(":\\")
+    }
+
     const getPath = item => item.isDirectory 
         ? item.name != ".."
-            ? [currentPath + pathDelimiter + item.name, null]
-            : currentPath != pathDelimiter
-                ? getParentDir(currentPath)
-                : [ROOT, null]
+            ? [
+                isLinux() 
+                ? currentPath + pathDelimiter + item.name 
+                : currentPath.endsWith(":\\")
+                    ? currentPath + item.name
+                    : currentPath + pathDelimiter + item.name, 
+                null]
+            : parentIsRoot()  
+                ? [ROOT, null]
+                : getParentDir(currentPath)
         : [null, null]
 
     const getItems = async path => {
@@ -155,7 +171,7 @@ export const getDirectory = (folderId, path) => {
 
     const getItem = item => isLinux() 
         ? currentPath == pathDelimiter ? pathDelimiter + item.name : currentPath + pathDelimiter + item.name
-        : currentPath.endsWith(":\\") ? currentPath + pathDelimiter + item.name : currentPath + pathDelimiter + item.name
+        : currentPath.endsWith(":\\") ? currentPath + item.name : currentPath + pathDelimiter + item.name
 
     return {
         getType,

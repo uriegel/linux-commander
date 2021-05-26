@@ -124,8 +124,10 @@ class Folder extends HTMLElement {
             
 
         this.pathInput.onkeydown = evt => {
-            if (evt.which == 13)
+            if (evt.which == 13) {
                 this.changePath(this.pathInput.value)
+                this.table.setFocus()
+            }
         }
         this.pathInput.onfocus = () => setTimeout(() => this.pathInput.select())
     }
@@ -190,6 +192,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO Windows: \\unc instead of c:\
 // TODO Windows: Version PElite
 // TODO Windows: Icons für exe and dll
-// TODO Viewer fpr img, pdf and mp4
+// TODO Viewer für img, pdf and mp4
