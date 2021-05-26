@@ -23,6 +23,8 @@ const onPathChanged = evt => setTitle(evt.detail)
 
 folderLeft.addEventListener("pathChanged", onPathChanged)
 folderRight.addEventListener("pathChanged", onPathChanged)
+folderLeft.addEventListener("tab", () => folderRight.setFocus())
+folderRight.addEventListener("tab", () => folderLeft.setFocus())
 
 function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {
@@ -44,8 +46,22 @@ function onShowHidden(hidden) {
 
 folderLeft.setFocus()
 
-var activeFolder = folderLeft
+// document.addEventListener("keydown", evt => {
+//     switch (evt.which) {
+//         case 9: // tab
+//             if (!evt.shiftKey) {
+//                 if (activeFolder == folderLeft)
+//                     folderRight.setFocus()
+//                 else
+//                     folderLeft.setFocus()
+//                 evt.preventDefault()
+//                 evt.stopPropagation()
+//             }
+//             break
+//     }
+// })
 
+var activeFolder = folderLeft
 
 
 

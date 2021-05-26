@@ -69,6 +69,14 @@ class Folder extends HTMLElement {
                 case 8: // backspace
                     this.getHistoryPath(evt.shiftKey)
                     return
+                case 9: // tab
+                    if (evt.shiftKey) {
+                        this.pathInput.setFocus()
+                    } else 
+                        this.dispatchEvent(new CustomEvent('tab', { detail: this.id }))
+                    evt.preventDefault()
+                    evt.stopPropagation()
+                    break
                 case 35: // end
                     if (evt.shiftKey) {
                         const pos = this.table.getPosition()
@@ -182,6 +190,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO tab focus
 // TODO Windows: Version PElite
 // TODO Windows: Icons für exe and dll
+// TODO Viewer fpr img, pdf and mp4
