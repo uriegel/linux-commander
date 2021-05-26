@@ -122,7 +122,7 @@ class Folder extends HTMLElement {
         this.pathInput.onfocus = () => setTimeout(() => this.pathInput.select())
     }
 
-    async changePath(path) {
+    async changePath(path, fromBacklog) {
         const result = getProcessor(this.folderId, path, this.processor)
         let items = (await result.processor.getItems(path)).map(n => {
             n.isHidden = n.name && n.name[0] == '.' && n.name[1] != '.'
@@ -155,31 +155,33 @@ class Folder extends HTMLElement {
         if (await this.processor.addExtensions(items))
             this.table.refresh()
         
-        this.onPathChanged(path)
+        this.onPathChanged(path, fromBacklog)
     }
 
-    onPathChanged(newPath) {
+    onPathChanged(newPath, fromBacklog) {
         const path = newPath || this.processor.getCurrentPath()
         this.pathInput.value = path
         localStorage.setItem(`${this.folderId}-lastPath`, path)
-        if (this.backPosition >= 0)
+        if (!fromBacklog) {
+            this.backPosition++
             this.backtrack.length = this.backPosition
-        this.backPosition++
-        this.backtrack.push(path)
+            this.backtrack.push(path)
+        }
     }
 
     getHistoryPath(forward) {
         if (!forward && this.backPosition >= 0) {
             this.backPosition--
-            this.changePath(this.backtrack[this.backPosition])
+            this.changePath(this.backtrack[this.backPosition], true)
         } else if (forward && this.backPosition < this.backtrack.length - 1) {
             this.backPosition++
-            this.changePath(this.backtrack[this.backPosition])
+            this.changePath(this.backtrack[this.backPosition], true)
         }
     }
 }
 
 customElements.define('folder-table', Folder)
 
-// TODO History with backspace and ctrl backspace
 // TODO tab focus
+// TODO Windows: Version PElite
+// TODO Windows: Icons für exe and dll
