@@ -45,6 +45,8 @@ function onShowHidden(hidden) {
 }
 
 folderLeft.setFocus()
+if (!isLinux())
+    setTimeout(() => folderLeft.setFocus(), 100)
 
 // document.addEventListener("keydown", evt => {
 //     switch (evt.which) {

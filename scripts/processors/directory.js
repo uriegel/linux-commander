@@ -2,6 +2,8 @@ export const DIRECTORY = "directory"
 import { formatDateTime, formatSize, getExtension } from "./renderTools.js"
 import { ROOT } from "./root.js"
 
+const pathDelimiter = isLinux() ? "/" : "\\"
+
 export const getDirectory = (folderId, path) => {
     const getType = () => DIRECTORY
     
@@ -71,16 +73,16 @@ export const getDirectory = (folderId, path) => {
     }
 
     const getParentDir = path => {
-        let pos = path.lastIndexOf('/')
-        return [pos ? path.substr(0, pos) : "/", path.substr(pos + 1)]
+        let pos = path.lastIndexOf(pathDelimiter)
+        return [pos ? path.substr(0, pos) : pathDelimiter, path.substr(pos + 1)]
     }
 
     const getCurrentPath = () => currentPath
 
     const getPath = item => item.isDirectory 
         ? item.name != ".."
-            ? [currentPath + '/' + item.name, null]
-            : currentPath != "/"
+            ? [currentPath + pathDelimiter + item.name, null]
+            : currentPath != pathDelimiter
                 ? getParentDir(currentPath)
                 : [ROOT, null]
         : [null, null]
@@ -151,7 +153,9 @@ export const getDirectory = (folderId, path) => {
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-directory-widths`, JSON.stringify(widths))
 
-    const getItem = item => currentPath == "/" ? "/" + item.name : currentPath + "/" + item.name
+    const getItem = item => isLinux() 
+        ? currentPath == pathDelimiter ? pathDelimiter + item.name : currentPath + pathDelimiter + item.name
+        : currentPath.endsWith(":\\") ? currentPath + pathDelimiter + item.name : currentPath + pathDelimiter + item.name
 
     return {
         getType,

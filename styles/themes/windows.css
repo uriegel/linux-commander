@@ -2,6 +2,8 @@
     --exif-color: darkblue;
     --selected-exif-color: yellow;
     
+    --vtc-top: 16px;
+
     --vtc-scrollbar-button-display: none;
     --vtc-scrollbar-width: 12px;
     --vtc-scrollbar-background-color: transparent;
@@ -22,5 +24,8 @@ body.themeWindows {
     font-size: 75%;
 }
 
+.pathInput.themeWindows {
+    font-size: 100%;
+}
 
 

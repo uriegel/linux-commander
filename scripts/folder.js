@@ -71,7 +71,7 @@ class Folder extends HTMLElement {
                     return
                 case 9: // tab
                     if (evt.shiftKey) {
-                        this.pathInput.setFocus()
+                        this.pathInput.focus()
                     } else 
                         this.dispatchEvent(new CustomEvent('tab', { detail: this.id }))
                     evt.preventDefault()

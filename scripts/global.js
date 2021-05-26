@@ -17,11 +17,13 @@ function setTheme(theme) {
 }
 
 function setTitle(title) {
-    sendMessageToWebView("title", title)
+    if (isLinux())
+        sendMessageToWebView("title", title)
 }
 
 function setInitialTheme(theme) {
-    sendMessageToWebView("theme", theme)
+    if (isLinux())
+        sendMessageToWebView("theme", theme)
 }
 
 function showHidden(hidden) {
