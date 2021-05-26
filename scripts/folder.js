@@ -13,6 +13,8 @@ class Folder extends HTMLElement {
             </div`
         
         this.table = this.getElementsByTagName("VIRTUAL-TABLE-COMPONENT")[0]
+        this.backtrack = []
+        this.backPosition = -1
         this.pathInput = this.getElementsByTagName("INPUT")[0]
         const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
         this.changePath(lastPath)
@@ -64,6 +66,9 @@ class Folder extends HTMLElement {
         
         this.table.addEventListener("keydown", evt => {
             switch (evt.which) {
+                case 8: // backspace
+                    this.getHistoryPath(evt.shiftKey)
+                    return
                 case 35: // end
                     if (evt.shiftKey) {
                         const pos = this.table.getPosition()
@@ -149,10 +154,28 @@ class Folder extends HTMLElement {
         ))
         if (await this.processor.addExtensions(items))
             this.table.refresh()
+        
+        this.onPathChanged(path)
+    }
 
-        const newPath = path || this.processor.getCurrentPath()
-        this.pathInput.value = newPath
-        localStorage.setItem(`${this.folderId}-lastPath`, newPath)
+    onPathChanged(newPath) {
+        const path = newPath || this.processor.getCurrentPath()
+        this.pathInput.value = path
+        localStorage.setItem(`${this.folderId}-lastPath`, path)
+        if (this.backPosition >= 0)
+            this.backtrack.length = this.backPosition
+        this.backPosition++
+        this.backtrack.push(path)
+    }
+
+    getHistoryPath(forward) {
+        if (!forward && this.backPosition >= 0) {
+            this.backPosition--
+            this.changePath(this.backtrack[this.backPosition])
+        } else if (forward && this.backPosition < this.backtrack.length - 1) {
+            this.backPosition++
+            this.changePath(this.backtrack[this.backPosition])
+        }
     }
 }
 
