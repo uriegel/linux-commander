@@ -93,7 +93,7 @@ export const getDirectory = (folderId, path) => {
         ? item.name != ".."
             ? [
                 isLinux() 
-                ? currentPath + pathDelimiter + item.name 
+                ? currentPath != "/" ? currentPath + pathDelimiter + item.name : currentPath + item.name
                 : currentPath.endsWith(":\\")
                     ? currentPath + item.name
                     : currentPath + pathDelimiter + item.name, 
