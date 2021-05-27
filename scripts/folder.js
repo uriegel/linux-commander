@@ -162,8 +162,10 @@ class Folder extends HTMLElement {
             items.filter(n => n.name.toLowerCase()
                 .startsWith(restrictValue.toLowerCase())
         ))
-        if (await this.processor.addExtensions(items))
-            this.table.refresh()
+        ;(async () => {
+            if (await this.processor.addExtensions(items))
+                this.table.refresh()
+        })()
         
         this.onPathChanged(path, fromBacklog)
     }
