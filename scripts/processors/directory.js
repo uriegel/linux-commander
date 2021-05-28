@@ -103,15 +103,13 @@ export const getDirectory = (folderId, path) => {
                 : getParentDir(currentPath)
         : [null, null]
 
-    const getItems = async path => {
+    const getItems = async (id, path) => {
         const responseStr = await fetch("/commander/getitems", { 
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
             },            
-            body: JSON.stringify({
-                path
-            }) 
+            body: JSON.stringify({ id, path }) 
         })
         const response = await responseStr.json()
         let result = [{
@@ -125,32 +123,6 @@ export const getDirectory = (folderId, path) => {
             currentPath = path
         return result
     }    
-
-    const addExtensions = async items => {
-        const imageItems = items
-            .map((n, index) => ({ index, name: n.name}))
-            .filter((n, i) => n.name && (n.name.toLowerCase().endsWith(".jpg") || n.name.toLowerCase().endsWith(".png")))
-
-        if (imageItems.length) {
-            const responseStr = await fetch("/commander/getexifs", { 
-                method: 'POST', 
-                headers: {
-                    'Content-Type': 'application/json'
-                },            
-                body: JSON.stringify({
-                    path: currentPath,
-                    items: imageItems
-                }) 
-            })
-            const response = await responseStr.json()
-            response.forEach(n => {
-                items[n.index].exiftime = n.exiftime
-            })
-            return response.length ? true : false
-        }
-        else
-            return false
-    }
 
     const getSortFunction = (column, isSubItem) => {
         switch (column) {
@@ -173,16 +145,24 @@ export const getDirectory = (folderId, path) => {
         ? currentPath == pathDelimiter ? pathDelimiter + item.name : currentPath + pathDelimiter + item.name
         : currentPath.endsWith(":\\") ? currentPath + item.name : currentPath + pathDelimiter + item.name
 
+    const onEvent = (items, msg) => {
+        const exifItems = JSON.parse(msg)
+        exifItems.forEach(n => {
+            items[n.index].exiftime = n.exiftime
+        })
+        return exifItems.length ? true : false
+    }
+
     return {
         getType,
         getColumns,
-        addExtensions,
         renderRow,
         getCurrentPath,
         getPath,
         getItems,
         getSortFunction,
         saveWidths,
-        getItem
+        getItem,
+        onEvent
     }
 }

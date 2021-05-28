@@ -13,6 +13,7 @@ use crate::server::server;
 
 mod server;
 mod requests;
+mod eventsink;
 #[cfg(target_os = "linux")]
 mod linux;
 #[cfg(target_os = "windows")]

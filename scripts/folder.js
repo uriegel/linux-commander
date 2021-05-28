@@ -19,6 +19,9 @@ class Folder extends HTMLElement {
         const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
         this.changePath(lastPath)
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
+        const events = new WebSocket(`ws://localhost:${location.port}/events/${this.folderId}`)
+        events.onopen = () => console.log("Bin geöffnet")
+        events.onmessage = msg => this.onEvent(msg.data)
     }
     
     changeTheme(theme) {
@@ -134,7 +137,7 @@ class Folder extends HTMLElement {
 
     async changePath(path, fromBacklog) {
         const result = getProcessor(this.folderId, path, this.processor)
-        let items = (await result.processor.getItems(path)).map(n => {
+        let items = (await result.processor.getItems(this.folderId, path)).map(n => {
             n.isHidden = n.name && n.name[0] == '.' && n.name[1] != '.'
             return n
         })
@@ -162,10 +165,6 @@ class Folder extends HTMLElement {
             items.filter(n => n.name.toLowerCase()
                 .startsWith(restrictValue.toLowerCase())
         ))
-        ;(async () => {
-            if (await this.processor.addExtensions(items))
-                this.table.refresh()
-        })()
         
         this.onPathChanged(path, fromBacklog)
     }
@@ -190,10 +189,16 @@ class Folder extends HTMLElement {
             this.changePath(this.backtrack[this.backPosition], true)
         }
     }
+
+    onEvent(msg) {
+        if (this.processor.onEvent(this.table.items, msg))
+            this.table.refresh()
+    }
 }
 
 customElements.define('folder-table', Folder)
 
+// TODO exifs: discard old resolves!
 // TODO Windows: \\unc instead of c:\
 // TODO Windows: Version PElite
 // TODO Windows: Icons für exe and dll

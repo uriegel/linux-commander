@@ -3,7 +3,9 @@ use exif::{In, Tag};
 use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
 use warp::{http::HeaderValue, hyper::{self, HeaderMap, Response}};
-use std::{fmt, fs, iter::Take, time::UNIX_EPOCH};
+use std::{fmt, fs, iter::Take, thread, time::UNIX_EPOCH};
+
+use crate::eventsink::EventSinks;
 
 const ICON_SIZE: i32 = 16;
 
@@ -102,7 +104,9 @@ pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
     }
 }
 
-pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, Error> {
+pub fn send_exif_items(id: String, path: String, items: &DirectoryItems, event_sinks: EventSinks) {
+    let index_pos = items.dirs.len() as u32 + 1;
+    let files: Vec<FileItem> = items.files.iter().map(|n| FileItem{name: n.name.clone(), size: n.size, time: n.time}).collect();
 
     fn get_unix_time(str: &str)->i64 {
         let naive_date_time = NaiveDateTime::parse_from_str(str, "%Y-%m-%d %H:%M:%S").unwrap();
@@ -110,33 +114,49 @@ pub fn get_exif_items(path: &str, items: &Vec<ExifItem>)->Result<Vec<ExifItem>, 
         datetime.timestamp_millis()
     }
 
-    let result: Vec<ExifItem> = items.iter().filter_map(|n | {
-        let filename = format!("{}/{}", path, n.name);
-        let file = std::fs::File::open(filename).unwrap();
-        let mut bufreader = std::io::BufReader::new(&file);
-        let exifreader = exif::Reader::new();
-        if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
-            let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
-                Some(info) => Some(info.display_value().to_string()),
-                None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
-                    Some(info) => Some(info.display_value().to_string()),
-                    None => None
-                } 
+    thread::spawn( move|| {
+        
+        let mut index: u32 = 0;
+        let exifitems: Vec<ExifItem> = files.iter().filter_map(|n| {
+            let ext = n.name.to_lowercase();
+            let res = if ext.ends_with(".png") || ext.ends_with(".jpg") {
+
+                let filename = format!("{}/{}", path, n.name);
+                let file = std::fs::File::open(filename).unwrap();
+                let mut bufreader = std::io::BufReader::new(&file);
+                let exifreader = exif::Reader::new();
+                if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
+                    let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+                        Some(info) => Some(info.display_value().to_string()),
+                        None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+                            Some(info) => Some(info.display_value().to_string()),
+                            None => None
+                        } 
+                    };
+                    match exiftime {
+                        Some(exiftime) => Some(ExifItem { 
+                            name: n.name.to_string(), 
+                            index: index + index_pos, 
+                            exiftime: get_unix_time(&exiftime)
+                        }),
+                        None => None
+                    }
+                }
+                else {
+                    None
+                }
+            } else {
+                None
             };
-            match exiftime {
-                Some(exiftime) => Some(ExifItem { 
-                    name: n.name.to_string(), 
-                    index: n.index, 
-                    exiftime: get_unix_time(&exiftime)
-                }),
-                None => None
-            }
+            index += 1;
+            res
+        }).collect();
+                
+        if exifitems.len() > 0 {
+            let json = serde_json::to_string(&exifitems).unwrap();
+            event_sinks.send(id, json);
         }
-        else {
-            None
-        }
-    }).collect();
-    Ok(result)
+    });
 }
 
 pub async fn get_icon(param: GetIcon) -> Result<impl warp::Reply, warp::Rejection> {
