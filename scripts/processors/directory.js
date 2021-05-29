@@ -9,7 +9,7 @@ export const getDirectory = (folderId, path) => {
     
     let currentPath = ""
 
-    const getColumns = () => {
+    const getColumns = getProcessor => {
         const widthstr = localStorage.getItem(`${folderId}-directory-widths`)
         const widths = widthstr ? JSON.parse(widthstr) : []
         let columns = [{
@@ -30,7 +30,11 @@ export const getDirectory = (folderId, path) => {
                     td.appendChild(document.importNode(t.content, true))
                 } else {
                     const img = document.createElement("img")
-                    const ext = getExtension(item.name)
+                    const ext = isLinux() 
+                        ? getExtension(item.name)
+                        : item.name.toLowerCase().endsWith(".exe")
+                            ? getProcessor().getIconPath(item.name)
+                            : getExtension(item.name)
                     if (ext) {
                         img.src = `commander/geticon?ext=${ext}`
                         img.classList.add("image")
@@ -153,6 +157,8 @@ export const getDirectory = (folderId, path) => {
         return exifItems.length ? true : false
     }
 
+    const getIconPath = name => currentPath + pathDelimiter + name
+
     return {
         getType,
         getColumns,
@@ -163,6 +169,7 @@ export const getDirectory = (folderId, path) => {
         getSortFunction,
         saveWidths,
         getItem,
-        onEvent
+        onEvent,
+        getIconPath
     }
 }

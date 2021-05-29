@@ -20,7 +20,6 @@ class Folder extends HTMLElement {
         this.changePath(lastPath)
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
         const events = new WebSocket(`ws://localhost:${location.port}/events/${this.folderId}`)
-        events.onopen = () => console.log("Bin geöffnet")
         events.onmessage = msg => this.onEvent(msg.data)
     }
     
@@ -149,7 +148,7 @@ class Folder extends HTMLElement {
         this.table.setItems([])
         if (result.changed) {
             this.processor = result.processor
-            const columns = this.processor.getColumns()
+            const columns = isLinux() ? this.processor.getColumns() : this.processor.getColumns(() => this.processor)
             this.table.setColumns(columns)
             this.sortFunction = null
         }
@@ -202,5 +201,4 @@ customElements.define('folder-table', Folder)
 // TODO exifs: discard old resolves!
 // TODO Windows: \\unc instead of c:\
 // TODO Windows: Version PElite
-// TODO Windows: Icons für exe and dll, already implemented in systemicons
 // TODO Viewer für img, pdf and mp4
