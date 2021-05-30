@@ -179,6 +179,10 @@ class Folder extends HTMLElement {
         }
     }
 
+    getCurrentPath() {
+        return this.processor.getCurrentPath()
+    }
+
     getHistoryPath(forward) {
         if (!forward && this.backPosition >= 0) {
             this.backPosition--
@@ -197,7 +201,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO F9 adapt pathes
 // TODO exifs: discard old resolves!
 // TODO Windows: \\unc instead of c:\
 // TODO Windows: Version PElite

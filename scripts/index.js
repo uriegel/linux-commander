@@ -48,20 +48,14 @@ folderLeft.setFocus()
 if (!isLinux())
     setTimeout(() => folderLeft.setFocus(), 100)
 
-// document.addEventListener("keydown", evt => {
-//     switch (evt.which) {
-//         case 9: // tab
-//             if (!evt.shiftKey) {
-//                 if (activeFolder == folderLeft)
-//                     folderRight.setFocus()
-//                 else
-//                     folderLeft.setFocus()
-//                 evt.preventDefault()
-//                 evt.stopPropagation()
-//             }
-//             break
-//     }
-// })
+document.addEventListener("keydown", evt => {
+    switch (evt.which) {
+        case 120: // F9
+            const inactiveFolder = activeFolder == folderLeft ? folderRight : folderLeft
+            inactiveFolder.changePath(activeFolder.getCurrentPath())        
+            break
+    }
+})
 
 var activeFolder = folderLeft
 
