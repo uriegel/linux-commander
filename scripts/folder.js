@@ -205,3 +205,5 @@ customElements.define('folder-table', Folder)
 // TODO Windows: Version PElite
 // TODO Viewer für img, pdf and mp4
 // TODO Refresh Ctrl+R
+// TODO Windows: Status line (# files, # selected files)
+// TODO Viewer für img, pdf and mp4
