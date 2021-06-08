@@ -53,7 +53,7 @@ pub struct FileItem {
 
 #[derive(Serialize, Deserialize)]
 pub struct ExifItem {
-    index: u32,
+    index: usize,
     name: String,
     #[serde(default)]
     exiftime: i64
@@ -105,8 +105,16 @@ pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
 }
 
 pub fn send_exif_items(id: String, path: String, items: &DirectoryItems, event_sinks: EventSinks) {
-    let index_pos = items.dirs.len() as u32 + 1;
-    let files: Vec<FileItem> = items.files.iter().map(|n| FileItem{name: n.name.clone(), size: n.size, time: n.time}).collect();
+    let index_pos = items.dirs.len() + 1;
+    let files: Vec<(usize, FileItem)> = items.files
+        .iter()
+        .enumerate()
+        .map(| (index, n)| (index, FileItem{name: n.name.clone(), size: n.size, time: n.time}))
+        .filter(|(_, n)| {
+            let ext = n.name.to_lowercase();
+            ext.ends_with(".png") || ext.ends_with(".jpg")
+        })
+        .collect();
 
     fn get_unix_time(str: &str)->i64 {
         let naive_date_time = NaiveDateTime::parse_from_str(str, "%Y-%m-%d %H:%M:%S").unwrap();
@@ -114,49 +122,48 @@ pub fn send_exif_items(id: String, path: String, items: &DirectoryItems, event_s
         datetime.timestamp_millis()
     }
 
-    thread::spawn( move|| {
-        
-        let mut index: u32 = 0;
-        let exifitems: Vec<ExifItem> = files.iter().filter_map(|n| {
-            let ext = n.name.to_lowercase();
-            let res = if ext.ends_with(".png") || ext.ends_with(".jpg") {
-
-                let filename = format!("{}/{}", path, n.name);
-                let file = std::fs::File::open(filename).unwrap();
-                let mut bufreader = std::io::BufReader::new(&file);
-                let exifreader = exif::Reader::new();
-                if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
-                    let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
-                        Some(info) => Some(info.display_value().to_string()),
-                        None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
-                            Some(info) => Some(info.display_value().to_string()),
-                            None => None
-                        } 
-                    };
-                    match exiftime {
-                        Some(exiftime) => Some(ExifItem { 
-                            name: n.name.to_string(), 
-                            index: index + index_pos, 
-                            exiftime: get_unix_time(&exiftime)
-                        }),
-                        None => None
+    if files.len() > 0 {
+        if let Some(request_id) = event_sinks.register_request(id.clone()) {
+            thread::spawn( move|| {
+                let exifitems: Vec<ExifItem> = files.iter().filter_map(|(index, n)| {
+                    let filename = format!("{}/{}", path, n.name);
+                    let file = std::fs::File::open(filename).unwrap();
+                    let mut bufreader = std::io::BufReader::new(&file);
+                    let exifreader = exif::Reader::new();
+    
+                    if event_sinks.is_request_active(id.clone(), request_id) {
+                        if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
+                            let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+                                Some(info) => Some(info.display_value().to_string()),
+                                None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+                                    Some(info) => Some(info.display_value().to_string()),
+                                    None => None
+                                } 
+                            };
+                            match exiftime {
+                                Some(exiftime) => Some(ExifItem { 
+                                    name: n.name.to_string(), 
+                                    index: index + index_pos, 
+                                    exiftime: get_unix_time(&exiftime)
+                                }),
+                                None => None
+                            }
+                        }
+                        else {
+                            None
+                        }
+                    } else {
+                        None
                     }
+                }).collect();
+                        
+                if exifitems.len() > 0 && event_sinks.is_request_active(id.clone(), request_id) {
+                    let json = serde_json::to_string(&exifitems).unwrap();
+                    event_sinks.send(id, json);
                 }
-                else {
-                    None
-                }
-            } else {
-                None
-            };
-            index += 1;
-            res
-        }).collect();
-                
-        if exifitems.len() > 0 {
-            let json = serde_json::to_string(&exifitems).unwrap();
-            event_sinks.send(id, json);
+            });
         }
-    });
+    }
 }
 
 pub async fn get_icon(param: GetIcon) -> Result<impl warp::Reply, warp::Rejection> {

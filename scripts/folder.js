@@ -201,7 +201,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO exifs: discard old resolves!
 // TODO Windows: \\unc instead of c:\
 // TODO Windows: Version PElite
 // TODO Viewer für img, pdf and mp4
