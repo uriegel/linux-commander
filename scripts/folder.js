@@ -201,9 +201,8 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO Status line (# files, # selected files)
+// TODO Refresh Ctrl+R
 // TODO Windows: \\unc instead of c:\
 // TODO Windows: Version PElite
-// TODO Viewer für img, pdf and mp4
-// TODO Refresh Ctrl+R
-// TODO Windows: Status line (# files, # selected files)
-// TODO Viewer für img, pdf and mp4
+// TODO Viewer for img, pdf and mp4

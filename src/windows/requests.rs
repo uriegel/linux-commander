@@ -69,3 +69,30 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
         // })
     }
 }
+
+
+pub fn check_extended_items(ext: &str)->bool {
+    ext.ends_with(".png") 
+    || ext.ends_with(".jpg")
+    || ext.ends_with(".exe")
+    || ext.ends_with(".dll")
+}
+
+pub fn get_version(path: &str)->Option<String> {
+
+        // if let Ok(file_map) = pelite::FileMap::open(r"c:\windows\explorer.exe") {
+        //     if let Ok(image) = pelite::PeFile::from_bytes(file_map.as_ref()) {
+        //         if let Ok(resources) = image.resources() {
+        //             if let Ok(version_info) = resources.version_info() {
+        //                 let file_info = version_info.file_info();
+        //                 if let Some(fixed) = file_info.fixed {
+        //                     println!("Version: {:?}, {},{},{},{}", fixed.dwFileVersion, fixed.dwFileVersion.Major, fixed.dwFileVersion.Minor, fixed.dwFileVersion.Patch, fixed.dwFileVersion.Build);    
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+
+    None
+}

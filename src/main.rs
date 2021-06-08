@@ -97,30 +97,6 @@ fn run_app() {
 }
 
 fn main() {
-
-        if let Ok(file_map) = pelite::FileMap::open(r"c:\windows\explorer.exe") {
-            if let Ok(image) = pelite::PeFile::from_bytes(file_map.as_ref()) {
-                if let Ok(resources) = image.resources() {
-                    if let Ok(version_info) = resources.version_info() {
-                        let file_info = version_info.file_info();
-                        if let Some(fixed) = file_info.fixed {
-                            println!("Version: {:?}, {},{},{},{}", fixed.dwFileVersion, fixed.dwFileVersion.Major, fixed.dwFileVersion.Minor, fixed.dwFileVersion.Patch, fixed.dwFileVersion.Build);    
-                        }
-                    }
-                }
-            }
-    
-        // Extract the resources from the image
-    
-        // Extract the version info from the resources
-    
-    
-        }
-
-
-    
-
-
     run_app();
 }
 

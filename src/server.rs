@@ -4,7 +4,7 @@ use serde::{Deserialize};
 use tokio::runtime::Runtime;
 use warp::{Filter, fs::dir};
 use webview_app::headers::add_headers;
-use crate::{eventsink::{EventSinks, on_eventsink, with_events}, requests::send_exif_items};
+use crate::{eventsink::{EventSinks, on_eventsink, with_events}, requests::retrieve_extended_items};
 
 #[cfg(target_os = "linux")]
 use crate::linux::requests::get_root_items;
@@ -81,7 +81,7 @@ async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
 async fn get_items(param: GetItems, event_sinks: EventSinks)->Result<impl warp::Reply, warp::Rejection> {
     match get_directory_items(&param.path, ) {
         Ok(items ) => {
-            send_exif_items(param.id, param.path, &items, event_sinks);
+            retrieve_extended_items(param.id, param.path, &items, event_sinks);
             Ok (warp::reply::json(&items))
         },
         Err(err) => {

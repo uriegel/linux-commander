@@ -7,6 +7,11 @@ use std::{fmt, fs, iter::Take, thread, time::UNIX_EPOCH};
 
 use crate::eventsink::EventSinks;
 
+#[cfg(target_os = "linux")]
+use crate::linux::requests::{check_extended_items, get_version};
+#[cfg(target_os = "windows")]
+use crate::windows::requests::{check_extended_items, get_version};
+
 const ICON_SIZE: i32 = 16;
 
 pub struct Error {
@@ -52,7 +57,7 @@ pub struct FileItem {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct ExifItem {
+pub struct ExtendedItem {
     index: usize,
     name: String,
     #[serde(default)]
@@ -104,7 +109,7 @@ pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
     }
 }
 
-pub fn send_exif_items(id: String, path: String, items: &DirectoryItems, event_sinks: EventSinks) {
+pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems, event_sinks: EventSinks) {
     let index_pos = items.dirs.len() + 1;
     let files: Vec<(usize, FileItem)> = items.files
         .iter()
@@ -112,7 +117,7 @@ pub fn send_exif_items(id: String, path: String, items: &DirectoryItems, event_s
         .map(| (index, n)| (index, FileItem{name: n.name.clone(), size: n.size, time: n.time}))
         .filter(|(_, n)| {
             let ext = n.name.to_lowercase();
-            ext.ends_with(".png") || ext.ends_with(".jpg")
+            check_extended_items(&ext)            
         })
         .collect();
 
@@ -125,40 +130,50 @@ pub fn send_exif_items(id: String, path: String, items: &DirectoryItems, event_s
     if files.len() > 0 {
         if let Some(request_id) = event_sinks.register_request(id.clone()) {
             thread::spawn( move|| {
-                let exifitems: Vec<ExifItem> = files.iter().filter_map(|(index, n)| {
+                let extended_items: Vec<ExtendedItem> = files.iter().filter_map(|(index, n)| {
                     let filename = format!("{}/{}", path, n.name);
-                    let file = std::fs::File::open(filename).unwrap();
-                    let mut bufreader = std::io::BufReader::new(&file);
-                    let exifreader = exif::Reader::new();
-    
-                    if event_sinks.is_request_active(id.clone(), request_id) {
-                        if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
-                            let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
-                                Some(info) => Some(info.display_value().to_string()),
-                                None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+
+                    let ext = n.name.to_lowercase();
+                    if ext.ends_with(".png") || ext.ends_with(".jpg") {
+                        let file = std::fs::File::open(filename).unwrap();
+                        let mut bufreader = std::io::BufReader::new(&file);
+                        let exifreader = exif::Reader::new();
+        
+                        if event_sinks.is_request_active(id.clone(), request_id) {
+                            if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
+                                let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
                                     Some(info) => Some(info.display_value().to_string()),
+                                    None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+                                        Some(info) => Some(info.display_value().to_string()),
+                                        None => None
+                                    } 
+                                };
+                                match exiftime {
+                                    Some(exiftime) => Some(ExtendedItem { 
+                                        name: n.name.to_string(), 
+                                        index: index + index_pos, 
+                                        exiftime: get_unix_time(&exiftime)
+                                    }),
                                     None => None
-                                } 
-                            };
-                            match exiftime {
-                                Some(exiftime) => Some(ExifItem { 
-                                    name: n.name.to_string(), 
-                                    index: index + index_pos, 
-                                    exiftime: get_unix_time(&exiftime)
-                                }),
-                                None => None
+                                }
                             }
-                        }
-                        else {
+                            else {
+                                None
+                            }
+                        } else {
                             None
                         }
                     } else {
-                        None
+                        if let Some(p) = get_version(&filename) {
+                            None
+                        } else {
+                            None
+                        }
                     }
                 }).collect();
                         
-                if exifitems.len() > 0 && event_sinks.is_request_active(id.clone(), request_id) {
-                    let json = serde_json::to_string(&exifitems).unwrap();
+                if extended_items.len() > 0 && event_sinks.is_request_active(id.clone(), request_id) {
+                    let json = serde_json::to_string(&extended_items).unwrap();
                     event_sinks.send(id, json);
                 }
             });

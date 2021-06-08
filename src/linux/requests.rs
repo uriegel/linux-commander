@@ -100,3 +100,12 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
         Err(Error {message: "Execution of lsblk failed".to_string()}) 
     }
 }
+
+pub fn check_extended_items(ext: &str)->bool {
+    ext.ends_with(".png") 
+    || ext.ends_with(".jpg")
+}
+
+pub fn get_version(_: &str)->Option<String> {
+    None
+}
