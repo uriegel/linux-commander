@@ -203,4 +203,5 @@ customElements.define('folder-table', Folder)
 
 // TODO Windows: \\unc instead of c:\
 // TODO Windows: Version PElite
+// TODO Windows: Status line (# files, # selected files)
 // TODO Viewer für img, pdf and mp4
