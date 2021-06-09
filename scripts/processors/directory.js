@@ -65,7 +65,15 @@ export const getDirectory = (folderId, path) => {
                 td.innerHTML = formatSize(item.size)
                 td.classList.add("rightAligned")
             }
+        }, {
+            name: "Version",
+            isSortable: true,
+            render: (td, item) => {
+                td.innerHTML = item.version ? `${item.version.major}.${item.version.minor}.${item.version.patch}.${item.version.build}` : ""
+            }
         }]
+        if (isLinux())
+            columns = columns.filter(n => n.name != "Version")        
         if (widths)
             columns = columns.map((n, i)=> ({ ...n, width: widths[i]}))
         return columns
@@ -152,7 +160,10 @@ export const getDirectory = (folderId, path) => {
     const onEvent = (items, msg) => {
         const exifItems = JSON.parse(msg)
         exifItems.forEach(n => {
-            items[n.index].exiftime = n.exiftime
+            if (n.exiftime)
+                items[n.index].exiftime = n.exiftime
+            else
+                items[n.index].version = n.version
         })
         return exifItems.length ? true : false
     }
