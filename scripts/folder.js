@@ -16,11 +16,12 @@ class Folder extends HTMLElement {
         this.backtrack = []
         this.backPosition = -1
         this.pathInput = this.getElementsByTagName("INPUT")[0]
-        const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
-        this.changePath(lastPath)
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
+        const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
         const events = new WebSocket(`ws://localhost:${location.port}/events/${this.folderId}`)
+        events.onopen = () => this.changePath(lastPath)
         events.onmessage = msg => this.onEvent(msg.data)
+
     }
     
     changeTheme(theme) {
@@ -204,5 +205,4 @@ customElements.define('folder-table', Folder)
 // TODO Status line (# files, # selected files)
 // TODO Refresh Ctrl+R
 // TODO Windows: \\unc instead of c:\
-// TODO Windows: Version PElite
 // TODO Viewer for img, pdf and mp4

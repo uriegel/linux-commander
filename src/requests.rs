@@ -8,9 +8,9 @@ use std::{fmt, fs, iter::Take, thread, time::UNIX_EPOCH};
 use crate::eventsink::EventSinks;
 
 #[cfg(target_os = "linux")]
-use crate::linux::requests::{check_extended_items, get_version};
+use crate::linux::requests::{check_extended_items, get_version, create_extended_item, ExtendedItem};
 #[cfg(target_os = "windows")]
-use crate::windows::requests::{check_extended_items, get_version};
+use crate::windows::requests::{check_extended_items, get_version, create_extended_item, ExtendedItem};
 
 const ICON_SIZE: i32 = 16;
 
@@ -54,14 +54,6 @@ pub struct FileItem {
     name: String,
     time: u128,
     size: u64
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ExtendedItem {
-    index: usize,
-    name: String,
-    #[serde(default)]
-    exiftime: i64
 }
 
 pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
@@ -149,11 +141,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
                                     } 
                                 };
                                 match exiftime {
-                                    Some(exiftime) => Some(ExtendedItem { 
-                                        name: n.name.to_string(), 
-                                        index: index + index_pos, 
-                                        exiftime: get_unix_time(&exiftime)
-                                    }),
+                                    Some(exiftime) => create_extended_item(index + index_pos, get_unix_time(&exiftime)),
                                     None => None
                                 }
                             }
@@ -164,11 +152,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
                             None
                         }
                     } else {
-                        if let Some(p) = get_version(&filename) {
-                            None
-                        } else {
-                            None
-                        }
+                        get_version(&filename, index + index_pos) 
                     }
                 }).collect();
                         

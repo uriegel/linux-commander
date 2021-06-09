@@ -15,6 +15,26 @@ pub struct RootItem {
     pub capacity: u64,
 }
 
+#[derive(Serialize)]
+pub struct ExtendedItem {
+    index: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    exiftime: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    version: Option<VersionInfo>
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VersionInfo {
+    pub major: u16, 
+    pub minor: u16,
+    pub patch: u16,
+    pub build: u16
+}
+
 pub fn get_root_items()->Result<Vec<RootItem>, Error> {
 
     fn extract_drives(wchrs: &[u16])->Vec<String> {
@@ -78,21 +98,32 @@ pub fn check_extended_items(ext: &str)->bool {
     || ext.ends_with(".dll")
 }
 
-pub fn get_version(path: &str)->Option<String> {
-
-        // if let Ok(file_map) = pelite::FileMap::open(r"c:\windows\explorer.exe") {
-        //     if let Ok(image) = pelite::PeFile::from_bytes(file_map.as_ref()) {
-        //         if let Ok(resources) = image.resources() {
-        //             if let Ok(version_info) = resources.version_info() {
-        //                 let file_info = version_info.file_info();
-        //                 if let Some(fixed) = file_info.fixed {
-        //                     println!("Version: {:?}, {},{},{},{}", fixed.dwFileVersion, fixed.dwFileVersion.Major, fixed.dwFileVersion.Minor, fixed.dwFileVersion.Patch, fixed.dwFileVersion.Build);    
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-
+pub fn get_version(path: &str, index: usize)->Option<ExtendedItem> {
+    if let Ok(file_map) = pelite::FileMap::open(path) {
+        if let Ok(image) = pelite::PeFile::from_bytes(file_map.as_ref()) {
+            if let Ok(resources) = image.resources() {
+                if let Ok(version_info) = resources.version_info() {
+                    let file_info = version_info.file_info();
+                    if let Some(fixed) = file_info.fixed {
+                        let version = VersionInfo {
+                            major: fixed.dwFileVersion.Major, 
+                            minor: fixed.dwFileVersion.Minor, 
+                            patch: fixed.dwFileVersion.Patch, 
+                            build: fixed.dwFileVersion.Build 
+                        };
+                        return Some(ExtendedItem{index, version: Some(version), exiftime: None});
+                    }
+                }
+            }
+        }
+    }
     None
+}
+
+pub fn create_extended_item(index: usize, exiftime: i64)->Option<ExtendedItem> {
+    Some(ExtendedItem{
+        index, 
+        exiftime: Some(exiftime),
+        version: None
+    })
 }

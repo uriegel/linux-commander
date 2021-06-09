@@ -14,6 +14,14 @@ pub struct RootItem {
     pub file_system: String,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct ExtendedItem {
+    index: usize,
+    name: String,
+    #[serde(default)]
+    exiftime: i64
+}
+
 pub fn get_root_items()->Result<Vec<RootItem>, Error> {
     let output = Command::new("lsblk")
         .arg("--bytes")
@@ -106,6 +114,6 @@ pub fn check_extended_items(ext: &str)->bool {
     || ext.ends_with(".jpg")
 }
 
-pub fn get_version(_: &str)->Option<String> {
+pub fn get_version(_: &str)->Option<ExtendedItem> {
     None
 }

@@ -52,7 +52,9 @@ document.addEventListener("keydown", evt => {
     switch (evt.which) {
         case 120: // F9
             const inactiveFolder = activeFolder == folderLeft ? folderRight : folderLeft
-            inactiveFolder.changePath(activeFolder.getCurrentPath())        
+            inactiveFolder.changePath(activeFolder.getCurrentPath())
+            evt.preventDefault()
+            evt.stopPropagation()
             break
     }
 })
