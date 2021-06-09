@@ -14,12 +14,12 @@ pub struct RootItem {
     pub file_system: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 pub struct ExtendedItem {
     index: usize,
-    name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    exiftime: i64
+    exiftime: Option<i64>
 }
 
 pub fn get_root_items()->Result<Vec<RootItem>, Error> {
@@ -114,6 +114,13 @@ pub fn check_extended_items(ext: &str)->bool {
     || ext.ends_with(".jpg")
 }
 
-pub fn get_version(_: &str)->Option<ExtendedItem> {
+pub fn get_version(_: &str, _: usize)->Option<ExtendedItem> {
     None
+}
+
+pub fn create_extended_item(index: usize, exiftime: i64)->Option<ExtendedItem> {
+    Some(ExtendedItem{
+        index, 
+        exiftime: Some(exiftime)
+    })
 }
