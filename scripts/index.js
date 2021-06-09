@@ -19,7 +19,7 @@ folderRight.addEventListener("onFocus", evt => {
      activeFolder = folderRight
 })
 
-const onPathChanged = evt => setTitle(evt.detail)
+const onPathChanged = evt => setTitle(evt.detail.title, evt.detail.dirs, evt.detail.files)
 
 folderLeft.addEventListener("pathChanged", onPathChanged)
 folderRight.addEventListener("pathChanged", onPathChanged)

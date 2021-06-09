@@ -16,9 +16,9 @@ function setTheme(theme) {
         onThemeCallback(theme)
 }
 
-function setTitle(title) {
+function setTitle(title, dirs, files) {
     if (isLinux())
-        sendMessageToWebView("title", title)
+        sendMessageToWebView("title", `${title} - ${dirs} Dirs, ${files} Files`)
 }
 
 function setInitialTheme(theme) {

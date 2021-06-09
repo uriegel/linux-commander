@@ -100,6 +100,11 @@ class Folder extends HTMLElement {
                     this.table.setPosition(pos + 1)
                     break
                 }
+                case 82: { // "R"
+                    if (evt.ctrlKey) 
+                        this.changePath(this.processor.getCurrentPath())
+                    break
+                }
                 case 107: { // Numlock +
                     this.table.items.forEach(n => n.isSelected = !n.isNotSelectable)
                     this.table.refresh()
@@ -115,17 +120,11 @@ class Folder extends HTMLElement {
 
         this.table.addEventListener("focusin", async evt => {
             this.dispatchEvent(new CustomEvent('onFocus', { detail: this.id }))
-            if (this.table.items && this.table.items.length > 0) {
-                this.dispatchEvent(new CustomEvent('pathChanged', { detail: this.processor.getItem(this.table.items[this.table.getPosition()]) }))
-            }
+            this.sendStatusInfo(evt.detail)
         })
 
-        this.table.addEventListener("currentIndexChanged", evt => {
-            if (this.table.items && this.table.items.length > 0)
-                this.dispatchEvent(new CustomEvent('pathChanged', { detail: this.processor.getItem(this.table.items[evt.detail]) }))
-        })
+        this.table.addEventListener("currentIndexChanged", evt => this.sendStatusInfo(evt.detail))
             
-
         this.pathInput.onkeydown = evt => {
             if (evt.which == 13) {
                 this.changePath(this.pathInput.value)
@@ -154,12 +153,14 @@ class Folder extends HTMLElement {
             this.sortFunction = null
         }
 
-        if (this.sortFunction) {
-            const dirs = items.filter(n => n.isDirectory)
-            const files = items.filter(n => !n.isDirectory)
+        const dirs = items.filter(n => n.isDirectory)
+        const files = items.filter(n => !n.isDirectory)
+        this.dirsCount = dirs.length
+        this.filesCount = files.length
+
+        if (this.sortFunction) 
             items = dirs.concat(files.sort(this.sortFunction))
-        }
-    
+
         this.table.setItems(items)
         this.table.setRestriction((items, restrictValue) => 
             items.filter(n => n.name.toLowerCase()
@@ -198,11 +199,24 @@ class Folder extends HTMLElement {
         if (this.processor.onEvent(this.table.items, msg))
             this.table.refresh()
     }
+
+    sendStatusInfo(index) {
+        if (this.table.items && this.table.items.length > 0)
+            this.dispatchEvent(new CustomEvent('pathChanged', { detail: {
+                title: this.processor.getItem(this.table.items[index]),
+                dirs: this.dirsCount,
+                files: this.filesCount
+            }}))
+    }
 }
 
 customElements.define('folder-table', Folder)
 
-// TODO Status line (# files, # selected files)
-// TODO Refresh Ctrl+R
+// TODO getItems when exifs are retrieved: extrem slow!!! on NTFS
+// TODO Status line (# files, # selected files), root
+// TODO Status Linux: styling
+// TODO Windows: Status 
 // TODO Windows: \\unc instead of c:\
+// TODO Windows: sort version
+// TODO Windows: size: margin right
 // TODO Viewer for img, pdf and mp4
