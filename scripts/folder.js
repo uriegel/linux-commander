@@ -212,7 +212,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO getItems when exifs are retrieved: extrem slow!!! on NTFS
 // TODO Status line (# files, # selected files), root
 // TODO Status Linux: styling
 // TODO Windows: Status 

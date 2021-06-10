@@ -1,4 +1,4 @@
-use std::{collections::HashMap, convert::Infallible, sync::{Arc, Mutex, atomic::{AtomicUsize, Ordering}}};
+use std::{collections::HashMap, convert::Infallible, sync::{Arc, Mutex, atomic::{AtomicBool, AtomicUsize, Ordering}}};
 use futures::StreamExt;
 use tokio::{spawn, sync::mpsc};
 use tokio_stream::wrappers::UnboundedReceiverStream;
@@ -8,7 +8,8 @@ type EventSink = mpsc::UnboundedSender<Result<Message, warp::Error>>;
 
 struct EventSession {
     event_sink: EventSink,
-    request_id: AtomicUsize
+    request_id: AtomicUsize,
+    request_active: AtomicBool
 }
 
 #[derive(Clone)]
@@ -22,7 +23,11 @@ impl EventSinks {
     }
 
     pub fn insert(&self, id: String, event_sink: EventSink) {
-        self.es.lock().unwrap().insert(id, EventSession { event_sink, request_id: AtomicUsize::new(0) } );    
+        self.es.lock().unwrap().insert(id, EventSession { 
+            event_sink, 
+            request_id: AtomicUsize::new(0), 
+            request_active: AtomicBool::new(false)
+        });    
     }
 
     pub fn register_request(&self, id: String) -> Option<usize> {
@@ -30,6 +35,12 @@ impl EventSinks {
             Some(session.request_id.fetch_add(1, Ordering::Relaxed) + 1)
         } else {
             None
+        }
+    }
+
+    pub fn set_request(&self, id: &str, active: bool) {
+        if let Some(session) = self.es.lock().unwrap().get(id) {
+            session.request_active.swap(active, Ordering::Relaxed);
         }
     }
     
@@ -47,6 +58,9 @@ impl EventSinks {
         }
     }
     
+    pub fn active_requests(&self) -> bool {
+        self.es.lock().unwrap().iter().any(|(_, s)|s.request_active.load(Ordering::Relaxed))
+    }
 }
 
 pub fn with_events(event_sinks: EventSinks) -> impl Filter<Extract = (EventSinks,), Error = Infallible> + Clone {

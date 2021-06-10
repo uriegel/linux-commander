@@ -3,7 +3,7 @@ use exif::{In, Tag};
 use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
 use warp::{http::HeaderValue, hyper::{self, HeaderMap, Response}};
-use std::{fmt, fs, iter::Take, thread, time::UNIX_EPOCH};
+use std::{fmt, fs, iter::Take, thread::{self, sleep}, time::{Duration, UNIX_EPOCH}};
 
 use crate::eventsink::EventSinks;
 
@@ -56,9 +56,10 @@ pub struct FileItem {
     size: u64
 }
 
-pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
+pub fn get_directory_items(path: &str, id: &str, event_sinks: EventSinks)->Result<DirectoryItems, Error> {
     match fs::read_dir(path) {
         Ok(entries) => {
+            event_sinks.set_request(id, true);
             let (dirs, files): (Vec<_>, Vec<_>) = entries
                 .filter_map(|entry| {
                     match entry {
@@ -92,6 +93,8 @@ pub fn get_directory_items(path: &str)->Result<DirectoryItems, Error> {
                 .collect();
             files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
            
+            event_sinks.set_request(id, false);
+
             Ok(DirectoryItems{
                 dirs,
                 files
@@ -132,6 +135,11 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
                         let exifreader = exif::Reader::new();
         
                         if event_sinks.is_request_active(id.clone(), request_id) {
+
+                            if event_sinks.active_requests() {
+                                sleep(Duration::from_millis(500));
+                            }
+                                
                             if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
                                 let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
                                     Some(info) => Some(info.display_value().to_string()),
