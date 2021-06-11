@@ -4,6 +4,7 @@ import './folder.js'
 const folderLeft = document.getElementById("folderLeft")
 const folderRight = document.getElementById("folderRight")
 const splitter = document.getElementById('splitter')
+const viewerSplitter = document.getElementById('viewerSplitter')
 
 initializeCallbacks(onTheme, onShowHidden)
 ;(() => {
@@ -30,10 +31,11 @@ function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {
         document.body.classList.remove(n)
         splitter.classList.remove(n)
+        viewerSplitter.classList.remove(n)
     })
-    splitter
     document.body.classList.add(theme)    
     splitter.classList.add(theme)    
+    viewerSplitter.classList.add(theme)    
     folderLeft.changeTheme(theme)
     folderRight.changeTheme(theme)
     localStorage.setItem("theme", theme)
