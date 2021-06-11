@@ -6,7 +6,7 @@ const folderRight = document.getElementById("folderRight")
 const splitter = document.getElementById('splitter')
 const viewerSplitter = document.getElementById('viewerSplitter')
 
-initializeCallbacks(onTheme, onShowHidden)
+initializeCallbacks(onTheme, onShowHidden, onShowViewer)
 ;(() => {
     const initialTheme = isLinux() ? (localStorage.getItem("theme") || "themeAdwaita") : "themeWindows"
     onTheme(initialTheme)
@@ -44,6 +44,12 @@ function onTheme(theme) {
 function onShowHidden(hidden) {
     folderLeft.showHidden(hidden)
     folderRight.showHidden(hidden)
+}
+
+function onShowViewer(show) {
+    viewerSplitter.setAttribute("secondInvisible", !show)
+    folderLeft.onResize()
+    folderRight.onResize()
 }
 
 folderLeft.setFocus()

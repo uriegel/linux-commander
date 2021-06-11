@@ -34,6 +34,10 @@ class Folder extends HTMLElement {
         this.table.themeChanged()
     }
 
+    onResize() {
+        this.table.themeChanged()
+    }
+
     showHidden(hidden) {
         this.showHiddenItems = hidden
         this.changePath(this.processor.getCurrentPath())
@@ -212,10 +216,12 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO Status line: on focus does not respect current item
 // TODO Status line (# files, # selected files), root
 // TODO Status Linux: styling
 // TODO Windows: Status 
 // TODO Windows: \\unc instead of c:\
 // TODO Windows: sort version
 // TODO Windows: size: margin right
+// TODO Windows: Viewer F3 
 // TODO Viewer for img, pdf and mp4

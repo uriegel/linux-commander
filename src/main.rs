@@ -36,11 +36,32 @@ fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Bu
                     None => println!("Could not set ShowHidden, could not extract from variant")
                 }
             },
-            None => println!("Could not set theme")
+            None => println!("Could not set action")
         }
     });
     application.add_action(&action);
     application.set_accels_for_action("app.showhidden", &["<Ctrl>H"]);
+
+    let initial_bool_state = false.to_variant();
+    let action = SimpleAction::new_stateful("viewer", None, &initial_bool_state);
+    let weak_webview = webview.clone();
+    action.connect_change_state(move |a, s| {
+        match s {
+            Some(val) => {
+                a.set_state(val);
+                match val.get::<bool>(){
+                    Some(show_viewer) => weak_webview.run_javascript(
+                        &format!("showViewer({})", show_viewer),
+                        Some(&gio::Cancellable::new()),
+                        |_|{}),
+                    None => println!("Could not show Viewer, could not extract from variant")
+                }
+            },
+            None => println!("Could not set action")
+        }
+    });
+    application.add_action(&action);
+    application.set_accels_for_action("app.viewer", &["F3"]);
 
     let initial_state = "".to_variant();
     let weak_webview = webview.clone();

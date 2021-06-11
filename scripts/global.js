@@ -5,9 +5,10 @@ function isLinux() {
     return _isLinux
 }
 
-function initializeCallbacks(onTheme, onShowHidden) {
+function initializeCallbacks(onTheme, onShowHidden, onShowViewer) {
     onThemeCallback = onTheme
     onShowHiddenCallback = onShowHidden
+    onShowViewerCallback = onShowViewer
 }
 
 function setTheme(theme) {
@@ -31,8 +32,14 @@ function showHidden(hidden) {
         onShowHiddenCallback(hidden)
 }
 
+function showViewer(show) {
+    if (onShowViewerCallback)
+        onShowViewerCallback(show)
+}
+
 const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn(acc), args);
 
 var onThemeCallback
 var onShowHiddenCallback
+var onShowViewerCallback
 var _isLinux = undefined
