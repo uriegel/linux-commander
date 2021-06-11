@@ -10,13 +10,17 @@
 
     <body class="themeAdwaita">
 
-        <grid-splitter id="splitter" orientation="HORIZONTAL">
-            <div id="first" slot="first" class="tableContainer">
-                <folder-table id="folderLeft"></folder-table>
-            </div>
-            <div id="second" slot="second" class="tableContainer">
-                <folder-table id="folderRight"></folder-table>
-            </div>
+
+        <grid-splitter id="viewerSplitter" orientation="VERTICAL">
+            <grid-splitter id="splitter" slot="first" orientation="HORIZONTAL">
+                <div id="first" slot="first" class="tableContainer">
+                    <folder-table id="folderLeft"></folder-table>
+                </div>
+                <div id="second" slot="second" class="tableContainer">
+                    <folder-table id="folderRight"></folder-table>
+                </div>
+            </grid-splitter>
+            <div slot="second"></div>
         </grid-splitter>
 
         <template id="driveIcon">

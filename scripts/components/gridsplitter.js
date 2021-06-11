@@ -10,6 +10,8 @@ template.innerHTML = `
             display:flex;
             flex-grow: 1;
             flex-direction: row;        
+            width: 100%;
+            height: 100%;
         }   
         .slot {
             flex-grow: 1;
