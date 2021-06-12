@@ -25,11 +25,12 @@ export const refreshViewer = path => {
 
 const refresh = path => {
     const extPos = path.lastIndexOf(".")
-    const ext = extPos != -1 ? path.substr(extPos+1) : ""
+    const ext = extPos != -1 ? path.substr(extPos+1).toLowerCase() : ""
     switch (ext) {
         case "png":
         case "jpg":
             viewerImg.classList.remove("hidden")
+            viewerImg.src = `/commander/getview?path=${path}` 
             break
         default:
             viewerImg.classList.add("hidden")
