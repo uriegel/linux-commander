@@ -223,4 +223,4 @@ customElements.define('folder-table', Folder)
 // TODO Windows: sort version
 // TODO Windows: size: margin right
 // TODO Windows: Viewer F3 
-// TODO Viewer for img, pdf and mp4
+// TODO Viewer for pdf and mp4 (range)
