@@ -44,7 +44,7 @@ const refresh = path => {
         case "pdf":
             viewerImg.classList.add("hidden")
             viewerFrame.classList.remove("hidden")
-            viewerFrame.src = `/commander/getview?path=${path}` 
+            viewerFrame.data = `/commander/getview?path=${path}` 
             break
         default:
             viewerImg.classList.add("hidden")
