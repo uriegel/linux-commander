@@ -124,7 +124,7 @@ class Folder extends HTMLElement {
 
         this.table.addEventListener("focusin", async evt => {
             this.dispatchEvent(new CustomEvent('onFocus', { detail: this.id }))
-            this.sendStatusInfo(evt.detail)
+            this.sendStatusInfo(this.table.getPosition())
         })
 
         this.table.addEventListener("currentIndexChanged", evt => this.sendStatusInfo(evt.detail))
@@ -216,7 +216,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Status line: on focus does not respect current item
 // TODO Status line (# files, # selected files), root
 // TODO Status Linux: styling
 // TODO Windows: Status 
