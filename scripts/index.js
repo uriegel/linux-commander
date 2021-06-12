@@ -1,12 +1,17 @@
 import './components/gridsplitter.js'
 import './folder.js'
+import {onTheme as onViewerTheme, onShowViewer, refreshViewer} from './viewer.js'
 
 const folderLeft = document.getElementById("folderLeft")
 const folderRight = document.getElementById("folderRight")
 const splitter = document.getElementById('splitter')
-const viewerSplitter = document.getElementById('viewerSplitter')
 
-initializeCallbacks(onTheme, onShowHidden, onShowViewer)
+initializeCallbacks(onTheme, onShowHidden, show => {
+    onShowViewer(show, currentPath)
+    folderLeft.onResize()
+    folderRight.onResize()
+})
+
 ;(() => {
     const initialTheme = isLinux() ? (localStorage.getItem("theme") || "themeAdwaita") : "themeWindows"
     onTheme(initialTheme)
@@ -20,7 +25,11 @@ folderRight.addEventListener("onFocus", evt => {
      activeFolder = folderRight
 })
 
-const onPathChanged = evt => setTitle(evt.detail.title, evt.detail.dirs, evt.detail.files)
+const onPathChanged = evt => {
+    currentPath = evt.detail.path
+    refreshViewer(evt.detail.path)
+    setTitle(evt.detail.path, evt.detail.dirs, evt.detail.files)
+}
 
 folderLeft.addEventListener("pathChanged", onPathChanged)
 folderRight.addEventListener("pathChanged", onPathChanged)
@@ -31,25 +40,18 @@ function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {
         document.body.classList.remove(n)
         splitter.classList.remove(n)
-        viewerSplitter.classList.remove(n)
     })
     document.body.classList.add(theme)    
     splitter.classList.add(theme)    
-    viewerSplitter.classList.add(theme)    
     folderLeft.changeTheme(theme)
     folderRight.changeTheme(theme)
+    onViewerTheme(theme)
     localStorage.setItem("theme", theme)
 }
 
 function onShowHidden(hidden) {
     folderLeft.showHidden(hidden)
     folderRight.showHidden(hidden)
-}
-
-function onShowViewer(show) {
-    viewerSplitter.setAttribute("secondInvisible", !show)
-    folderLeft.onResize()
-    folderRight.onResize()
 }
 
 folderLeft.setFocus()
@@ -68,7 +70,7 @@ document.addEventListener("keydown", evt => {
 })
 
 var activeFolder = folderLeft
-
+var currentPath = ""
 
 
 

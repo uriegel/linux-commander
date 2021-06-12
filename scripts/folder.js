@@ -207,7 +207,7 @@ class Folder extends HTMLElement {
     sendStatusInfo(index) {
         if (this.table.items && this.table.items.length > 0)
             this.dispatchEvent(new CustomEvent('pathChanged', { detail: {
-                title: this.processor.getItem(this.table.items[index]),
+                path: this.processor.getItem(this.table.items[index]),
                 dirs: this.dirsCount,
                 files: this.filesCount
             }}))
