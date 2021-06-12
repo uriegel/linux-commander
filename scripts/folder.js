@@ -224,3 +224,4 @@ customElements.define('folder-table', Folder)
 // TODO Windows: size: margin right
 // TODO Windows: Viewer F3 
 // TODO Viewer for pdf and mp4 (range)
+// TODO When a path is not available anymore: fallback to root
