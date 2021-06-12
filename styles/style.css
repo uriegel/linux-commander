@@ -41,7 +41,7 @@ body {
     height: 100%;
 }
 
-#viewerImg {
+#viewerImg, #viewerFrame {
     position: absolute;
     left: 0;
     top: 0;

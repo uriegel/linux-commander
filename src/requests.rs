@@ -202,13 +202,30 @@ pub async fn get_view(param: GetView) -> Result<impl warp::Reply, warp::Rejectio
                         Ok (warp::reply::Response::new(body))
                     },
                     Err(err) => {
-                        println!("Could not get icon: {}", err);
+                        println!("Could not get img: {}", err);
+                        Err(warp::reject())
+                    }
+                }
+            },
+            "pdf" => {
+                match tokio::fs::File::open(param.path).await {
+                    Ok(file) => {
+                        let stream = FramedRead::new(file, BytesCodec::new());
+                        let body = hyper::Body::wrap_stream(stream);
+                        let mut response = warp::reply::Response::new(body);
+                        let headers = response.headers_mut();
+                        let mut header_map = create_headers();
+                        header_map.insert("Content-Type", HeaderValue::from_str("application/pdf").unwrap());
+                        headers.extend(header_map);
+                        Ok (response)
+                    },
+                    Err(err) => {
+                        println!("Could not get pdf: {}", err);
                         Err(warp::reject())
                     }
                 }
             },
             "mp4" => Err(warp::reject()),
-            "pdf" => Err(warp::reject()),
             _ => Err(warp::reject())
         }
     } else {
