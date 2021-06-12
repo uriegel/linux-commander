@@ -2,6 +2,7 @@ use chrono::{Local, NaiveDateTime, TimeZone, Utc};
 use exif::{In, Tag};
 use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
+use tokio_util::codec::{BytesCodec, FramedRead};
 use warp::{http::HeaderValue, hyper::{self, HeaderMap, Response}};
 use std::{fmt, fs, iter::Take, thread::{self, sleep}, time::{Duration, UNIX_EPOCH}};
 
@@ -34,6 +35,11 @@ pub struct DirectoryItems {
 #[derive(Deserialize)]
 pub struct GetIcon {
     ext: String,
+}
+
+#[derive(Deserialize)]
+pub struct GetView {
+    path: String
 }
 
 enum FileType {
@@ -182,6 +188,32 @@ pub async fn get_icon(param: GetIcon) -> Result<impl warp::Reply, warp::Rejectio
     header_map.insert("Content-Type", HeaderValue::from_str("image/png").unwrap());
     headers.extend(header_map);
     Ok (response)        
+}
+
+pub async fn get_view(param: GetView) -> Result<impl warp::Reply, warp::Rejection> {
+    if let Some(ext_pos) = param.path.rfind(".") {
+        let ext = &param.path[ext_pos+1..].to_lowercase();        
+        match ext.as_str() {
+            "jpg" | "png" => {
+                match tokio::fs::File::open(param.path).await {
+                    Ok(file) => {
+                        let stream = FramedRead::new(file, BytesCodec::new());
+                        let body = hyper::Body::wrap_stream(stream);
+                        Ok (warp::reply::Response::new(body))
+                    },
+                    Err(err) => {
+                        println!("Could not get icon: {}", err);
+                        Err(warp::reject())
+                    }
+                }
+            },
+            "mp4" => Err(warp::reject()),
+            "pdf" => Err(warp::reject()),
+            _ => Err(warp::reject())
+        }
+    } else {
+        Err(warp::reject())
+    }
 }
 
 fn create_headers() -> HeaderMap {

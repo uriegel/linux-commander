@@ -4,11 +4,11 @@ use serde::{Deserialize};
 use tokio::runtime::Runtime;
 use warp::{Filter, fs::dir};
 use webview_app::headers::add_headers;
-use crate::{eventsink::{EventSinks, on_eventsink, with_events}, requests::retrieve_extended_items};
+use crate::{eventsink::{EventSinks, on_eventsink, with_events}, requests::{get_view, retrieve_extended_items}};
+use crate::{requests::{get_directory_items, get_icon}};
 
 #[cfg(target_os = "linux")]
 use crate::linux::requests::get_root_items;
-use crate::{requests::{get_directory_items, get_icon}};
 #[cfg(target_os = "windows")]
 use crate::windows::requests::get_root_items;
 
@@ -49,6 +49,13 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
             .and(warp::query::query())
             .and_then(get_icon);
 
+        let route_get_view = 
+            warp::path("commander")
+            .and(warp::path("getview"))
+            .and(warp::path::end())
+            .and(warp::query::query())
+            .and_then(get_view);
+
         let route_events = 
             warp::path("events")
             .and(warp::ws())
@@ -59,6 +66,7 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
         let routes = route_get_items
             .or(route_get_root)
             .or(route_get_icon)
+            .or(route_get_view)
             .or(route_events)
             .or(route_static);
 
