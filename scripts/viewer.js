@@ -8,6 +8,8 @@ export function onTheme(theme) {
 }
 
 export function onShowViewer(show, path) {
+    if (show == undefined)
+        show = !viewerActive
     viewerActive = show
     viewerSplitter.setAttribute("secondInvisible", !show)
     if (show) 

@@ -60,6 +60,11 @@ if (!isLinux())
 
 document.addEventListener("keydown", evt => {
     switch (evt.which) {
+        case 114: // F3
+            showViewer()
+            evt.preventDefault()
+            evt.stopPropagation()
+            break
         case 120: // F9
             const inactiveFolder = activeFolder == folderLeft ? folderRight : folderLeft
             inactiveFolder.changePath(activeFolder.getCurrentPath())
