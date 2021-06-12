@@ -219,9 +219,9 @@ customElements.define('folder-table', Folder)
 // TODO Status line (# files, # selected files), root
 // TODO Status Linux: styling
 // TODO Windows: Status 
+// TODO Windows: ShowHidden
 // TODO Windows: \\unc instead of c:\
 // TODO Windows: sort version
 // TODO Windows: size: margin right
-// TODO Windows: Viewer F3 
 // TODO Viewer for pdf and mp4 (range)
 // TODO When a path is not available anymore: fallback to root
