@@ -9,7 +9,7 @@ body {
     flex-direction: column;
 }
 
-#splitter {
+#viewerSplitter, #splitter {
     flex-grow: 1;
 }
 
