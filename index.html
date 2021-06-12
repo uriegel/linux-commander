@@ -9,8 +9,6 @@
     </head>
 
     <body class="themeAdwaita">
-
-
         <grid-splitter id="viewerSplitter" orientation="VERTICAL" secondinvisible="true">
             <grid-splitter id="splitter" slot="first" orientation="HORIZONTAL">
                 <div id="first" slot="first" class="tableContainer">
@@ -20,7 +18,9 @@
                     <folder-table id="folderRight"></folder-table>
                 </div>
             </grid-splitter>
-            <div slot="second"></div>
+            <div slot="second" id="viewer">
+                <img id="viewerImg" src="/commander/getview?path=/home/uwe/Bilder/Fotos/2019/MarsaAlam/Bild0215.JPG" />
+            </div>
         </grid-splitter>
 
         <template id="driveIcon">
