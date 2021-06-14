@@ -1,6 +1,6 @@
 const viewerSplitter = document.getElementById('viewerSplitter')
 const viewerImg = document.getElementById('viewerImg')
-const viewerFrame = document.getElementById('viewerFrame')
+const pdfViewer = document.getElementById('pdfViewer')
 
 export function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => viewerSplitter.classList.remove(n))
@@ -16,7 +16,6 @@ export function onShowViewer(show, path) {
         refresh(path)
     else {
         viewerImg.src = null
-        viewerFrame.src = null
     }
 }
 
@@ -37,18 +36,18 @@ const refresh = path => {
     switch (ext) {
         case "png":
         case "jpg":
-            viewerFrame.classList.add("hidden")
+            pdfViewer.classList.add("hidden")
             viewerImg.classList.remove("hidden")
             viewerImg.src = `/commander/getview?path=${path}` 
             break
         case "pdf":
             viewerImg.classList.add("hidden")
-            viewerFrame.classList.remove("hidden")
-            viewerFrame.data = `/commander/getview?path=${path}` 
+            pdfViewer.classList.remove("hidden")
+            pdfViewer.load(`/commander/getview?path=${path}`) 
             break
         default:
             viewerImg.classList.add("hidden")
-            viewerFrame.classList.add("hidden")
+            pdfViewer.classList.add("hidden")
             break
     }
 }

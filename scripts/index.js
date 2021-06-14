@@ -1,4 +1,5 @@
 import './components/gridsplitter.js'
+import './components/pdfviewer.js'
 import './folder.js'
 import {onTheme as onViewerTheme, onShowViewer, refreshViewer} from './viewer.js'
 
