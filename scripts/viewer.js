@@ -1,6 +1,7 @@
 const viewerSplitter = document.getElementById('viewerSplitter')
 const viewerImg = document.getElementById('viewerImg')
-const pdfViewer = document.getElementById('pdfViewer')
+const viewerPdf = document.getElementById('viewerPdf')
+const viewerVideo = document.getElementById('viewerVideo')
 
 export function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => viewerSplitter.classList.remove(n))
@@ -16,6 +17,7 @@ export function onShowViewer(show, path) {
         refresh(path)
     else {
         viewerImg.src = null
+        viewerVideo.src = null
     }
 }
 
@@ -36,18 +38,31 @@ const refresh = path => {
     switch (ext) {
         case "png":
         case "jpg":
-            pdfViewer.classList.add("hidden")
+            viewerPdf.classList.add("hidden")
+            viewerVideo.classList.add("hidden")
             viewerImg.classList.remove("hidden")
             viewerImg.src = `/commander/getview?path=${path}` 
+            viewerVideo.src = null
             break
         case "pdf":
             viewerImg.classList.add("hidden")
-            pdfViewer.classList.remove("hidden")
-            pdfViewer.load(`/commander/getview?path=${path}`) 
+            viewerVideo.classList.add("hidden")
+            viewerPdf.classList.remove("hidden")
+            viewerPdf.load(`/commander/getview?path=${path}`) 
+            viewerVideo.src = null
+            break
+        case "mp4":
+        case "mkv":
+            viewerPdf.classList.add("hidden")
+            viewerImg.classList.add("hidden")
+            viewerVideo.classList.remove("hidden")
+            viewerVideo.src = `/commander/getview?path=${path}` 
             break
         default:
+            viewerVideo.classList.add("hidden")
             viewerImg.classList.add("hidden")
-            pdfViewer.classList.add("hidden")
+            viewerPdf.classList.add("hidden")
+            viewerVideo.src = null
             break
     }
 }
