@@ -190,7 +190,11 @@ pub async fn get_icon(param: GetIcon) -> Result<impl warp::Reply, warp::Rejectio
     Ok (response)        
 }
 
-pub async fn get_view(param: GetView) -> Result<impl warp::Reply, warp::Rejection> {
+pub async fn get_view(param: GetView, range: String) -> Result<impl warp::Reply, warp::Rejection> {
+
+    println!("Der Räntsch: {}", range);
+
+
     if let Some(ext_pos) = param.path.rfind(".") {
         let ext = &param.path[ext_pos+1..].to_lowercase();        
         match ext.as_str() {

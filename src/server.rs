@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 
 use serde::{Deserialize};
 use tokio::runtime::Runtime;
-use warp::{Filter, fs::dir};
+use warp::{Filter, Rejection, fs::dir, hyper::header::RANGE};
 use webview_app::headers::add_headers;
 use crate::{eventsink::{EventSinks, on_eventsink, with_events}, requests::{get_view, retrieve_extended_items}};
 use crate::{requests::{get_directory_items, get_icon}};
@@ -16,6 +16,11 @@ use crate::windows::requests::get_root_items;
 struct GetItems {
     id: String,
     path: String,
+}
+
+async fn check_range(range: String) -> Result<(), Rejection> {
+    println!("Range");
+    Ok(())
 }
 
 pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
@@ -54,6 +59,7 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
             .and(warp::path("getview"))
             .and(warp::path::end())
             .and(warp::query::query())
+            .and(warp::header::<String>("Connection"))
             .and_then(get_view);
 
         let route_events = 
