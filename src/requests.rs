@@ -190,11 +190,71 @@ pub async fn get_icon(param: GetIcon) -> Result<impl warp::Reply, warp::Rejectio
     Ok (response)        
 }
 
-pub async fn get_view(param: GetView, range: String) -> Result<impl warp::Reply, warp::Rejection> {
+pub async fn get_range(param: GetView, range: String) -> Result<impl warp::Reply, warp::Rejection> {
 
     println!("Der Räntsch: {}", range);
 
 
+    if let Some(ext_pos) = param.path.rfind(".") {
+        let ext = &param.path[ext_pos+1..].to_lowercase();        
+        match ext.as_str() {
+            "jpg" | "png" => {
+                match tokio::fs::File::open(param.path).await {
+                    Ok(file) => {
+                        let stream = FramedRead::new(file, BytesCodec::new());
+                        let body = hyper::Body::wrap_stream(stream);
+                        Ok (warp::reply::Response::new(body))
+                    },
+                    Err(err) => {
+                        println!("Could not get img: {}", err);
+                        Err(warp::reject())
+                    }
+                }
+            },
+            "pdf" => {
+                match tokio::fs::File::open(param.path).await {
+                    Ok(file) => {
+                        let stream = FramedRead::new(file, BytesCodec::new());
+                        let body = hyper::Body::wrap_stream(stream);
+                        let mut response = warp::reply::Response::new(body);
+                        let headers = response.headers_mut();
+                        let mut header_map = create_headers();
+                        header_map.insert("Content-Type", HeaderValue::from_str("application/pdf").unwrap());
+                        headers.extend(header_map);
+                        Ok (response)
+                    },
+                    Err(err) => {
+                        println!("Could not get pdf: {}", err);
+                        Err(warp::reject())
+                    }
+                }
+            },
+            "mp4"|"mkv" => {
+                match tokio::fs::File::open(param.path).await {
+                    Ok(file) => {
+                        let stream = FramedRead::new(file, BytesCodec::new());
+                        let body = hyper::Body::wrap_stream(stream);
+                        let mut response = warp::reply::Response::new(body);
+                        let headers = response.headers_mut();
+                        let mut header_map = create_headers();
+                        header_map.insert("Content-Type", HeaderValue::from_str("video/mp4").unwrap());
+                        headers.extend(header_map);
+                        Ok (response)
+                    },
+                    Err(err) => {
+                        println!("Could not get pdf: {}", err);
+                        Err(warp::reject())
+                    }
+                }
+            },
+            _ => Err(warp::reject())
+        }
+    } else {
+        Err(warp::reject())
+    }
+}
+
+pub async fn get_view(param: GetView) -> Result<impl warp::Reply, warp::Rejection> {
     if let Some(ext_pos) = param.path.rfind(".") {
         let ext = &param.path[ext_pos+1..].to_lowercase();        
         match ext.as_str() {
