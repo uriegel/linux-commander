@@ -217,8 +217,6 @@ class Folder extends HTMLElement {
 customElements.define('folder-table', Folder)
 
 // TODO Windows: Viewer: are worker released when changing pdf?
-// TODO Viewer mp4 (range)
-// TODO Viewer audio (range)
 // TODO When a path is not available anymore: fallback to root
 
 // TODO Status line (# files, # selected files), root
