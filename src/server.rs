@@ -2,9 +2,10 @@ use std::net::SocketAddr;
 
 use serde::{Deserialize};
 use tokio::runtime::Runtime;
-use warp::{Filter, Rejection, fs::dir, hyper::header::RANGE};
+use warp::{Filter, fs::dir};
+use warp_range::{filter_range, with_partial_content_status};
 use webview_app::headers::add_headers;
-use crate::{eventsink::{EventSinks, on_eventsink, with_events}, requests::{get_range, get_view, retrieve_extended_items}};
+use crate::{eventsink::{EventSinks, on_eventsink, with_events}, requests::{get_video, get_video_range, get_view, retrieve_extended_items}};
 use crate::{requests::{get_directory_items, get_icon}};
 
 #[cfg(target_os = "linux")]
@@ -16,11 +17,6 @@ use crate::windows::requests::get_root_items;
 struct GetItems {
     id: String,
     path: String,
-}
-
-async fn check_range(range: String) -> Result<(), Rejection> {
-    println!("Range");
-    Ok(())
 }
 
 pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
@@ -54,13 +50,21 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
             .and(warp::query::query())
             .and_then(get_icon);
 
-        let route_get_range = 
+        let route_get_video = 
             warp::path("commander")
-            .and(warp::path("getview"))
+            .and(warp::path("getvideo"))
             .and(warp::path::end())
             .and(warp::query::query())
-            .and(warp::header::<String>("Range"))
-            .and_then(get_range);
+            .and_then(get_video);
+    
+        let route_get_video_range = 
+            warp::path("commander")
+            .and(warp::path("getvideo"))
+            .and(warp::path::end())
+            .and(warp::query::query())
+            .and(filter_range())
+            .and_then(get_video_range)
+            .map(with_partial_content_status);
 
         let route_get_view = 
             warp::path("commander")
@@ -79,8 +83,9 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
         let routes = route_get_items
             .or(route_get_root)
             .or(route_get_icon)
-            .or(route_get_range)
             .or(route_get_view)
+            .or(route_get_video_range)
+            .or(route_get_video)
             .or(route_events)
             .or(route_static);
 

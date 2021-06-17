@@ -56,7 +56,7 @@ const refresh = path => {
             viewerPdf.classList.add("hidden")
             viewerImg.classList.add("hidden")
             viewerVideo.classList.remove("hidden")
-            viewerVideo.src = `/commander/getview?path=${path}` 
+            viewerVideo.src = `/commander/getvideo?path=${path}` 
             break
         default:
             viewerVideo.classList.add("hidden")
