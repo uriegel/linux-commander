@@ -20,8 +20,7 @@ class Folder extends HTMLElement {
         const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
         const events = new WebSocket(`ws://localhost:${location.port}/events/${this.folderId}`)
         events.onopen = () => this.changePath(lastPath)
-        events.onmessage = msg => this.onEvent(msg.data)
-
+        events.onmessage = msg => setTimeout(() => this.onEvent(msg.data))
     }
     
     changeTheme(theme) {
@@ -70,7 +69,11 @@ class Folder extends HTMLElement {
                 }
             }
         })
-        
+
+        this.table.addEventListener("delete", async evt => {
+            console.log("Lösch", evt)
+        })
+                
         this.table.addEventListener("keydown", evt => {
             switch (evt.which) {
                 case 8: // backspace
@@ -146,9 +149,9 @@ class Folder extends HTMLElement {
         })
         if (!this.showHiddenItems)
             items = items.filter(n => n.isHidden == false)
-        if (!items)
+        if (!items) 
             return
-
+            
         this.table.setItems([])
         if (result.changed) {
             this.processor = result.processor

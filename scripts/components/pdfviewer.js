@@ -105,11 +105,12 @@ class PdfViewer extends HTMLElement {
         this.pdfDoc = await this.loadingTask.promise
       	pagecount.textContent = this.pdfDoc.numPages
       
-       	this.renderPage(this.pageNum)
+		if (this.pageNum) 
+			this.renderPage(this.pageNum)
     }
 
 	onWidthChanged() {
-		if (this.canvasContainer.clientWidth != this.width) {
+		if (this.canvasContainer.clientWidth != this.width && this.pageNum) {
 			this.queueRenderPage(this.pageNum)
 			this.width = this.canvasContainer.clientWidth
 		}

@@ -743,12 +743,15 @@ class VirtualTableComponent extends HTMLElement {
                     return
                 delta = -this.position
                 break
-            case 40: // down
-                delta = 1
-                break
             case 38: // up
                 delta = -1
                 break
+            case 40: // down
+                delta = 1
+                break
+            case 46: //DEL
+                this.dispatchEvent(new CustomEvent('delete', { detail: { currentItem: this.position } }))
+                return
             default:
                 checkRestriction()
                 return
