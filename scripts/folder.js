@@ -219,6 +219,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO Hide hidden optional by request for windows and linux in rust
 // TODO Windows: Viewer: are worker released when changing pdf?
 // TODO When a path is not available anymore: fallback to root
 
