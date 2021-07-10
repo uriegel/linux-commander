@@ -158,9 +158,6 @@ export const getDirectory = (folderId, path) => {
         : currentPath.endsWith(":\\") ? currentPath + item.name : currentPath + pathDelimiter + item.name
 
     const onEvent = (items, msg) => {
-
-        // TODO: if hidden items are existent, then index is wrong
-
         const exifItems = JSON.parse(msg)
         exifItems.forEach(n => {
             if (n.exiftime)

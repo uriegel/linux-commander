@@ -109,6 +109,10 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
     }
 }
 
+pub fn is_hidden(_: &str, name: &str)->bool {
+    name.as_bytes()[0] == b'.' && name.as_bytes()[1] != b'.'
+}
+
 pub fn check_extended_items(ext: &str)->bool {
     ext.ends_with(".png") 
     || ext.ends_with(".jpg")

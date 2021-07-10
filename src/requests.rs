@@ -7,7 +7,7 @@ use warp::{http::HeaderValue, hyper::{self, HeaderMap, Response}};
 use warp_range::get_range;
 use std::{fmt, fs, iter::Take, thread::{self, sleep}, time::{Duration, UNIX_EPOCH}};
 
-use crate::eventsink::EventSinks;
+use crate::{eventsink::EventSinks, linux::requests::is_hidden};
 
 #[cfg(target_os = "linux")]
 use crate::linux::requests::{check_extended_items, get_version, create_extended_item, ExtendedItem};
@@ -52,6 +52,7 @@ enum FileType {
 #[serde(rename_all = "camelCase")]
 pub struct DirItem {
     name: String,
+    is_hidden: bool,
     is_directory: bool
 }
 
@@ -59,56 +60,73 @@ pub struct DirItem {
 #[serde(rename_all = "camelCase")]
 pub struct FileItem {
     name: String,
+    is_hidden: bool,
     time: u128,
     size: u64
 }
 
-pub fn get_directory_items(path: &str, id: &str, event_sinks: EventSinks)->Result<DirectoryItems, Error> {
-    match fs::read_dir(path) {
-        Ok(entries) => {
-            event_sinks.set_request(id, true);
-            let (dirs, files): (Vec<_>, Vec<_>) = entries
-                .filter_map(|entry| {
-                    match entry {
-                        Ok(entry) => 
-                            match entry.metadata() {
-                                Ok(metadata) => Some(match metadata.is_dir() {
-                                    true => FileType::Dir(DirItem {
-                                        name: String::from(entry.file_name().to_str().unwrap()),
-                                        is_directory: true
-                                    }),
-                                    false => FileType::File(FileItem {
-                                        name: String::from(entry.file_name().to_str().unwrap()),
-                                        time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
-                                        size: metadata.len()
-                                    })
-                                }),
-                                _ => None
-                            },
-                        _ => None
-                    }
-                })
-                .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
-            let mut dirs: Vec<DirItem> = dirs
-                .into_iter()
-                .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
-                .collect();
-            dirs.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
-            let mut files: Vec<FileItem> = files
-                .into_iter()
-                .filter_map(|ft|if let FileType::File(file) = ft {Some(file)} else {None})
-                .collect();
-            files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
-           
-            event_sinks.set_request(id, false);
-
-            Ok(DirectoryItems{
-                dirs,
-                files
-            })
-        },
-        Err(err) => Err(Error {message: format!("read_dir of {} failed: {}", path, err)})
+impl From<std::io::Error> for Error {
+    fn from(error: std::io::Error) -> Self {
+        Error {message: format!("read_dir failed: {}", error)}
     }
+}
+
+fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
+    if supress {|file_type| {
+        match file_type {
+            FileType::File(ref file) => if file.is_hidden { None } else { Some(file_type) }
+            FileType::Dir(ref file) => if file.is_hidden { None} else { Some(file_type) }
+        }
+    }} else { |e| Some(e) }
+}
+
+pub fn get_directory_items(path: &str, id: &str, suppress_hidden: bool, event_sinks: EventSinks)->Result<DirectoryItems, Error> {
+    let entries = fs::read_dir(path)?;
+    event_sinks.set_request(id, true);
+    let (dirs, files): (Vec<_>, Vec<_>) = entries
+        .filter_map(|entry| {
+            entry.ok()
+                .and_then(|entry| { match entry.metadata().ok() {
+                    Some(metadata) => Some((entry, metadata)),
+                    None => None
+                }})
+                .and_then(|(entry, metadata)| {
+                    let name = String::from(entry.file_name().to_str().unwrap());
+                    let is_hidden = is_hidden(path, &name);
+                    Some(match metadata.is_dir() {
+                        true => FileType::Dir(DirItem {
+                            name,
+                            is_hidden,
+                            is_directory: true
+                        }),
+                        false => FileType::File(FileItem {
+                            name,
+                            is_hidden,
+                            time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
+                            size: metadata.len()
+                        })
+                    })
+                })
+                .and_then(get_supress_hidden(suppress_hidden))
+        })
+        .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
+    let mut dirs: Vec<DirItem> = dirs
+        .into_iter()
+        .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
+        .collect();
+    dirs.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
+    let mut files: Vec<FileItem> = files
+        .into_iter()
+        .filter_map(|ft|if let FileType::File(file) = ft {Some(file)} else {None})
+        .collect();
+    files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
+    
+    event_sinks.set_request(id, false);
+
+    Ok(DirectoryItems{
+        dirs,
+        files
+    })
 }
 
 pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems, event_sinks: EventSinks) {
@@ -116,7 +134,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
     let files: Vec<(usize, FileItem)> = items.files
         .iter()
         .enumerate()
-        .map(| (index, n)| (index, FileItem{name: n.name.clone(), size: n.size, time: n.time}))
+        .map(| (index, n)| (index, FileItem{name: n.name.clone(), is_hidden: n.is_hidden, size: n.size, time: n.time}))
         .filter(|(_, n)| {
             let ext = n.name.to_lowercase();
             check_extended_items(&ext)            

@@ -143,12 +143,7 @@ class Folder extends HTMLElement {
 
     async changePath(path, fromBacklog) {
         const result = getProcessor(this.folderId, path, this.processor)
-        let items = (await result.processor.getItems(this.folderId, path)).map(n => {
-            n.isHidden = n.name && n.name[0] == '.' && n.name[1] != '.'
-            return n
-        })
-        if (!this.showHiddenItems)
-            items = items.filter(n => n.isHidden == false)
+        let items = (await result.processor.getItems(this.folderId, path))
         if (!items) 
             return
             
@@ -219,7 +214,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Hide hidden optional by request for windows and linux in rust
+// TODO Hide hidden per request
 // TODO Windows: Viewer: are worker released when changing pdf?
 // TODO When a path is not available anymore: fallback to root
 

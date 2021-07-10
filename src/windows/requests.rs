@@ -90,7 +90,6 @@ pub fn get_root_items()->Result<Vec<RootItem>, Error> {
     }
 }
 
-
 pub fn check_extended_items(ext: &str)->bool {
     ext.ends_with(".png") 
     || ext.ends_with(".jpg")
