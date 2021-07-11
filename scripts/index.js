@@ -36,6 +36,12 @@ folderLeft.addEventListener("pathChanged", onPathChanged)
 folderRight.addEventListener("pathChanged", onPathChanged)
 folderLeft.addEventListener("tab", () => folderRight.setFocus())
 folderRight.addEventListener("tab", () => folderLeft.setFocus())
+folderLeft.addEventListener("delete", evt => onDelete(evt.detail))
+folderRight.addEventListener("delete", evt => onDelete(evt.detail))
+
+function onDelete(itemsToDelete) {
+    console.log("del", itemsToDelete)
+}
 
 function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {

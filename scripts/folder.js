@@ -71,7 +71,13 @@ class Folder extends HTMLElement {
         })
 
         this.table.addEventListener("delete", async evt => {
-            console.log("Lösch", evt)
+            const selectedIndexes = this.table.items
+                .map((n, i) => ({i, isSelected: n.isSelected}))
+                .filter(n => n.isSelected)
+                .map(n => n.i) || evt.detail.currentItem
+            const param = selectedIndexes.length > 0 ? selectedIndexes : [ evt.detail.currentItem ] 
+            if (param.length > 1 || param[0])
+                this.dispatchEvent(new CustomEvent('delete', { detail: param }))
         })
                 
         this.table.addEventListener("keydown", evt => {
