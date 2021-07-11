@@ -214,8 +214,8 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Hide hidden per request
 // TODO Windows: Viewer: are worker released when changing pdf?
+// TODO Windows: Hamurger Menu and context menu
 // TODO When a path is not available anymore: fallback to root
 
 // TODO Status line (# files, # selected files), root
