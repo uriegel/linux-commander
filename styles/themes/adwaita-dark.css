@@ -26,6 +26,27 @@
 
     --gridsplitter-grip-color : #262626;
     --gridsplitter-grip-hover-color : #383838;
-    --gridsplitter-grip-active-color : #585858;;
+    --gridsplitter-grip-active-color : #585858;
+
+    --dbc-main-color: white;
+    --dbc-main-background-color: #353535;
+    --dbc-button-background-color: #353535;
+    --dbc-button-color: white;
+    --dbc-button-hover-background-color: #4b4b4b;
+    --dbc-button-active-background-color: #242424;   
+    --dbc-button-margin: 20px 0px 0px 0px;
+    --dbc-button-flexgrow: 1;
+    --dbc-button-marginleft: 0px;
+    --dbc-button-focus-color: rgb(126, 126, 126);    
+    --dbc-button-cornerradius: 0px;
+    --dbc-button-bordercolor: black;
+    --dbc-button-borderstyle: solid;
+    --dbc-button-borderwidth: 1px 0px 1px 1px;
+    --dbc-button-first-borderwidth: 0px;
+    --dbc-button-buttomradius: 5px;
+    --dbc-button-padding: 10px 15px;
+    --dbc-button-outlinestyle: dotted;
+    --dbc-button-outlineoffset: -2px;
+    --dbc-input-selection-color: #3584e4;
 }
 
