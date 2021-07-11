@@ -435,12 +435,6 @@ class DialogBoxComponent extends HTMLElement {
             this.dialogroot.classList.add("none")
             this.dialogContainer.classList.remove("rightTranslated");
             this.dialogContainer.classList.remove("leftTranslated");
-            const dialogResult = {result}
-            if (input)
-                dialogResult.input = input
-            if ((result == RESULT_OK || result == RESULT_YES) && this.onExtendedResult)
-                this.onExtendedResult(dialogResult)
-            this.resolveDialog(dialogResult)
         }
 
         this.fader.addEventListener("transitionend", transitionend)
@@ -450,6 +444,13 @@ class DialogBoxComponent extends HTMLElement {
             this.dialogContainer.classList.add(result == RESULT_OK || result == RESULT_YES ? "leftTranslated" : "rightTranslated")    
         this.fader.classList.add("faded")
         this.dialog.classList.add("faded")
+
+        const dialogResult = {result}
+        if (input)
+            dialogResult.input = input
+        if ((result == RESULT_OK || result == RESULT_YES) && this.onExtendedResult)
+            this.onExtendedResult(dialogResult)
+        this.resolveDialog(dialogResult)
     }
 
     focusButton(focus) {
