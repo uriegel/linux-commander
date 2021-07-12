@@ -148,7 +148,7 @@ class Folder extends HTMLElement {
 
     async changePath(path, fromBacklog) {
         const result = getProcessor(this.folderId, path, this.processor)
-        let items = (await result.processor.getItems(this.folderId, path))
+        let items = (await result.processor.getItems(this.folderId, path, this.showHiddenItems))
         if (!items) 
             return
             
@@ -219,7 +219,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO ShowHidden via request
 // TODO Windows: Viewer: are worker released when changing pdf?
 // TODO Windows: Hamurger Menu and context menu
 // TODO When a path is not available anymore: fallback to root

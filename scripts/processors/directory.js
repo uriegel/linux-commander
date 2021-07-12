@@ -115,13 +115,13 @@ export const getDirectory = (folderId, path) => {
                 : getParentDir(currentPath)
         : [null, null]
 
-    const getItems = async (id, path) => {
+    const getItems = async (id, path, hiddenIncluded) => {
         const responseStr = await fetch("/commander/getitems", { 
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
             },            
-            body: JSON.stringify({ id, path }) 
+            body: JSON.stringify({ id, path, hiddenIncluded }) 
         })
         const response = await responseStr.json()
         let result = [{

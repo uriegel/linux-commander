@@ -14,9 +14,12 @@ use crate::linux::requests::get_root_items;
 use crate::windows::requests::get_root_items;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct GetItems {
     id: String,
     path: String,
+    #[serde(default)]
+    hidden_included: bool
 }
 
 pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
@@ -106,7 +109,7 @@ async fn get_root()->Result<impl warp::Reply, warp::Rejection> {
 }
 
 async fn get_items(param: GetItems, event_sinks: EventSinks)->Result<impl warp::Reply, warp::Rejection> {
-    match get_directory_items(&param.path, &param.id, false, event_sinks.clone()) {
+    match get_directory_items(&param.path, &param.id, !param.hidden_included, event_sinks.clone()) {
         Ok(items ) => {
             retrieve_extended_items(param.id, param.path, &items, event_sinks);
             Ok (warp::reply::json(&items))
