@@ -71,13 +71,12 @@ class Folder extends HTMLElement {
         })
 
         this.table.addEventListener("delete", async evt => {
-            const selectedIndexes = this.table.items
-                .map((n, i) => ({i, isSelected: n.isSelected}))
-                .filter(n => n.isSelected)
-                .map(n => n.i) || evt.detail.currentItem
-            const param = selectedIndexes.length > 0 ? selectedIndexes : [ evt.detail.currentItem ] 
-            if (param.length > 1 || param[0])
-                this.dispatchEvent(new CustomEvent('delete', { detail: param }))
+            const selectedItems = this.table.items
+                .filter(n => n.isSelected) 
+            if (selectedItems.length == 0 && evt.detail.currentItem == 0)
+                return
+            const param = selectedItems.length > 0 ? selectedItems : [ this.table.items[evt.detail.currentItem] ] 
+            this.dispatchEvent(new CustomEvent('delete', { detail: param }))
         })
                 
         this.table.addEventListener("keydown", evt => {
@@ -220,6 +219,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO ShowHidden via request
 // TODO Windows: Viewer: are worker released when changing pdf?
 // TODO Windows: Hamurger Menu and context menu
 // TODO When a path is not available anymore: fallback to root

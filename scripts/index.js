@@ -9,11 +9,25 @@ const folderRight = document.getElementById("folderRight")
 const splitter = document.getElementById('splitter')
 const dialog = document.querySelector('dialog-box-component')
 
+const DIRECTORY = 1
+const FILE = 2
+const BOTH = 3
+
 initializeCallbacks(onTheme, onShowHidden, show => {
     onShowViewer(show, currentPath)
     folderLeft.onResize()
     folderRight.onResize()
 })
+
+function getItemsTypes(selectedItems) {
+    const types = selectedItems
+        .map(n => n.isDirectory)
+        .filter((item, index, resultList) => resultList
+            .findIndex(n => n == item) == index)
+    return types.length == 1
+    ? types[0] ? DIRECTORY : FILE
+    : BOTH
+}
 
 ;(() => {
     const initialTheme = isLinux() ? (localStorage.getItem("theme") || "themeAdwaita") : "themeWindows"
@@ -42,10 +56,19 @@ folderLeft.addEventListener("delete", evt => onDelete(evt.detail))
 folderRight.addEventListener("delete", evt => onDelete(evt.detail))
 
 async function onDelete(itemsToDelete) {
-    console.log("del", itemsToDelete)
+    const itemsType = getItemsTypes(itemsToDelete)
+    const text = itemsType == FILE 
+        ? itemsToDelete.length == 1 
+            ? "Möchtest Du die Datei löschen?"
+            : "Möchtest Du die Dateien löschen?"
+        : itemsType == DIRECTORY
+        ?  itemsToDelete.length == 1 
+            ? "Möchtest Du den Ordner löschen?"
+            : "Möchtest Du die Ordner löschen?"
+        : "Möchtest Du die Einträge löschen?"
 
     const res = await dialog.show({
-        text: "Löschen",
+        text,
         btnOk: true,
         btnCancel: true
     })    
