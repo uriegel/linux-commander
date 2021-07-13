@@ -2,13 +2,15 @@ use webview_app::app::{App, AppSettings, WarpSettings};
 #[cfg(target_os = "linux")]
 use webview_app::app::connect_msg_callback;
 #[cfg(target_os = "linux")]
-use gtk::GtkApplicationExt;
+use gio::{SimpleAction, traits::ActionMapExt};
 #[cfg(target_os = "linux")]
-use gio::{ActionMapExt, SimpleAction};
+use gtk::{
+    Application, ApplicationWindow, Builder, HeaderBar, prelude::{
+        ToVariant, BuilderExtManual, GtkApplicationExt, HeaderBarExt
+    }
+};
 #[cfg(target_os = "linux")]
-use gtk::{Application, ApplicationWindow, Builder, HeaderBar, HeaderBarExt, prelude::{BuilderExtManual, ToVariant}};
-#[cfg(target_os = "linux")]
-use webkit2gtk::{WebView, WebViewExt};
+use webkit2gtk::{WebView, traits::WebViewExt};
 use crate::server::server;
 
 mod server;
@@ -70,7 +72,7 @@ fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Bu
         match s {
         Some(val) => {
             a.set_state(val);
-            match val.get_str(){
+            match val.str(){
                 Some(theme) => 
                     weak_webview.run_javascript(&format!("setTheme('{}')", theme), Some(&gio::Cancellable::new()), |_|{}),
                 None => println!("Could not set theme, could not extract from variant")
@@ -82,7 +84,7 @@ fn on_init(application: &Application, _: &ApplicationWindow, builder: &Option<Bu
     application.add_action(&action);
 
     if let Some(builder) = builder {
-        let headerbar: HeaderBar = builder.get_object("headerbar").unwrap();
+        let headerbar: HeaderBar = builder.object("headerbar").unwrap();
         connect_msg_callback(webview, move|cmd: &str, payload: &str|{ 
             match cmd {
                 "title" => headerbar.set_subtitle(Some(payload)),
