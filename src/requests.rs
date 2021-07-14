@@ -160,12 +160,11 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
                         let exifreader = exif::Reader::new();
         
                         if event_sinks.is_request_active(id.clone(), request_id) {
-
                             if event_sinks.active_requests() {
                                 sleep(Duration::from_millis(500));
                             }
                                 
-                            if let Ok(exif) = exifreader.read_from_container(&mut bufreader) {
+                            exifreader.read_from_container(&mut bufreader).ok().and_then(|exif|{
                                 let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
                                     Some(info) => Some(info.display_value().to_string()),
                                     None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
@@ -177,10 +176,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
                                     Some(exiftime) => create_extended_item(index + index_pos, get_unix_time(&exiftime)),
                                     None => None
                                 }
-                            }
-                            else {
-                                None
-                            }
+                            }) 
                         } else {
                             None
                         }

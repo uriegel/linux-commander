@@ -15,8 +15,15 @@ pub struct RootItem {
 }
 
 #[derive(Serialize)]
+pub enum MsgType {
+    ExtendedItem = 1
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ExtendedItem {
     index: usize,
+    msg_type: MsgType,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     exiftime: Option<i64>
@@ -125,6 +132,7 @@ pub fn get_version(_: &str, _: usize)->Option<ExtendedItem> {
 pub fn create_extended_item(index: usize, exiftime: i64)->Option<ExtendedItem> {
     Some(ExtendedItem{
         index, 
+        msg_type: MsgType::ExtendedItem,
         exiftime: Some(exiftime)
     })
 }
