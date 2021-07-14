@@ -22,6 +22,15 @@ struct GetItems {
     hidden_included: bool
 }
 
+#[derive(Debug)]
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DeleteItems {
+    id: String,
+    path: String,
+    files: Vec<String>
+}
+
 pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
     rt.spawn(async move {
 
@@ -76,6 +85,15 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
             .and(warp::query::query())
             .and_then(get_view);
 
+        let route_delete = 
+            warp::post()
+            .and(warp::path("commander"))
+            .and(warp::path("delete"))
+            .and(warp::path::end())
+            .and(warp::body::json())
+            .and(with_events(event_sinks.clone()))
+            .and_then(delete);
+
         let route_events = 
             warp::path("events")
             .and(warp::ws())
@@ -89,6 +107,7 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
             .or(route_get_view)
             .or(route_get_video_range)
             .or(route_get_video)
+            .or(route_delete)
             .or(route_events)
             .or(route_static);
 
@@ -121,5 +140,8 @@ async fn get_items(param: GetItems, event_sinks: EventSinks)->Result<impl warp::
     }
 }
 
+async fn delete(param: DeleteItems, event_sinks: EventSinks)->Result<impl warp::Reply, warp::Rejection> {
+    Ok (warp::reply::reply())
+}
 
 

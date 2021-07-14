@@ -3,6 +3,8 @@ import './components/pdfviewer.js'
 import './components/DialogBoxComponent.js'
 import './folder.js'
 import {onTheme as onViewerTheme, onShowViewer, refreshViewer} from './viewer.js'
+import { addDeleteJob } from './jobs.js'
+import { RESULT_OK } from './components/DialogBoxComponent.js'
 
 const folderLeft = document.getElementById("folderLeft")
 const folderRight = document.getElementById("folderRight")
@@ -73,6 +75,8 @@ async function onDelete(itemsToDelete) {
         btnCancel: true
     })    
     activeFolder.setFocus()
+    if (res.result == RESULT_OK)
+        addDeleteJob()
 }
 
 function onTheme(theme) {
