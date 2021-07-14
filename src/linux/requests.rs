@@ -2,7 +2,7 @@
 
 use serde::{Serialize};
 
-use crate::requests::{Error, IteratorExt};
+use crate::{requests::{Error, IteratorExt}, server::DeleteItems};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -127,4 +127,10 @@ pub fn create_extended_item(index: usize, exiftime: i64)->Option<ExtendedItem> {
         index, 
         exiftime: Some(exiftime)
     })
+}
+
+pub async fn delete(param: DeleteItems) {
+    // TODO add delete job
+    tokio::time::sleep(std::time::Duration::from_secs(7)).await;
+    println!("In linux: {:?}", param);
 }

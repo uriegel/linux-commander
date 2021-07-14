@@ -191,6 +191,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
                         
                 if extended_items.len() > 0 && event_sinks.is_request_active(id.clone(), request_id) {
                     let json = serde_json::to_string(&extended_items).unwrap();
+                    // TODO msg with msgtype 
                     event_sinks.send(id, json);
                 }
             });
