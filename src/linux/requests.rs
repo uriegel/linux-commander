@@ -114,8 +114,8 @@ pub fn get_version(_: &str, _: usize)->Option<ExtendedItem> {
     None
 }
 
-pub async fn delete(param: DeleteItems) {
+pub async fn delete(path: &str, items: Vec<String>) {
     // TODO add delete job
     tokio::time::sleep(std::time::Duration::from_secs(7)).await;
-    println!("In linux: {:?}", param);
+    println!("In linux: {}", path);
 }

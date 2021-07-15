@@ -1,7 +1,7 @@
 
 // TODO Only in certain processors, not in root!
 
-export const addDeleteJob = async () => {
+export const addDeleteJob = async (id) => {
     console.log("Welche Seite und was?")
 
     const responseStr = await fetch("/commander/delete", { 
@@ -10,7 +10,7 @@ export const addDeleteJob = async () => {
             'Content-Type': 'application/json'
         },            
         body: JSON.stringify({ 
-            id: "id",
+            id,
             path: "path",
             files: ["file1", "file2" ]
         }) 

@@ -1,17 +1,13 @@
 use std::{net::SocketAddr};
 
-use serde::{Deserialize};
+use serde::{Serialize, Deserialize};
 use tokio::{runtime::Runtime, task};
 use warp::{Filter, fs::dir};
 use warp_range::{filter_range, with_partial_content_status};
 use webview_app::headers::add_headers;
-use crate::{
-    eventsink::{
+use crate::{eventsink::{
         EventSinks, on_eventsink, with_events
-    }, linux::requests, requests::{
-        get_video, get_video_range, get_view, retrieve_extended_items
-    }
-};
+    }, linux::requests, requests::{MsgType, get_video, get_video_range, get_view, retrieve_extended_items}};
 use crate::{requests::{get_directory_items, get_icon}};
 
 #[cfg(target_os = "linux")]
@@ -32,9 +28,9 @@ struct GetItems {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteItems {
-    id: String,
-    path: String,
-    files: Vec<String>
+    pub id: String,
+    pub path: String,
+    pub files: Vec<String>
 }
 
 pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
@@ -146,11 +142,23 @@ async fn get_items(param: GetItems, event_sinks: EventSinks)->Result<impl warp::
     }
 }
 
-async fn delete(param: DeleteItems, event_sinks: EventSinks)->Result<impl warp::Reply, warp::Rejection> {
-    task::spawn( async {
-        requests::delete(param).await;
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Progress {
+    value: i32,
+    msg_type: MsgType,
+}
 
-        // TODO Send error or success
+
+async fn delete(param: DeleteItems, event_sinks: EventSinks)->Result<impl warp::Reply, warp::Rejection> {
+    task::spawn(  async move {
+        requests::delete(&param.path, param.files).await;
+
+
+        let progress = Progress { value: 7, msg_type: MsgType::Progress };
+        let json = serde_json::to_string(&progress).unwrap();
+        event_sinks.send(param.id, json);
+
         // TODO progress in status bar
         // let json = serde_json::to_string(&extended_items).unwrap();
         // event_sinks.send(param.id, json);

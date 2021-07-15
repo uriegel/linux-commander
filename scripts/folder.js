@@ -22,6 +22,8 @@ class Folder extends HTMLElement {
         events.onopen = () => this.changePath(lastPath)
         events.onmessage = msg => setTimeout(() => this.onEvent(msg.data))
     }
+
+    get id() { return this.folderId}
     
     changeTheme(theme) {
         ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {
@@ -208,6 +210,9 @@ class Folder extends HTMLElement {
             case "ExtendedItem":
                 if (this.processor.onEvent(this.table.items, msg.items))
                     this.table.refresh()
+                break
+            case "Progress":
+                console.log("progress")
                 break
         }
     }
