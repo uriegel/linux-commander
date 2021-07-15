@@ -202,9 +202,14 @@ class Folder extends HTMLElement {
         }
     }
 
-    onEvent(msg) {
-        if (this.processor.onEvent(this.table.items, msg))
-            this.table.refresh()
+    onEvent(data) {
+        const msg = JSON.parse(data)
+        switch (msg.msgType) {
+            case "ExtendedItem":
+                if (this.processor.onEvent(this.table.items, msg.items))
+                    this.table.refresh()
+                break
+        }
     }
 
     sendStatusInfo(index) {

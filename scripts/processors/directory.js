@@ -157,15 +157,14 @@ export const getDirectory = (folderId, path) => {
         ? currentPath == pathDelimiter ? pathDelimiter + item.name : currentPath + pathDelimiter + item.name
         : currentPath.endsWith(":\\") ? currentPath + item.name : currentPath + pathDelimiter + item.name
 
-    const onEvent = (items, msg) => {
-        const exifItems = JSON.parse(msg)
-        exifItems.forEach(n => {
+    const onEvent = (items, extendedItems) => {
+        extendedItems.forEach(n => {
             if (n.exiftime)
                 items[n.index].exiftime = n.exiftime
             else
                 items[n.index].version = n.version
         })
-        return exifItems.length ? true : false
+        return extendedItems.length ? true : false
     }
 
     const getIconPath = name => currentPath + pathDelimiter + name

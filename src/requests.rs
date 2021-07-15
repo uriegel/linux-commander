@@ -10,9 +10,9 @@ use std::{fmt, fs, iter::Take, thread::{self, sleep}, time::{Duration, UNIX_EPOC
 use crate::{eventsink::EventSinks, linux::requests::is_hidden};
 
 #[cfg(target_os = "linux")]
-use crate::linux::requests::{check_extended_items, get_version, create_extended_item, ExtendedItem};
+use crate::linux::requests::{check_extended_items, get_version};
 #[cfg(target_os = "windows")]
-use crate::windows::requests::{check_extended_items, get_version, create_extended_item, ExtendedItem};
+use crate::windows::requests::{check_extended_items, get_version};
 
 const ICON_SIZE: i32 = 16;
 
@@ -63,6 +63,35 @@ pub struct FileItem {
     is_hidden: bool,
     time: u128,
     size: u64
+}
+
+#[derive(Serialize)]
+pub enum MsgType {
+    ExtendedItem = 1
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExtendedItems {
+    msg_type: MsgType,
+    items: Vec<ExtendedItem>
+}
+
+#[derive(Serialize)]
+pub struct ExtendedItem {
+    index: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    exiftime: Option<i64>
+}
+
+impl ExtendedItem {
+    pub fn new(index: usize, exiftime: i64) -> Self {
+        ExtendedItem {
+            index, 
+            exiftime: Some(exiftime)
+        }
+    }
 }
 
 impl From<std::io::Error> for Error {
@@ -173,7 +202,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
                                     } 
                                 };
                                 match exiftime {
-                                    Some(exiftime) => create_extended_item(index + index_pos, get_unix_time(&exiftime)),
+                                    Some(exiftime) => Some(ExtendedItem::new(index + index_pos, get_unix_time(&exiftime))),
                                     None => None
                                 }
                             }) 
@@ -186,8 +215,8 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems,
                 }).collect();
                         
                 if extended_items.len() > 0 && event_sinks.is_request_active(id.clone(), request_id) {
-                    let json = serde_json::to_string(&extended_items).unwrap();
-                    // TODO msg with msgtype 
+                    let extended_items_msg = ExtendedItems{ items: extended_items, msg_type: MsgType::ExtendedItem };
+                    let json = serde_json::to_string(&extended_items_msg).unwrap();
                     event_sinks.send(id, json);
                 }
             });

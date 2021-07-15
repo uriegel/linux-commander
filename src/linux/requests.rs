@@ -2,7 +2,7 @@
 
 use serde::{Serialize};
 
-use crate::{requests::{Error, IteratorExt}, server::DeleteItems};
+use crate::{requests::{Error, ExtendedItem, IteratorExt}, server::DeleteItems};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -12,21 +12,6 @@ pub struct RootItem {
     pub mount_point: String,
     pub capacity: u64,
     pub file_system: String,
-}
-
-#[derive(Serialize)]
-pub enum MsgType {
-    ExtendedItem = 1
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ExtendedItem {
-    index: usize,
-    msg_type: MsgType,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    exiftime: Option<i64>
 }
 
 pub fn get_root_items()->Result<Vec<RootItem>, Error> {
@@ -127,14 +112,6 @@ pub fn check_extended_items(ext: &str)->bool {
 
 pub fn get_version(_: &str, _: usize)->Option<ExtendedItem> {
     None
-}
-
-pub fn create_extended_item(index: usize, exiftime: i64)->Option<ExtendedItem> {
-    Some(ExtendedItem{
-        index, 
-        msg_type: MsgType::ExtendedItem,
-        exiftime: Some(exiftime)
-    })
 }
 
 pub async fn delete(param: DeleteItems) {
