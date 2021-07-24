@@ -1,10 +1,8 @@
-use std::{any::Any, sync::{Arc, Mutex}};
-
 use serde::{Serialize, Deserialize};
 use tokio::{runtime::Runtime, task};
 use warp::{Filter, fs::dir};
 use warp_range::{filter_range, with_partial_content_status};
-use webview_app::{app::WarpInitData, headers::add_headers};
+use webview_app::{app::{AppState, WarpInitData}, headers::add_headers};
 use crate::{eventsink::{
         EventSinks, on_eventsink, with_events
     }, linux::requests, requests::{MsgType, get_video, get_video_range, get_view, retrieve_extended_items}};
@@ -151,7 +149,7 @@ struct Progress {
 }
 
 
-async fn delete(param: DeleteItems, event_sinks: EventSinks, state: Arc<Mutex<Box<dyn Any + Send>>>)->Result<impl warp::Reply, warp::Rejection> {
+async fn delete(param: DeleteItems, event_sinks: EventSinks, state: AppState)->Result<impl warp::Reply, warp::Rejection> {
     task::spawn(  async move {
         requests::delete(&param.path, param.files, state).await;
 

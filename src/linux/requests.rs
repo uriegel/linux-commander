@@ -1,12 +1,13 @@
- use std::{any::Any, process::Command, sync::{Arc, Mutex}};
+ use std::{any::Any, process::Command};
 
 use gio::glib::Sender;
 use serde::{Serialize};
+use webview_app::app::AppState;
 
 use crate::requests::{Error, ExtendedItem, IteratorExt};
 
-pub struct AppState {
-    pub test_sender: Sender<bool>
+pub struct State {
+    pub progress_sender: Sender<f32>
 }
 
 #[derive(Serialize)]
@@ -119,10 +120,13 @@ pub fn get_version(_: &str, _: usize)->Option<ExtendedItem> {
     None
 }
 
-pub async fn delete(path: &str, _items: Vec<String>, state: Arc<Mutex<Box<dyn Any + Send>>>) {
+pub async fn delete(path: &str, _items: Vec<String>, state: AppState) {
     // TODO add delete job
     
-
+    for n in 0..=10 {
+        test_send(&state, n as f32 / 10.0);
+        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+    }
     
 
     
@@ -142,21 +146,19 @@ pub async fn delete(path: &str, _items: Vec<String>, state: Arc<Mutex<Box<dyn An
     // );        
 
     
-    test_send(&state, true);
-    
-    
-    tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
-    test_send(&state, false);
+
+    
+    
 
 
 
     println!("In linux: {}", path);
 }
 
-fn test_send(state: &Arc<Mutex<Box<dyn Any + Send>>>, val: bool) {
+fn test_send(state: &AppState, val: f32) {
     let s = state.lock().unwrap();
     let r: &dyn Any = s.as_ref();
-    let dc = r.downcast_ref::<AppState>().unwrap();
-    dc.test_sender.send(val).ok();
+    let dc = r.downcast_ref::<State>().unwrap();
+    dc.progress_sender.send(val).ok();
 }
