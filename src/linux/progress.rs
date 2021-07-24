@@ -1,7 +1,7 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, f64::consts::PI, rc::Rc};
 
-use gio::{glib::{MainContext, PRIORITY_DEFAULT_IDLE, Receiver, Sender, timeout_future_seconds}, prelude::Continue};
-use gtk::{Builder, DrawingArea, Revealer, prelude::{BuilderExtManual, RevealerExt}};
+use gio::{glib::{MainContext, PRIORITY_DEFAULT_IDLE, Receiver, Sender, timeout_future_seconds}, prelude::*};
+use gtk::{Builder, DrawingArea, Inhibit, Revealer, cairo::{Antialias, Context, LineCap, LineJoin}, prelude::{BuilderExtManual, RevealerExt, WidgetExt}};
 use webview_app::app::AppState;
 
 use super::requests::State;
@@ -9,7 +9,8 @@ use super::requests::State;
 #[derive(Clone)]
 pub struct Progress {
     revealer: Revealer,
-    drawing_area: DrawingArea
+    drawing_area: DrawingArea,
+    
 }
 
 impl Progress {
@@ -21,8 +22,12 @@ impl Progress {
         let mut val = state.lock().unwrap();
         *val = Box::new(State{ progress_sender });
     
+        let drawing_area_clone = drawing_area.clone();
         let progress = Progress { revealer, drawing_area };
         progress.init_receiver(receiver);
+        let progress_clone = progress.clone();
+        drawing_area_clone.connect_draw(move|_, context| { progress_clone.draw(context) });
+        //drawing_area_clone.queue_draw();
         progress
     }
 
@@ -39,8 +44,6 @@ impl Progress {
                 *id = *id + 1;
             }
 
-            println!("Progrss: {}", val);
-
             if val == 1.0 {
                 let main_context = MainContext::default();
                 let id_clone = id_box.clone();
@@ -50,11 +53,9 @@ impl Progress {
                 let progress_clone = progress.clone();
                 main_context.spawn_local(async move {
                     timeout_future_seconds(10).await;
-                    println!("Zuschlag");
                     let idb = id_clone.borrow();
                     let id = *idb;
                     if this_id == id {
-                        println!("this_id: {} {}", this_id, id);
                         progress_clone.revealer.set_reveal_child(false);
                     }
                 });
@@ -62,6 +63,33 @@ impl Progress {
             
             Continue(true)
         });   
+    }
+
+    fn draw(&self, context: &Context)->Inhibit {
+        let width = self.drawing_area.allocated_width();
+        let height = self.drawing_area.allocated_height();
+        context.set_antialias(Antialias::Best);
+        context.set_line_join(LineJoin::Miter);
+        context.set_line_cap(LineCap::Round);
+
+        context.translate(width as f64/2.0, height as f64 /2.0);
+        context.stroke_preserve().ok();
+
+        context.arc_negative(0.0, 0.0, 
+            ((if width < height { width } else { height}) / 2 - 0).into(),
+            - PI / 2.0, - PI / 2.0 + 1.2 * PI);
+        context.line_to(0.0, 0.0);
+        context.set_source_rgb(0.7, 0.7, 0.7);
+        context.fill().ok();
+
+        context.move_to(0.0, 0.0);
+        context.arc(0.0, 0.0, 
+            ((if width < height { width } else { height}) / 2 - 0).into(),
+            - PI / 2.0, - PI / 2.0 + 1.2 * PI);
+
+        context.set_source_rgb(0.3, 0.3, 0.3);
+        context.fill().ok();
+        Inhibit(false)
     }
 }
 
