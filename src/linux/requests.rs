@@ -1,6 +1,6 @@
  use std::{any::Any, process::Command};
 
-use gio::glib::Sender;
+use gio::{Cancellable, File, glib::Sender, traits::FileExt};
 use serde::{Serialize};
 use webview_app::app::AppState;
 
@@ -127,7 +127,9 @@ pub async fn delete(path: &str, items: Vec<String>, state: AppState) {
     }).collect();
     
     let count = files_to_delete.len();
-    for (pos, file) in files_to_delete.iter().enumerate() {
+    for (pos, filepath) in files_to_delete.iter().enumerate() {
+        let file = File::for_path(filepath);
+        let result = file.trash::<Cancellable>(None);
         send_progress(&state, count, pos + 1);
     }
 }
@@ -137,6 +139,5 @@ fn send_progress(state: &AppState, size: usize, val: usize) {
     let r: &dyn Any = s.as_ref();
     let dc = r.downcast_ref::<State>().unwrap();
     let val = val as f32 / size as f32;
-    println!("Wall: {}", val);
     dc.progress_sender.send(val).ok();
 }
