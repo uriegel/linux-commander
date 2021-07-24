@@ -153,14 +153,9 @@ async fn delete(param: DeleteItems, event_sinks: EventSinks, state: AppState)->R
     task::spawn(  async move {
         requests::delete(&param.path, param.files, state).await;
 
-
         let progress = Progress { value: 7, msg_type: MsgType::Progress };
         let json = serde_json::to_string(&progress).unwrap();
         event_sinks.send(param.id, json);
-
-        // TODO progress in status bar
-        // let json = serde_json::to_string(&extended_items).unwrap();
-        // event_sinks.send(param.id, json);
     });
     Ok (warp::reply::reply())
 }

@@ -76,7 +76,7 @@ async function onDelete(itemsToDelete) {
     })    
     activeFolder.setFocus()
     if (res.result == RESULT_OK)
-        addDeleteJob(activeFolder.id)
+        addDeleteJob(activeFolder.id, activeFolder.getCurrentPath(), itemsToDelete.map(n => n.name))
 }
 
 function onTheme(theme) {

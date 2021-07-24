@@ -231,7 +231,7 @@ customElements.define('folder-table', Folder)
 
 // TODO Copy: progress control in status bar
 // TODO Windows: Viewer: are worker released when changing pdf?
-// TODO Windows: Hamurger Menu and context menu
+// TODO Windows: Hamburger Menu and context menu
 // TODO When a path is not available anymore: fallback to root
 
 // TODO Status line (# files, # selected files), root

@@ -120,45 +120,23 @@ pub fn get_version(_: &str, _: usize)->Option<ExtendedItem> {
     None
 }
 
-pub async fn delete(path: &str, _items: Vec<String>, state: AppState) {
-    // TODO add delete job
+pub async fn delete(path: &str, items: Vec<String>, state: AppState) {
     
-    for n in 0..=10 {
-        test_send(&state, n as f32 / 10.0);
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+    let files_to_delete: Vec<String> = items.iter().map(|file|{
+        path.to_string() + if path.ends_with("/") { "" } else { "/" } + file
+    }).collect();
+    
+    let count = files_to_delete.len();
+    for (pos, file) in files_to_delete.iter().enumerate() {
+        send_progress(&state, count, pos + 1);
     }
-    
-
-    
-    
-    
-
-    // let entries = vec!["Michel".to_string(), "Sara".to_string(), "Liam".to_string(), "Zelda".to_string(), "Neo".to_string(), "Octopus master".to_string()];
-    // sender.send(entries).ok();
-    // println!("TID Warp {:?}", thread::current().id());
-    // receiver.attach( None, move |entries | {
-    // //         for (i, entry) in entries.iter().enumerate() {
-              
-    // //         }
-    //         println!("TID im resifer {:?}", thread::current().id());
-    //         Continue(true)
-    //     }
-    // );        
-
-    
-
-
-    
-    
-
-
-
-    println!("In linux: {}", path);
 }
 
-fn test_send(state: &AppState, val: f32) {
+fn send_progress(state: &AppState, size: usize, val: usize) {
     let s = state.lock().unwrap();
     let r: &dyn Any = s.as_ref();
     let dc = r.downcast_ref::<State>().unwrap();
+    let val = val as f32 / size as f32;
+    println!("Wall: {}", val);
     dc.progress_sender.send(val).ok();
 }
