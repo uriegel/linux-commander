@@ -1,4 +1,4 @@
-use std::{cell::RefCell, f64::consts::PI, rc::Rc};
+use std::{cell::RefCell, cmp::{max, min}, f64::consts::PI, rc::Rc};
 
 use gio::{glib::{MainContext, PRIORITY_DEFAULT_IDLE, Receiver, Sender, timeout_future_seconds}, prelude::*};
 use gtk::{Builder, DrawingArea, Inhibit, Revealer, cairo::{Antialias, Context, LineCap, LineJoin}, prelude::{BuilderExtManual, RevealerExt, WidgetExt}};
@@ -10,7 +10,7 @@ use super::requests::State;
 pub struct Progress {
     revealer: Revealer,
     drawing_area: DrawingArea,
-    
+    progress: Rc<RefCell<u32>> // 1..1000
 }
 
 impl Progress {
@@ -23,11 +23,10 @@ impl Progress {
         *val = Box::new(State{ progress_sender });
     
         let drawing_area_clone = drawing_area.clone();
-        let progress = Progress { revealer, drawing_area };
+        let progress = Progress { revealer, drawing_area, progress: Rc::new(RefCell::new(0)) };
         progress.init_receiver(receiver);
         let progress_clone = progress.clone();
         drawing_area_clone.connect_draw(move|_, context| { progress_clone.draw(context) });
-        //drawing_area_clone.queue_draw();
         progress
     }
 
@@ -39,6 +38,9 @@ impl Progress {
             if !progress.revealer.reveals_child() {
                 progress.revealer.set_reveal_child(true);
             }
+
+            progress.set_progress(val);
+
             {
                 let mut id = id_box.borrow_mut();
                 *id = *id + 1;
@@ -75,9 +77,13 @@ impl Progress {
         context.translate(width as f64/2.0, height as f64 /2.0);
         context.stroke_preserve().ok();
 
+        let idb = self.progress.borrow();
+        let progress = *idb;
+        let angle = - PI / 2.0 + (progress as f64/ 500.0) * PI;
+
         context.arc_negative(0.0, 0.0, 
             ((if width < height { width } else { height}) / 2 - 0).into(),
-            - PI / 2.0, - PI / 2.0 + 1.2 * PI);
+            - PI / 2.0, angle);
         context.line_to(0.0, 0.0);
         context.set_source_rgb(0.7, 0.7, 0.7);
         context.fill().ok();
@@ -85,11 +91,19 @@ impl Progress {
         context.move_to(0.0, 0.0);
         context.arc(0.0, 0.0, 
             ((if width < height { width } else { height}) / 2 - 0).into(),
-            - PI / 2.0, - PI / 2.0 + 1.2 * PI);
+            - PI / 2.0, angle);
 
         context.set_source_rgb(0.3, 0.3, 0.3);
         context.fill().ok();
         Inhibit(false)
+    }
+
+    fn set_progress(&self, val: f32) {
+        let val = (val * 1000.0) as u32;
+        let val = max(min(val, 1000), 1);
+        let mut progress = self.progress.borrow_mut();
+        *progress = val;
+        self.drawing_area.queue_draw();        
     }
 }
 
