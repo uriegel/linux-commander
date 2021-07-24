@@ -1,8 +1,13 @@
- use std::process::Command;
+ use std::{any::Any, process::Command, sync::{Arc, Mutex}};
 
+use gio::glib::Sender;
 use serde::{Serialize};
 
-use crate::{requests::{Error, ExtendedItem, IteratorExt}, server::DeleteItems};
+use crate::requests::{Error, ExtendedItem, IteratorExt};
+
+pub struct AppState {
+    pub test_sender: Sender<bool>
+}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -114,8 +119,44 @@ pub fn get_version(_: &str, _: usize)->Option<ExtendedItem> {
     None
 }
 
-pub async fn delete(path: &str, items: Vec<String>) {
+pub async fn delete(path: &str, _items: Vec<String>, state: Arc<Mutex<Box<dyn Any + Send>>>) {
     // TODO add delete job
-    tokio::time::sleep(std::time::Duration::from_secs(7)).await;
+    
+
+    
+
+    
+    
+    
+
+    // let entries = vec!["Michel".to_string(), "Sara".to_string(), "Liam".to_string(), "Zelda".to_string(), "Neo".to_string(), "Octopus master".to_string()];
+    // sender.send(entries).ok();
+    // println!("TID Warp {:?}", thread::current().id());
+    // receiver.attach( None, move |entries | {
+    // //         for (i, entry) in entries.iter().enumerate() {
+              
+    // //         }
+    //         println!("TID im resifer {:?}", thread::current().id());
+    //         Continue(true)
+    //     }
+    // );        
+
+    
+    test_send(&state, true);
+    
+    
+    tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+
+    test_send(&state, false);
+
+
+
     println!("In linux: {}", path);
+}
+
+fn test_send(state: &Arc<Mutex<Box<dyn Any + Send>>>, val: bool) {
+    let s = state.lock().unwrap();
+    let r: &dyn Any = s.as_ref();
+    let dc = r.downcast_ref::<AppState>().unwrap();
+    dc.test_sender.send(val).ok();
 }

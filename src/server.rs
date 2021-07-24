@@ -1,10 +1,10 @@
-use std::{net::SocketAddr};
+use std::{any::Any, sync::{Arc, Mutex}};
 
 use serde::{Serialize, Deserialize};
 use tokio::{runtime::Runtime, task};
 use warp::{Filter, fs::dir};
 use warp_range::{filter_range, with_partial_content_status};
-use webview_app::headers::add_headers;
+use webview_app::{app::WarpInitData, headers::add_headers};
 use crate::{eventsink::{
         EventSinks, on_eventsink, with_events
     }, linux::requests, requests::{MsgType, get_video, get_video_range, get_view, retrieve_extended_items}};
@@ -33,12 +33,13 @@ pub struct DeleteItems {
     pub files: Vec<String>
 }
 
-pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
+pub fn server(rt: &Runtime, data: WarpInitData) {
+    let state = data.state.clone();
     rt.spawn(async move {
 
         let event_sinks = EventSinks::new();
 
-        let route_static = dir(static_dir)
+        let route_static = dir(data.static_dir)
             .map(add_headers);
 
         let route_get_root = 
@@ -94,7 +95,7 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
             .and(warp::path::end())
             .and(warp::body::json())
             .and(with_events(event_sinks.clone()))
-            .and_then(delete);
+            .and_then(move |p, e| { delete(p, e, state.clone())});
 
         let route_events = 
             warp::path("events")
@@ -114,7 +115,7 @@ pub fn server(rt: &Runtime, socket_addr: SocketAddr, static_dir: String) {
             .or(route_static);
 
         warp::serve(routes)
-            .run(socket_addr)
+            .run(data.socket_addr)
             .await;        
     });
 }
@@ -150,9 +151,9 @@ struct Progress {
 }
 
 
-async fn delete(param: DeleteItems, event_sinks: EventSinks)->Result<impl warp::Reply, warp::Rejection> {
+async fn delete(param: DeleteItems, event_sinks: EventSinks, state: Arc<Mutex<Box<dyn Any + Send>>>)->Result<impl warp::Reply, warp::Rejection> {
     task::spawn(  async move {
-        requests::delete(&param.path, param.files).await;
+        requests::delete(&param.path, param.files, state).await;
 
 
         let progress = Progress { value: 7, msg_type: MsgType::Progress };

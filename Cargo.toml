@@ -5,7 +5,7 @@ authors = ["uwe"]
 edition = "2018"
 
 [dependencies]
-webview_app = "0.4"
+webview_app = "0.5"
 systemicons = "0.4"
 tokio = { version = "1.8", features = ["full"] }
 tokio-util = "0.6"
