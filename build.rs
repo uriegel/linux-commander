@@ -1,12 +1,10 @@
-#[cfg(target_os = "windows")]
-extern crate winres;
+use std::process::Command;
 
-#[cfg(target_os = "windows")]
 fn main() {
-    let mut res = winres::WindowsResource::new();
-    res.set_icon("Kirk.ico");
-    res.compile().unwrap();
+    eprintln!("Building resources...");
+    let result = Command::new("sh")
+        .args(&["-c", "cd resources && glib-compile-resources resources.xml"])
+        .output()
+        .expect("failed to execute process");
+    eprintln!("Resources built: {:?}", result);
 }
-
-#[cfg(target_os = "linux")]
-fn main() {}

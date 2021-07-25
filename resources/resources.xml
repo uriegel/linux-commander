@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/de/uriegel/commander">
+    <file>main_window.glade</file>
+    <file>kirk.png</file>
+    <file>style.css</file>
+  </gresource>
+</gresources>
