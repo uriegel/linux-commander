@@ -233,6 +233,11 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO WebView from builder
+// TODO Save window position from schema
+// TODO WebSettings
+// TODO Load files from custom scheme from resource
+
 // TODO Test Videoplayer with url: file range
 // TODO Test withresource scheme: when refreshing
 // TODO Test withresource scheme: icons: same icon
