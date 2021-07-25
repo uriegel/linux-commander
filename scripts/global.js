@@ -43,3 +43,14 @@ var onThemeCallback
 var onShowHiddenCallback
 var onShowViewerCallback
 var _isLinux = undefined
+
+
+
+
+var globres = new Map()
+
+const endtest = ok => {
+    res = globres.get(ok.id)
+    globres.delete(ok.id)
+    res(ok)
+}

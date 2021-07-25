@@ -233,6 +233,11 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO Test Videoplayer with url: file range
+// TODO Test withresource scheme: when refreshing
+// TODO Test withresource scheme: icons: same icon
+
+
 // TODO Rename
 // TODO CreateFolder
 // TODO Copy

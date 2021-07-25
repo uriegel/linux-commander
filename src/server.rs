@@ -23,7 +23,7 @@ struct GetItems {
 }
 
 #[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteItems {
     pub id: String,
@@ -92,8 +92,8 @@ pub fn server(rt: &Runtime, data: WarpInitData) {
             .and(warp::path("delete"))
             .and(warp::path::end())
             .and(warp::body::json())
-            .and(with_events(event_sinks.clone()))
-            .and_then(move |p, e| { delete(p, e, state.clone())});
+            //.and(with_events(event_sinks.clone()))
+            .and_then(delete);
 
         let route_events = 
             warp::path("events")
@@ -148,15 +148,15 @@ struct Refresh {
 }
 
 
-async fn delete(param: DeleteItems, event_sinks: EventSinks, state: AppState)->Result<impl warp::Reply, warp::Rejection> {
-    task::spawn(  async move {
-        requests::delete(&param.path, param.files, state).await;
+async fn delete(param: DeleteItems)->Result<impl warp::Reply, warp::Rejection> {
+    // task::spawn(  async move {
+    //     requests::delete(&param.path, param.files, state).await;
 
-        let progress = Refresh { msg_type: MsgType::Refresh };
-        let json = serde_json::to_string(&progress).unwrap();
-        event_sinks.send(param.id, json);
-    });
-    Ok (warp::reply::reply())
+    //     let progress = Refresh { msg_type: MsgType::Refresh };
+    //     let json = serde_json::to_string(&progress).unwrap();
+    //     event_sinks.send(param.id, json);
+    // });
+    Ok (warp::reply::json(&param))
 }
 
 

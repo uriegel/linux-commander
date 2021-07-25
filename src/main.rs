@@ -21,7 +21,7 @@ fn on_init(data: InitData) {
         SimpleAction, traits::ActionMapExt
     };
 
-    use crate::linux::progress::Progress;
+    use crate::{linux::progress::Progress, server::DeleteItems};
     
     let builder = data.builder.as_ref().expect("GTK Builder not available");
     Progress::new(builder, &data.state);
@@ -46,10 +46,26 @@ fn on_init(data: InitData) {
     data.application.add_action(&action);
 
     let headerbar: HeaderBar = builder.object("headerbar").unwrap();
+
+    let webview_clone = data.webview.clone();
+
     connect_msg_callback(data.webview, move|cmd: &str, payload: &str|{ 
         match cmd {
             "title" => headerbar.set_subtitle(Some(payload)),
             "theme" => action.set_state(&payload.to_variant()),
+
+            "test" => {
+                
+
+                let settings: DeleteItems = serde_json::from_str(payload).unwrap();
+                let jason = serde_json::to_string(&settings).expect("msg")   ;
+
+                webview_clone.run_javascript(
+                                    &format!("endtest({})", jason),
+                                    Some(&gio::Cancellable::new()),
+                                    |_|{})
+            
+                },
             _ => {}
         }
     });
