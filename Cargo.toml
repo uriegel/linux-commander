@@ -5,34 +5,25 @@ authors = ["uwe"]
 edition = "2018"
 
 [dependencies]
-webview_app = "0.5"
-systemicons = "0.4"
-tokio = { version = "1.8", features = ["full"] }
-tokio-util = "0.6"
-tokio-stream = "0.1"
-warp = "0.3.1"
-dirs = "3.0.2"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-chrono = "0.4"
-lexical-sort = "0.3"
-kamadak-exif = "0.5"
-futures = { version = "0.3", default-features = false }
-warp-range = "0.1"
-
-[target.'cfg(target_os="linux")'.dependencies]
+#webview_app = "0.5"
+#systemicons = "0.4"
+#tokio = { version = "1.8", features = ["full"] }
+#tokio-util = "0.6"
+#tokio-stream = "0.1"
+#warp = "0.3.1"
+#dirs = "3.0.2"
+#serde = { version = "1.0", features = ["derive"] }
+#serde_json = "1.0"
+#chrono = "0.4"
+#lexical-sort = "0.3"
+#kamadak-exif = "0.5"
+#futures = { version = "0.3", default-features = false }
+#warp-range = "0.1"
 gtk = "0.14"
 gio = "0.14"
 glib = "0.14"
 webkit2gtk = "0.14"
-webkit2gtk-sys = "0.14"
-
-[target.'cfg(target_os="windows")'.dependencies]
-winapi = { version = "0.3.9", features = ["winuser"]}
-pelite = "0.9"
-
-[target.'cfg(target_os="windows")'.build-dependencies]
-winres = "0.1"
+#webkit2gtk-sys = "0.14"
 
 [profile.release]
 panic = 'abort'
