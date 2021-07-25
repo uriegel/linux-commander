@@ -41,6 +41,10 @@ class Folder extends HTMLElement {
 
     showHidden(hidden) {
         this.showHiddenItems = hidden
+        this.reloadItems()
+    }
+
+    reloadItems() {
         this.changePath(this.processor.getCurrentPath())
     }
 
@@ -116,7 +120,7 @@ class Folder extends HTMLElement {
                 }
                 case 82: { // "R"
                     if (evt.ctrlKey) 
-                        this.changePath(this.processor.getCurrentPath())
+                        this.reloadItems()
                     break
                 }
                 case 107: { // Numlock +
@@ -211,8 +215,8 @@ class Folder extends HTMLElement {
                 if (this.processor.onEvent(this.table.items, msg.items))
                     this.table.refresh()
                 break
-            case "Progress":
-                console.log("progress")
+            case "Refresh":
+                this.reloadItems()
                 break
         }
     }
@@ -229,10 +233,17 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO Rename
+// TODO CreateFolder
+// TODO Copy
 // TODO Copy: progress control in status bar
+// TODO Move
+// TODO Copy with Copy Paste (from external or fro internal)
 // TODO Windows: Viewer: are worker released when changing pdf?
 // TODO Windows: Hamburger Menu and context menu
 // TODO When a path is not available anymore: fallback to root
+// TODO ProgressControl: multiple progresses: show in ProgressBars in popovermenu, show latest in ProgressPie
+// TODO ProgressControl: On Error: Red X: Show Errors in List in popover
 
 // TODO Status line (# files, # selected files), root
 // TODO Status Linux: styling

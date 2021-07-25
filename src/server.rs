@@ -143,8 +143,7 @@ async fn get_items(param: GetItems, event_sinks: EventSinks)->Result<impl warp::
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct Progress {
-    value: i32,
+struct Refresh {
     msg_type: MsgType,
 }
 
@@ -153,7 +152,7 @@ async fn delete(param: DeleteItems, event_sinks: EventSinks, state: AppState)->R
     task::spawn(  async move {
         requests::delete(&param.path, param.files, state).await;
 
-        let progress = Progress { value: 7, msg_type: MsgType::Progress };
+        let progress = Refresh { msg_type: MsgType::Refresh };
         let json = serde_json::to_string(&progress).unwrap();
         event_sinks.send(param.id, json);
     });

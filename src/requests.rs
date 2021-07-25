@@ -68,7 +68,7 @@ pub struct FileItem {
 #[derive(Serialize)]
 pub enum MsgType {
     ExtendedItem,
-    Progress
+    Refresh
 }
 
 #[derive(Serialize)]
