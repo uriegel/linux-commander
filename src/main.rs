@@ -1,4 +1,6 @@
-use gio::{Resource, prelude::ApplicationExtManual, resources_register, traits::ApplicationExt};
+use std::cell::RefCell;
+
+use gio::{Resource, Settings, prelude::ApplicationExtManual, resources_register, traits::{ApplicationExt, SettingsExt}};
 use gtk::{
     Application, ApplicationWindow, Builder, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
         BuilderExtManual, CssProviderExt, GtkWindowExt, WidgetExt
@@ -24,6 +26,34 @@ fn main() {
 
         let builder = Builder::from_resource("/de/uriegel/commander/main_window.glade");
         let window: ApplicationWindow = builder.object("window").expect("Couldn't get window");
+
+        let settings = Settings::new("de.uriegel.commander");
+        let width = settings.int("window-width");
+        let height = settings.int("window-height");
+        let is_maximized = settings.boolean("is-maximized");
+        window.set_default_size(width, height);
+        if is_maximized {
+            window.maximize();
+        }        
+
+        let r_size = RefCell::new((0, 0));
+        let r_is_maximized = RefCell::new(is_maximized);
+        let window_clone = window.clone();
+            window.connect_configure_event(move |_,_| {
+            let size = window_clone.size();
+            let old_r_size = r_size.replace(size);
+            if size.0 != old_r_size.0 || size.1 != old_r_size.1 {
+                settings.set_int("window-width", size.0).ok();
+                settings.set_int("window-height", size.1).ok();                
+            }
+            let is_maximized = window_clone.is_maximized();
+            let old_r_is_maximized = r_is_maximized.replace(is_maximized);
+            if old_r_is_maximized != is_maximized {
+                settings.set_boolean("is-maximized", is_maximized).ok();                
+            }
+            false
+        });        
+
         window.set_application(Some(app));
         window.show_all();
     });
