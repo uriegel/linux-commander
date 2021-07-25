@@ -13,3 +13,9 @@ A Norton Commander clone based on Web Components and Rust
 ### Extensions for VS Code
 rust-analyzer on Linux
 Rust on Windows
+
+## Installation of GTK schema
+```
+    sudo install -D de.uriegel.commander.gschema.xml /usr/share/glib-2.0/schemas/
+    $ sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
+```    
