@@ -185,6 +185,8 @@
   <object class="WebKitSettings" type-func="webkit_settings_get_type" id="settings">
     <property name="enable-developer-extras">True</property>
     <property name="user-agent">Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15</property>
+    <property name="allow-file-access-from-file-urls">True</property>
+    <property name="allow-universal-access-from-file-urls">True</property>
     <property name="hardware-acceleration-policy">always</property>
   </object>
   <object class="GtkApplicationWindow" id="window">
