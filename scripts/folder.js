@@ -233,8 +233,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO WebView from builder
-// TODO WebSettings
 // TODO Load files from custom scheme from resource
 
 // TODO Test Videoplayer with url: file range

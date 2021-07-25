@@ -182,17 +182,17 @@
       </packing>
     </child>
   </object>
-  <!-- <object class="WebKitSettings" type-func="webkit_settings_get_type" id="settings">
+  <object class="WebKitSettings" type-func="webkit_settings_get_type" id="settings">
     <property name="enable-developer-extras">True</property>
     <property name="user-agent">Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15</property>
     <property name="allow-file-access-from-file-urls">True</property>
     <property name="allow-universal-access-from-file-urls">True</property>
     <property name="hardware-acceleration-policy">always</property>
-  </object> -->
+  </object>
   <object class="GtkApplicationWindow" id="window">
     <property name="icon">kirk.png</property>
     <property name="can-focus">False</property>
-    <!-- <child>
+    <child>
       <object class="WebKitWebView" type-func="webkit_web_view_get_type" id="webview">
         <property name="visible">True</property>
         <property name="can-focus">True</property>
@@ -201,7 +201,7 @@
           <placeholder/>
         </child>
       </object>
-    </child> -->
+    </child>
     <child type="titlebar">
       <object class="GtkHeaderBar" id="headerbar">
         <property name="visible">True</property>

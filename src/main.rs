@@ -6,6 +6,7 @@ use gtk::{
         BuilderExtManual, CssProviderExt, GtkWindowExt, WidgetExt
     }
 };
+use webkit2gtk::{WebView, traits::WebViewExt};
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), Default::default());
@@ -35,6 +36,10 @@ fn main() {
         if is_maximized {
             window.maximize();
         }        
+
+        let webview: WebView = builder.object("webview").expect("Couldn't get webview");
+        webview.connect_context_menu(|_, _, _, _| true );
+        webview.load_uri("https://crates.io");
 
         let r_size = RefCell::new((0, 0));
         let r_is_maximized = RefCell::new(is_maximized);
