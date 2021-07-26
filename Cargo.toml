@@ -5,7 +5,6 @@ authors = ["uwe"]
 edition = "2018"
 
 [dependencies]
-#webview_app = "0.5"
 #systemicons = "0.4"
 #tokio = { version = "1.8", features = ["full"] }
 #tokio-util = "0.6"
@@ -22,6 +21,7 @@ edition = "2018"
 gtk = "0.14"
 gio = "0.14"
 glib = "0.14"
+urlencoding = "2.1"
 webkit2gtk = "0.14"
 #webkit2gtk-sys = "0.14"
 

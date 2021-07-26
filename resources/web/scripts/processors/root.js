@@ -47,7 +47,7 @@ export const getRoot = folderId => {
     const getPath = item => [item.mountPoint, null]
 
     const getItems = async () => {
-        const responseStr = await fetch('/commander/getroot')
+        const responseStr = await fetch('request://getroot')
         const response = await responseStr.json()
         const mounted = response.filter(n => n.mountPoint)
         const unmounted = response.filter(n => !n.mountPoint)

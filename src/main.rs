@@ -3,6 +3,7 @@ use std::{cell::RefCell};
 use gio::{Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, SettingsExt}};
 use glib::ToVariant;
 use gtk::{Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt}};
+use urlencoding::decode;
 use webkit2gtk::{WebView, traits::{URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
 fn main() {
@@ -105,7 +106,9 @@ fn main() {
         context.register_uri_scheme("provide", move |request|{
             let gpath = request.path().unwrap();
             let path = gpath.as_str();
-            println!("Pfad {}", path);
+            let gurl = request.uri().unwrap();
+            let url = gurl.as_str();
+            println!("Pfad {}  {}", path, url);
             let (subpath, content_type) = match path {
                 "" => ("/index.html", Some("text/html".to_string())),
                 a => (a, get_content_type(path))
@@ -119,6 +122,21 @@ fn main() {
             } 
         });
         webview.load_uri("provide://content");
+
+        context.register_uri_scheme("request", move |request|{
+            let gurl = request.uri().unwrap();
+            let url = std::str::from_utf8(&gurl.as_bytes()[10..]).unwrap();
+            let pos = url.find("?");
+            let (cmd, params) = if let Some(pos) = pos {
+                let query = std::str::from_utf8(&(url.as_bytes()[pos+1..])).unwrap().replace("+", "%20");
+                let decoded = decode(&query).unwrap().to_string();
+                (std::str::from_utf8(&(url.as_bytes()[..pos])).unwrap(), Some(decoded))
+            } else {
+                (url, None)
+            };
+
+            println!("cmd: {}, query: {:?}, url: {}", cmd, params, url);
+        });
 
         let r_size = RefCell::new((0, 0));
         let r_is_maximized = RefCell::new(is_maximized);
