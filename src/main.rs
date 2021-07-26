@@ -1,12 +1,8 @@
-use std::cell::RefCell;
+use std::{cell::RefCell};
 
-use gio::{Resource, Settings, prelude::ApplicationExtManual, resources_register, traits::{ApplicationExt, SettingsExt}};
-use gtk::{
-    Application, ApplicationWindow, Builder, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
-        BuilderExtManual, CssProviderExt, GtkWindowExt, WidgetExt
-    }
-};
-use webkit2gtk::{WebView, traits::WebViewExt};
+use gio::{Resource, ResourceLookupFlags, Settings, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, SettingsExt}};
+use gtk::{Application, ApplicationWindow, Builder, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, WidgetExt}};
+use webkit2gtk::{WebView, traits::{URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), Default::default());
@@ -39,7 +35,45 @@ fn main() {
 
         let webview: WebView = builder.object("webview").expect("Couldn't get webview");
         webview.connect_context_menu(|_, _, _, _| true );
-        webview.load_uri("https://crates.io");
+        
+        let webview_clone = webview.clone();
+        let action = gio::SimpleAction::new("devtools", None);
+        action.connect_activate(move |_,_| match webview_clone.inspector() {
+            Some(inspector) => inspector.show(),
+            None => println!("Could not show web inspector")
+        });
+        app.add_action(&action);        
+        app.set_accels_for_action("app.devtools", &["F12"]);
+
+        let context = webview.context().unwrap();
+
+        fn get_content_type(path: &str)->Option<String> {
+            match path {
+                p if p.ends_with("js") => Some("application/javascript".to_string()),
+                p if p.ends_with("css") => Some("text/css".to_string()),
+                _ => None
+            }
+        }
+
+        context.register_uri_scheme("provide", move |request|{
+            let gpath = request.path().unwrap();
+            let path = gpath.as_str();
+            println!("Pfad {}", path);
+            let (subpath, content_type) = match path {
+                "" => ("/index.html", Some("text/html".to_string())),
+                a => (a, get_content_type(path))
+            };
+
+            if let Some(content_type) = content_type {
+                let path = "/de/uriegel/commander/web".to_string() + subpath;
+                let (size, _) = res.info(&path, ResourceLookupFlags::NONE).unwrap();
+                let istream = res.open_stream(&path, ResourceLookupFlags::NONE).unwrap();
+                request.finish(&istream, size as i64, Some(&content_type));
+            } 
+        });
+        webview.load_uri("provide://content");
+
+
 
         let r_size = RefCell::new((0, 0));
         let r_is_maximized = RefCell::new(is_maximized);

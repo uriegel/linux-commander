@@ -4,5 +4,22 @@
     <file>main_window.glade</file>
     <file>kirk.png</file>
     <file>style.css</file>
+    <file>web/index.html</file>
+    <file>web/styles/themes/adwaita-dark.css</file>
+    <file>web/styles/themes/adwaita.css</file>
+    <file>web/styles/style.css</file>
+    <file>web/scripts/folder.js</file>
+    <file>web/scripts/global.js</file>
+    <file>web/scripts/index.js</file>
+    <file>web/scripts/jobs.js</file>
+    <file>web/scripts/viewer.js</file>
+    <file>web/scripts/components/DialogBoxComponent.js</file>
+    <file>web/scripts/components/gridsplitter.js</file>
+    <file>web/scripts/components/pdfviewer.js</file>
+    <file>web/scripts/components/virtualtablecomponent.js</file>
+    <file>web/scripts/processors/directory.js</file>
+    <file>web/scripts/processors/processor.js</file>
+    <file>web/scripts/processors/renderTools.js</file>
+    <file>web/scripts/processors/root.js</file>
   </gresource>
 </gresources>
