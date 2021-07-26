@@ -16,15 +16,6 @@ use crate::windows::requests::{check_extended_items, get_version};
 
 const ICON_SIZE: i32 = 16;
 
-pub struct Error {
-    pub message: String
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})", self.message)
-    }
-}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -46,14 +37,6 @@ pub struct GetView {
 enum FileType {
     Dir(DirItem),
     File(FileItem)
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DirItem {
-    name: String,
-    is_hidden: bool,
-    is_directory: bool
 }
 
 #[derive(Serialize)]
@@ -95,11 +78,6 @@ impl ExtendedItem {
     }
 }
 
-impl From<std::io::Error> for Error {
-    fn from(error: std::io::Error) -> Self {
-        Error {message: format!("read_dir failed: {}", error)}
-    }
-}
 
 fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
     if supress {|file_type| {
@@ -313,17 +291,4 @@ fn create_headers() -> HeaderMap {
     header_map
 }
 
-pub trait IteratorExt: Iterator {
-
-    fn take_option(self, n: Option<usize>) -> Take<Self>
-        where
-            Self: Sized {
-        match n {
-            Some(n ) => self.take(n),
-            None => self.take(usize::MAX)
-        }
-    }
-}
-
-impl<I: Iterator> IteratorExt for I {}
 
