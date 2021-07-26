@@ -1,13 +1,21 @@
 use core::fmt;
-use std::{cell::RefCell, future::Future, iter::Take};
+use std::{cell::RefCell, iter::Take};
 
 use async_process::Command;
-use gio::{Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, SettingsExt}};
+use gio::{
+    MemoryInputStream, Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{
+        ActionMapExt, ApplicationExt, SettingsExt
+    }
+};
 use glib::{MainContext, ToVariant};
-use gtk::{Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt}};
+use gtk::{
+    Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
+        BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt
+    }
+};
 use urlencoding::decode;
 use serde::{Serialize, Deserialize};
-use webkit2gtk::{WebView, traits::{URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
+use webkit2gtk::{URISchemeRequest, WebView, traits::{URISchemeRequestExt, WebContextExt, SecurityManagerExt, WebInspectorExt, WebViewExt}};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -140,7 +148,6 @@ fn main() {
             // if let Some(content_type) = content_type {
 
             
-            //     let request_clone = request.clone();
             //     let subpath = subpath.to_string();
             //     let res_clone = res.clone();
             
@@ -151,7 +158,6 @@ fn main() {
             //         let path = "/de/uriegel/commander/web".to_string() + &subpath;
             //         let (size, _) = res_clone.info(&path, ResourceLookupFlags::NONE).unwrap();
             //         let istream = res_clone.open_stream(&path, ResourceLookupFlags::NONE).unwrap();
-            //         request_clone.finish(&istream, size as i64, Some(&content_type));
             //     });
             // } 
         });
@@ -172,12 +178,13 @@ fn main() {
 
             println!("cmd: {}, query: {:?}, url: {}", cmd, params, url);
 
+            let request_clone = request.clone();
             let main_context = MainContext::default();
             main_context.spawn_local(async move {
                 match cmd.as_str() {
                     "getroot" => {
                         let items = get_root_items().await.unwrap();
-                        println!("get rotz: {:?}", items);
+                        send_response(&request_clone, &items);
                     },                    
                     "getitems" => {
                         let param: GetItems = get_param(&params.expect("msg"));
@@ -190,6 +197,10 @@ fn main() {
             });
             
         });
+
+        let security = context.security_manager().unwrap();
+        security.register_uri_scheme_as_cors_enabled("request://getroot");
+        security.register_uri_scheme_as_cors_enabled("provide://");
 
         let r_size = RefCell::new((0, 0));
         let r_is_maximized = RefCell::new(is_maximized);
@@ -320,6 +331,14 @@ async fn get_root_items()-> Result<Vec<RootItem>, Error> {
     }
 }
 
+fn send_response<T>(request: &URISchemeRequest, val: &T) 
+where T: Serialize {
+    let json = serde_json::to_string(val).unwrap();
+    let gbytes = glib:: Bytes::from_owned(json);
+    let stream = MemoryInputStream::from_bytes(&gbytes);
+    request.finish(&stream, gbytes.len() as i64, Some("application/json"));
+}
+
 #[derive(Debug)]
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -363,43 +382,6 @@ pub trait IteratorExt: Iterator {
 impl<I: Iterator> IteratorExt for I {}
 
 
-// use webview_app::app::{App, AppSettings, WarpSettings};
-// use crate::server::server;
-
-// #[cfg(target_os = "linux")]
-// use webview_app::app::InitData;
-
-// mod server;
-// mod requests;
-// mod eventsink;
-// #[cfg(target_os = "linux")]
-// mod linux;
-// #[cfg(target_os = "windows")]
-// mod windows;
-
-// #[cfg(target_os = "linux")]
-// fn on_init(data: InitData) {
-//     use gtk::{HeaderBar, prelude::{BuilderExtManual, GtkApplicationExt, HeaderBarExt, ToVariant}};
-//     use webkit2gtk::traits::WebViewExt;
-//     use webview_app::app::{connect_msg_callback};
-//     use gio::{
-//         SimpleAction, traits::ActionMapExt
-//     };
-
-//     use crate::{linux::progress::Progress, server::DeleteItems};
-    
-    
-
-
-
-//     connect_msg_callback(data.webview, move|cmd: &str, payload: &str|{ 
-//         match cmd {
-//             "title" => headerbar.set_subtitle(Some(payload)),
-//             "theme" => action.set_state(&payload.to_variant()),
-
-//             "test" => {
-                
-
 //                 let settings: DeleteItems = serde_json::from_str(payload).unwrap();
 //                 let jason = serde_json::to_string(&settings).expect("msg")   ;
 
@@ -434,35 +416,6 @@ impl<I: Iterator> IteratorExt for I {}
 //     data.application.add_action(&action);
 //     data.application.set_accels_for_action("app.showhidden", &["<Ctrl>H"]);
 
-// }
-
-// fn run_app() {
-//     let port = 9865;
-//     let app = App::new(
-//         AppSettings{
-//             title: "Commander".to_string(),
-//             enable_dev_tools: true,
-//             warp_settings: Some(WarpSettings{
-//                 port: port,
-//                 init_fn: Some(server)
-//             }),
-//             window_pos_storage_path: Some("commander".to_string()),
-//             #[cfg(target_os = "linux")]
-//             url: format!("http://localhost:{}?os=linux", port),
-//             #[cfg(target_os = "linux")]
-//             on_app_init: Some(on_init),
-//             #[cfg(target_os = "linux")]
-//             application_id: "de.uriegel.commander".to_string(),
-//             #[cfg(target_os = "linux")]
-//             use_glade: true,
-//             ..Default::default()
-//         });
-//     app.run();
-// }
-
-// fn main() {
-//     run_app();
-// }
 
 
 
