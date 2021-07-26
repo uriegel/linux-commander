@@ -1,13 +1,13 @@
 use std::{cell::RefCell};
 
-use gio::{Resource, ResourceLookupFlags, Settings, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, SettingsExt}};
-use gtk::{Application, ApplicationWindow, Builder, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, WidgetExt}};
+use gio::{Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, SettingsExt}};
+use glib::ToVariant;
+use gtk::{Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt}};
 use webkit2gtk::{WebView, traits::{URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), Default::default());
     application.connect_activate(|app| {
-        
         let resources_bytes = include_bytes!("../resources/resources.gresource");
         let resource_data = glib::Bytes::from(&resources_bytes[..]);
         let res = Resource::from_data(&resource_data).unwrap();
@@ -34,12 +34,31 @@ fn main() {
         }        
 
         let webview: WebView = builder.object("webview").expect("Couldn't get webview");
+        let headerbar: HeaderBar = builder.object("headerbar").unwrap();
         webview.connect_context_menu(|_, _, _, _| true );
+
+        let initial_state = "".to_variant();
+        let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
+        let webview_clone = webview.clone();
+        action.connect_change_state(move |a, s| {
+            match s {
+            Some(val) => {
+                a.set_state(val);
+                match val.str(){
+                    Some(theme) => 
+                    webview_clone.run_javascript(&format!("setTheme('{}')", theme), Some(&gio::Cancellable::new()), |_|{}),
+                    None => println!("Could not set theme, could not extract from variant")
+                }
+            },
+            None => println!("Could not set theme")
+        }
+        });
+        app.add_action(&action);
 
         connect_msg_callback(&webview, move|cmd: &str, payload: &str|{ 
             match cmd {
-                "title" => {}, //headerbar.set_subtitle(Some(payload)),
-                "theme" => {}, // action.set_state(&payload.to_variant()),
+                "title" => headerbar.set_subtitle(Some(payload)),
+                "theme" => action.set_state(&payload.to_variant()),
                 _ => {}
             }
         });
@@ -53,8 +72,28 @@ fn main() {
         app.add_action(&action);        
         app.set_accels_for_action("app.devtools", &["F12"]);
 
-        let context = webview.context().unwrap();
+        let initial_bool_state = false.to_variant();
+        let action = SimpleAction::new_stateful("viewer", None, &initial_bool_state);
+        let webview_clone = webview.clone();
+        action.connect_change_state(move |a, s| {
+            match s {
+                Some(val) => {
+                    a.set_state(val);
+                    match val.get::<bool>(){
+                        Some(show_viewer) => webview_clone.run_javascript(
+                            &format!("showViewer({})", show_viewer),
+                            Some(&gio::Cancellable::new()),
+                            |_|{}),
+                        None => println!("Could not show Viewer, could not extract from variant")
+                    }
+                },
+                None => println!("Could not set action")
+            }
+        });
+        app.add_action(&action);
+        app.set_accels_for_action("app.viewer", &["F3"]);
 
+        let context = webview.context().unwrap();
         fn get_content_type(path: &str)->Option<String> {
             match path {
                 p if p.ends_with("js") => Some("application/javascript".to_string()),
@@ -80,8 +119,6 @@ fn main() {
             } 
         });
         webview.load_uri("provide://content");
-
-
 
         let r_size = RefCell::new((0, 0));
         let r_is_maximized = RefCell::new(is_maximized);
@@ -150,31 +187,9 @@ pub fn connect_msg_callback<F: Fn(&str, &str)->() + 'static>(webview: &WebView, 
 
 //     use crate::{linux::progress::Progress, server::DeleteItems};
     
-//     let builder = data.builder.as_ref().expect("GTK Builder not available");
-//     Progress::new(builder, &data.state);
     
-//     let initial_state = "".to_variant();
-//     let webview_clone = data.webview.clone();
 
-//     let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
-//     action.connect_change_state(move |a, s| {
-//         match s {
-//         Some(val) => {
-//             a.set_state(val);
-//             match val.str(){
-//                 Some(theme) => 
-//                 webview_clone.run_javascript(&format!("setTheme('{}')", theme), Some(&gio::Cancellable::new()), |_|{}),
-//                 None => println!("Could not set theme, could not extract from variant")
-//             }
-//         },
-//         None => println!("Could not set theme")
-//     }
-//     });
-//     data.application.add_action(&action);
 
-//     let headerbar: HeaderBar = builder.object("headerbar").unwrap();
-
-//     let webview_clone = data.webview.clone();
 
 //     connect_msg_callback(data.webview, move|cmd: &str, payload: &str|{ 
 //         match cmd {
@@ -218,26 +233,6 @@ pub fn connect_msg_callback<F: Fn(&str, &str)->() + 'static>(webview: &WebView, 
 //     data.application.add_action(&action);
 //     data.application.set_accels_for_action("app.showhidden", &["<Ctrl>H"]);
 
-//     let initial_bool_state = false.to_variant();
-//     let action = SimpleAction::new_stateful("viewer", None, &initial_bool_state);
-//     let webview_clone = data.webview.clone();
-//     action.connect_change_state(move |a, s| {
-//         match s {
-//             Some(val) => {
-//                 a.set_state(val);
-//                 match val.get::<bool>(){
-//                     Some(show_viewer) => webview_clone.run_javascript(
-//                         &format!("showViewer({})", show_viewer),
-//                         Some(&gio::Cancellable::new()),
-//                         |_|{}),
-//                     None => println!("Could not show Viewer, could not extract from variant")
-//                 }
-//             },
-//             None => println!("Could not set action")
-//         }
-//     });
-//     data.application.add_action(&action);
-//     data.application.set_accels_for_action("app.viewer", &["F3"]);
 // }
 
 // fn run_app() {
