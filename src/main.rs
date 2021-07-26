@@ -1,7 +1,7 @@
 use std::{cell::RefCell};
 
 use gio::{Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, SettingsExt}};
-use glib::ToVariant;
+use glib::{MainContext, ToVariant, timeout_future_seconds};
 use gtk::{Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt}};
 use urlencoding::decode;
 use webkit2gtk::{WebView, traits::{URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
@@ -114,16 +114,36 @@ fn main() {
                 a => (a, get_content_type(path))
             };
 
+            // if let Some(content_type) = content_type {
+            //     let path = "/de/uriegel/commander/web".to_string() + subpath;
+            //     let (size, _) = res.info(&path, ResourceLookupFlags::NONE).unwrap();
+            //     let istream = res.open_stream(&path, ResourceLookupFlags::NONE).unwrap();
+            //     request.finish(&istream, size as i64, Some(&content_type));
+            // }             
             if let Some(content_type) = content_type {
-                let path = "/de/uriegel/commander/web".to_string() + subpath;
-                let (size, _) = res.info(&path, ResourceLookupFlags::NONE).unwrap();
-                let istream = res.open_stream(&path, ResourceLookupFlags::NONE).unwrap();
-                request.finish(&istream, size as i64, Some(&content_type));
+
+                let main_context = MainContext::default();
+                let request_clone = request.clone();
+                let subpath = subpath.to_string();
+                let res_clone = res.clone();
+                main_context.spawn_local(async move {
+
+                    timeout_future_seconds(2).await;
+
+                    let dirs = async_std::fs::read_dir("/").await;
+                    println!("dirs {:?}", dirs);
+
+                    let path = "/de/uriegel/commander/web".to_string() + &subpath;
+                    let (size, _) = res_clone.info(&path, ResourceLookupFlags::NONE).unwrap();
+                    let istream = res_clone.open_stream(&path, ResourceLookupFlags::NONE).unwrap();
+                    request_clone.finish(&istream, size as i64, Some(&content_type));
+                });
             } 
         });
         webview.load_uri("provide://content");
 
         context.register_uri_scheme("request", move |request|{
+            
             let gurl = request.uri().unwrap();
             let url = std::str::from_utf8(&gurl.as_bytes()[10..]).unwrap();
             let pos = url.find("?");
@@ -135,6 +155,13 @@ fn main() {
                 (url, None)
             };
 
+            // match cmd {
+            //     "getroot" => {
+
+                        
+            //         });
+            //     }
+            // }
             println!("cmd: {}, query: {:?}, url: {}", cmd, params, url);
         });
 

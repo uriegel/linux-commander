@@ -23,6 +23,9 @@ gio = "0.14"
 glib = "0.14"
 urlencoding = "2.1"
 webkit2gtk = "0.14"
+async-std = "1.9"
+
+
 #webkit2gtk-sys = "0.14"
 
 [profile.release]
