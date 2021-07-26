@@ -18,9 +18,9 @@ class Folder extends HTMLElement {
         this.pathInput = this.getElementsByTagName("INPUT")[0]
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
         const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
-        const events = new WebSocket(`ws://localhost:${location.port}/events/${this.folderId}`)
-        events.onopen = () => this.changePath(lastPath)
-        events.onmessage = msg => setTimeout(() => this.onEvent(msg.data))
+        // const events = new WebSocket(`ws://localhost:${location.port}/events/${this.folderId}`)
+        this.changePath(lastPath)
+        // events.onmessage = msg => setTimeout(() => this.onEvent(msg.data))
     }
 
     get id() { return this.folderId}
@@ -161,7 +161,7 @@ class Folder extends HTMLElement {
         this.table.setItems([])
         if (result.changed) {
             this.processor = result.processor
-            const columns = isLinux() ? this.processor.getColumns() : this.processor.getColumns(() => this.processor)
+            const columns = this.processor.getColumns()
             this.table.setColumns(columns)
             this.sortFunction = null
         }

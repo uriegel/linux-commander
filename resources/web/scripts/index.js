@@ -32,7 +32,7 @@ function getItemsTypes(selectedItems) {
 }
 
 ;(() => {
-    const initialTheme = isLinux() ? (localStorage.getItem("theme") || "themeAdwaita") : "themeWindows"
+    const initialTheme = localStorage.getItem("theme") || "themeAdwaita"
     onTheme(initialTheme)
     setInitialTheme(initialTheme) 
 })()
@@ -100,8 +100,6 @@ function onShowHidden(hidden) {
 }
 
 folderLeft.setFocus()
-if (!isLinux())
-    setTimeout(() => folderLeft.setFocus(), 100)
 
 document.addEventListener("keydown", evt => {
     switch (evt.which) {

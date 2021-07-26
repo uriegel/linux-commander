@@ -1,10 +1,3 @@
-
-function isLinux() {
-    if (_isLinux == undefined)
-        _isLinux = location.search.endsWith("linux")
-    return _isLinux
-}
-
 function initializeCallbacks(onTheme, onShowHidden, onShowViewer) {
     onThemeCallback = onTheme
     onShowHiddenCallback = onShowHidden
@@ -17,14 +10,16 @@ function setTheme(theme) {
         onThemeCallback(theme)
 }
 
+function sendMessageToWebView(command, param) {
+    alert(`!!webmesg!!${command}!!${param}`)
+}
+
 function setTitle(title, dirs, files) {
-    if (isLinux())
-        sendMessageToWebView("title", `${title} - ${dirs} Dirs, ${files} Files`)
+    sendMessageToWebView("title", `${title} - ${dirs} Dirs, ${files} Files`)
 }
 
 function setInitialTheme(theme) {
-    if (isLinux())
-        sendMessageToWebView("theme", theme)
+    sendMessageToWebView("theme", theme)
 }
 
 function showHidden(hidden) {
@@ -42,7 +37,7 @@ const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn
 var onThemeCallback
 var onShowHiddenCallback
 var onShowViewerCallback
-var _isLinux = undefined
+
 
 
 

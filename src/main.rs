@@ -35,6 +35,14 @@ fn main() {
 
         let webview: WebView = builder.object("webview").expect("Couldn't get webview");
         webview.connect_context_menu(|_, _, _, _| true );
+
+        connect_msg_callback(&webview, move|cmd: &str, payload: &str|{ 
+            match cmd {
+                "title" => {}, //headerbar.set_subtitle(Some(payload)),
+                "theme" => {}, // action.set_state(&payload.to_variant()),
+                _ => {}
+            }
+        });
         
         let webview_clone = webview.clone();
         let action = gio::SimpleAction::new("devtools", None);
@@ -98,6 +106,23 @@ fn main() {
     });
 
     application.run();
+}
+
+pub fn connect_msg_callback<F: Fn(&str, &str)->() + 'static>(webview: &WebView, on_msg: F) {
+    let webmsg = "!!webmesg!!";
+
+    webview.connect_script_dialog(move|_, dialog | {
+        let str = dialog.get_message();
+        if str.starts_with(webmsg) {
+            let msg = &str[webmsg.len()..];
+            if let Some(pos) = msg.find("!!") {
+                let cmd = &msg[0..pos];
+                let payload = &msg[pos+2..];
+                on_msg(cmd, payload);
+            }
+        }
+        true
+    });
 }
 
 // use webview_app::app::{App, AppSettings, WarpSettings};
