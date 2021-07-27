@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{cell::RefCell, fs, iter::Take, thread, time::UNIX_EPOCH};
+use std::{cell::RefCell, fs, iter::Take, pin::Pin, sync::{Arc, Mutex}, task::{Context, Poll, Waker}, thread, time::{Duration, UNIX_EPOCH}};
 
 use async_process::Command;
 use gio::{
@@ -17,7 +17,7 @@ use lexical_sort::natural_lexical_cmp;
 use urlencoding::decode;
 use serde::{Serialize, Deserialize};
 use webkit2gtk::{URISchemeRequest, WebView, traits::{URISchemeRequestExt, WebContextExt, SecurityManagerExt, WebInspectorExt, WebViewExt}};
-use async_std::prelude::*;
+use async_std::{prelude::*};
 
 #[derive(Debug)]
 #[derive(Deserialize)]
@@ -104,8 +104,14 @@ fn main() {
             main_context.spawn_local(async move {
                 match cmd.as_str() {
                     "getRoot" => {
-                        let items = get_root_items().await.unwrap();
-                        send_request_result(&webview_clone, &id, items);
+
+                        let erg = GtkFuture::new(Duration::from_secs(1), move || {
+                            format!("Das hanben wir: {}", cmd) 
+                        }).await;
+                        println!("Das isses {}", erg);
+
+                       // let items = get_root_items().await.unwrap();
+                        send_request_result(&webview_clone, &id, "items");
                     },                    
                     "getItems" => {
                         let sender = sender.clone();
@@ -536,6 +542,77 @@ fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
             FileType::Dir(ref file) => if file.is_hidden { None} else { Some(file_type) }
         }
     }} else { |e| Some(e) }
+}
+
+pub struct GtkFuture {
+    shared_state: Arc<Mutex<SharedState>>,
+}
+
+struct SharedState {
+    /// Whether or not the sleep time has elapsed
+    completed: bool,
+    erg: String,
+
+    /// The waker for the task that `TimerFuture` is running on.
+    /// The thread can use this after setting `completed = true` to tell
+    /// `TimerFuture`'s task to wake up, see that `completed = true`, and
+    /// move forward.
+    waker: Option<Waker>,
+}
+
+impl Future for GtkFuture {
+    type Output = String;
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        // Look at the shared state to see if the timer has already completed.
+        let mut shared_state = self.shared_state.lock().unwrap();
+        if shared_state.completed {
+            Poll::Ready(shared_state.erg.clone())
+        } else {
+            // Set waker so that the thread can wake up the current task
+            // when the timer has completed, ensuring that the future is polled
+            // again and sees that `completed = true`.
+            //
+            // It's tempting to do this once rather than repeatedly cloning
+            // the waker each time. However, the `TimerFuture` can move between
+            // tasks on the executor, which could cause a stale waker pointing
+            // to the wrong task, preventing `TimerFuture` from waking up
+            // correctly.
+            //
+            // N.B. it's possible to check for this using the `Waker::will_wake`
+            // function, but we omit that here to keep things simple.
+            shared_state.waker = Some(cx.waker().clone());
+            Poll::Pending
+        }
+    }
+}
+
+impl GtkFuture {
+    /// Create a new `TimerFuture` which will complete after the provided
+    /// timeout.
+    pub fn new<R: FnOnce()->String + Send + 'static>(duration: Duration, on_request: R) -> Self {
+        let shared_state = Arc::new(Mutex::new(SharedState {
+            completed: false,
+            erg: "".to_string(),
+            waker: None,
+        }));
+
+        // Spawn the new thread
+        let thread_shared_state = shared_state.clone();
+        thread::spawn(move || {
+            thread::sleep(duration);
+            let erg = on_request();
+            let mut shared_state = thread_shared_state.lock().unwrap();
+            // Signal that the timer has completed and wake up the last
+            // task on which the future was polled, if one exists.
+            shared_state.completed = true;
+            shared_state.erg = erg;
+            if let Some(waker) = shared_state.waker.take() {
+                waker.wake()
+            }
+        });
+
+        GtkFuture { shared_state }
+    }
 }
 
 //     let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
