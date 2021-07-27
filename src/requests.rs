@@ -94,12 +94,6 @@ where R: FnOnce(&str, &str)->RFut  + 'static, RFut: Future<Output = ()> {
 // const ICON_SIZE: i32 = 16;
 
 
-// #[derive(Serialize)]
-// #[serde(rename_all = "camelCase")]
-// pub struct DirectoryItems {
-//     pub files: Vec<FileItem>,
-//     pub dirs: Vec<DirItem>
-// }
 
 // #[derive(Deserialize)]
 // pub struct GetIcon {
@@ -144,54 +138,6 @@ where R: FnOnce(&str, &str)->RFut  + 'static, RFut: Future<Output = ()> {
 
 
 
-// pub fn get_directory_items(path: &str, id: &str, suppress_hidden: bool, event_sinks: EventSinks)->Result<DirectoryItems, Error> {
-//     let entries = fs::read_dir(path)?;
-//     event_sinks.set_request(id, true);
-//     let (dirs, files): (Vec<_>, Vec<_>) = entries
-//         .filter_map(|entry| {
-//             entry.ok()
-//                 .and_then(|entry| { match entry.metadata().ok() {
-//                     Some(metadata) => Some((entry, metadata)),
-//                     None => None
-//                 }})
-//                 .and_then(|(entry, metadata)| {
-//                     let name = String::from(entry.file_name().to_str().unwrap());
-//                     let is_hidden = is_hidden(path, &name);
-//                     Some(match metadata.is_dir() {
-//                         true => FileType::Dir(DirItem {
-//                             name,
-//                             is_hidden,
-//                             is_directory: true
-//                         }),
-//                         false => FileType::File(FileItem {
-//                             name,
-//                             is_hidden,
-//                             time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
-//                             size: metadata.len()
-//                         })
-//                     })
-//                 })
-//                 .and_then(get_supress_hidden(suppress_hidden))
-//         })
-//         .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
-//     let mut dirs: Vec<DirItem> = dirs
-//         .into_iter()
-//         .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
-//         .collect();
-//     dirs.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
-//     let mut files: Vec<FileItem> = files
-//         .into_iter()
-//         .filter_map(|ft|if let FileType::File(file) = ft {Some(file)} else {None})
-//         .collect();
-//     files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
-    
-//     event_sinks.set_request(id, false);
-
-//     Ok(DirectoryItems{
-//         dirs,
-//         files
-//     })
-// }
 
 // pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems, event_sinks: EventSinks) {
 //     let index_pos = items.dirs.len() + 1;

@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{cell::RefCell, iter::Take, time::UNIX_EPOCH};
+use std::{cell::RefCell, fs, iter::Take, thread, time::UNIX_EPOCH};
 
 use async_process::Command;
 use gio::{
@@ -7,12 +7,13 @@ use gio::{
         ActionMapExt, ApplicationExt, SettingsExt
     }
 };
-use glib::{MainContext, ToVariant};
+use glib::{Continue, MainContext, PRIORITY_DEFAULT, ToVariant};
 use gtk::{
     Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
         BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt
     }
 };
+use lexical_sort::natural_lexical_cmp;
 use urlencoding::decode;
 use serde::{Serialize, Deserialize};
 use webkit2gtk::{URISchemeRequest, WebView, traits::{URISchemeRequestExt, WebContextExt, SecurityManagerExt, WebInspectorExt, WebViewExt}};
@@ -79,6 +80,14 @@ fn main() {
         app.add_action(&action);
 
         let webview_clone = webview.clone();
+        let (sender, receiver) = 
+            MainContext::channel::<(String, DirectoryItems)>(PRIORITY_DEFAULT);
+        receiver.attach(None, move |(id, items)| {
+            send_request_result(&webview_clone, &id, items);
+            Continue(true)
+        });
+
+        let webview_clone = webview.clone();
         connect_msg_callback(&webview, move|cmd: &str, payload: &str|{ 
             match cmd {
                 "title" => headerbar.set_subtitle(Some(payload)),
@@ -91,18 +100,20 @@ fn main() {
             let param = param.to_string();
             let id = id.to_string();
             let webview_clone = webview_clone.clone();
+            let sender = sender.clone();
             main_context.spawn_local(async move {
                 match cmd.as_str() {
                     "getRoot" => {
                         let items = get_root_items().await.unwrap();
-                        send_request_result(webview_clone, &id, items);
+                        send_request_result(&webview_clone, &id, items);
                     },                    
                     "getItems" => {
+                        let sender = sender.clone();
                         let params: GetItems = serde_json::from_str(&param).unwrap();
-                        let items = get_items(&params.path, &params.folder_id, params.hidden_included).await;
-
-
-                        //send_request_result(webview_clone, &id, items);
+                        thread::spawn(move || {
+                            let result = get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap();
+                            sender.send((id, result)).expect("Could not send through channel");
+                        });
                     },
                     _ => {}
                 }
@@ -213,8 +224,15 @@ fn main() {
                     },                    
                     "getitems" => {
                         let param: GetItems = get_param(&params.expect("msg"));
-                        let dirs = async_std::fs::read_dir("/").await.ok().expect("could not read directory");
-                        println!("dirs {:?}", dirs);
+                        let (sender, receiver) = 
+                            MainContext::channel::<DirectoryItems>(PRIORITY_DEFAULT);
+                        thread::spawn(move || {
+                            let result = get_directory_items(&param.path, &param.folder_id, !param.hidden_included).unwrap();
+                            sender.send(result).expect("Could not send through channel");
+                        });
+                        receiver.attach(None, move |enable_button| {
+                            Continue(false)
+                        });
                     },
                     _ => {}
                 }
@@ -283,7 +301,7 @@ fn connect_msg_callback<F: Fn(&str, &str)->() + 'static, R: Fn(&str, &str, &str)
     });
 }
 
-fn send_request_result<T>(webview: WebView, id: &str, result: T)
+fn send_request_result<T>(webview: &WebView, id: &str, result: T)
 where T: Serialize {
     let json = serde_json::to_string(&result).expect("msg");
     webview.run_javascript(&format!("requestResult({}, {})", id, json),
@@ -377,38 +395,53 @@ async fn get_root_items()-> Result<Vec<RootItem>, Error> {
     }
 }
 
-async fn get_items(path: &str, folder_id: &str, hidden_included: bool)->Result<(), Error> {
-    let entries = async_std::fs::read_dir(path).await?;    
-    let entries = entries.map(|e|{e});
-    // let (dirs, files): (Vec<_>, Vec<_>) = entries
-    //     .filter_map(|entry| {
-    //         entry.ok()
-    //             .and_then(|entry| { match entry.metadata() {
-    //                 metadata => Some((entry, metadata)),
-    //                 None => None
-    //             }})
-    //             .and_then(|(entry, metadata)| {
-    //                 let name = String::from(entry.file_name().to_str().unwrap());
-    //                 let is_hidden = is_hidden(path, &name);
-    //                 Some(match metadata.is_dir() {
-    //                     true => FileType::Dir(DirItem {
-    //                         name,
-    //                         is_hidden,
-    //                         is_directory: true
-    //                     }),
-    //                     false => FileType::File(FileItem {
-    //                         name,
-    //                         is_hidden,
-    //                         time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
-    //                         size: metadata.len()
-    //                     })
-    //                 })
-    //             })
-    //             .and_then(get_supress_hidden(!hidden_included))
-    //     })
-    //     .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
+pub fn get_directory_items(path: &str, id: &str, suppress_hidden: bool)->Result<DirectoryItems, Error> {
+    let entries = fs::read_dir(path)?;
+//    event_sinks.set_request(id, true);
+    let (dirs, files): (Vec<_>, Vec<_>) = entries
+        .filter_map(|entry| {
+            entry.ok()
+                .and_then(|entry| { match entry.metadata().ok() {
+                    Some(metadata) => Some((entry, metadata)),
+                    None => None
+                }})
+                .and_then(|(entry, metadata)| {
+                    let name = String::from(entry.file_name().to_str().unwrap());
+                    let is_hidden = is_hidden(path, &name);
+                    Some(match metadata.is_dir() {
+                        true => FileType::Dir(DirItem {
+                            name,
+                            is_hidden,
+                            is_directory: true
+                        }),
+                        false => FileType::File(FileItem {
+                            name,
+                            is_hidden,
+                            time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
+                            size: metadata.len()
+                        })
+                    })
+                })
+                .and_then(get_supress_hidden(suppress_hidden))
+        })
+        .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
+    let mut dirs: Vec<DirItem> = dirs
+        .into_iter()
+        .filter_map(|ft|if let FileType::Dir(dir) = ft {Some(dir)} else {None})
+        .collect();
+    dirs.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
+    let mut files: Vec<FileItem> = files
+        .into_iter()
+        .filter_map(|ft|if let FileType::File(file) = ft {Some(file)} else {None})
+        .collect();
+    files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
+    
+    // event_sinks.set_request(id, false);
 
-    Ok(())
+    Ok(DirectoryItems{
+        dirs,
+        files
+    })
 }
 
 
@@ -465,6 +498,14 @@ impl<I: Iterator> IteratorExt for I {}
 pub fn is_hidden(_: &str, name: &str)->bool {
     name.as_bytes()[0] == b'.' && name.as_bytes()[1] != b'.'
 }
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DirectoryItems {
+    pub files: Vec<FileItem>,
+    pub dirs: Vec<DirItem>
+}
+
 
 enum FileType {
     Dir(DirItem),

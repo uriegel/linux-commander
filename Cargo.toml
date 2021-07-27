@@ -11,7 +11,6 @@ edition = "2018"
 #tokio-stream = "0.1"
 #warp = "0.3.1"
 #chrono = "0.4"
-#lexical-sort = "0.3"
 #kamadak-exif = "0.5"
 #futures = { version = "0.3", default-features = false }
 #warp-range = "0.1"
@@ -26,6 +25,7 @@ serde_json = "1.0"
 serde_qs = "0.8"
 async-process = "1.1"
 dirs = "3.0"
+lexical-sort = "0.3"
 
 #webkit2gtk-sys = "0.14"
 
