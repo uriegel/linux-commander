@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{cell::RefCell, iter::Take};
+use std::{cell::RefCell, iter::Take, time::UNIX_EPOCH};
 
 use async_process::Command;
 use gio::{
@@ -16,11 +16,13 @@ use gtk::{
 use urlencoding::decode;
 use serde::{Serialize, Deserialize};
 use webkit2gtk::{URISchemeRequest, WebView, traits::{URISchemeRequestExt, WebContextExt, SecurityManagerExt, WebInspectorExt, WebViewExt}};
+use async_std::prelude::*;
 
+#[derive(Debug)]
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct GetItems {
-    id: String,
+    folder_id: String,
     path: String,
     #[serde(default)]
     hidden_included: bool
@@ -76,14 +78,36 @@ fn main() {
         });
         app.add_action(&action);
 
+        let webview_clone = webview.clone();
         connect_msg_callback(&webview, move|cmd: &str, payload: &str|{ 
             match cmd {
                 "title" => headerbar.set_subtitle(Some(payload)),
                 "theme" => action.set_state(&payload.to_variant()),
                 _ => {}
-            }}, move |cmd, id, param| {
-                println!("Performing request here: {}, {}, {}", cmd, id, param)
+            }
+        }, move |cmd, id, param| {
+            let main_context = MainContext::default();
+            let cmd = cmd.to_string();
+            let param = param.to_string();
+            let id = id.to_string();
+            let webview_clone = webview_clone.clone();
+            main_context.spawn_local(async move {
+                match cmd.as_str() {
+                    "getRoot" => {
+                        let items = get_root_items().await.unwrap();
+                        send_request_result(webview_clone, &id, items);
+                    },                    
+                    "getItems" => {
+                        let params: GetItems = serde_json::from_str(&param).unwrap();
+                        let items = get_items(&params.path, &params.folder_id, params.hidden_included).await;
+
+
+                        //send_request_result(webview_clone, &id, items);
+                    },
+                    _ => {}
+                }
             });
+        });
             
         let webview_clone = webview.clone();
         let action = gio::SimpleAction::new("devtools", None);
@@ -189,7 +213,6 @@ fn main() {
                     },                    
                     "getitems" => {
                         let param: GetItems = get_param(&params.expect("msg"));
-                        
                         let dirs = async_std::fs::read_dir("/").await.ok().expect("could not read directory");
                         println!("dirs {:?}", dirs);
                     },
@@ -258,6 +281,13 @@ fn connect_msg_callback<F: Fn(&str, &str)->() + 'static, R: Fn(&str, &str, &str)
 
         true
     });
+}
+
+fn send_request_result<T>(webview: WebView, id: &str, result: T)
+where T: Serialize {
+    let json = serde_json::to_string(&result).expect("msg");
+    webview.run_javascript(&format!("requestResult({}, {})", id, json),
+    Some(&gio::Cancellable::new()),|_|{});
 }
 
 async fn get_root_items()-> Result<Vec<RootItem>, Error> {
@@ -347,6 +377,41 @@ async fn get_root_items()-> Result<Vec<RootItem>, Error> {
     }
 }
 
+async fn get_items(path: &str, folder_id: &str, hidden_included: bool)->Result<(), Error> {
+    let entries = async_std::fs::read_dir(path).await?;    
+    let entries = entries.map(|e|{e});
+    // let (dirs, files): (Vec<_>, Vec<_>) = entries
+    //     .filter_map(|entry| {
+    //         entry.ok()
+    //             .and_then(|entry| { match entry.metadata() {
+    //                 metadata => Some((entry, metadata)),
+    //                 None => None
+    //             }})
+    //             .and_then(|(entry, metadata)| {
+    //                 let name = String::from(entry.file_name().to_str().unwrap());
+    //                 let is_hidden = is_hidden(path, &name);
+    //                 Some(match metadata.is_dir() {
+    //                     true => FileType::Dir(DirItem {
+    //                         name,
+    //                         is_hidden,
+    //                         is_directory: true
+    //                     }),
+    //                     false => FileType::File(FileItem {
+    //                         name,
+    //                         is_hidden,
+    //                         time: metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_millis(),
+    //                         size: metadata.len()
+    //                     })
+    //                 })
+    //             })
+    //             .and_then(get_supress_hidden(!hidden_included))
+    //     })
+    //     .partition(|entry| if let FileType::Dir(_) = entry { true } else {false });
+
+    Ok(())
+}
+
+
 fn send_response<T>(request: &URISchemeRequest, val: &T) 
 where T: Serialize {
     let json = serde_json::to_string(val).unwrap();
@@ -397,21 +462,41 @@ pub trait IteratorExt: Iterator {
 
 impl<I: Iterator> IteratorExt for I {}
 
+pub fn is_hidden(_: &str, name: &str)->bool {
+    name.as_bytes()[0] == b'.' && name.as_bytes()[1] != b'.'
+}
 
-//                 let settings: DeleteItems = serde_json::from_str(payload).unwrap();
-//                 let jason = serde_json::to_string(&settings).expect("msg")   ;
+enum FileType {
+    Dir(DirItem),
+    File(FileItem)
+}
 
-//                 webview_clone.run_javascript(
-//                                     &format!("endtest({})", jason),
-//                                     Some(&gio::Cancellable::new()),
-//                                     |_|{})
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FileItem {
+    name: String,
+    is_hidden: bool,
+    time: u128,
+    size: u64
+}
             
-//                 },
-//             _ => {}
-//         }
-//     });
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DirItem {
+    name: String,
+    is_hidden: bool,
+    is_directory: bool
+}
 
-//     let initial_bool_state = false.to_variant();
+fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
+    if supress {|file_type| {
+        match file_type {
+            FileType::File(ref file) => if file.is_hidden { None } else { Some(file_type) }
+            FileType::Dir(ref file) => if file.is_hidden { None} else { Some(file_type) }
+        }
+    }} else { |e| Some(e) }
+}
+
 //     let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
 //     let webview_clone = data.webview.clone();
 //     action.connect_change_state(move |a, s| {

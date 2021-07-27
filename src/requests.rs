@@ -111,19 +111,6 @@ where R: FnOnce(&str, &str)->RFut  + 'static, RFut: Future<Output = ()> {
 //     pub path: String
 // }
 
-// enum FileType {
-//     Dir(DirItem),
-//     File(FileItem)
-// }
-
-// #[derive(Serialize)]
-// #[serde(rename_all = "camelCase")]
-// pub struct FileItem {
-//     name: String,
-//     is_hidden: bool,
-//     time: u128,
-//     size: u64
-// }
 
 // #[derive(Serialize)]
 // pub enum MsgType {
@@ -156,14 +143,6 @@ where R: FnOnce(&str, &str)->RFut  + 'static, RFut: Future<Output = ()> {
 // }
 
 
-// fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
-//     if supress {|file_type| {
-//         match file_type {
-//             FileType::File(ref file) => if file.is_hidden { None } else { Some(file_type) }
-//             FileType::Dir(ref file) => if file.is_hidden { None} else { Some(file_type) }
-//         }
-//     }} else { |e| Some(e) }
-// }
 
 // pub fn get_directory_items(path: &str, id: &str, suppress_hidden: bool, event_sinks: EventSinks)->Result<DirectoryItems, Error> {
 //     let entries = fs::read_dir(path)?;

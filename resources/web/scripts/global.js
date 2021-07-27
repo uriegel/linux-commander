@@ -4,6 +4,10 @@ function initializeCallbacks(onTheme, onShowHidden, onShowViewer) {
     onShowViewerCallback = onShowViewer
 }
 
+function initializeRequestsCallback(onRequest) {
+    onRequestCallback = onRequest
+}
+
 function setTheme(theme) {
     initialTheme = theme
     if (onThemeCallback)
@@ -15,7 +19,11 @@ function sendMessageToWebView(command, param) {
 }
 
 function sendRequestToWebView(command, id, param) {
-    alert(`!!request!!${command}!!${id}${(param ? "!!${param)" : "")}`)
+    alert(`!!request!!${command}!!${id}${(param ? `!!${JSON.stringify(param)}` : "")}`)
+}
+
+function requestResult(id, result) {
+    onRequestCallback(id, result)
 }
 
 function setTitle(title, dirs, files) {
@@ -41,15 +49,8 @@ const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn
 var onThemeCallback
 var onShowHiddenCallback
 var onShowViewerCallback
+var onRequestCallback
 
 
 
 
-
-var globres = new Map()
-
-const endtest = ok => {
-    res = globres.get(ok.id)
-    globres.delete(ok.id)
-    res(ok)
-}

@@ -49,16 +49,14 @@ export const getRoot = folderId => {
 
     const getItems = async () => {
         const response = await requests.getRoot()
-
-
-        // const mounted = response.filter(n => n.mountPoint)
-        // const unmounted = response.filter(n => !n.mountPoint)
-        // return mounted
-        //     .concat(unmounted)
-        //     .map(n => { 
-        //         n.isNotSelectable = true
-        //         return n
-        //     })
+        const mounted = response.filter(n => n.mountPoint)
+        const unmounted = response.filter(n => !n.mountPoint)
+        return mounted
+            .concat(unmounted)
+            .map(n => { 
+                n.isNotSelectable = true
+                return n
+            })
     }
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-root-widths`, JSON.stringify(widths))

@@ -5,6 +5,7 @@ import './folder.js'
 import {onTheme as onViewerTheme, onShowViewer, refreshViewer} from './viewer.js'
 import { addDeleteJob } from './jobs.js'
 import { RESULT_OK } from './components/DialogBoxComponent.js'
+import { initializeRequests} from './requests.js'
 
 const folderLeft = document.getElementById("folderLeft")
 const folderRight = document.getElementById("folderRight")
@@ -20,6 +21,8 @@ initializeCallbacks(onTheme, onShowHidden, show => {
     folderLeft.onResize()
     folderRight.onResize()
 })
+
+initializeRequests()
 
 function getItemsTypes(selectedItems) {
     const types = selectedItems

@@ -1,5 +1,6 @@
 export const DIRECTORY = "directory"
 import { formatDateTime, formatSize, getExtension } from "./renderTools.js"
+import * as requests from "../requests.js"
 import { ROOT } from "./root.js"
 
 const pathDelimiter = "/"
@@ -94,23 +95,15 @@ export const getDirectory = (folderId, path) => {
         : [null, null]
 
     const getItems = async (id, path, hiddenIncluded) => {
-
-        const url = new URL("request://getitems")
-        const params = { id, path, hiddenIncluded }
-        Object.keys(params).forEach(key => {
-            const val = params[key]
-            if (val)
-                url.searchParams.append(key, val)
-        })
-        const responseStr = await fetch(url)
-        const response = await responseStr.json()
+        let items = await requests.getItems(id, path, hiddenIncluded)
+        console.log("get items", items)
         let result = [{
                 name: "..",
                 isDirectory: true,
                 isNotSelectable: true
             }]
-            .concat(response.dirs)
-            .concat(response.files)
+            .concat(items.dirs)
+            .concat(items.files)
         if (result && result.length)
             currentPath = path
         return result
