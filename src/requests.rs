@@ -1,6 +1,78 @@
-pub fn on_request(cmd: &str, param: &str) {
-    println!("Request: {}, {}", cmd, param)
+use std::future::Future;
+
+use glib::MainContext;
+use webkit2gtk::{WebView, traits::WebViewExt};
+
+pub fn connect_msg_callback<F, R, RFut>(main_context: MainContext, webview: &WebView, on_msg: F, on_request: R) 
+    where F: Fn(&str, &str)->() + 'static,
+        R: FnOnce(&str, &str)->RFut + 'static,
+        RFut: Future<Output = ()> {
+    let webmsg = "!!webmsg!!";
+    let request = "!!request!!";
+
+    webview.connect_script_dialog(move|_, dialog | {
+        let str = dialog.get_message();
+        if str.starts_with(webmsg) {
+            let msg = &str[webmsg.len()..];
+            if let Some(pos) = msg.find("!!") {
+                let cmd = &msg[0..pos];
+                let payload = &msg[pos+2..];
+                on_msg(cmd, payload);
+            }
+        } else if str.starts_with(request) {
+            let msg = &str[request.len()..];
+            if let Some(pos) = msg.find("!!") {
+                let cmd = &msg[0..pos];
+                let part = &msg[pos+2..];
+                let (id, param) = if let Some(pos) = part.find("!!") {
+                    let id = &part[0..pos];
+                    let param = &part[pos+2..];
+                    (id.to_string(), param.to_string())
+//                    perform_request(&main_context, on_request, cmd.to_string(), );
+                } else {
+                    (part.to_string(), "{}".to_string())
+                };
+                main_context.spawn_local(async move {
+                    println!("Performing request: {}, {}, {}", cmd, id, param);
+                    on_request(&cmd, &param).await;
+                });
+        }
+        }
+
+        true
+    });
 }
+
+fn perform_request<R, RFut>(main_context: &MainContext, on_request: R, cmd: String, id: String, param: String) 
+where R: FnOnce(&str, &str)->RFut  + 'static, RFut: Future<Output = ()> {
+    main_context.spawn_local(async move {
+        println!("Performing request: {}, {}, {}", cmd, id, param);
+        on_request(&cmd, &param).await;
+        //on_request(&cmd, &param).await;
+    });
+}
+
+// fn perform_request<F: FnOnce(&str, &str)->(dyn Future<Output = ()> + 'static)>(main_context: &MainContext, on_request: F, cmd: String, id: String, param: String) {
+//     main_context.spawn_local(async move {
+//         println!("Performing request: {}, {}, {}", cmd, id, param);
+//         on_request(cmd, param).await;
+//         //on_request(&cmd, &param).await;
+//     });
+// }
+
+// async fn on_request(cmd: &str, param: &str)/*->Result<T, Error>*/  {
+//     println!("Request: {}, {}", cmd, param);
+//     match cmd {
+//         "getRoot" => 
+//     }
+    
+    
+    
+    
+    
+//     //    on_request(cmd, param).await;
+
+// }
 
 
 // use chrono::{Local, NaiveDateTime, TimeZone, Utc};

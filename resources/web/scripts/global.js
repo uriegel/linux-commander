@@ -14,8 +14,8 @@ function sendMessageToWebView(command, param) {
     alert(`!!webmsg!!${command}!!${param}`)
 }
 
-function sendRequestToWebView(command, param, id) {
-    alert(`!!request!!${command}!!${id}!!${param}`)
+function sendRequestToWebView(command, id, param) {
+    alert(`!!request!!${command}!!${id}${(param ? "!!${param)" : "")}`)
 }
 
 function setTitle(title, dirs, files) {
