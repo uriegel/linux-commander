@@ -1,3 +1,5 @@
+mod requests;
+
 use core::fmt;
 use std::{cell::RefCell, iter::Take};
 
@@ -16,6 +18,8 @@ use gtk::{
 use urlencoding::decode;
 use serde::{Serialize, Deserialize};
 use webkit2gtk::{URISchemeRequest, WebView, traits::{URISchemeRequestExt, WebContextExt, SecurityManagerExt, WebInspectorExt, WebViewExt}};
+
+use crate::requests::on_request;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -80,7 +84,7 @@ fn main() {
             match cmd {
                 "title" => headerbar.set_subtitle(Some(payload)),
                 "theme" => action.set_state(&payload.to_variant()),
-                _ => {}
+                _ => on_request(cmd, payload)
             }
         });
         
@@ -228,7 +232,12 @@ fn main() {
 }
 
 pub fn connect_msg_callback<F: Fn(&str, &str)->() + 'static>(webview: &WebView, on_msg: F) {
-    let webmsg = "!!webmesg!!";
+    let webmsg = "!!webmsg!!";
+    let request = "!!request!!";
+
+    fn perform_request(cmd: &str, id: &str, param: &str) {
+        println!("Performing request: {}, {}, {}", cmd, id, param)
+    }
 
     webview.connect_script_dialog(move|_, dialog | {
         let str = dialog.get_message();
@@ -239,7 +248,21 @@ pub fn connect_msg_callback<F: Fn(&str, &str)->() + 'static>(webview: &WebView, 
                 let payload = &msg[pos+2..];
                 on_msg(cmd, payload);
             }
+        } else if str.starts_with(request) {
+            let msg = &str[request.len()..];
+            if let Some(pos) = msg.find("!!") {
+                let cmd = &msg[0..pos];
+                let part = &msg[pos+2..];
+                if let Some(pos) = part.find("!!") {
+                    let id = &part[0..pos];
+                    let param = &part[pos+2..];
+                    perform_request(cmd, id, param);
+                } else {
+                    perform_request(cmd, part, "{}");
+                }
+            }
         }
+
         true
     });
 }

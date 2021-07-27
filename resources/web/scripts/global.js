@@ -11,7 +11,11 @@ function setTheme(theme) {
 }
 
 function sendMessageToWebView(command, param) {
-    alert(`!!webmesg!!${command}!!${param}`)
+    alert(`!!webmsg!!${command}!!${param}`)
+}
+
+function sendRequestToWebView(command, param, id) {
+    alert(`!!request!!${command}!!${id}!!${param}`)
 }
 
 function setTitle(title, dirs, files) {

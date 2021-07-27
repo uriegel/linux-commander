@@ -1,4 +1,5 @@
 import { formatSize } from "./renderTools.js"
+import * as requests from "../requests.js"
 
 export const ROOT = "root"
 
@@ -47,16 +48,17 @@ export const getRoot = folderId => {
     const getPath = item => [item.mountPoint, null]
 
     const getItems = async () => {
-        const responseStr = await fetch('request://getroot')
-        const response = await responseStr.json()
-        const mounted = response.filter(n => n.mountPoint)
-        const unmounted = response.filter(n => !n.mountPoint)
-        return mounted
-            .concat(unmounted)
-            .map(n => { 
-                n.isNotSelectable = true
-                return n
-            })
+        const response = await requests.getRoot()
+
+
+        // const mounted = response.filter(n => n.mountPoint)
+        // const unmounted = response.filter(n => !n.mountPoint)
+        // return mounted
+        //     .concat(unmounted)
+        //     .map(n => { 
+        //         n.isNotSelectable = true
+        //         return n
+        //     })
     }
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-root-widths`, JSON.stringify(widths))
