@@ -80,14 +80,6 @@ fn main() {
         app.add_action(&action);
 
         let webview_clone = webview.clone();
-        let (sender, receiver) = 
-            MainContext::channel::<(String, DirectoryItems)>(PRIORITY_DEFAULT);
-        receiver.attach(None, move |(id, items)| {
-            send_request_result(&webview_clone, &id, items);
-            Continue(true)
-        });
-
-        let webview_clone = webview.clone();
         connect_msg_callback(&webview, move|cmd: &str, payload: &str|{ 
             match cmd {
                 "title" => headerbar.set_subtitle(Some(payload)),
@@ -100,26 +92,22 @@ fn main() {
             let param = param.to_string();
             let id = id.to_string();
             let webview_clone = webview_clone.clone();
-            let sender = sender.clone();
             main_context.spawn_local(async move {
                 match cmd.as_str() {
                     "getRoot" => {
-
-                        let erg = GtkFuture::new(Duration::from_secs(1), move || {
-                            format!("Das hanben wir: {}", cmd) 
-                        }).await;
-                        println!("Das isses {}", erg);
-
-                       // let items = get_root_items().await.unwrap();
-                        send_request_result(&webview_clone, &id, "items");
+                        let items = get_root_items().await.unwrap();
+                        send_request_result(&webview_clone, &id, items);
                     },                    
                     "getItems" => {
-                        let sender = sender.clone();
                         let params: GetItems = serde_json::from_str(&param).unwrap();
-                        thread::spawn(move || {
+                        let erg = GtkFuture::new(move || {
                             let result = get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap();
-                            sender.send((id, result)).expect("Could not send through channel");
-                        });
+                            serde_json::to_string(&result).expect("msg")
+                        }).await;
+                        send_request_str(&webview_clone, &id, &erg);
+//                        thread::spawn(move || {
+  //                          let result = get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap();
+    //                        sender.send((id, result)).expect("Could not send through channel");
                     },
                     _ => {}
                 }
@@ -205,51 +193,6 @@ fn main() {
         });
         webview.load_uri("provide://content");
 
-        context.register_uri_scheme("request", move |request|{
-            
-            let gurl = request.uri().unwrap();
-            let url = std::str::from_utf8(&gurl.as_bytes()[10..]).unwrap();
-            let pos = url.find("?");
-            let (cmd, params) = if let Some(pos) = pos {
-                let query = std::str::from_utf8(&(url.as_bytes()[pos+1..])).unwrap().replace("+", "%20");
-                let decoded = decode(&query).unwrap().to_string();
-                (std::str::from_utf8(&(url.as_bytes()[..pos])).unwrap().to_string(), Some(decoded))
-            } else {
-                (url.to_string(), None)
-            };
-
-            println!("cmd: {}, query: {:?}, url: {}", cmd, params, url);
-
-            let request_clone = request.clone();
-            let main_context = MainContext::default();
-            main_context.spawn_local(async move {
-                match cmd.as_str() {
-                    "getroot" => {
-                        let items = get_root_items().await.unwrap();
-                        send_response(&request_clone, &items);
-                    },                    
-                    "getitems" => {
-                        let param: GetItems = get_param(&params.expect("msg"));
-                        let (sender, receiver) = 
-                            MainContext::channel::<DirectoryItems>(PRIORITY_DEFAULT);
-                        thread::spawn(move || {
-                            let result = get_directory_items(&param.path, &param.folder_id, !param.hidden_included).unwrap();
-                            sender.send(result).expect("Could not send through channel");
-                        });
-                        receiver.attach(None, move |enable_button| {
-                            Continue(false)
-                        });
-                    },
-                    _ => {}
-                }
-            });
-            
-        });
-
-        let security = context.security_manager().unwrap();
-        security.register_uri_scheme_as_cors_enabled("request://getroot");
-        security.register_uri_scheme_as_cors_enabled("provide://");
-
         let r_size = RefCell::new((0, 0));
         let r_is_maximized = RefCell::new(is_maximized);
         let window_clone = window.clone();
@@ -311,6 +254,11 @@ fn send_request_result<T>(webview: &WebView, id: &str, result: T)
 where T: Serialize {
     let json = serde_json::to_string(&result).expect("msg");
     webview.run_javascript(&format!("requestResult({}, {})", id, json),
+    Some(&gio::Cancellable::new()),|_|{});
+}
+
+fn send_request_str(webview: &WebView, id: &str, result: &str) {
+    webview.run_javascript(&format!("requestResult({}, {})", id, result),
     Some(&gio::Cancellable::new()),|_|{});
 }
 
@@ -505,6 +453,7 @@ pub fn is_hidden(_: &str, name: &str)->bool {
     name.as_bytes()[0] == b'.' && name.as_bytes()[1] != b'.'
 }
 
+#[derive(Debug)]
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DirectoryItems {
@@ -512,12 +461,12 @@ pub struct DirectoryItems {
     pub dirs: Vec<DirItem>
 }
 
-
 enum FileType {
     Dir(DirItem),
     File(FileItem)
 }
 
+#[derive(Debug)]
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FileItem {
@@ -526,7 +475,8 @@ pub struct FileItem {
     time: u128,
     size: u64
 }
-            
+
+#[derive(Debug)]
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DirItem {
@@ -544,14 +494,14 @@ fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
     }} else { |e| Some(e) }
 }
 
-pub struct GtkFuture {
-    shared_state: Arc<Mutex<SharedState>>,
+pub struct GtkFuture<T> {
+    shared_state: Arc<Mutex<SharedState<T>>>,
 }
 
-struct SharedState {
+struct SharedState<T> {
     /// Whether or not the sleep time has elapsed
     completed: bool,
-    erg: String,
+    erg: Option<T>,
 
     /// The waker for the task that `TimerFuture` is running on.
     /// The thread can use this after setting `completed = true` to tell
@@ -560,13 +510,14 @@ struct SharedState {
     waker: Option<Waker>,
 }
 
-impl Future for GtkFuture {
-    type Output = String;
+impl<T: Clone + Send + 'static> Future for GtkFuture<T> {
+    type Output = T;
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         // Look at the shared state to see if the timer has already completed.
         let mut shared_state = self.shared_state.lock().unwrap();
         if shared_state.completed {
-            Poll::Ready(shared_state.erg.clone())
+            // TODO Dont copy value, use Arc<Mutex>
+            Poll::Ready(shared_state.erg.clone().expect("msg"))
         } else {
             // Set waker so that the thread can wake up the current task
             // when the timer has completed, ensuring that the future is polled
@@ -586,26 +537,25 @@ impl Future for GtkFuture {
     }
 }
 
-impl GtkFuture {
+impl<T: Send + 'static> GtkFuture<T> {
     /// Create a new `TimerFuture` which will complete after the provided
     /// timeout.
-    pub fn new<R: FnOnce()->String + Send + 'static>(duration: Duration, on_request: R) -> Self {
+    pub fn new<R: FnOnce()->T + Send + 'static>(on_request: R) -> Self {
         let shared_state = Arc::new(Mutex::new(SharedState {
             completed: false,
-            erg: "".to_string(),
+            erg: None,
             waker: None,
         }));
 
         // Spawn the new thread
         let thread_shared_state = shared_state.clone();
         thread::spawn(move || {
-            thread::sleep(duration);
             let erg = on_request();
             let mut shared_state = thread_shared_state.lock().unwrap();
             // Signal that the timer has completed and wake up the last
             // task on which the future was polled, if one exists.
             shared_state.completed = true;
-            shared_state.erg = erg;
+            shared_state.erg = Some(erg);
             if let Some(waker) = shared_state.waker.take() {
                 waker.wake()
             }
