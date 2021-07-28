@@ -1,12 +1,15 @@
 mod gtk_async;
 
 use core::fmt;
-use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
+use std::{cell::RefCell, fs, iter::Take, thread::sleep, time::{Duration, UNIX_EPOCH}};
 
 use async_process::Command;
+use chrono::{Local, NaiveDateTime, TimeZone};
+use exif::{In, Tag};
 use gio::{MemoryInputStream, Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{
         ActionMapExt, ApplicationExt, SettingsExt
-    }};
+    }
+};
 use glib::{Bytes, MainContext, ToVariant};
 use gtk::{
     Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
@@ -17,7 +20,7 @@ use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
 use webkit2gtk::{WebView, traits::{SecurityManagerExt, URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
-use crate::gtk_async::GtkFuture;
+use crate::{gtk_async::GtkFuture};
 
 #[derive(Debug)]
 #[derive(Deserialize)]
@@ -60,7 +63,7 @@ fn main() {
         let webview: WebView = builder.object("webview").expect("Couldn't get webview");
         let headerbar: HeaderBar = builder.object("headerbar").unwrap();
         webview.connect_context_menu(|_, _, _, _| true );
-
+        let webview_clone = webview.clone();
         let initial_state = "".to_variant();
         let action_themes = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
         let webview_clone = webview.clone();
@@ -113,6 +116,7 @@ fn main() {
             let param = param.to_string();
             let id = id.to_string();
             let webview_clone = webview_clone.clone();
+            let webview_clone2 = webview_clone.clone();
             main_context.spawn_local(async move {
                 match cmd.as_str() {
                     "getRoot" => {
@@ -121,10 +125,23 @@ fn main() {
                     },                    
                     "getItems" => {
                         let params: GetItems = serde_json::from_str(&param).unwrap();
-                        let erg = GtkFuture::new(move || {
+                        let folder_id = params.folder_id.clone();
+                        let path = params.path.clone();
+                        let items = GtkFuture::new(move || {
                             get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap()
                         }).await;
-                        send_request_result(&webview_clone, &id, &erg);
+                        send_request_result(&webview_clone, &id, &items);
+                        
+                        let extended_items = GtkFuture::new(move || {
+                            retrieve_extended_items(folder_id, path, &items)
+                        }).await;
+                        if let Some(extended_items) = extended_items {
+                            let extended_items_msg = ExtendedItems{ items: extended_items, msg_type: MsgType::ExtendedItem };
+                            let json = serde_json::to_string(&extended_items_msg).unwrap();
+                            println!("EXIF: {}", json);
+                            //webview_clone2.run_javascript(&format!("setTheme('{}')", "theme"), Some(&gio::Cancellable::new()), |_|{});
+                            //event_sinks.send(id, json);
+                        }
                     },
                     _ => {}
                 }
@@ -353,9 +370,8 @@ async fn get_root_items()-> Result<Vec<RootItem>, Error> {
     }
 }
 
-pub fn get_directory_items(path: &str, _id: &str, suppress_hidden: bool)->Result<DirectoryItems, Error> {
+pub fn get_directory_items(path: &str, id: &str, suppress_hidden: bool)->Result<DirectoryItems, Error> {
     let entries = fs::read_dir(path)?;
-//    event_sinks.set_request(id, true);
     let (dirs, files): (Vec<_>, Vec<_>) = entries
         .filter_map(|entry| {
             entry.ok()
@@ -394,8 +410,6 @@ pub fn get_directory_items(path: &str, _id: &str, suppress_hidden: bool)->Result
         .collect();
     files.sort_by(|a, b|natural_lexical_cmp(&a.name, &b.name));
     
-    // event_sinks.set_request(id, false);
-
     Ok(DirectoryItems{
         dirs,
         files
@@ -489,8 +503,95 @@ fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
     }} else { |e| Some(e) }
 }
 
+pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems)->Option<Vec<ExtendedItem>> {
+    let index_pos = items.dirs.len() + 1;
+    let files: Vec<(usize, FileItem)> = items.files
+        .iter()
+        .enumerate()
+        .map(| (index, n)| (index, FileItem{name: n.name.clone(), is_hidden: n.is_hidden, size: n.size, time: n.time}))
+        .filter(|(_, n)| {
+            let ext = n.name.to_lowercase();
+            check_extended_items(&ext)            
+        })
+        .collect();
+
+    fn get_unix_time(str: &str)->i64 {
+        let naive_date_time = NaiveDateTime::parse_from_str(str, "%Y-%m-%d %H:%M:%S").unwrap();
+        let datetime = Local.from_local_datetime(&naive_date_time).unwrap();
+        datetime.timestamp_millis()
+    }
+
+    if files.len() > 0 {
+        let extended_items: Vec<ExtendedItem> = files.iter().filter_map(|(index, n)| {
+            let filename = format!("{}/{}", path, n.name);
+
+            let ext = n.name.to_lowercase();
+            if ext.ends_with(".png") || ext.ends_with(".jpg") {
+                let file = std::fs::File::open(filename).unwrap();
+                let mut bufreader = std::io::BufReader::new(&file);
+                let exifreader = exif::Reader::new();
+
+                // if event_sinks.active_requests() {
+                //     sleep(Duration::from_millis(500));
+                // }
+                    
+                exifreader.read_from_container(&mut bufreader).ok().and_then(|exif|{
+                    let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
+                        Some(info) => Some(info.display_value().to_string()),
+                        None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+                            Some(info) => Some(info.display_value().to_string()),
+                            None => None
+                        } 
+                    };
+                    match exiftime {
+                        Some(exiftime) => Some(ExtendedItem::new(index + index_pos, get_unix_time(&exiftime))),
+                        None => None
+                    }
+                }) 
+            } else {
+                None
+            }
+        }).collect();
+        if extended_items.len() > 0 { Some(extended_items) } else { None }
+    } else {
+        None
+    }
+}
 
 
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExtendedItems {
+    msg_type: MsgType,
+    items: Vec<ExtendedItem>
+}
 
 
+#[derive(Serialize)]
+pub struct ExtendedItem {
+    index: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    exiftime: Option<i64>
+}
+
+impl ExtendedItem {
+    pub fn new(index: usize, exiftime: i64) -> Self {
+        ExtendedItem {
+            index, 
+            exiftime: Some(exiftime)
+        }
+    }
+}
+
+pub fn check_extended_items(ext: &str)->bool {
+    ext.ends_with(".png") 
+    || ext.ends_with(".jpg")
+}
+
+#[derive(Serialize)]
+pub enum MsgType {
+    ExtendedItem,
+    Refresh
+}

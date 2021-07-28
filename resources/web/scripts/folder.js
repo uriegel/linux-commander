@@ -233,7 +233,8 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Exif with events
+// TODO Exif with events: send event to js
+// TODO Exif with events: cancellelation
 // TODO Delete items
 
 // TODO Rename

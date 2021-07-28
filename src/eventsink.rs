@@ -1,10 +1,23 @@
-use std::{collections::HashMap, convert::Infallible, sync::{Arc, Mutex, atomic::{AtomicBool, AtomicUsize, Ordering}}};
-use futures::StreamExt;
-use tokio::{spawn, sync::mpsc};
-use tokio_stream::wrappers::UnboundedReceiverStream;
-use warp::{Filter, Rejection, Reply, ws::{Message, WebSocket, Ws}};
+use std::{collections::HashMap, sync::{Arc, Mutex, atomic::{AtomicBool, AtomicUsize, Ordering}}};
 
-type EventSink = mpsc::UnboundedSender<Result<Message, warp::Error>>;
+use glib::{Continue, MainContext, PRIORITY_DEFAULT, Sender, clone};
+use gtk::glib;
+use serde::{Serialize};
+use webkit2gtk::WebView;
+
+// use std::{collections::HashMap, convert::Infallible, sync::{Arc, Mutex, atomic::{AtomicBool, AtomicUsize, Ordering}}};
+// use futures::StreamExt;
+// use tokio::{spawn, sync::mpsc};
+// use tokio_stream::wrappers::UnboundedReceiverStream;
+// use warp::{Filter, Rejection, Reply, ws::{Message, WebSocket, Ws}};
+
+#[derive(Serialize)]
+pub enum MsgType {
+    ExtendedItem,
+    Refresh
+}
+
+type EventSink = Sender<String>;
 
 struct EventSession {
     event_sink: EventSink,
@@ -54,7 +67,7 @@ impl EventSinks {
 
     pub fn send(&self, id: String, msg: String) {
         if let Some(session) = self.es.lock().unwrap().get(&id) {
-            let _ = session.event_sink.send(Ok(Message::text(msg)));
+            let _ = session.event_sink.send(msg);
         }
     }
     
@@ -63,19 +76,18 @@ impl EventSinks {
     }
 }
 
-pub fn with_events(event_sinks: EventSinks) -> impl Filter<Extract = (EventSinks,), Error = Infallible> + Clone {
-    warp::any()
-        .map(move || event_sinks.clone() )
+pub fn initialize(event_sinks: EventSinks, webview: WebView) {
+    let (sender, receiver) = MainContext::channel::<String>(PRIORITY_DEFAULT);
+    event_sinks.insert("left".to_string(), sender);
+    receiver.attach(None, clone!(@weak webview => @default-return Continue(true), move|msg|{
+        //webview.
+        Continue(true)
+    }));
+    let (sender, receiver) = MainContext::channel::<String>(PRIORITY_DEFAULT);
+    event_sinks.insert("right".to_string(), sender);
+    receiver.attach(None, clone!(@weak webview => @default-return Continue(true), move|msg|{
+        //webview.
+        Continue(true)
+    }));
 }
 
-pub async fn on_eventsink(ws: Ws, id: String, event_sinks: EventSinks) -> Result< impl Reply, Rejection> {
-    Ok(ws.on_upgrade(move |socket| on_connection(socket, id, event_sinks)))
-}
-
-async fn on_connection(ws: WebSocket, id: String, event_sinks: EventSinks) {
-    let (client_ws_sender, _) = ws.split();
-    let (client_sender, client_rcv) = mpsc::unbounded_channel();
-    let client_rcv = UnboundedReceiverStream::new(client_rcv);
-    spawn(client_rcv.forward(client_ws_sender));
-    event_sinks.insert(id, client_sender);
-}
