@@ -1,35 +1,3 @@
-fn perform_request<R, RFut>(main_context: &MainContext, on_request: R, cmd: String, id: String, param: String) 
-where R: FnOnce(&str, &str)->RFut  + 'static, RFut: Future<Output = ()> {
-    main_context.spawn_local(async move {
-        println!("Performing request: {}, {}, {}", cmd, id, param);
-        on_request(&cmd, &param).await;
-        //on_request(&cmd, &param).await;
-    });
-}
-
-// fn perform_request<F: FnOnce(&str, &str)->(dyn Future<Output = ()> + 'static)>(main_context: &MainContext, on_request: F, cmd: String, id: String, param: String) {
-//     main_context.spawn_local(async move {
-//         println!("Performing request: {}, {}, {}", cmd, id, param);
-//         on_request(cmd, param).await;
-//         //on_request(&cmd, &param).await;
-//     });
-// }
-
-// async fn on_request(cmd: &str, param: &str)/*->Result<T, Error>*/  {
-//     println!("Request: {}, {}", cmd, param);
-//     match cmd {
-//         "getRoot" => 
-//     }
-    
-    
-    
-    
-    
-//     //    on_request(cmd, param).await;
-
-// }
-
-
 // use chrono::{Local, NaiveDateTime, TimeZone, Utc};
 // use exif::{In, Tag};
 // use lexical_sort::natural_lexical_cmp;
@@ -45,15 +13,6 @@ where R: FnOnce(&str, &str)->RFut  + 'static, RFut: Future<Output = ()> {
 // use crate::linux::requests::{check_extended_items, get_version};
 // #[cfg(target_os = "windows")]
 // use crate::windows::requests::{check_extended_items, get_version};
-
-// const ICON_SIZE: i32 = 16;
-
-
-
-// #[derive(Deserialize)]
-// pub struct GetIcon {
-//     ext: String,
-// }
 
 // #[derive(Deserialize)]
 // pub struct GetView {
@@ -158,17 +117,6 @@ where R: FnOnce(&str, &str)->RFut  + 'static, RFut: Future<Output = ()> {
 //             });
 //         }
 //     }
-// }
-
-// pub async fn get_icon(param: GetIcon) -> Result<impl warp::Reply, warp::Rejection> {
-//     let bytes = systemicons::get_icon(&param.ext, ICON_SIZE).unwrap();
-//     let body = hyper::Body::from(bytes);
-//     let mut response = Response::new(body);
-//     let headers = response.headers_mut();
-//     let mut header_map = create_headers();
-//     header_map.insert("Content-Type", HeaderValue::from_str("image/png").unwrap());
-//     headers.extend(header_map);
-//     Ok (response)        
 // }
 
 // pub async fn get_view(param: GetView) -> Result<impl warp::Reply, warp::Rejection> {

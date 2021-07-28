@@ -4,12 +4,10 @@ use core::fmt;
 use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
 
 use async_process::Command;
-use gio::{
-    Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{
+use gio::{MemoryInputStream, Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{
         ActionMapExt, ApplicationExt, SettingsExt
-    }
-};
-use glib::{MainContext, ToVariant};
+    }};
+use glib::{Bytes, MainContext, ToVariant};
 use gtk::{
     Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
         BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt
@@ -189,21 +187,16 @@ fn main() {
                 let istream = res.open_stream(&path, ResourceLookupFlags::NONE).unwrap();
                 request.finish(&istream, size as i64, Some(&content_type));
             }             
-            // if let Some(content_type) = content_type {
 
-            
-            //     let subpath = subpath.to_string();
-            //     let res_clone = res.clone();
-            
-
-            //         timeout_future_seconds(2).await;
-
-            
-            //         let path = "/de/uriegel/commander/web".to_string() + &subpath;
-            //         let (size, _) = res_clone.info(&path, ResourceLookupFlags::NONE).unwrap();
-            //         let istream = res_clone.open_stream(&path, ResourceLookupFlags::NONE).unwrap();
-            //     });
-            // } 
+            if subpath == "/commander/geticon" {
+                let pos = url.find("?").unwrap();
+                let ext = &url[pos+5..];
+                if let Some(icon) = systemicons::get_icon(ext, 16).ok() {
+                    let bytes = Bytes::from_owned(icon);
+                    let stream = MemoryInputStream::from_bytes(&bytes);
+                    request.finish(&stream, bytes.len() as i64, Some("image/png"));
+                }
+            }
         });
         webview.load_uri("provide://content");
 

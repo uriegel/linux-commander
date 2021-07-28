@@ -18,10 +18,6 @@ pub fn check_extended_items(ext: &str)->bool {
     || ext.ends_with(".jpg")
 }
 
-pub fn get_version(_: &str, _: usize)->Option<ExtendedItem> {
-    None
-}
-
 pub async fn delete(path: &str, items: Vec<String>, state: AppState) {
     
     let files_to_delete: Vec<String> = items.iter().map(|file|{

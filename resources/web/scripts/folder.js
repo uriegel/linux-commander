@@ -233,8 +233,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO SystemIcons with scheme (cache?)
-// TODO Test withresource scheme: icons: same icon
 // TODO Pictures with scheme
 // TODO Video with warp
 

@@ -13,15 +13,6 @@ use crate::linux::requests::get_root_items;
 #[cfg(target_os = "windows")]
 use crate::windows::requests::get_root_items;
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct GetItems {
-    id: String,
-    path: String,
-    #[serde(default)]
-    hidden_included: bool
-}
-
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -40,13 +31,6 @@ pub struct DeleteItems {
             .and(warp::body::json())
             .and(with_events(event_sinks.clone()))
             .and_then(get_items);
-
-        let route_get_icon = 
-            warp::path("commander")
-            .and(warp::path("geticon"))
-            .and(warp::path::end())
-            .and(warp::query::query())
-            .and_then(get_icon);
 
         let route_get_video = 
             warp::path("commander")
