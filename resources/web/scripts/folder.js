@@ -233,12 +233,12 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Load files from custom scheme from resource
-
-// TODO Test Videoplayer with url: file range
-// TODO Test withresource scheme: when refreshing
+// TODO SystemIcons with scheme (cache?)
 // TODO Test withresource scheme: icons: same icon
+// TODO Pictures with scheme
+// TODO Video with warp
 
+// TODO Exif with events
 
 // TODO Rename
 // TODO CreateFolder
