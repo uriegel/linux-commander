@@ -32,28 +32,7 @@ pub struct DeleteItems {
             .and(with_events(event_sinks.clone()))
             .and_then(get_items);
 
-        let route_get_video = 
-            warp::path("commander")
-            .and(warp::path("getvideo"))
-            .and(warp::path::end())
-            .and(warp::query::query())
-            .and_then(get_video);
-    
-        let route_get_video_range = 
-            warp::path("commander")
-            .and(warp::path("getvideo"))
-            .and(warp::path::end())
-            .and(warp::query::query())
-            .and(filter_range())
-            .and_then(get_video_range)
-            .map(with_partial_content_status);
 
-        let route_get_view = 
-            warp::path("commander")
-            .and(warp::path("getview"))
-            .and(warp::path::end())
-            .and(warp::query::query())
-            .and_then(get_view);
 
 
 async fn get_items(param: GetItems, event_sinks: EventSinks)->Result<impl warp::Reply, warp::Rejection> {

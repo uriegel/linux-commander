@@ -1,4 +1,5 @@
 mod gtk_async;
+mod warp;
 
 use core::fmt;
 use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
@@ -15,6 +16,7 @@ use gtk::{
 };
 use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
+use tokio::runtime::Runtime;
 use webkit2gtk::{WebView, traits::{URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
 use crate::gtk_async::GtkFuture;
@@ -31,7 +33,8 @@ struct GetItems {
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), Default::default());
-    application.connect_activate(|app| {
+    let rt = Runtime::new().unwrap();
+    application.connect_activate(move|app| {
         let resources_bytes = include_bytes!("../resources/resources.gresource");
         let resource_data = glib::Bytes::from(&resources_bytes[..]);
         let res = Resource::from_data(&resource_data).unwrap();
@@ -218,6 +221,7 @@ fn main() {
             false
         });        
 
+        warp::start(&rt);
         window.set_application(Some(app));
         window.show_all();
     });

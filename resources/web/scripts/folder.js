@@ -233,10 +233,9 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Pictures with scheme
-// TODO Video with warp
 
 // TODO Exif with events
+// TODO Crash in pdf viewer
 
 // TODO Rename
 // TODO CreateFolder
