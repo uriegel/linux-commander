@@ -17,7 +17,7 @@ use gtk::{
 use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
 use tokio::runtime::Runtime;
-use webkit2gtk::{WebView, traits::{URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
+use webkit2gtk::{WebView, traits::{SecurityManagerExt, URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
 use crate::gtk_async::GtkFuture;
 
@@ -173,6 +173,8 @@ fn main() {
             }
         }
 
+        let secman = context.security_manager().expect("");
+        secman.register_uri_scheme_as_local("provide");
         context.register_uri_scheme("provide", move |request|{
             let gpath = request.path().unwrap();
             let path = gpath.as_str();

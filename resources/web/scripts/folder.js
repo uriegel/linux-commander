@@ -235,14 +235,13 @@ customElements.define('folder-table', Folder)
 
 
 // TODO Exif with events
-// TODO Crash in pdf viewer
 
 // TODO Rename
 // TODO CreateFolder
 // TODO Copy
 // TODO Copy: progress control in status bar
 // TODO Move
-// TODO Copy with Copy Paste (from external or fro internal)
+// TODO Copy with Copy Paste (from external or from internal)
 // TODO Windows: Viewer: are worker released when changing pdf?
 // TODO Windows: Hamburger Menu and context menu
 // TODO When a path is not available anymore: fallback to root

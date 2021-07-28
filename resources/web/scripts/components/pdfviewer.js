@@ -75,7 +75,7 @@ class PdfViewer extends HTMLElement {
     async load(url) {
 		const loadPdfScripts = async () => new Promise(res => {
             const script = document.createElement('script')
-            script.src = '//mozilla.github.io/pdf.js/build/pdf.js'
+            script.src = 'https://mozilla.github.io/pdf.js/build/pdf.js'
             script.onload = () => res()
             //scriptTag.onreadystatechange = () => this.run(pdfUrl)
             document.body.appendChild(script)
@@ -84,7 +84,7 @@ class PdfViewer extends HTMLElement {
 		if (!this.pdfjsLib) {
 			await loadPdfScripts()
 			this.pdfjsLib = window['pdfjs-dist/build/pdf']
-			this.pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js'
+			this.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js'
 		}
 
 		this.run(url)			
