@@ -233,8 +233,8 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-
 // TODO Exif with events
+// TODO Delete items
 
 // TODO Rename
 // TODO CreateFolder
@@ -250,9 +250,4 @@ customElements.define('folder-table', Folder)
 
 // TODO Status line (# files, # selected files), root
 // TODO Status Linux: styling
-// TODO Windows: Status 
-// TODO Windows: ShowHidden
-// TODO Windows: \\unc instead of c:\
-// TODO Windows: sort version
-// TODO Windows: size: margin right
 

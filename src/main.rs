@@ -1,5 +1,4 @@
 mod gtk_async;
-mod warp;
 
 use core::fmt;
 use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
@@ -16,7 +15,6 @@ use gtk::{
 };
 use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
-use tokio::runtime::Runtime;
 use webkit2gtk::{WebView, traits::{SecurityManagerExt, URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
 use crate::gtk_async::GtkFuture;
@@ -33,8 +31,7 @@ struct GetItems {
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), Default::default());
-    let rt = Runtime::new().unwrap();
-    application.connect_activate(move|app| {
+    application.connect_activate(|app| {
         let resources_bytes = include_bytes!("../resources/resources.gresource");
         let resource_data = glib::Bytes::from(&resources_bytes[..]);
         let res = Resource::from_data(&resource_data).unwrap();
@@ -65,9 +62,9 @@ fn main() {
         webview.connect_context_menu(|_, _, _, _| true );
 
         let initial_state = "".to_variant();
-        let action = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
+        let action_themes = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
         let webview_clone = webview.clone();
-        action.connect_change_state(move |a, s| {
+        action_themes.connect_change_state(move |a, s| {
             match s {
             Some(val) => {
                 a.set_state(val);
@@ -80,7 +77,7 @@ fn main() {
             None => println!("Could not set theme")
         }
         });
-        app.add_action(&action);
+        app.add_action(&action_themes);
 
         let initial_bool_state = false.to_variant();
         let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
@@ -107,7 +104,7 @@ fn main() {
         connect_msg_callback(&webview, move|cmd: &str, payload: &str|{ 
             match cmd {
                 "title" => headerbar.set_subtitle(Some(payload)),
-                "theme" => action.set_state(&payload.to_variant()),
+                "theme" => action_themes.set_state(&payload.to_variant()),
                 _ => {}
             }
         }, move |cmd, id, param| {
@@ -223,7 +220,6 @@ fn main() {
             false
         });        
 
-        warp::start(&rt);
         window.set_application(Some(app));
         window.show_all();
     });

@@ -1,26 +1,3 @@
-use serde::{Serialize, Deserialize};
-use tokio::{runtime::Runtime, task};
-use warp::{Filter, fs::dir};
-use warp_range::{filter_range, with_partial_content_status};
-use webview_app::{app::{AppState, WarpInitData}, headers::add_headers};
-use crate::{eventsink::{
-        EventSinks, on_eventsink, with_events
-    }, linux::requests, requests::{MsgType, get_video, get_video_range, get_view, retrieve_extended_items}};
-use crate::{requests::{get_directory_items, get_icon}};
-
-#[cfg(target_os = "linux")]
-use crate::linux::requests::get_root_items;
-#[cfg(target_os = "windows")]
-use crate::windows::requests::get_root_items;
-
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteItems {
-    pub id: String,
-    pub path: String,
-    pub files: Vec<String>
-}
 
 
         let route_get_items = 
