@@ -1,23 +1,25 @@
+mod gtk_async;
+
 use core::fmt;
-use std::{cell::RefCell, fs, iter::Take, pin::Pin, sync::{Arc, Mutex}, task::{Context, Poll, Waker}, thread, time::{Duration, UNIX_EPOCH}};
+use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
 
 use async_process::Command;
 use gio::{
-    MemoryInputStream, Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{
+    Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{
         ActionMapExt, ApplicationExt, SettingsExt
     }
 };
-use glib::{Continue, MainContext, PRIORITY_DEFAULT, ToVariant};
+use glib::{MainContext, ToVariant};
 use gtk::{
     Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
         BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt
     }
 };
 use lexical_sort::natural_lexical_cmp;
-use urlencoding::decode;
 use serde::{Serialize, Deserialize};
-use webkit2gtk::{URISchemeRequest, WebView, traits::{URISchemeRequestExt, WebContextExt, SecurityManagerExt, WebInspectorExt, WebViewExt}};
-use async_std::{prelude::*};
+use webkit2gtk::{WebView, traits::{URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
+
+use crate::gtk_async::GtkFuture;
 
 #[derive(Debug)]
 #[derive(Deserialize)]
@@ -101,13 +103,9 @@ fn main() {
                     "getItems" => {
                         let params: GetItems = serde_json::from_str(&param).unwrap();
                         let erg = GtkFuture::new(move || {
-                            let result = get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap();
-                            serde_json::to_string(&result).expect("msg")
+                            get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap()
                         }).await;
-                        send_request_str(&webview_clone, &id, &erg);
-//                        thread::spawn(move || {
-  //                          let result = get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap();
-    //                        sender.send((id, result)).expect("Could not send through channel");
+                        send_request_result(&webview_clone, &id, &erg);
                     },
                     _ => {}
                 }
@@ -151,11 +149,6 @@ fn main() {
                 p if p.ends_with("css") => Some("text/css".to_string()),
                 _ => None
             }
-        }
-
-        fn get_param<'a,T>(param: &'a str)->T 
-            where T: Deserialize<'a> {
-            serde_qs::from_str(param).unwrap()
         }
 
         context.register_uri_scheme("provide", move |request|{
@@ -254,11 +247,6 @@ fn send_request_result<T>(webview: &WebView, id: &str, result: T)
 where T: Serialize {
     let json = serde_json::to_string(&result).expect("msg");
     webview.run_javascript(&format!("requestResult({}, {})", id, json),
-    Some(&gio::Cancellable::new()),|_|{});
-}
-
-fn send_request_str(webview: &WebView, id: &str, result: &str) {
-    webview.run_javascript(&format!("requestResult({}, {})", id, result),
     Some(&gio::Cancellable::new()),|_|{});
 }
 
@@ -398,15 +386,6 @@ pub fn get_directory_items(path: &str, id: &str, suppress_hidden: bool)->Result<
     })
 }
 
-
-fn send_response<T>(request: &URISchemeRequest, val: &T) 
-where T: Serialize {
-    let json = serde_json::to_string(val).unwrap();
-    let gbytes = glib:: Bytes::from_owned(json);
-    let stream = MemoryInputStream::from_bytes(&gbytes);
-    request.finish(&stream, gbytes.len() as i64, Some("application/json"));
-}
-
 #[derive(Debug)]
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -494,76 +473,6 @@ fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
     }} else { |e| Some(e) }
 }
 
-pub struct GtkFuture<T> {
-    shared_state: Arc<Mutex<SharedState<T>>>,
-}
-
-struct SharedState<T> {
-    /// Whether or not the sleep time has elapsed
-    completed: bool,
-    erg: Option<T>,
-
-    /// The waker for the task that `TimerFuture` is running on.
-    /// The thread can use this after setting `completed = true` to tell
-    /// `TimerFuture`'s task to wake up, see that `completed = true`, and
-    /// move forward.
-    waker: Option<Waker>,
-}
-
-impl<T: Clone + Send + 'static> Future for GtkFuture<T> {
-    type Output = T;
-    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        // Look at the shared state to see if the timer has already completed.
-        let mut shared_state = self.shared_state.lock().unwrap();
-        if shared_state.completed {
-            // TODO Dont copy value, use Arc<Mutex>
-            Poll::Ready(shared_state.erg.clone().expect("msg"))
-        } else {
-            // Set waker so that the thread can wake up the current task
-            // when the timer has completed, ensuring that the future is polled
-            // again and sees that `completed = true`.
-            //
-            // It's tempting to do this once rather than repeatedly cloning
-            // the waker each time. However, the `TimerFuture` can move between
-            // tasks on the executor, which could cause a stale waker pointing
-            // to the wrong task, preventing `TimerFuture` from waking up
-            // correctly.
-            //
-            // N.B. it's possible to check for this using the `Waker::will_wake`
-            // function, but we omit that here to keep things simple.
-            shared_state.waker = Some(cx.waker().clone());
-            Poll::Pending
-        }
-    }
-}
-
-impl<T: Send + 'static> GtkFuture<T> {
-    /// Create a new `TimerFuture` which will complete after the provided
-    /// timeout.
-    pub fn new<R: FnOnce()->T + Send + 'static>(on_request: R) -> Self {
-        let shared_state = Arc::new(Mutex::new(SharedState {
-            completed: false,
-            erg: None,
-            waker: None,
-        }));
-
-        // Spawn the new thread
-        let thread_shared_state = shared_state.clone();
-        thread::spawn(move || {
-            let erg = on_request();
-            let mut shared_state = thread_shared_state.lock().unwrap();
-            // Signal that the timer has completed and wake up the last
-            // task on which the future was polled, if one exists.
-            shared_state.completed = true;
-            shared_state.erg = Some(erg);
-            if let Some(waker) = shared_state.waker.take() {
-                waker.wake()
-            }
-        });
-
-        GtkFuture { shared_state }
-    }
-}
 
 //     let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
 //     let webview_clone = data.webview.clone();
