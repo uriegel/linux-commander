@@ -81,6 +81,27 @@ fn main() {
         });
         app.add_action(&action);
 
+        let initial_bool_state = false.to_variant();
+        let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
+        let webview_clone = webview.clone();
+        action.connect_change_state(move |a, s| {
+            match s {
+                Some(val) => {
+                    a.set_state(val);
+                    match val.get::<bool>(){
+                        Some(show_hidden) => webview_clone.run_javascript(
+                            &format!("showHidden({})", show_hidden),
+                            Some(&gio::Cancellable::new()),
+                            |_|{}),
+                        None => println!("Could not set ShowHidden, could not extract from variant")
+                    }
+                },
+                None => println!("Could not set action")
+            }
+        });
+        app.add_action(&action);
+        app.set_accels_for_action("app.showhidden", &["<Ctrl>H"]);
+
         let webview_clone = webview.clone();
         connect_msg_callback(&webview, move|cmd: &str, payload: &str|{ 
             match cmd {
@@ -337,7 +358,7 @@ async fn get_root_items()-> Result<Vec<RootItem>, Error> {
     }
 }
 
-pub fn get_directory_items(path: &str, id: &str, suppress_hidden: bool)->Result<DirectoryItems, Error> {
+pub fn get_directory_items(path: &str, _id: &str, suppress_hidden: bool)->Result<DirectoryItems, Error> {
     let entries = fs::read_dir(path)?;
 //    event_sinks.set_request(id, true);
     let (dirs, files): (Vec<_>, Vec<_>) = entries
@@ -474,25 +495,6 @@ fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
 }
 
 
-//     let action = SimpleAction::new_stateful("showhidden", None, &initial_bool_state);
-//     let webview_clone = data.webview.clone();
-//     action.connect_change_state(move |a, s| {
-//         match s {
-//             Some(val) => {
-//                 a.set_state(val);
-//                 match val.get::<bool>(){
-//                     Some(show_hidden) => webview_clone.run_javascript(
-//                         &format!("showHidden({})", show_hidden),
-//                         Some(&gio::Cancellable::new()),
-//                         |_|{}),
-//                     None => println!("Could not set ShowHidden, could not extract from variant")
-//                 }
-//             },
-//             None => println!("Could not set action")
-//         }
-//     });
-//     data.application.add_action(&action);
-//     data.application.set_accels_for_action("app.showhidden", &["<Ctrl>H"]);
 
 
 
