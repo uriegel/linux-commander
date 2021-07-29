@@ -4,6 +4,10 @@ function initializeCallbacks(onTheme, onShowHidden, onShowViewer) {
     onShowViewerCallback = onShowViewer
 }
 
+function initializeFolderEvents(folderId, onEvent) {
+    eventSinks.set(folderId, onEvent)
+}
+
 function initializeRequestsCallback(onRequest) {
     onRequestCallback = onRequest
 }
@@ -44,13 +48,18 @@ function showViewer(show) {
         onShowViewerCallback(show)
 }
 
+function onExifitems(folderId, exif_items) {
+    let onEvent = eventSinks.get(folderId)
+    onEvent(exif_items)
+}
+
 const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn(acc), args);
 
 var onThemeCallback
 var onShowHiddenCallback
 var onShowViewerCallback
 var onRequestCallback
-
+var eventSinks = new Map()
 
 
 

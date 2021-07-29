@@ -18,9 +18,8 @@ class Folder extends HTMLElement {
         this.pathInput = this.getElementsByTagName("INPUT")[0]
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
         const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
-        // const events = new WebSocket(`ws://localhost:${location.port}/events/${this.folderId}`)
+        initializeFolderEvents(this.folderId, msg => setTimeout(() => this.onEvent(msg))) 
         this.changePath(lastPath)
-        // events.onmessage = msg => setTimeout(() => this.onEvent(msg.data))
     }
 
     get id() { return this.folderId}
@@ -208,10 +207,9 @@ class Folder extends HTMLElement {
         }
     }
 
-    onEvent(data) {
-        const msg = JSON.parse(data)
+    onEvent(msg) {
         switch (msg.msgType) {
-            case "ExtendedItem":
+            case "ExifItem":
                 if (this.processor.onEvent(this.table.items, msg.items))
                     this.table.refresh()
                 break
@@ -233,8 +231,8 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Exif with events: send event to js
-// TODO Exif with events: cancellelation
+// TODO Exif with events: check folders latest requestId: update exifs only if it matches 
+// TODO Exif with events: cancellation
 // TODO Delete items
 
 // TODO Rename

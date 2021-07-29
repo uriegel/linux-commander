@@ -1,7 +1,7 @@
 mod gtk_async;
 
 use core::fmt;
-use std::{cell::RefCell, fs, iter::Take, thread::sleep, time::{Duration, UNIX_EPOCH}};
+use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
 
 use async_process::Command;
 use chrono::{Local, NaiveDateTime, TimeZone};
@@ -63,7 +63,6 @@ fn main() {
         let webview: WebView = builder.object("webview").expect("Couldn't get webview");
         let headerbar: HeaderBar = builder.object("headerbar").unwrap();
         webview.connect_context_menu(|_, _, _, _| true );
-        let webview_clone = webview.clone();
         let initial_state = "".to_variant();
         let action_themes = SimpleAction::new_stateful("themes", Some(&initial_state.type_()), &initial_state);
         let webview_clone = webview.clone();
@@ -72,8 +71,7 @@ fn main() {
             Some(val) => {
                 a.set_state(val);
                 match val.str(){
-                    Some(theme) => 
-                    webview_clone.run_javascript(&format!("setTheme('{}')", theme), Some(&gio::Cancellable::new()), |_|{}),
+                    Some(theme) => set_theme(&webview_clone, theme),
                     None => println!("Could not set theme, could not extract from variant")
                 }
             },
@@ -90,10 +88,7 @@ fn main() {
                 Some(val) => {
                     a.set_state(val);
                     match val.get::<bool>(){
-                        Some(show_hidden) => webview_clone.run_javascript(
-                            &format!("showHidden({})", show_hidden),
-                            Some(&gio::Cancellable::new()),
-                            |_|{}),
+                        Some(show) => show_hidden(&webview_clone, show),
                         None => println!("Could not set ShowHidden, could not extract from variant")
                     }
                 },
@@ -116,7 +111,6 @@ fn main() {
             let param = param.to_string();
             let id = id.to_string();
             let webview_clone = webview_clone.clone();
-            let webview_clone2 = webview_clone.clone();
             main_context.spawn_local(async move {
                 match cmd.as_str() {
                     "getRoot" => {
@@ -132,15 +126,14 @@ fn main() {
                         }).await;
                         send_request_result(&webview_clone, &id, &items);
                         
-                        let extended_items = GtkFuture::new(move || {
-                            retrieve_extended_items(folder_id, path, &items)
+                        let folder_id = folder_id.clone();
+                        let folder_id_clone = folder_id.clone();
+                        let exif_items = GtkFuture::new(move || {
+                            retrieve_exif_items(&folder_id, path, &items)
                         }).await;
-                        if let Some(extended_items) = extended_items {
-                            let extended_items_msg = ExtendedItems{ items: extended_items, msg_type: MsgType::ExtendedItem };
-                            let json = serde_json::to_string(&extended_items_msg).unwrap();
-                            println!("EXIF: {}", json);
-                            //webview_clone2.run_javascript(&format!("setTheme('{}')", "theme"), Some(&gio::Cancellable::new()), |_|{});
-                            //event_sinks.send(id, json);
+                        if let Some(exif_items) = exif_items {
+                            let exif_items = ExifItems{ items: exif_items, msg_type: MsgType::ExifItem };
+                            send_exifs(&webview_clone, &folder_id_clone, &exif_items);
                         }
                     },
                     _ => {}
@@ -503,7 +496,7 @@ fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
     }} else { |e| Some(e) }
 }
 
-pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems)->Option<Vec<ExtendedItem>> {
+pub fn retrieve_exif_items(id: &str, path: String, items: &DirectoryItems)->Option<Vec<ExifItem>> {
     let index_pos = items.dirs.len() + 1;
     let files: Vec<(usize, FileItem)> = items.files
         .iter()
@@ -511,7 +504,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems)
         .map(| (index, n)| (index, FileItem{name: n.name.clone(), is_hidden: n.is_hidden, size: n.size, time: n.time}))
         .filter(|(_, n)| {
             let ext = n.name.to_lowercase();
-            check_extended_items(&ext)            
+            check_exif_items(&ext)            
         })
         .collect();
 
@@ -522,7 +515,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems)
     }
 
     if files.len() > 0 {
-        let extended_items: Vec<ExtendedItem> = files.iter().filter_map(|(index, n)| {
+        let exif_items: Vec<ExifItem> = files.iter().filter_map(|(index, n)| {
             let filename = format!("{}/{}", path, n.name);
 
             let ext = n.name.to_lowercase();
@@ -544,7 +537,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems)
                         } 
                     };
                     match exiftime {
-                        Some(exiftime) => Some(ExtendedItem::new(index + index_pos, get_unix_time(&exiftime))),
+                        Some(exiftime) => Some(ExifItem::new(index + index_pos, get_unix_time(&exiftime))),
                         None => None
                     }
                 }) 
@@ -552,7 +545,7 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems)
                 None
             }
         }).collect();
-        if extended_items.len() > 0 { Some(extended_items) } else { None }
+        if exif_items.len() > 0 { Some(exif_items) } else { None }
     } else {
         None
     }
@@ -562,36 +555,52 @@ pub fn retrieve_extended_items(id: String, path: String, items: &DirectoryItems)
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ExtendedItems {
+pub struct ExifItems {
     msg_type: MsgType,
-    items: Vec<ExtendedItem>
+    items: Vec<ExifItem>
 }
 
 
 #[derive(Serialize)]
-pub struct ExtendedItem {
+pub struct ExifItem {
     index: usize,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     exiftime: Option<i64>
 }
 
-impl ExtendedItem {
+impl ExifItem {
     pub fn new(index: usize, exiftime: i64) -> Self {
-        ExtendedItem {
+        ExifItem {
             index, 
             exiftime: Some(exiftime)
         }
     }
 }
 
-pub fn check_extended_items(ext: &str)->bool {
+pub fn check_exif_items(ext: &str)->bool {
     ext.ends_with(".png") 
     || ext.ends_with(".jpg")
 }
 
 #[derive(Serialize)]
 pub enum MsgType {
-    ExtendedItem,
+    ExifItem,
     Refresh
+}
+
+fn set_theme(webview: &WebView, theme: &str) {
+    send_msg(webview, &format!("setTheme('{}')", theme));   
+}
+
+fn show_hidden(webview: &WebView, show: bool) {
+    send_msg(webview, &format!("showHidden({})", show));   
+}
+
+fn send_msg(webview: &WebView, msg: &str) {
+    webview.run_javascript(msg, Some(&gio::Cancellable::new()), |_|{});   
+}
+
+fn send_exifs(webview: &WebView, folder_id: &str, exif_items: &ExifItems) {
+    send_msg(webview, &format!("onExifitems('{}', {})", folder_id, serde_json::to_string(&exif_items).unwrap()));   
 }

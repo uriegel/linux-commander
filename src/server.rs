@@ -15,7 +15,7 @@
 async fn get_items(param: GetItems, event_sinks: EventSinks)->Result<impl warp::Reply, warp::Rejection> {
     match get_directory_items(&param.path, &param.id, !param.hidden_included, event_sinks.clone()) {
         Ok(items ) => {
-            retrieve_extended_items(param.id, param.path, &items, event_sinks);
+            retrieve_exif_items(param.id, param.path, &items, event_sinks);
             Ok (warp::reply::json(&items))
         },
         Err(err) => {

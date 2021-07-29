@@ -13,7 +13,7 @@ use webkit2gtk::WebView;
 
 #[derive(Serialize)]
 pub enum MsgType {
-    ExtendedItem,
+    ExifItem,
     Refresh
 }
 
