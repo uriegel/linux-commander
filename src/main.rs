@@ -1,5 +1,5 @@
 mod gtk_async;
-//mod progress;
+mod progress;
 mod requests;
 
 use core::fmt;
@@ -8,8 +8,8 @@ use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
 use async_process::Command;
 use chrono::{Local, NaiveDateTime, TimeZone};
 use exif::{In, Tag};
-use gio::{Cancellable, File, MemoryInputStream, Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, FileExt, SettingsExt}};
-use glib::{Bytes, MainContext, PRIORITY_DEFAULT, Priority, ToVariant};
+use gio::{File, MemoryInputStream, Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, FileExt, SettingsExt}};
+use glib::{Bytes, MainContext, PRIORITY_DEFAULT, Sender, ToVariant};
 use gtk::{
     Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
         BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt
@@ -19,7 +19,7 @@ use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
 use webkit2gtk::{WebView, traits::{SecurityManagerExt, URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
-use crate::{gtk_async::GtkFuture, requests::Requests};
+use crate::{gtk_async::GtkFuture, progress::Progress, requests::Requests};
 
 #[derive(Debug)]
 #[derive(Deserialize)]
@@ -62,6 +62,7 @@ fn main() {
 
         let builder = Builder::from_resource("/de/uriegel/commander/main_window.glade");
         let window: ApplicationWindow = builder.object("window").expect("Couldn't get window");
+        let progress = Progress::new(&builder);
 
         let settings = Settings::new("de.uriegel.commander");
         let width = settings.int("window-width");
@@ -123,7 +124,9 @@ fn main() {
             let param = param.to_string();
             let id = id.to_string();
             let webview_clone = webview_clone.clone();
+            let webview_clone2 = webview_clone.clone();
             let requests_clone = requests.clone();
+            let progress = progress.clone();
             main_context.spawn_local(async move {
                 match cmd.as_str() {
                     "getRoot" => {
@@ -136,23 +139,24 @@ fn main() {
                         let reqid = requests_clone.register_request(&folder_id).expect("Could not get req id");
                         let path = params.path.clone();
                         let items = GtkFuture::new(move || {
-                            get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap()
+                            get_directory_items(&params.path, !params.hidden_included).unwrap()
                         }).await;
                         send_request_result(&webview_clone, &id, &items);
                         
-                        let folder_id = folder_id.clone();
-                        let folder_id_clone = folder_id.clone();
+                        let folder_id_clone = folder_id;
+                        let folder_id_clone2 = folder_id_clone.clone();
                         let exif_items = GtkFuture::new(move || {
-                            retrieve_exif_items(&folder_id, reqid, path, &items, &requests_clone)
+                            retrieve_exif_items(&folder_id_clone, reqid, path, &items, &requests_clone)
                         }).await;
                         if let Some(exif_items) = exif_items {
                             let exif_items = ExifItems{ items: exif_items, msg_type: MsgType::ExifItem };
-                            send_exifs(&webview_clone, &folder_id_clone, &exif_items);
+                            send_exifs(&webview_clone, &folder_id_clone2, &exif_items);
                         }
                     },
                     "deleteItems" => {
                         let params: DeleteItems = serde_json::from_str(&param).unwrap();
                         println!("DELETE {:?}", params);
+                        let folder_id = params.folder_id.clone();
 
                         let files_to_delete: Vec<String> = params.items_to_delete.iter().map(|file|{
                             params.path.clone() + if params.path.ends_with("/") { "" } else { "/" } + file
@@ -161,9 +165,11 @@ fn main() {
                         let count = files_to_delete.len();
                         for (pos, filepath) in files_to_delete.iter().enumerate() {
                             let file = File::for_path(filepath);
-                            let result = file.trash_async_future(PRIORITY_DEFAULT).await;
-//                            send_progress(&state, count, pos + 1);
+                            // TODO:
+                            let _result = file.trash_async_future(PRIORITY_DEFAULT).await;
+                            send_progress(&progress.sender, count, pos + 1);
                         }
+                        refresh_folder(&webview_clone2, &folder_id);
                     }
                     _ => {}
                 }
@@ -392,7 +398,7 @@ async fn get_root_items()-> Result<Vec<RootItem>, Error> {
     }
 }
 
-pub fn get_directory_items(path: &str, id: &str, suppress_hidden: bool)->Result<DirectoryItems, Error> {
+pub fn get_directory_items(path: &str, suppress_hidden: bool)->Result<DirectoryItems, Error> {
     let entries = fs::read_dir(path)?;
     let (dirs, files): (Vec<_>, Vec<_>) = entries
         .filter_map(|entry| {
@@ -636,4 +642,12 @@ fn send_msg(webview: &WebView, msg: &str) {
 
 fn send_exifs(webview: &WebView, folder_id: &str, exif_items: &ExifItems) {
     send_msg(webview, &format!("onExifitems('{}', {})", folder_id, serde_json::to_string(&exif_items).unwrap()));   
+}
+
+fn refresh_folder(webview: &WebView, folder_id: &str) {
+    send_msg(webview, &format!("refreshFolder('{}')", folder_id));   
+}
+
+fn send_progress(sender: &Sender<f32>, count: usize, val: usize) {
+    sender.send(val as f32/ count as f32).ok();
 }

@@ -231,8 +231,6 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Delete items: refresh
-// TODO Delete items: show progress
 // TODO Clean up main
 
 // TODO Rename

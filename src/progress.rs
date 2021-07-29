@@ -5,22 +5,21 @@ use gtk::{Builder, DrawingArea, Inhibit, Revealer, cairo::{Antialias, Context, L
 
 #[derive(Clone)]
 pub struct Progress {
+    pub sender: Sender<f32>,
     revealer: Revealer,
     drawing_area: DrawingArea,
     progress: Rc<RefCell<u32>> // 1..1000
 }
 
 impl Progress {
-    pub fn new(builder: &Builder, state: &AppState)->Self {
+    pub fn new(builder: &Builder)->Self {
         let revealer: Revealer = builder.object("ProgressRevealer").unwrap();
         let drawing_area: DrawingArea = builder.object("ProgressArea").unwrap();
 
-        let (progress_sender, receiver): (Sender<f32>, Receiver<f32>) = MainContext::channel::<f32>(PRIORITY_DEFAULT_IDLE);
-        let mut val = state.lock().unwrap();
-        *val = Box::new(State{ progress_sender });
+        let (sender, receiver): (Sender<f32>, Receiver<f32>) = MainContext::channel::<f32>(PRIORITY_DEFAULT_IDLE);
     
         let drawing_area_clone = drawing_area.clone();
-        let progress = Progress { revealer, drawing_area, progress: Rc::new(RefCell::new(0)) };
+        let progress = Progress { revealer, drawing_area, progress: Rc::new(RefCell::new(0)), sender };
         progress.init_receiver(receiver);
         let progress_clone = progress.clone();
         drawing_area_clone.connect_draw(move|_, context| { progress_clone.draw(context) });

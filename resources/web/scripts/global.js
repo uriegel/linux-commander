@@ -53,6 +53,11 @@ function onExifitems(folderId, exif_items) {
     onEvent(exif_items)
 }
 
+function refreshFolder(folderId) {
+    let onEvent = eventSinks.get(folderId)
+    onEvent({msgType: "Refresh"})
+}
+
 const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn(acc), args);
 
 var onThemeCallback
