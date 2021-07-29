@@ -231,9 +231,9 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Exif with events: check folders latest requestId: update exifs only if it matches 
-// TODO Exif with events: cancellation
-// TODO Delete items
+// TODO Delete items: refresh
+// TODO Delete items: show progress
+// TODO Clean up main
 
 // TODO Rename
 // TODO CreateFolder
@@ -241,8 +241,6 @@ customElements.define('folder-table', Folder)
 // TODO Copy: progress control in status bar
 // TODO Move
 // TODO Copy with Copy Paste (from external or from internal)
-// TODO Windows: Viewer: are worker released when changing pdf?
-// TODO Windows: Hamburger Menu and context menu
 // TODO When a path is not available anymore: fallback to root
 // TODO ProgressControl: multiple progresses: show in ProgressBars in popovermenu, show latest in ProgressPie
 // TODO ProgressControl: On Error: Red X: Show Errors in List in popover

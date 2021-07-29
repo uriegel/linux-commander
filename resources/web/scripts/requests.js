@@ -10,6 +10,10 @@ export async function getItems(folderId, path, hiddenIncluded) {
     return request("getItems", { folderId, path, hiddenIncluded })
 }
 
+export async function deleteItems(folderId, path, itemsToDelete) {
+    return request("deleteItems", { folderId, path, itemsToDelete })
+}
+
 async function request(method, param) {
     return new Promise((res, rej) => {
         let id = ++requestIdFactory

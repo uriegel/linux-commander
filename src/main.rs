@@ -1,4 +1,6 @@
 mod gtk_async;
+//mod progress;
+mod requests;
 
 use core::fmt;
 use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
@@ -6,11 +8,8 @@ use std::{cell::RefCell, fs, iter::Take, time::UNIX_EPOCH};
 use async_process::Command;
 use chrono::{Local, NaiveDateTime, TimeZone};
 use exif::{In, Tag};
-use gio::{MemoryInputStream, Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{
-        ActionMapExt, ApplicationExt, SettingsExt
-    }
-};
-use glib::{Bytes, MainContext, ToVariant};
+use gio::{Cancellable, File, MemoryInputStream, Resource, ResourceLookupFlags, Settings, SimpleAction, prelude::ApplicationExtManual, resources_register, traits::{ActionMapExt, ApplicationExt, FileExt, SettingsExt}};
+use glib::{Bytes, MainContext, PRIORITY_DEFAULT, Priority, ToVariant};
 use gtk::{
     Application, ApplicationWindow, Builder, HeaderBar, STYLE_PROVIDER_PRIORITY_APPLICATION, StyleContext, gdk::Screen, prelude::{
         BuilderExtManual, CssProviderExt, GtkApplicationExt, GtkWindowExt, HeaderBarExt, WidgetExt
@@ -20,7 +19,7 @@ use lexical_sort::natural_lexical_cmp;
 use serde::{Serialize, Deserialize};
 use webkit2gtk::{WebView, traits::{SecurityManagerExt, URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
-use crate::{gtk_async::GtkFuture};
+use crate::{gtk_async::GtkFuture, requests::Requests};
 
 #[derive(Debug)]
 #[derive(Deserialize)]
@@ -30,6 +29,15 @@ struct GetItems {
     path: String,
     #[serde(default)]
     hidden_included: bool
+}
+
+#[derive(Debug)]
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DeleteItems {
+    folder_id: String,
+    path: String,
+    items_to_delete: Vec<String>
 }
 
 fn main() {
@@ -47,6 +55,10 @@ fn main() {
             &provider,
             STYLE_PROVIDER_PRIORITY_APPLICATION,
         );        
+
+        let requests = Requests::new();
+        requests.insert("folderLeft".to_string());
+        requests.insert("folderRight".to_string());
 
         let builder = Builder::from_resource("/de/uriegel/commander/main_window.glade");
         let window: ApplicationWindow = builder.object("window").expect("Couldn't get window");
@@ -111,6 +123,7 @@ fn main() {
             let param = param.to_string();
             let id = id.to_string();
             let webview_clone = webview_clone.clone();
+            let requests_clone = requests.clone();
             main_context.spawn_local(async move {
                 match cmd.as_str() {
                     "getRoot" => {
@@ -120,6 +133,7 @@ fn main() {
                     "getItems" => {
                         let params: GetItems = serde_json::from_str(&param).unwrap();
                         let folder_id = params.folder_id.clone();
+                        let reqid = requests_clone.register_request(&folder_id).expect("Could not get req id");
                         let path = params.path.clone();
                         let items = GtkFuture::new(move || {
                             get_directory_items(&params.path, &params.folder_id, !params.hidden_included).unwrap()
@@ -129,13 +143,28 @@ fn main() {
                         let folder_id = folder_id.clone();
                         let folder_id_clone = folder_id.clone();
                         let exif_items = GtkFuture::new(move || {
-                            retrieve_exif_items(&folder_id, path, &items)
+                            retrieve_exif_items(&folder_id, reqid, path, &items, &requests_clone)
                         }).await;
                         if let Some(exif_items) = exif_items {
                             let exif_items = ExifItems{ items: exif_items, msg_type: MsgType::ExifItem };
                             send_exifs(&webview_clone, &folder_id_clone, &exif_items);
                         }
                     },
+                    "deleteItems" => {
+                        let params: DeleteItems = serde_json::from_str(&param).unwrap();
+                        println!("DELETE {:?}", params);
+
+                        let files_to_delete: Vec<String> = params.items_to_delete.iter().map(|file|{
+                            params.path.clone() + if params.path.ends_with("/") { "" } else { "/" } + file
+                        }).collect();
+    
+                        let count = files_to_delete.len();
+                        for (pos, filepath) in files_to_delete.iter().enumerate() {
+                            let file = File::for_path(filepath);
+                            let result = file.trash_async_future(PRIORITY_DEFAULT).await;
+//                            send_progress(&state, count, pos + 1);
+                        }
+                    }
                     _ => {}
                 }
             });
@@ -496,7 +525,7 @@ fn get_supress_hidden(supress: bool) -> fn (FileType)->Option<FileType> {
     }} else { |e| Some(e) }
 }
 
-pub fn retrieve_exif_items(id: &str, path: String, items: &DirectoryItems)->Option<Vec<ExifItem>> {
+pub fn retrieve_exif_items(folder_id: &str, reqid: usize, path: String, items: &DirectoryItems, requests: &Requests)->Option<Vec<ExifItem>> {
     let index_pos = items.dirs.len() + 1;
     let files: Vec<(usize, FileItem)> = items.files
         .iter()
@@ -516,36 +545,40 @@ pub fn retrieve_exif_items(id: &str, path: String, items: &DirectoryItems)->Opti
 
     if files.len() > 0 {
         let exif_items: Vec<ExifItem> = files.iter().filter_map(|(index, n)| {
-            let filename = format!("{}/{}", path, n.name);
+            if requests.is_request_active(folder_id, reqid) {
+                let filename = format!("{}/{}", path, n.name);
 
-            let ext = n.name.to_lowercase();
-            if ext.ends_with(".png") || ext.ends_with(".jpg") {
-                let file = std::fs::File::open(filename).unwrap();
-                let mut bufreader = std::io::BufReader::new(&file);
-                let exifreader = exif::Reader::new();
-
-                // if event_sinks.active_requests() {
-                //     sleep(Duration::from_millis(500));
-                // }
-                    
-                exifreader.read_from_container(&mut bufreader).ok().and_then(|exif|{
-                    let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
-                        Some(info) => Some(info.display_value().to_string()),
-                        None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+                let ext = n.name.to_lowercase();
+                if ext.ends_with(".png") || ext.ends_with(".jpg") {
+                    let file = std::fs::File::open(filename).unwrap();
+                    let mut bufreader = std::io::BufReader::new(&file);
+                    let exifreader = exif::Reader::new();
+                        
+                    exifreader.read_from_container(&mut bufreader).ok().and_then(|exif|{
+                        let exiftime = match exif.get_field(Tag::DateTimeOriginal, In::PRIMARY) {
                             Some(info) => Some(info.display_value().to_string()),
+                            None => match exif.get_field(Tag::DateTime, In::PRIMARY) {
+                                Some(info) => Some(info.display_value().to_string()),
+                                None => None
+                            } 
+                        };
+                        match exiftime {
+                            Some(exiftime) => Some(ExifItem::new(index + index_pos, get_unix_time(&exiftime))),
                             None => None
-                        } 
-                    };
-                    match exiftime {
-                        Some(exiftime) => Some(ExifItem::new(index + index_pos, get_unix_time(&exiftime))),
-                        None => None
-                    }
-                }) 
+                        }
+                    }) 
+                } else {
+                    None
+                }
             } else {
-                None
+                    None
             }
         }).collect();
-        if exif_items.len() > 0 { Some(exif_items) } else { None }
+        if exif_items.len() > 0 && requests.is_request_active(folder_id, reqid) { 
+            Some(exif_items) 
+        } else { 
+            None
+        } 
     } else {
         None
     }

@@ -2,9 +2,6 @@ use std::{cell::RefCell, cmp::{max, min}, f64::consts::PI, rc::Rc};
 
 use gio::{glib::{MainContext, PRIORITY_DEFAULT_IDLE, Receiver, Sender, timeout_future_seconds}, prelude::*};
 use gtk::{Builder, DrawingArea, Inhibit, Revealer, cairo::{Antialias, Context, LineCap, LineJoin}, prelude::{BuilderExtManual, RevealerExt, WidgetExt}};
-use webview_app::app::AppState;
-
-use super::requests::State;
 
 #[derive(Clone)]
 pub struct Progress {
