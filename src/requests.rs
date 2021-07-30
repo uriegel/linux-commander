@@ -1,151 +1,16 @@
 use async_process::Command;
 use chrono::{Local, NaiveDateTime, TimeZone};
 use exif::{In, Tag};
-use glib::Sender;
 use lexical_sort::natural_lexical_cmp;
-use serde::{Serialize, Deserialize};
+use serde::Serialize; 
 use webkit2gtk::{WebView, traits::WebViewExt};
-use core::fmt;
-use std::{collections::HashMap, fs, iter::Take, sync::{Arc, Mutex, atomic::{AtomicUsize, Ordering}}, time::UNIX_EPOCH};
+use std::{fs, time::UNIX_EPOCH};
 
-#[derive(Clone)]
-pub struct Requests {
-    es: Arc<Mutex<HashMap<String, AtomicUsize>>>
-} 
-
-impl Requests {
-    pub fn new() -> Self {
-        Self { es: Arc::new(Mutex::new(HashMap::new())) }
+use crate::{
+    activerequests::ActiveRequests,  iteratorext::IteratorExt, requestdata::{
+        DirItem, DirectoryItems, Error, ExifItem, FileItem, FileType, RootItem
     }
-
-    pub fn insert(&self, id: String) {
-        self.es.lock().unwrap().insert(id, AtomicUsize::new(0));    
-    }
-
-    pub fn register_request(&self, id: &str) -> Option<usize> {
-        if let Some(request_id) = self.es.lock().unwrap().get(id) {
-            Some(request_id.fetch_add(1, Ordering::Relaxed) + 1)
-        } else {
-            None
-        }
-    }
-
-    pub fn is_request_active(&self, id: &str, request_id: usize) -> bool {
-        if let Some(recent_request_id) = self.es.lock().unwrap().get(id) {
-            recent_request_id.load(Ordering::Relaxed) == request_id
-        } else {
-            false
-        }
-    }
-}
-
-#[derive(Debug)]
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GetItems {
-    pub folder_id: String,
-    pub path: String,
-    #[serde(default)]
-    pub hidden_included: bool
-}
-
-#[derive(Debug)]
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RootItem {
-    pub name: String,
-    pub display: String,
-    pub mount_point: String,
-    pub capacity: u64,
-    pub file_system: String,
-}
-
-#[derive(Debug)]
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DirectoryItems {
-    pub files: Vec<FileItem>,
-    pub dirs: Vec<DirItem>
-}
-
-enum FileType {
-    Dir(DirItem),
-    File(FileItem)
-}
-
-#[derive(Debug)]
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FileItem {
-    name: String,
-    is_hidden: bool,
-    time: u128,
-    size: u64
-}
-
-#[derive(Debug)]
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DirItem {
-    name: String,
-    is_hidden: bool,
-    is_directory: bool
-}
-
-#[derive(Serialize)]
-pub enum MsgType {
-    ExifItem
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ExifItems {
-    pub msg_type: MsgType,
-    pub items: Vec<ExifItem>
-}
-
-#[derive(Debug)]
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteItems {
-    pub folder_id: String,
-    pub path: String,
-    pub items_to_delete: Vec<String>
-}
-
-#[derive(Serialize)]
-pub struct ExifItem {
-    index: usize,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    exiftime: Option<i64>
-}
-
-impl ExifItem {
-    pub fn new(index: usize, exiftime: i64) -> Self {
-        ExifItem {
-            index, 
-            exiftime: Some(exiftime)
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct Error {
-    pub message: String
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})", self.message)
-    }
-}
-
-impl From<std::io::Error> for Error {
-    fn from(error: std::io::Error) -> Self {
-        Error {message: format!("read_dir failed: {}", error)}
-    }
-}
+};
 
 pub async fn get_root_items()-> Result<Vec<RootItem>, Error> {
     let output = Command::new("lsblk")
@@ -280,7 +145,7 @@ pub fn get_directory_items(path: &str, suppress_hidden: bool)->Result<DirectoryI
     })
 }
 
-pub fn retrieve_exif_items(folder_id: &str, reqid: usize, path: String, items: &DirectoryItems, requests: &Requests)->Option<Vec<ExifItem>> {
+pub fn retrieve_exif_items(folder_id: &str, reqid: usize, path: String, items: &DirectoryItems, active_requests: &ActiveRequests)->Option<Vec<ExifItem>> {
     let index_pos = items.dirs.len() + 1;
     let files: Vec<(usize, FileItem)> = items.files
         .iter()
@@ -300,7 +165,7 @@ pub fn retrieve_exif_items(folder_id: &str, reqid: usize, path: String, items: &
 
     if files.len() > 0 {
         let exif_items: Vec<ExifItem> = files.iter().filter_map(|(index, n)| {
-            if requests.is_request_active(folder_id, reqid) {
+            if active_requests.is_request_active(folder_id, reqid) {
                 let filename = format!("{}/{}", path, n.name);
 
                 let ext = n.name.to_lowercase();
@@ -329,7 +194,7 @@ pub fn retrieve_exif_items(folder_id: &str, reqid: usize, path: String, items: &
                     None
             }
         }).collect();
-        if exif_items.len() > 0 && requests.is_request_active(folder_id, reqid) { 
+        if exif_items.len() > 0 && active_requests.is_request_active(folder_id, reqid) { 
             Some(exif_items) 
         } else { 
             None
@@ -344,30 +209,6 @@ where T: Serialize {
     let json = serde_json::to_string(&result).expect("msg");
     webview.run_javascript(&format!("requestResult({}, {})", id, json),
     Some(&gio::Cancellable::new()),|_|{});
-}
-
-pub fn set_theme(webview: &WebView, theme: &str) {
-    send_msg(webview, &format!("setTheme('{}')", theme));   
-}
-
-pub fn send_progress(sender: &Sender<f32>, count: usize, val: usize) {
-    sender.send(val as f32/ count as f32).ok();
-}
-
-pub fn refresh_folder(webview: &WebView, folder_id: &str) {
-    send_msg(webview, &format!("refreshFolder('{}')", folder_id));   
-}
-
-pub fn send_exifs(webview: &WebView, folder_id: &str, exif_items: &ExifItems) {
-    send_msg(webview, &format!("onExifitems('{}', {})", folder_id, serde_json::to_string(&exif_items).unwrap()));   
-}
-
-pub fn show_hidden(webview: &WebView, show: bool) {
-    send_msg(webview, &format!("showHidden({})", show));   
-}
-
-fn send_msg(webview: &WebView, msg: &str) {
-    webview.run_javascript(msg, Some(&gio::Cancellable::new()), |_|{});   
 }
 
 fn is_hidden(_: &str, name: &str)->bool {
@@ -387,17 +228,3 @@ fn check_exif_items(ext: &str)->bool {
     ext.ends_with(".png") 
     || ext.ends_with(".jpg")
 }
-
-trait IteratorExt: Iterator {
-
-    fn take_option(self, n: Option<usize>) -> Take<Self>
-        where
-            Self: Sized {
-        match n {
-            Some(n ) => self.take(n),
-            None => self.take(usize::MAX)
-        }
-    }
-}
-
-impl<I: Iterator> IteratorExt for I {}

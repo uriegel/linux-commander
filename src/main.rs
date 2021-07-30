@@ -1,5 +1,10 @@
+mod actions;
+mod activerequests;
 mod gtk_async;
+mod iteratorext;
+mod msgcallback;
 mod progress;
+mod requestdata;
 mod requests;
 
 use std::cell::RefCell;
@@ -17,12 +22,9 @@ use gtk::{
 };
 use webkit2gtk::{WebView, traits::{SecurityManagerExt, URISchemeRequestExt, WebContextExt, WebInspectorExt, WebViewExt}};
 
-use crate::{
-    gtk_async::GtkFuture, progress::Progress, requests::{
-        DeleteItems, ExifItems, GetItems, MsgType, Requests, get_directory_items, get_root_items, refresh_folder, retrieve_exif_items, 
-        send_exifs, send_progress, send_request_result, set_theme, show_hidden
-    }
-};
+use crate::{actions::{refresh_folder, send_exifs, send_progress, set_theme, show_hidden}, activerequests::ActiveRequests, gtk_async::GtkFuture, msgcallback::connect_msg_callback, progress::Progress, requestdata::{DeleteItems, ExifItems, GetItems, MsgType}, requests::{
+        get_directory_items, get_root_items, retrieve_exif_items, send_request_result
+    }};
 
 fn main() {
     let application = Application::new(Some("de.uriegel.commander"), Default::default());
@@ -40,9 +42,9 @@ fn main() {
             STYLE_PROVIDER_PRIORITY_APPLICATION,
         );        
 
-        let requests = Requests::new();
-        requests.insert("folderLeft".to_string());
-        requests.insert("folderRight".to_string());
+        let active_requests = ActiveRequests::new();
+        active_requests.insert("folderLeft".to_string());
+        active_requests.insert("folderRight".to_string());
 
         let builder = Builder::from_resource("/de/uriegel/commander/main_window.glade");
         let window: ApplicationWindow = builder.object("window").expect("Couldn't get window");
@@ -109,7 +111,7 @@ fn main() {
             let id = id.to_string();
             let webview_clone = webview_clone.clone();
             let webview_clone2 = webview_clone.clone();
-            let requests_clone = requests.clone();
+            let requests_clone = active_requests.clone();
             let progress = progress.clone();
             main_context.spawn_local(async move {
                 match cmd.as_str() {
@@ -254,37 +256,5 @@ fn main() {
     });
 
     application.run();
-}
-
-fn connect_msg_callback<F: Fn(&str, &str)->() + 'static, R: Fn(&str, &str, &str)->() + 'static>(webview: &WebView, on_msg: F, on_request: R) {
-    let webmsg = "!!webmsg!!";
-    let request = "!!request!!";
-
-    webview.connect_script_dialog(move|_, dialog | {
-        let str = dialog.get_message();
-        if str.starts_with(webmsg) {
-            let msg = &str[webmsg.len()..];
-            if let Some(pos) = msg.find("!!") {
-                let cmd = &msg[0..pos];
-                let payload = &msg[pos+2..];
-                on_msg(cmd, payload);
-            }
-        } else if str.starts_with(request) {
-            let msg = &str[request.len()..];
-            if let Some(pos) = msg.find("!!") {
-                let cmd = &msg[0..pos];
-                let part = &msg[pos+2..];
-                if let Some(pos) = part.find("!!") {
-                    let id = &part[0..pos];
-                    let param = &part[pos+2..];
-                    on_request(cmd, id, param);
-                } else {
-                    on_request(cmd, part, "{}");
-                }
-            }
-        }
-
-        true
-    });
 }
 

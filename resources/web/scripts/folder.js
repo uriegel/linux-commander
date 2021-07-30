@@ -231,6 +231,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO refactor control flow in requests (Errors)
 // TODO Rename
 // TODO CreateFolder
 // TODO Copy
