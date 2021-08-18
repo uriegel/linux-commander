@@ -1,5 +1,4 @@
 import { formatSize } from "./renderTools.js"
-import * as requests from "../requests.js"
 
 export const ROOT = "root"
 

@@ -1,9 +1,8 @@
 export const DIRECTORY = "directory"
 import { formatDateTime, formatSize, getExtension } from "./renderTools.js"
-import * as requests from "../requests.js"
 import { ROOT } from "./root.js"
 
-const pathDelimiter = "/"
+const pathDelimiter = isLinux() ? "/" : "\\"
 
 export const getDirectory = (folderId, path) => {
     const getType = () => DIRECTORY
@@ -62,7 +61,15 @@ export const getDirectory = (folderId, path) => {
                 td.innerHTML = formatSize(item.size)
                 td.classList.add("rightAligned")
             }
+        }, {
+            name: "Version",
+            isSortable: true,
+            render: (td, item) => {
+                td.innerHTML = item.version ? `${item.version.major}.${item.version.minor}.${item.version.patch}.${item.version.build}` : ""
+            }
         }]
+        if (isLinux())
+            columns = columns.filter(n => n.name != "Version")   
         if (widths)
             columns = columns.map((n, i)=> ({ ...n, width: widths[i]}))
         return columns
@@ -76,34 +83,50 @@ export const getDirectory = (folderId, path) => {
     const getParentDir = path => {
         let pos = path.lastIndexOf(pathDelimiter)
         let parent = pos ? path.substr(0, pos) : pathDelimiter
+        if (!isLinux() && parent.indexOf("\\") == -1)
+            parent += pathDelimiter
         return [parent, path.substr(pos + 1)]
     }
-
+    
     const getCurrentPath = () => currentPath
 
-    const parentIsRoot = () =>  currentPath == pathDelimiter
+    const parentIsRoot = () => {
+        if (isLinux()) {
+            return currentPath == pathDelimiter
+        } else 
+            return currentPath.endsWith(":\\")
+    }
     
     const getPath = item => item.isDirectory 
         ? item.name != ".."
             ? [
-                currentPath != "/" ? currentPath + pathDelimiter + item.name : currentPath + item.name,
-                null
-            ]
+                isLinux() 
+                ? currentPath != "/" ? currentPath + pathDelimiter + item.name : currentPath + item.name
+                : currentPath.endsWith(":\\")
+                    ? currentPath + item.name
+                    : currentPath + pathDelimiter + item.name, 
+                null]
             : parentIsRoot()  
                 ? [ROOT, null]
                 : getParentDir(currentPath)
         : [null, null]
 
     const getItems = async (id, path, hiddenIncluded) => {
-        let items = await requests.getItems(id, path, hiddenIncluded)
-        console.log("get items", items)
+        const responseStr = await fetch("/commander/getitems", { 
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },            
+            body: JSON.stringify({ id, path, hiddenIncluded }) 
+        })
+        const response = await responseStr.json()
         let result = [{
                 name: "..",
                 isDirectory: true,
                 isNotSelectable: true
             }]
-            .concat(items.dirs)
-            .concat(items.files)
+            .concat(response.dirs)
+            .concat(response.files)
         if (result && result.length)
             currentPath = path
         return result
