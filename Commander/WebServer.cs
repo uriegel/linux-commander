@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using GtkDotNet;
 using UwebServer;
 using UwebServer.Routes;
@@ -13,12 +12,24 @@ static class WebServer
     {
         var startTime = DateTime.Now;
         var routeWebSite = new WebSite(file => new ResourceStream($"/de/uriegel/commander/web/{file}"), _ => startTime);
+        var routeService = new JsonService("/commander", async input => 
+        {
+            switch (input.Path)
+            {
+                case "getitems":
+                    var getItems = input.RequestParam.Get<GetItems>();
+                    return new { Name = "Uwe Riegel", EMail = "uriegel@web.de" };
+                default:
+                    return new { Name = "Uwe Riegel", EMail = "uriegel@web.de" };
+            }
+        });
 
         server = new(new()
         {
             Port = 9865,
             Routes = new Route[]
             {
+                routeService,
                 routeWebSite
             }
         });
@@ -26,3 +37,5 @@ static class WebServer
 
     static readonly Server server;
 }
+
+record GetItems(string Id, string Path, bool HiddenIncluded);
