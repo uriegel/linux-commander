@@ -1,4 +1,5 @@
-﻿using GtkDotNet;
+﻿using System;
+using GtkDotNet;
 
 var app = new Application("de.uriegel.commander");
 WebServer.Start();
@@ -10,6 +11,13 @@ app.Run(() =>
     var window = new Window(builder.GetObject("window"));
     var headerBar = new HeaderBar(builder.GetObject("headerbar"));
     var webView = new WebView();
+
+    app.AddActions(new[] {
+        new GtkAction("destroy", () => app.Quit(), "<Ctrl>Q"), 
+        new GtkAction("showhidden", false, state => Console.WriteLine(state), "<Ctrl>H"),
+        new GtkAction("themes", "themeAdwaita", state => Console.WriteLine(state)),
+        new GtkAction("devtools", () => webView.Inspector.Show(), "F12"), 
+    });    
     window.Add(webView);
     webView.LoadUri($"http://localhost:9865");
     webView.Settings.EnableDeveloperExtras = true;

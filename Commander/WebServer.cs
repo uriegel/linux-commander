@@ -1,4 +1,5 @@
 using System.IO;
+using GtkDotNet;
 using UwebServer;
 using UwebServer.Routes;
 
@@ -11,8 +12,7 @@ static class WebServer
 
     static WebServer()
     {
-        // TODO: from Resource
-        var routeWebSite = new WebSite(file => File.OpenRead(Path.Combine("/home/uwe/Projekte/URiegel.WebServer/webroot/Reitbeteiligung", file)));
+        var routeWebSite = new WebSite(file => new ResourceStream($"/de/uriegel/commander/web/{file}"));
 
         server = new(new()
         {
