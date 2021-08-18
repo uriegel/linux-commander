@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GtkDotNet" Version="5.0.0" />
+    <PackageReference Include="GtkDotNet" Version="5.1.0" />
     <PackageReference Include="URiegel.WebServer" Version="0.0.2" />
   </ItemGroup>
 

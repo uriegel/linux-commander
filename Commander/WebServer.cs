@@ -7,8 +7,6 @@ using UwebServer.Routes;
 static class WebServer
 {
     public static void Start() => server.Start();
-
-    // TODO: Call stop
     public static void Stop() => server.Stop();
 
     static WebServer()

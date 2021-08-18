@@ -12,35 +12,68 @@ app.Run(() =>
     var headerBar = new HeaderBar(builder.GetObject("headerbar"));
     var webView = new WebView();
 
+    var themeAction = new GtkAction("themes", "themeAdwaita", SetTheme);
     app.AddActions(new[] {
-        new GtkAction("destroy", () => app.Quit(), "<Ctrl>Q"), 
+        new GtkAction("destroy", () => window.Close(), "<Ctrl>Q"), 
         new GtkAction("showhidden", false, state => Console.WriteLine(state), "<Ctrl>H"),
-        new GtkAction("themes", "themeAdwaita", state => Console.WriteLine(state)),
+        themeAction,
         new GtkAction("devtools", () => webView.Inspector.Show(), "F12"), 
     });    
     window.Add(webView);
     webView.LoadUri($"http://localhost:9865");
     webView.Settings.EnableDeveloperExtras = true;
 
+    webView.ScriptDialog += (s, e) =>
+    {
+        if (e.Message.StartsWith("!!webmsg!!"))
+        {
+            var text = e.Message[10..];
+            var pos = text.IndexOf("!!");
+            var msg = text[..pos];
+            var param = text[(pos+2)..];
+            switch (msg)
+            {
+                case "theme":
+                    themeAction.SetStringState(param);
+                    break;
+                case "title":
+                    Console.WriteLine($"{msg} {param}");
+                    break;
+                default:
+                    Console.WriteLine($"{msg} {param}");
+                    break;
+            }
+        }
+    };
+
     var settings = new Settings("de.uriegel.commander");
 
-    window.Configure += (s, e) => 
+    window.Delete += (s, e) => 
     {
         var (w, h) = (s as Window).Size;
+        var (x, y) = (s as Window).GetPosition();
         settings.SetInt("window-width", w);
         settings.SetInt("window-height", h);
+        settings.SetInt("window-position-x", x);
+        settings.SetInt("window-position-y", y);
         settings.SetBool("is-maximized", window.IsMaximized());
+        WebServer.Stop();
     };    
     
     app.AddWindow(window);
 
     var w = settings.GetInt("window-width");
     var h = settings.GetInt("window-height");
+    var x = settings.GetInt("window-position-x");
+    var y = settings.GetInt("window-position-y");
     window.SetDefaultSize(w, h);
     if (settings.GetBool("is-maximized"))
         window.Maximize();
-    // window.Move(2900, 456);
+    if (x != -1 && y != -1)
+        window.Move(x, y);    
     window.ShowAll();
+
+    void SetTheme(string theme) => webView.RunJavascript($"setTheme('{theme}')");
 });
 
 
