@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using GtkDotNet;
 using UwebServer;
@@ -12,7 +13,8 @@ static class WebServer
 
     static WebServer()
     {
-        var routeWebSite = new WebSite(file => new ResourceStream($"/de/uriegel/commander/web/{file}"));
+        var startTime = DateTime.Now;
+        var routeWebSite = new WebSite(file => new ResourceStream($"/de/uriegel/commander/web/{file}"), _ => startTime);
 
         server = new(new()
         {

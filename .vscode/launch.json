@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Commander/bin/Debug/net5.0/Commander.dll",
+            "program": "${workspaceFolder}/Commander/bin/Debug/net5.0/linux-x64/Commander.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
