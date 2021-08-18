@@ -104,19 +104,34 @@ function onShowHidden(hidden) {
 
 folderLeft.setFocus()
 
-document.addEventListener("keydown", evt => {
+document.addEventListener("keydown", async evt => {
     switch (evt.which) {
         case 114: // F3
             showViewer()
             evt.preventDefault()
             evt.stopPropagation()
             break
-        case 120: // F9
+        case 118: // F7
+            const item = activeFolder.getSelectedItem()
+            const res = await dialog.show({
+                text: "Ordner anlegen",
+                input: true,
+                inputText: item != ".." ? item : "",
+                defBtnOk: true,
+                btnOk: true,
+                btnCancel: true
+            })    
+            activeFolder.setFocus()
+            evt.preventDefault()
+            evt.stopPropagation()
+            break
+        case 120: { // F9
             const inactiveFolder = activeFolder == folderLeft ? folderRight : folderLeft
             inactiveFolder.changePath(activeFolder.getCurrentPath())
             evt.preventDefault()
             evt.stopPropagation()
             break
+        }
     }
 })
 

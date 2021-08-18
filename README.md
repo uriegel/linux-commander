@@ -1,5 +1,5 @@
 # commander
-A Norton Commander clone based on Web Components and Rust
+A Norton Commander clone based on Web Components and C# (.NET 5)
 ## Prerequisites on Linux (Fedora)
 * ```sudo dnf install gtk3-devel```
 * ```sudo dnf install libsoup-devel```
@@ -10,9 +10,6 @@ A Norton Commander clone based on Web Components and Rust
 * ```sudo apt-get install libgtk-3-dev```
 * ```sudo apt install libsoup2.4-dev```
 * ```sudo apt-get install libwebkit2gtk-4.0-dev```
-### Extensions for VS Code
-rust-analyzer on Linux
-Rust on Windows
 
 ## Installation of GTK schema
 ```

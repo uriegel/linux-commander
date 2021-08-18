@@ -151,6 +151,10 @@ class Folder extends HTMLElement {
         this.pathInput.onfocus = () => setTimeout(() => this.pathInput.select())
     }
 
+    getSelectedItem() {
+        return this.table.items[this.table.getPosition()].name
+    }
+
     async changePath(path, fromBacklog) {
         const result = getProcessor(this.folderId, path, this.processor)
         let items = (await result.processor.getItems(this.folderId, path, this.showHiddenItems))
@@ -232,8 +236,9 @@ class Folder extends HTMLElement {
 customElements.define('folder-table', Folder)
 
 // TODO refactor control flow in requests (Errors)
-// TODO Rename
+// TODO Processor: CanAction 
 // TODO CreateFolder
+// TODO Rename
 // TODO Copy
 // TODO Copy: progress control in status bar
 // TODO Move
