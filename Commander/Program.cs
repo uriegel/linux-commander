@@ -14,10 +14,10 @@ app.Run(() =>
 
     var themeAction = new GtkAction("themes", "themeAdwaita", SetTheme);
     app.AddActions(new[] {
-        new GtkAction("destroy", () => window.Close(), "<Ctrl>Q"), 
-        new GtkAction("showhidden", false, state => Console.WriteLine(state), "<Ctrl>H"),
+        new GtkAction("destroy", window.Close, "<Ctrl>Q"), 
+        new GtkAction("showhidden", false, showHidden, "<Ctrl>H"),
         themeAction,
-        new GtkAction("devtools", () => webView.Inspector.Show(), "F12"), 
+        new GtkAction("devtools", webView.Inspector.Show, "F12"), 
     });    
     window.Add(webView);
     webView.LoadUri($"http://localhost:9865");
@@ -74,11 +74,11 @@ app.Run(() =>
     window.ShowAll();
 
     void SetTheme(string theme) => webView.RunJavascript($"setTheme('{theme}')");
+    void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
 });
 
-
+// TODO: Parent item not working
 // TODO: Sort items by name or ext
-// TODO: Show hidden
 // TODO: get root
 // TODO: icons
 // TODO: Windows

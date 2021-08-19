@@ -8,11 +8,12 @@ record DirItem(string Name, bool IsHidden, bool IsDirectory);
 record FileItem(string Name, bool IsHidden, long Time, long Size);
 static class DirectoryProcessor
 {
-    public static DirectoryItems GetItems(string path)
+    public static DirectoryItems GetItems(string path, bool showHidden)
     {
         var di = new DirectoryInfo(path);
         var dirItems = GetSafeItems(() => di.GetDirectories())
             .Select(n => new DirItem(n.Name, (n.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden, true))
+            .Where(n =>showHidden ? true : !n.IsHidden)
             .OrderBy(n => n.Name);
         var fileItems = GetSafeItems(() => di.GetFiles())
             .Select(n => new FileItem(
@@ -20,6 +21,7 @@ static class DirectoryProcessor
                 (n.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden, (n.LastWriteTimeUtc.ToFileTime() / 10000000 - 11644473600) * 1000, 
                 n.Length
             ))
+            .Where(n =>showHidden ? true : !n.IsHidden)
             .OrderBy(n => n.Name);
         return new DirectoryItems(dirItems, fileItems);
     }

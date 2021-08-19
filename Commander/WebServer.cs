@@ -19,7 +19,7 @@ static class WebServer
             {
                 case "getitems":
                     var getItems = input.RequestParam.Get<GetItems>();
-                    var items = DirectoryProcessor.GetItems(getItems.Path);
+                    var items = DirectoryProcessor.GetItems(getItems.Path, getItems.HiddenIncluded);
                     return Task.FromResult<object>(items);
                 default:
                     return Task.FromResult<object>(new { Name = "Uwe Riegel", EMail = "uriegel@web.de" });
