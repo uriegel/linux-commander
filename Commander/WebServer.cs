@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using GtkDotNet;
 using UwebServer;
 using UwebServer.Routes;
@@ -12,15 +13,16 @@ static class WebServer
     {
         var startTime = DateTime.Now;
         var routeWebSite = new WebSite(file => new ResourceStream($"/de/uriegel/commander/web/{file}"), _ => startTime);
-        var routeService = new JsonService("/commander", async input => 
+        var routeService = new JsonService("/commander", input => 
         {
             switch (input.Path)
             {
                 case "getitems":
                     var getItems = input.RequestParam.Get<GetItems>();
-                    return new { Name = "Uwe Riegel", EMail = "uriegel@web.de" };
+                    var items = DirectoryProcessor.GetItems(getItems.Path);
+                    return Task.FromResult<object>(items);
                 default:
-                    return new { Name = "Uwe Riegel", EMail = "uriegel@web.de" };
+                    return Task.FromResult<object>(new { Name = "Uwe Riegel", EMail = "uriegel@web.de" });
             }
         });
 

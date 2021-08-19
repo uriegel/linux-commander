@@ -77,4 +77,8 @@ app.Run(() =>
 });
 
 
-
+// TODO: Sort items by name or ext
+// TODO: Show hidden
+// TODO: get root
+// TODO: icons
+// TODO: Windows
