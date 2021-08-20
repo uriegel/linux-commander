@@ -37,7 +37,7 @@ app.Run(() =>
                     themeAction.SetStringState(param);
                     break;
                 case "title":
-                    Console.WriteLine($"{msg} {param}");
+                    headerBar.SetSubtitle(param);
                     break;
                 default:
                     Console.WriteLine($"{msg} {param}");
@@ -77,6 +77,5 @@ app.Run(() =>
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
 });
 
-// TODO: SetTitle
 // TODO: icons
 // TODO: Windows
