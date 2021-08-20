@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿#if Windows
+using System.Windows;
 
 namespace Commander
 {
@@ -6,3 +7,4 @@ namespace Commander
 	{
 	}
 }
+#endif

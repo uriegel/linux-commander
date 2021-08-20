@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if Windows
+using System;
 using System.Threading.Tasks;
 
 using UwebServer;
@@ -14,3 +15,4 @@ class FileServing
     }
 }
 
+#endif
