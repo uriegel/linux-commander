@@ -77,6 +77,6 @@ app.Run(() =>
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
 });
 
-// TODO: get root
+// TODO: SetTitle
 // TODO: icons
 // TODO: Windows

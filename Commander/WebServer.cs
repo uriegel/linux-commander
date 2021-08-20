@@ -13,16 +13,20 @@ static class WebServer
     {
         var startTime = DateTime.Now;
         var routeWebSite = new WebSite(file => new ResourceStream($"/de/uriegel/commander/web/{file}"), _ => startTime);
-        var routeService = new JsonService("/commander", input => 
+        var routeService = new JsonService("/commander", async input => 
         {
             switch (input.Path)
             {
                 case "getitems":
                     var getItems = input.RequestParam.Get<GetItems>();
                     var items = DirectoryProcessor.GetItems(getItems.Path, getItems.HiddenIncluded);
-                    return Task.FromResult<object>(items);
+                    return items;
+                case "getroot":
+                    var rootItems = await RootProcessor.GetItemsAsync();
+                    return rootItems;
                 default:
-                    return Task.FromResult<object>(new { Name = "Uwe Riegel", EMail = "uriegel@web.de" });
+                    // TODO:
+                    return new { Name = "Uwe Riegel", EMail = "uriegel@web.de" };
             }
         });
 

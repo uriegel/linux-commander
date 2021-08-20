@@ -1,6 +1,7 @@
 export const DIRECTORY = "directory"
 import { formatDateTime, formatSize, getExtension } from "./renderTools.js"
 import { ROOT } from "./root.js"
+import { request } from "../requests.js"
 
 const pathDelimiter = isLinux() ? "/" : "\\"
 
@@ -112,14 +113,7 @@ export const getDirectory = (folderId, path) => {
         : [null, null]
 
     const getItems = async (id, path, hiddenIncluded) => {
-        const responseStr = await fetch("/commander/getitems", { 
-            method: 'POST', 
-            headers: {
-                'Content-Type': 'application/json'
-            },            
-            body: JSON.stringify({ id, path, hiddenIncluded }) 
-        })
-        const response = await responseStr.json()
+        var response = await request("getitems", { id, path, hiddenIncluded })
         let result = [{
                 name: "..",
             isNotSelectable: true,

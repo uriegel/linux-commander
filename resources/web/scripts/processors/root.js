@@ -1,4 +1,5 @@
 import { formatSize } from "./renderTools.js"
+import { request } from "../requests.js"
 
 export const ROOT = "root"
 
@@ -47,7 +48,7 @@ export const getRoot = folderId => {
     const getPath = item => [item.mountPoint, null]
 
     const getItems = async () => {
-        const response = await requests.getRoot()
+        const response = await request("getroot");
         const mounted = response.filter(n => n.mountPoint)
         const unmounted = response.filter(n => !n.mountPoint)
         return mounted
