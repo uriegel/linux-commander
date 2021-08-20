@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if Linux
+using System;
 using GtkDotNet;
 
 var app = new Application("de.uriegel.commander");
@@ -77,7 +78,6 @@ app.Run(() =>
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
 });
 
-// TODO: Windows conditional compiling
-// TODO: Windows Wpf with webview2
-// TODO: Windows single file with resources
+#endif
+
 // TODO: Viewer

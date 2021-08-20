@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,19 +6,32 @@
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
     <PublishTrimmed>true</PublishTrimmed>
-    <PublishReadyToRun>false</PublishReadyToRun>        
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
+	<IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GtkDotNet" Version="5.2.0" />
     <PackageReference Include="URiegel.WebServer" Version="0.0.2" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(IsLinux)'=='true'">
+	  <PackageReference Include="GtkDotNet" Version="5.2.0" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(IsWindows)'=='true'">
+	<DefineConstants>Windows</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsLinux)'=='true'">
+	<DefineConstants>Linux</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="../resources/resources.gresource" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <Target Condition="'$(IsLinux)'=='true'" 
+		  Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="cd ../resources&#xD;&#xA;glib-compile-resources resources.xml" />
   </Target>
 
