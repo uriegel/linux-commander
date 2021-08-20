@@ -77,8 +77,6 @@ app.Run(() =>
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
 });
 
-// TODO: Parent item not working
-// TODO: Sort items by name or ext
 // TODO: get root
 // TODO: icons
 // TODO: Windows

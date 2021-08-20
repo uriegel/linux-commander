@@ -122,7 +122,8 @@ export const getDirectory = (folderId, path) => {
         const response = await responseStr.json()
         let result = [{
                 name: "..",
-                isNotSelectable: true
+            isNotSelectable: true,
+                isDirectory: true
             }]
             .concat(response.dirs)
             .concat(response.files)
