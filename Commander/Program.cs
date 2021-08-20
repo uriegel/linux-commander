@@ -77,4 +77,7 @@ app.Run(() =>
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
 });
 
-// TODO: Windows
+// TODO: Windows conditional compiling
+// TODO: Windows Wpf with webview2
+// TODO: Windows single file with resources
+// TODO: Viewer
