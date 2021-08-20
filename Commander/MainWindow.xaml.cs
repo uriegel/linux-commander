@@ -8,4 +8,5 @@ namespace Commander
 		public MainWindow() => InitializeComponent();
 	}
 }
+// TODO: Windows single file with resources
 #endif
