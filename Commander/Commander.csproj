@@ -33,8 +33,12 @@
     <PackageReference Include="URiegel.WebServer" Version="0.0.2" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(IsWindows)'=='true'">
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.902.49" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(IsLinux)'=='true'">
-	  <PackageReference Include="GtkDotNet" Version="5.2.0" />
+	<PackageReference Include="GtkDotNet" Version="5.2.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(IsWindows)'=='true'">
