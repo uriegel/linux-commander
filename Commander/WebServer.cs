@@ -11,7 +11,7 @@ static class WebServer
     static WebServer()
     {
         var startTime = DateTime.Now;
-        var routeWebSite = new WebSite(file => new ResourceStream($"/de/uriegel/commander/web/{file}"), _ => startTime);
+        var routeWebSite = FileServing.Create(startTime);
         var routeService = new JsonService("/commander", async input =>
         {
             switch (input.Path)
@@ -57,9 +57,7 @@ static class WebServer
                 case "geticon":
                     {
                         var ext = query.Parameters["ext"];
-                        using var iconInfo = IconInfo.Choose(ext, 16, IconLookup.ForceSvg);
-                        var file = iconInfo.GetFileName();
-                        await response.SendFileAsync(file);
+                        await FileServing.ServeIconAsync(ext, response);
                         break;
                     }
                 default:
