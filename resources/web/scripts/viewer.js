@@ -16,8 +16,8 @@ export function onShowViewer(show, path) {
     if (show) 
         refresh(path)
     else {
-        viewerImg.src = null
-        viewerVideo.src = null
+        viewerImg.src = undefined
+        viewerVideo.src = undefined
     }
 }
 
@@ -41,15 +41,15 @@ const refresh = path => {
             viewerPdf.classList.add("hidden")
             viewerVideo.classList.add("hidden")
             viewerImg.classList.remove("hidden")
-            viewerImg.src = `file://${path}` 
-            viewerVideo.src = null
+            viewerImg.src = `commander/getfile?file=${path}` 
+            viewerVideo.src = undefined
             break
         case "pdf":
             viewerImg.classList.add("hidden")
             viewerVideo.classList.add("hidden")
             viewerPdf.classList.remove("hidden")
-            viewerPdf.load(`file://${path}`) 
-            viewerVideo.src = null
+            viewerPdf.load(`commander/getfile?file=${path}`) 
+            viewerVideo.src = undefined
             break
         case "mp3":
         case "mp4":
@@ -58,13 +58,13 @@ const refresh = path => {
             viewerPdf.classList.add("hidden")
             viewerImg.classList.add("hidden")
             viewerVideo.classList.remove("hidden")
-            viewerVideo.src = `file://${path}` 
+            viewerVideo.src = `commander/getfile?file=${path}` 
             break
         default:
             viewerVideo.classList.add("hidden")
             viewerImg.classList.add("hidden")
             viewerPdf.classList.add("hidden")
-            viewerVideo.src = null
+            viewerVideo.src = undefined
             break
     }
 }

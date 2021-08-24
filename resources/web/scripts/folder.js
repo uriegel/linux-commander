@@ -229,13 +229,12 @@ class Folder extends HTMLElement {
                 path: this.processor.getItem(this.table.items[index]),
                 dirs: this.dirsCount,
                 files: this.filesCount
-            }}))
-    }
+            }}))    }
 }
 
 customElements.define('folder-table', Folder)
 
-// TODO refactor control flow in requests (Errors)
+
 // TODO Processor: CanAction 
 // TODO CreateFolder
 // TODO Rename

@@ -60,6 +60,12 @@ static class WebServer
                         await FileServing.ServeIconAsync(ext, response);
                         break;
                     }
+                case "getfile":
+                    {
+                        var file = query.Parameters["file"];
+                        await response.SendFileAsync(file);
+                        break;
+                    }
                 default:
                     await response.SendNotFoundAsync();
                     break;
