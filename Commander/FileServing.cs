@@ -1,6 +1,4 @@
-﻿#if Linux
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using GtkDotNet;
 using UwebServer;
@@ -19,5 +17,4 @@ class FileServing
     }
 }
 
-#endif
 

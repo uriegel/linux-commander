@@ -3,56 +3,22 @@
   <PropertyGroup>
     <PublishSingleFile>true</PublishSingleFile>
     <PublishTrimmed>true</PublishTrimmed>
-    <PublishReadyToRun>false</PublishReadyToRun>
-    <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
-	<IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IsLinux)'=='true'">
-	<OutputType>Exe</OutputType>
-	<RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <OutputType>Exe</OutputType>
+	  <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
 	  <TargetFramework>net5.0</TargetFramework>
+    <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IsWindows)'=='true'">
-	<OutputType>WinExe</OutputType>
-	<UseWPF>true</UseWPF>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-	  <TargetFramework>net5.0-windows</TargetFramework>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Page Remove="Windows\App.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ApplicationDefinition Include="Windows\App.xaml" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="URiegel.WebServer" Version="0.0.2" />
+    <PackageReference Include="GtkDotNet" Version="5.2.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(IsWindows)'=='true'">
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.902.49" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(IsLinux)'=='true'">
-	<PackageReference Include="GtkDotNet" Version="5.2.0" />
-  </ItemGroup>
-
-  <PropertyGroup Condition="'$(IsWindows)'=='true'">
-	<DefineConstants>Windows</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(IsLinux)'=='true'">
-	<DefineConstants>Linux</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(IsLinux)'=='true'">
+  <ItemGroup>
     <EmbeddedResource Include="../resources/resources.gresource" />
   </ItemGroup>
 
-  <Target Condition="'$(IsLinux)'=='true'" Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="cd ../resources&#xD;&#xA;glib-compile-resources resources.xml" />
   </Target>
 

@@ -1,5 +1,4 @@
-﻿#if Linux
-using System;
+﻿using System;
 using GtkDotNet;
 
 var app = new Application("de.uriegel.commander");
@@ -77,7 +76,5 @@ app.Run(() =>
     void SetTheme(string theme) => webView.RunJavascript($"setTheme('{theme}')");
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
 });
-
-#endif
 
 // TODO: Viewer
