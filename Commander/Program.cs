@@ -18,6 +18,7 @@ app.Run(() =>
         new GtkAction("showhidden", false, showHidden, "<Ctrl>H"),
         themeAction,
         new GtkAction("devtools", webView.Inspector.Show, "F12"), 
+        new GtkAction("viewer", false, showViewer, "F3"), 
     });    
     window.Add(webView);
     webView.LoadUri($"http://localhost:9865");
@@ -75,6 +76,7 @@ app.Run(() =>
 
     void SetTheme(string theme) => webView.RunJavascript($"setTheme('{theme}')");
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
+    void showViewer(bool show) => webView.RunJavascript($"showViewer({(show?"true":"false")})");
 });
 
 // TODO: Viewer

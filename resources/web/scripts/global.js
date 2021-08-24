@@ -1,9 +1,3 @@
-function isLinux() {
-    if (_isLinux == undefined)
-        _isLinux = location.search.endsWith("linux")
-//    return _isLinux
-    return true
-}
 function initializeCallbacks(onTheme, onShowHidden, onShowViewer) {
     onThemeCallback = onTheme
     onShowHiddenCallback = onShowHidden
@@ -42,8 +36,7 @@ function setTitle(title, dirs, files) {
 }
 
 function setInitialTheme(theme) {
-    if (isLinux())
-        sendMessageToWebView("theme", theme)
+    sendMessageToWebView("theme", theme)
 }
 
 function showHidden(hidden) {
@@ -73,6 +66,5 @@ var onShowHiddenCallback
 var onShowViewerCallback
 var onRequestCallback
 var eventSinks = new Map()
-var _isLinux = undefined
 
 

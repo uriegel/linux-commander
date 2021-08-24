@@ -3,7 +3,7 @@ import { formatDateTime, formatSize, getExtension } from "./renderTools.js"
 import { ROOT } from "./root.js"
 import { request } from "../requests.js"
 
-const pathDelimiter = isLinux() ? "/" : "\\"
+const pathDelimiter = "/"
 
 export const getDirectory = (folderId, path) => {
     const getType = () => DIRECTORY
@@ -62,15 +62,7 @@ export const getDirectory = (folderId, path) => {
                 td.innerHTML = formatSize(item.size)
                 td.classList.add("rightAligned")
             }
-        }, {
-            name: "Version",
-            isSortable: true,
-            render: (td, item) => {
-                td.innerHTML = item.version ? `${item.version.major}.${item.version.minor}.${item.version.patch}.${item.version.build}` : ""
-            }
         }]
-        if (isLinux())
-            columns = columns.filter(n => n.name != "Version")   
         if (widths)
             columns = columns.map((n, i)=> ({ ...n, width: widths[i]}))
         return columns
@@ -84,28 +76,17 @@ export const getDirectory = (folderId, path) => {
     const getParentDir = path => {
         let pos = path.lastIndexOf(pathDelimiter)
         let parent = pos ? path.substr(0, pos) : pathDelimiter
-        if (!isLinux() && parent.indexOf("\\") == -1)
-            parent += pathDelimiter
         return [parent, path.substr(pos + 1)]
     }
     
     const getCurrentPath = () => currentPath
 
-    const parentIsRoot = () => {
-        if (isLinux()) {
-            return currentPath == pathDelimiter
-        } else 
-            return currentPath.endsWith(":\\")
-    }
+    const parentIsRoot = () => currentPath == pathDelimiter
     
     const getPath = item => item.isDirectory 
         ? item.name != ".."
             ? [
-                isLinux() 
-                ? currentPath != "/" ? currentPath + pathDelimiter + item.name : currentPath + item.name
-                : currentPath.endsWith(":\\")
-                    ? currentPath + item.name
-                    : currentPath + pathDelimiter + item.name, 
+                currentPath != "/" ? currentPath + pathDelimiter + item.name : currentPath + item.name, 
                 null]
             : parentIsRoot()  
                 ? [ROOT, null]

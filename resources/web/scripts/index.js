@@ -103,11 +103,11 @@ folderLeft.setFocus()
 
 document.addEventListener("keydown", async evt => {
     switch (evt.which) {
-        case 114: // F3
-            showViewer()
-            evt.preventDefault()
-            evt.stopPropagation()
-            break
+        // case 114: // F3
+        //     showViewer()
+        //     evt.preventDefault()
+        //     evt.stopPropagation()
+        //     break
         case 118: // F7
             const item = activeFolder.getSelectedItem()
             const res = await dialog.show({
