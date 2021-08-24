@@ -79,4 +79,8 @@ app.Run(() =>
     void showViewer(bool show) => webView.RunJavascript($"showViewer({(show?"true":"false")})");
 });
 
-// TODO: Viewer
+// TODO: Exif-Datetime
+// TODO: CreateFolder
+// TODO: Delete 
+// TODO: Delete with progress
+// TODO: css-styles in GTK
