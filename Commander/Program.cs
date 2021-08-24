@@ -1,6 +1,12 @@
 ﻿using System;
 using GtkDotNet;
 
+
+using var er = new ExifReader("/home/uwe/Bilder/Fotos/2005/5 - Mambokauf/Bild011.jpg");
+DateTime aufnahme;
+if (!er.GetTagValue<DateTime>(ExifReader.ExifTags.DateTimeOriginal, out aufnahme))
+    er.GetTagValue<DateTime>(ExifReader.ExifTags.DateTime, out aufnahme);
+    
 var app = new Application("de.uriegel.commander");
 WebServer.Start();
 app.Run(() =>
