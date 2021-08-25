@@ -79,7 +79,6 @@ app.Run(() =>
     void showViewer(bool show) => webView.RunJavascript($"showViewer({(show?"true":"false")})");
 });
 
-// TODO: Exif-Datetime: check 2005 times
 // TODO: Exif-Datetime: check request
 // TODO: CreateFolder
 // TODO: Delete 
