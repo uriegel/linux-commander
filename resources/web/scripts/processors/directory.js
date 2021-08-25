@@ -93,8 +93,8 @@ export const getDirectory = (folderId, path) => {
                 : getParentDir(currentPath)
         : [null, null]
 
-    const getItems = async (id, path, hiddenIncluded) => {
-        var response = await request("getitems", { id, path, hiddenIncluded })
+    const getItems = async (id, requestId, path, hiddenIncluded) => {
+        var response = await request("getitems", { id, requestId, path, hiddenIncluded })
         let result = [{
                 name: "..",
             isNotSelectable: true,
@@ -136,6 +136,19 @@ export const getDirectory = (folderId, path) => {
         return exifItems.length ? true : false
     }
 
+    const sendExtendedInfos = async (folderId, reqestId, items) => {
+        var exifs = items
+            .map((n, i) => {
+                if (n.name.endsWith(".jpg") || n.name.endsWith(".jpeg") || n.name.endsWith(".png"))
+                    return Object.assign({ index: i }, n)
+                else
+                    return n
+            })
+            .filter(n => n.index != undefined)
+        // TODO: send exif request
+        console.log(exifs)
+    }
+
     const getIconPath = name => currentPath + pathDelimiter + name
 
     return {
@@ -149,6 +162,7 @@ export const getDirectory = (folderId, path) => {
         saveWidths,
         getItem,
         onEvent,
-        getIconPath
+        getIconPath,
+        sendExtendedInfos
     }
 }

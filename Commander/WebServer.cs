@@ -17,12 +17,18 @@ static class WebServer
             switch (input.Path)
             {
                 case "getitems":
+                {
                     var getItems = input.RequestParam.Get<GetItems>();
-                    var items = DirectoryProcessor.GetItems(getItems.Path, getItems.HiddenIncluded);
+                    var items = DirectoryProcessor.GetItems(getItems.Path, getItems.HiddenIncluded, getItems.Id);
                     return items;
+                }
                 case "getroot":
-                    var rootItems = await RootProcessor.GetItemsAsync();
-                    return rootItems;
+                {
+                    var getItems = input.RequestParam.Get<GetItems>();
+                    await Task.Delay(10000);
+                    var items = await RootProcessor.GetItemsAsync();
+                    return items;
+                }
                 default:
                     return new { };
             }
@@ -75,5 +81,5 @@ static class WebServer
     static readonly Server server;
 }
 
-record GetItems(string Id, string Path, bool HiddenIncluded);
+record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
 

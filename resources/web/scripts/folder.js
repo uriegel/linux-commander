@@ -5,6 +5,7 @@ class Folder extends HTMLElement {
     constructor() {
         super()
         this.folderId = this.getAttribute("id")
+        this.latestRequest = 0
         const additionalStyle = ".exif {color: var(--exif-color);} .isSelected .exif {color: var(--selected-exif-color); }"
         this.innerHTML = `
             <div class=folder>
@@ -157,10 +158,11 @@ class Folder extends HTMLElement {
 
     async changePath(path, fromBacklog) {
         const result = getProcessor(this.folderId, path, this.processor)
-        let items = (await result.processor.getItems(this.folderId, path, this.showHiddenItems))
-        if (!items) 
+        const req = ++this.latestRequest
+        let items = (await result.processor.getItems(this.folderId, req, path, this.showHiddenItems))
+        if (!items || req < this.latestRequest) 
             return
-            
+
         this.table.setItems([])
         if (result.changed) {
             this.processor = result.processor
@@ -182,6 +184,8 @@ class Folder extends HTMLElement {
             items.filter(n => n.name.toLowerCase()
                 .startsWith(restrictValue.toLowerCase())
         ))
+        
+        result.processor.sendExtendedInfos(this.folderId, req, this.table.items)
         
         this.onPathChanged(path, fromBacklog)
     }

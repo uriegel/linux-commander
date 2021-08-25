@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,8 +9,9 @@ record DirItem(string Name, bool IsHidden, bool IsDirectory);
 record FileItem(string Name, bool IsHidden, long Time, long Size);
 static class DirectoryProcessor
 {
-    public static DirectoryItems GetItems(string path, bool showHidden)
+    public static DirectoryItems GetItems(string path, bool showHidden, string folderId)
     {
+        var reqId = requests.AddOrUpdate(folderId, k => 1, (k, v) => v++);
         var di = new DirectoryInfo(path);
         var dirItems = GetSafeItems(() => di.GetDirectories())
             .Select(n => new DirItem(n.Name, (n.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden, true))
@@ -38,4 +40,10 @@ static class DirectoryProcessor
             return Enumerable.Empty<T>();
         }
     }
+
+    // TODO: when result is received in js: new request with reqid and files to retrieve exifs
+    // TODO: send result only if inc  not changed
+
+
+    static ConcurrentDictionary<string, int> requests = new();
 }

@@ -47,8 +47,8 @@ export const getRoot = folderId => {
 
     const getPath = item => [item.mountPoint, null]
 
-    const getItems = async () => {
-        const response = await request("getroot");
+    const getItems = async (id, requestId) => {
+        const response = await request("getroot", { id, requestId });
         const mounted = response.filter(n => n.mountPoint)
         const unmounted = response.filter(n => !n.mountPoint)
         return mounted
@@ -58,6 +58,8 @@ export const getRoot = folderId => {
                 return n
             })
     }
+
+    const sendExtendedInfos = () => { }
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-root-widths`, JSON.stringify(widths))
 
@@ -71,6 +73,7 @@ export const getRoot = folderId => {
         saveWidths, 
         getCurrentPath,
         getPath,
-        getItem
+        getItem,
+        sendExtendedInfos
     }
 }
