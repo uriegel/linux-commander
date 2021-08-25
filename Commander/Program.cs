@@ -1,12 +1,6 @@
 ﻿using System;
 using GtkDotNet;
-
-
-using var er = new ExifReader("/home/uwe/Bilder/Fotos/2005/5 - Mambokauf/Bild011.jpg");
-DateTime aufnahme;
-if (!er.GetTagValue<DateTime>(ExifReader.ExifTags.DateTimeOriginal, out aufnahme))
-    er.GetTagValue<DateTime>(ExifReader.ExifTags.DateTime, out aufnahme);
-    
+   
 var app = new Application("de.uriegel.commander");
 WebServer.Start();
 app.Run(() =>
@@ -85,7 +79,8 @@ app.Run(() =>
     void showViewer(bool show) => webView.RunJavascript($"showViewer({(show?"true":"false")})");
 });
 
-// TODO: Exif-Datetime
+// TODO: Exif-Datetime: check 2005 times
+// TODO: Exif-Datetime: check request
 // TODO: CreateFolder
 // TODO: Delete 
 // TODO: Delete with progress

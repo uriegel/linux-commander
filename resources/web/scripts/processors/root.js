@@ -59,7 +59,7 @@ export const getRoot = folderId => {
             })
     }
 
-    const sendExtendedInfos = () => { }
+    const getExtendedInfos = () => false
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-root-widths`, JSON.stringify(widths))
 
@@ -74,6 +74,6 @@ export const getRoot = folderId => {
         getCurrentPath,
         getPath,
         getItem,
-        sendExtendedInfos
+        getExtendedInfos
     }
 }

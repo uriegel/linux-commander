@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using UwebServer;
 using UwebServer.Routes;
@@ -25,10 +26,17 @@ static class WebServer
                 case "getroot":
                 {
                     var getItems = input.RequestParam.Get<GetItems>();
-                    await Task.Delay(10000);
                     var items = await RootProcessor.GetItemsAsync();
                     return items;
                 }
+                case "getexifs":
+                {
+                    // TODO: check reqId
+                    var getExifs = input.RequestParam.Get<GetExifs>();
+                    return getExifs.ExifItems
+                        .Select(n => DirectoryProcessor.GetExifData(getExifs.path, n))
+                        .Where(n => n != null);
+                } 
                 default:
                     return new { };
             }
@@ -82,4 +90,7 @@ static class WebServer
 }
 
 record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
+record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
+record ExifItem(int Index, string Name);
+record ExifReturnItem(int Index, DateTime ExifTime);
 

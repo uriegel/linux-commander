@@ -28,6 +28,15 @@ static class DirectoryProcessor
         return new DirectoryItems(dirItems, fileItems);
     }
 
+    public static ExifReturnItem GetExifData(string path, ExifItem exifItem)
+    {
+        using var exifReader = new ExifReader(Path.Combine(path, exifItem.Name));
+        if (!exifReader.GetTagValue<DateTime>(ExifReader.ExifTags.DateTimeOriginal, out var dateTime)
+            && !exifReader.GetTagValue<DateTime>(ExifReader.ExifTags.DateTime, out dateTime))
+            return null;
+        return new ExifReturnItem(exifItem.Index, dateTime);
+    }
+
     static IEnumerable<T> GetSafeItems<T>(Func<IEnumerable<T>> func)
     {
         try 

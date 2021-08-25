@@ -50,8 +50,8 @@ export const getDirectory = (folderId, path) => {
             name: "Datum",
             isSortable: true,
             render: (td, item) => {
-                td.innerHTML = formatDateTime(item.exiftime || item.time)
-                if (item.exiftime)
+                td.innerHTML = formatDateTime(item.exifTime || item.time)
+                if (item.exifTime)
                     td.classList.add("exif")
             }
         }, {
@@ -114,7 +114,7 @@ export const getDirectory = (folderId, path) => {
                     ? ([a, b]) => a.name.localeCompare(b.name)
                     : ([a, b]) => getExtension(a.name).localeCompare(getExtension(b.name))
             case 1: 
-                return ([a, b]) => (a.exiftime ? a.exiftime : a.time) - (b.exiftime ? b.exiftime : b.time)
+                return ([a, b]) => (a.exifTime ? a.exifTime : a.time) - (b.exifTime ? b.exifTime : b.time)
             case 2: 
                 return ([a, b]) => a.size - b.size
             default:
@@ -126,27 +126,25 @@ export const getDirectory = (folderId, path) => {
 
     const getItem = item => currentPath == pathDelimiter ? pathDelimiter + item.name : currentPath + pathDelimiter + item.name
 
-    const onEvent = (items, exifItems) => {
-        exifItems.forEach(n => {
-            if (n.exiftime)
-                items[n.index].exiftime = n.exiftime
-            else
-                items[n.index].version = n.version
-        })
-        return exifItems.length ? true : false
-    }
-
-    const sendExtendedInfos = async (folderId, reqestId, items) => {
-        var exifs = items
+    const getExtendedInfos = async (id, requestId, path, items) => {
+        var exifItems = items
             .map((n, i) => {
-                if (n.name.endsWith(".jpg") || n.name.endsWith(".jpeg") || n.name.endsWith(".png"))
-                    return Object.assign({ index: i }, n)
+                var name = n.name.toLocaleLowerCase();
+                if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png"))
+                    return { index: i, name: n.name }
                 else
                     return n
             })
             .filter(n => n.index != undefined)
-        // TODO: send exif request
-        console.log(exifs)
+        
+        if (exifItems.length > 0) {
+            var response = await request("getexifs", { id, requestId, path, exifItems })
+            if (response.length > 0) {
+                response.forEach(n => items[n.index].exifTime = n.exifTime)
+                return true
+            }
+        } 
+        return false
     }
 
     const getIconPath = name => currentPath + pathDelimiter + name
@@ -161,8 +159,7 @@ export const getDirectory = (folderId, path) => {
         getSortFunction,
         saveWidths,
         getItem,
-        onEvent,
         getIconPath,
-        sendExtendedInfos
+        getExtendedInfos
     }
 }

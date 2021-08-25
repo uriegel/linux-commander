@@ -185,9 +185,9 @@ class Folder extends HTMLElement {
                 .startsWith(restrictValue.toLowerCase())
         ))
         
-        result.processor.sendExtendedInfos(this.folderId, req, this.table.items)
-        
         this.onPathChanged(path, fromBacklog)
+        if (await this.processor.getExtendedInfos(this.folderId, req, path, this.table.items))
+            this.table.refresh()
     }
 
     onPathChanged(newPath, fromBacklog) {
@@ -217,10 +217,6 @@ class Folder extends HTMLElement {
 
     onEvent(msg) {
         switch (msg.msgType) {
-            case "ExifItem":
-                if (this.processor.onEvent(this.table.items, msg.items))
-                    this.table.refresh()
-                break
             case "Refresh":
                 this.reloadItems()
                 break
