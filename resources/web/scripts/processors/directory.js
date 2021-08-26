@@ -93,8 +93,8 @@ export const getDirectory = (folderId, path) => {
                 : getParentDir(currentPath)
         : [null, null]
 
-    const getItems = async (id, requestId, path, hiddenIncluded) => {
-        var response = await request("getitems", { id, requestId, path, hiddenIncluded })
+    const getItems = async (path, hiddenIncluded) => {
+        var response = await request("getitems", { path, hiddenIncluded })
         let result = [{
                 name: "..",
             isNotSelectable: true,
@@ -126,7 +126,7 @@ export const getDirectory = (folderId, path) => {
 
     const getItem = item => currentPath == pathDelimiter ? pathDelimiter + item.name : currentPath + pathDelimiter + item.name
 
-    const getExtendedInfos = async (id, requestId, path, items) => {
+    const getExtendedInfos = async (path, items) => {
         var exifItems = items
             .map((n, i) => {
                 var name = n.name.toLocaleLowerCase();
@@ -137,14 +137,10 @@ export const getDirectory = (folderId, path) => {
             })
             .filter(n => n.index != undefined)
         
-        if (exifItems.length > 0) {
-            var response = await request("getexifs", { id, requestId, path, exifItems })
-            if (response.length > 0) {
-                response.forEach(n => items[n.index].exifTime = n.exifTime)
-                return true
-            }
-        } 
-        return false
+        if (exifItems.length > 0) 
+            return await request("getexifs", { path, exifItems })
+        else
+            return []
     }
 
     const getIconPath = name => currentPath + pathDelimiter + name

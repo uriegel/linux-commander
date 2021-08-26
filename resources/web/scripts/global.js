@@ -4,31 +4,14 @@ function initializeCallbacks(onTheme, onShowHidden, onShowViewer) {
     onShowViewerCallback = onShowViewer
 }
 
-function initializeFolderEvents(folderId, onEvent) {
-    eventSinks.set(folderId, onEvent)
-}
-
-function initializeRequestsCallback(onRequest) {
-    onRequestCallback = onRequest
-}
-
 function setTheme(theme) {
     initialTheme = theme
     if (onThemeCallback)
         onThemeCallback(theme)
 }
 
-// TODO: per request -> g_idle_add
 function sendMessageToWebView(command, param) {
     alert(`!!webmsg!!${command}!!${param}`)
-}
-
-function sendRequestToWebView(command, id, param) {
-    alert(`!!request!!${command}!!${id}${(param ? `!!${JSON.stringify(param)}` : "")}`)
-}
-
-function requestResult(id, result) {
-    onRequestCallback(id, result)
 }
 
 function setTitle(title, dirs, files) {
@@ -49,22 +32,11 @@ function showViewer(show) {
         onShowViewerCallback(show)
 }
 
-function onExifitems(folderId, exif_items) {
-    let onEvent = eventSinks.get(folderId)
-    onEvent(exif_items)
-}
-
-function refreshFolder(folderId) {
-    let onEvent = eventSinks.get(folderId)
-    onEvent({msgType: "Refresh"})
-}
-
 const composeFunction = (...fns) => (...args) => fns.reduceRight((acc, fn) => fn(acc), args);
 
 var onThemeCallback
 var onShowHiddenCallback
 var onShowViewerCallback
 var onRequestCallback
-var eventSinks = new Map()
 
 

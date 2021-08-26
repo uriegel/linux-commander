@@ -17,7 +17,7 @@ export const getRoot = folderId => {
                 const span = document.createElement('span')
                 span.innerHTML = item.name
                 td.appendChild(span)
-            }            
+            }
         }, {
             name: "Mountpoint",
             render: (td, item) => td.innerHTML = item.mountPoint
@@ -34,7 +34,7 @@ export const getRoot = folderId => {
         }]
 
         if (widths)
-            columns = columns.map((n, i)=> ({ ...n, width: widths[i]}))
+            columns = columns.map((n, i) => ({ ...n, width: widths[i] }))
         return columns
     }
 
@@ -47,19 +47,19 @@ export const getRoot = folderId => {
 
     const getPath = item => [item.mountPoint, null]
 
-    const getItems = async (id, requestId) => {
-        const response = await request("getroot", { id, requestId });
+    const getItems = async () => {
+        const response = await request("getroot");
         const mounted = response.filter(n => n.mountPoint)
         const unmounted = response.filter(n => !n.mountPoint)
         return mounted
             .concat(unmounted)
-            .map(n => { 
+            .map(n => {
                 n.isNotSelectable = true
                 return n
             })
     }
 
-    const getExtendedInfos = () => false
+    const getExtendedInfos = () => []
 
     const saveWidths = widths => localStorage.setItem(`${folderId}-root-widths`, JSON.stringify(widths))
 

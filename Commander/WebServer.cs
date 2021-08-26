@@ -31,15 +31,15 @@ static class WebServer
                 }
                 case "getexifs":
                 {
-                    // TODO: check reqId
                     var getExifs = input.RequestParam.Get<GetExifs>();
                     return getExifs.ExifItems
                         .Select(n => DirectoryProcessor.GetExifData(getExifs.path, n))
                         .Where(n => n != null);
                 } 
                 default:
-                    return new { };
+                    break;
             }
+            return new { };
         });
         var routeFile = new FileRequest();
 

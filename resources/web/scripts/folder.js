@@ -19,7 +19,6 @@ class Folder extends HTMLElement {
         this.pathInput = this.getElementsByTagName("INPUT")[0]
         this.table.renderRow = (item, tr) => this.processor.renderRow(item, tr)
         const lastPath = localStorage.getItem(`${this.folderId}-lastPath`)
-        initializeFolderEvents(this.folderId, msg => setTimeout(() => this.onEvent(msg))) 
         this.changePath(lastPath)
     }
 
@@ -159,7 +158,7 @@ class Folder extends HTMLElement {
     async changePath(path, fromBacklog) {
         const result = getProcessor(this.folderId, path, this.processor)
         const req = ++this.latestRequest
-        let items = (await result.processor.getItems(this.folderId, req, path, this.showHiddenItems))
+        let items = (await result.processor.getItems(path, this.showHiddenItems))
         if (!items || req < this.latestRequest) 
             return
 
@@ -186,8 +185,11 @@ class Folder extends HTMLElement {
         ))
         
         this.onPathChanged(path, fromBacklog)
-        if (await this.processor.getExtendedInfos(this.folderId, req, path, this.table.items))
+        const response = await this.processor.getExtendedInfos(path, this.table.items)
+        if (response.length > 0 && req == this.latestRequest) {
+            response.forEach(n => items[n.index].exifTime = n.exifTime)
             this.table.refresh()
+        }
     }
 
     onPathChanged(newPath, fromBacklog) {
@@ -215,14 +217,6 @@ class Folder extends HTMLElement {
         }
     }
 
-    onEvent(msg) {
-        switch (msg.msgType) {
-            case "Refresh":
-                this.reloadItems()
-                break
-        }
-    }
-
     sendStatusInfo(index) {
         if (this.table.items && this.table.items.length > 0)
             this.dispatchEvent(new CustomEvent('pathChanged', { detail: {
@@ -234,7 +228,9 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-
+// TODO Delete 
+// TODO Delete with progress
+// TODO css-styles in GTK
 // TODO Processor: CanAction 
 // TODO CreateFolder
 // TODO Rename

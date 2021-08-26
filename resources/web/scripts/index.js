@@ -37,12 +37,8 @@ function getItemsTypes(selectedItems) {
     setInitialTheme(initialTheme) 
 })()
 
-folderLeft.addEventListener("onFocus", evt => {
-    activeFolder = folderLeft
-})
-folderRight.addEventListener("onFocus", evt => {
-    activeFolder = folderRight
-})
+folderLeft.addEventListener("onFocus", () => activeFolder = folderLeft)
+folderRight.addEventListener("onFocus", () => activeFolder = folderRight)
 
 const onPathChanged = evt => {
     currentPath = evt.detail.path
@@ -103,11 +99,6 @@ folderLeft.setFocus()
 
 document.addEventListener("keydown", async evt => {
     switch (evt.which) {
-        // case 114: // F3
-        //     showViewer()
-        //     evt.preventDefault()
-        //     evt.stopPropagation()
-        //     break
         case 118: // F7
             const item = activeFolder.getSelectedItem()
             const res = await dialog.show({
