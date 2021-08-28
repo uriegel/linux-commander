@@ -233,6 +233,7 @@ customElements.define('folder-table', Folder)
 // TODO ProgressControl
 // TODO set progressControl in Webserver
 // TODO CopyFile to CopyProcessor
+// TODO MoveFile to CopyProcessor
 // TODO Delete 
 // TODO Delete with progress
 // TODO Processor: CanAction 
@@ -250,3 +251,8 @@ customElements.define('folder-table', Folder)
 // TODO Status Linux: styling
 
 // TODO xdg-open
+
+// TODO Collect copy exceptions
+// TODO Turn Progress zu red (show Tooltip)
+// TODO Display Exceptions in List in html
+// TODO ConflictList before copy
