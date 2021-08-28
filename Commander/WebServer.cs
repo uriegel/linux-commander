@@ -1,19 +1,22 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GtkDotNet;
 using UwebServer;
 using UwebServer.Routes;
 
-static class WebServer
+class WebServer
 {
-    public static ProgressControl ProgressControl { get; set; }
-    public static void Start() => server.Start();
-    public static void Stop() => server.Stop();
+    public void Start() => server.Start();
+    public void Stop() => server.Stop();
 
-    static WebServer()
+    public WebServer(ProgressControl progressControl)
     {
         var startTime = DateTime.Now;
+        this.progressControl = progressControl;
+        this.copyProcessor = new(progressControl);
+
         var routeWebSite = FileServing.Create(startTime);
         var routeService = new JsonService("/commander", async input =>
         {
@@ -41,7 +44,8 @@ static class WebServer
                 case "copy":
                 {
                     var items = input.RequestParam.Get<Copy>();
-                    break;
+                        copyProcessor.AddJobs(items.Items.Select(n => Path.Combine(items.SourcePath, n)), items.destinationPath);
+                        break;
                 }
                 default:
                     break;
@@ -60,7 +64,6 @@ static class WebServer
                 routeWebSite
             }
         });
-
     }
 
     class FileRequest : Route
@@ -93,7 +96,9 @@ static class WebServer
             }
         }
     }
-    static readonly Server server;
+    readonly Server server;
+    readonly CopyProcessor copyProcessor;
+    readonly ProgressControl progressControl;
 }
 
 record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);

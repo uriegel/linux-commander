@@ -2,7 +2,6 @@
 using GtkDotNet;
    
 var app = new Application("de.uriegel.commander");
-WebServer.Start();
 app.Run(() =>
 {
     app.RegisterResources();
@@ -11,7 +10,8 @@ app.Run(() =>
     var window = new Window(builder.GetObject("window"));
     var headerBar = new HeaderBar(builder.GetObject("headerbar"));
     var progressRevealer = new Revealer(builder.GetObject("ProgressRevealer"));
-    WebServer.ProgressControl = new ProgressControl(builder.GetObject("ProgressArea"));
+    var webServer = new WebServer(new ProgressControl(builder.GetObject("ProgressArea")));
+    webServer.Start();
     var webView = new WebView();
 
     var themeAction = new GtkAction("themes", "themeAdwaita", SetTheme);
@@ -60,7 +60,7 @@ app.Run(() =>
         settings.SetInt("window-position-x", x);
         settings.SetInt("window-position-y", y);
         settings.SetBool("is-maximized", window.IsMaximized());
-        WebServer.Stop();
+        webServer.Stop();
     };    
     
     app.AddWindow(window);
