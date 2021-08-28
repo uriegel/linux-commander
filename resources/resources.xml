@@ -11,7 +11,6 @@
     <file>web/scripts/folder.js</file>
     <file>web/scripts/global.js</file>
     <file>web/scripts/index.js</file>
-    <file>web/scripts/jobs.js</file>
     <file>web/scripts/viewer.js</file>
     <file>web/scripts/requests.js</file>
     <file>web/scripts/components/DialogBoxComponent.js</file>

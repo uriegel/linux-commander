@@ -76,12 +76,9 @@ class Folder extends HTMLElement {
         })
 
         this.table.addEventListener("delete", async evt => {
-            const selectedItems = this.table.items
-                .filter(n => n.isSelected) 
-            if (selectedItems.length == 0 && evt.detail.currentItem == 0)
-                return
-            const param = selectedItems.length > 0 ? selectedItems : [ this.table.items[evt.detail.currentItem] ] 
-            this.dispatchEvent(new CustomEvent('delete', { detail: param }))
+            const selectedItems = this.getSelectedItems()
+            if (selectedItems.length > 0)
+                this.dispatchEvent(new CustomEvent('delete', { detail: selectedItems }))
         })
                 
         this.table.addEventListener("keydown", evt => {
@@ -132,6 +129,11 @@ class Folder extends HTMLElement {
                     this.table.refresh()
                     break
                 }
+                case 116: // F5
+                    const selectedItems = this.getSelectedItems()
+                    if (selectedItems.length > 0)
+                        this.dispatchEvent(new CustomEvent('copy', { detail: selectedItems }))
+                break
             }
         })
 
@@ -217,6 +219,16 @@ class Folder extends HTMLElement {
         }
     }
 
+    getSelectedItems() {
+        const selectedItems = this.table.items
+            .filter(n => n.isSelected) 
+        if (selectedItems.length == 0 && this.table.getPosition() == 0)
+            return []
+        return selectedItems.length > 0
+            ? selectedItems
+            : [this.table.items[this.table.getPosition()]]
+    }
+
     sendStatusInfo(index) {
         if (this.table.items && this.table.items.length > 0)
             this.dispatchEvent(new CustomEvent('pathChanged', { detail: {
@@ -230,9 +242,12 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO ProgressControl
-// TODO set progressControl in Webserver
 // TODO CopyFile to CopyProcessor
+// TODO refresh when job finished
+// TODO CopyFile File
+// TODO CopyFile Folder
+// TODO CopyFile Source == Destination
+// TODO CopyFile Recursion
 // TODO MoveFile to CopyProcessor
 // TODO Delete 
 // TODO Delete with progress

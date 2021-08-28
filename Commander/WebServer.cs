@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GtkDotNet;
 using UwebServer;
 using UwebServer.Routes;
 
 static class WebServer
 {
+    public static ProgressControl ProgressControl { get; set; }
     public static void Start() => server.Start();
     public static void Stop() => server.Stop();
 
@@ -35,7 +37,12 @@ static class WebServer
                     return getExifs.ExifItems
                         .Select(n => DirectoryProcessor.GetExifData(getExifs.path, n))
                         .Where(n => n != null);
-                } 
+                }
+                case "copy":
+                {
+                    var items = input.RequestParam.Get<Copy>();
+                    break;
+                }
                 default:
                     break;
             }
@@ -93,4 +100,4 @@ record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
 record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
 record ExifItem(int Index, string Name);
 record ExifReturnItem(int Index, DateTime ExifTime);
-
+record Copy(string SourcePath, String destinationPath, string[] Items);

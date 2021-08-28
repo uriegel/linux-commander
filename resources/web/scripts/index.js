@@ -2,8 +2,8 @@ import './components/gridsplitter.js'
 import './components/pdfviewer.js'
 import './components/DialogBoxComponent.js'
 import './folder.js'
+import { request } from "./requests.js"
 import {onTheme as onViewerTheme, onShowViewer, refreshViewer} from './viewer.js'
-import { addDeleteJob } from './jobs.js'
 import { RESULT_OK } from './components/DialogBoxComponent.js'
 
 const folderLeft = document.getElementById("folderLeft")
@@ -52,6 +52,34 @@ folderLeft.addEventListener("tab", () => folderRight.setFocus())
 folderRight.addEventListener("tab", () => folderLeft.setFocus())
 folderLeft.addEventListener("delete", evt => onDelete(evt.detail))
 folderRight.addEventListener("delete", evt => onDelete(evt.detail))
+folderLeft.addEventListener("copy", evt => onCopy(evt.detail, folderRight.getCurrentPath()))
+folderRight.addEventListener("copy", evt => onCopy(evt.detail, folderLeft.getCurrentPath()))
+
+async function onCopy(itemsToDelete, path) {
+    const itemsType = getItemsTypes(itemsToDelete)
+    const text = itemsType == FILE 
+        ? itemsToDelete.length == 1 
+            ? "Möchtest Du die Datei kopieren?"
+            : "Möchtest Du die Dateien kopieren?"
+        : itemsType == DIRECTORY
+        ?  itemsToDelete.length == 1 
+            ? "Möchtest Du den Ordner kopieren?"
+            : "Möchtest Du die Ordner kopieren?"
+        : "Möchtest Du die Einträge kopieren?"
+
+    const res = await dialog.show({
+        text,
+        btnOk: true,
+        btnCancel: true
+    })    
+    activeFolder.setFocus()
+    if (res.result == RESULT_OK)
+        await request("copy", {
+            sourcePath: activeFolder.getCurrentPath(),
+            destinationPath: path,
+            items: itemsToDelete.map(n => n.name)
+        })
+}
 
 async function onDelete(itemsToDelete) {
     const itemsType = getItemsTypes(itemsToDelete)
@@ -71,8 +99,8 @@ async function onDelete(itemsToDelete) {
         btnCancel: true
     })    
     activeFolder.setFocus()
-    if (res.result == RESULT_OK)
-        addDeleteJob(activeFolder.id, activeFolder.getCurrentPath(), itemsToDelete.map(n => n.name))
+    // if (res.result == RESULT_OK)
+    //     addDeleteJob(activeFolder.id, activeFolder.getCurrentPath(), itemsToDelete.map(n => n.name))
 }
 
 function onTheme(theme) {

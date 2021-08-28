@@ -10,6 +10,8 @@ app.Run(() =>
 
     var window = new Window(builder.GetObject("window"));
     var headerBar = new HeaderBar(builder.GetObject("headerbar"));
+    var progressRevealer = new Revealer(builder.GetObject("ProgressRevealer"));
+    WebServer.ProgressControl = new ProgressControl(builder.GetObject("ProgressArea"));
     var webView = new WebView();
 
     var themeAction = new GtkAction("themes", "themeAdwaita", SetTheme);
