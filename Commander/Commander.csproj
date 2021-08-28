@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="URiegel.WebServer" Version="0.0.2" />
-    <PackageReference Include="GtkDotNet" Version="5.2.0" />
+    <PackageReference Include="GtkDotNet" Version="5.4.0" />
   </ItemGroup>
 
   <ItemGroup>

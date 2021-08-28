@@ -223,14 +223,18 @@ class Folder extends HTMLElement {
                 path: this.processor.getItem(this.table.items[index]),
                 dirs: this.dirsCount,
                 files: this.filesCount
-            }}))    }
+            }
+        }))
+    }
 }
 
 customElements.define('folder-table', Folder)
 
+// TODO ProgressControl
+// TODO set progressControl in Webserver
+// TODO CopyFile to CopyProcessor
 // TODO Delete 
 // TODO Delete with progress
-// TODO css-styles in GTK
 // TODO Processor: CanAction 
 // TODO CreateFolder
 // TODO Rename
