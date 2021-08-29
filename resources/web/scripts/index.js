@@ -55,14 +55,14 @@ folderRight.addEventListener("delete", evt => onDelete(evt.detail))
 folderLeft.addEventListener("copy", evt => onCopy(evt.detail, folderRight.getCurrentPath()))
 folderRight.addEventListener("copy", evt => onCopy(evt.detail, folderLeft.getCurrentPath()))
 
-async function onCopy(itemsToDelete, path) {
-    const itemsType = getItemsTypes(itemsToDelete)
+async function onCopy(itemsToCopy, path) {
+    const itemsType = getItemsTypes(itemsToCopy)
     const text = itemsType == FILE 
-        ? itemsToDelete.length == 1 
+        ? itemsToCopy.length == 1 
             ? "Möchtest Du die Datei kopieren?"
             : "Möchtest Du die Dateien kopieren?"
         : itemsType == DIRECTORY
-        ?  itemsToDelete.length == 1 
+        ?  itemsToCopy.length == 1 
             ? "Möchtest Du den Ordner kopieren?"
             : "Möchtest Du die Ordner kopieren?"
         : "Möchtest Du die Einträge kopieren?"
@@ -77,7 +77,7 @@ async function onCopy(itemsToDelete, path) {
         await request("copy", {
             sourcePath: activeFolder.getCurrentPath(),
             destinationPath: path,
-            items: itemsToDelete.map(n => n.name)
+            items: itemsToCopy.map(n => n.name)
         })
 }
 
@@ -99,8 +99,11 @@ async function onDelete(itemsToDelete) {
         btnCancel: true
     })    
     activeFolder.setFocus()
-    // if (res.result == RESULT_OK)
-    //     addDeleteJob(activeFolder.id, activeFolder.getCurrentPath(), itemsToDelete.map(n => n.name))
+    if (res.result == RESULT_OK)
+        await request("delete", {
+            sourcePath: activeFolder.getCurrentPath(),
+            items: itemsToDelete.map(n => n.name)
+        })
 }
 
 function onTheme(theme) {

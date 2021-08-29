@@ -15,7 +15,7 @@ class WebServer
     {
         var startTime = DateTime.Now;
         this.progressControl = progressControl;
-        this.copyProcessor = new(progressControl);
+        this.processingQueue.OnProgress += (s, args) => progressControl.Progress = args.Current / args.Total;
 
         var routeWebSite = FileServing.Create(startTime);
         var routeService = new JsonService("/commander", async input =>
@@ -43,9 +43,21 @@ class WebServer
                 }
                 case "copy":
                 {
-                    var items = input.RequestParam.Get<Copy>();
-                        copyProcessor.AddJobs(items.Items.Select(n => Path.Combine(items.SourcePath, n)), items.destinationPath);
-                        break;
+                    var items = input.RequestParam.Get<FileItems>();
+                    foreach (var item in items.Items)
+                        processingQueue.AddJob(
+                            new ProcessingJob(ProcessingAction.Copy, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
+                        );
+                    break;
+                }
+                case "delete":
+                {
+                    var items = input.RequestParam.Get<FileItems>();
+                    foreach (var item in items.Items)
+                        processingQueue.AddJob(
+                            new ProcessingJob(ProcessingAction.Delete, Path.Combine(items.SourcePath, item), null)
+                        );
+                    break;
                 }
                 default:
                     break;
@@ -97,7 +109,7 @@ class WebServer
         }
     }
     readonly Server server;
-    readonly CopyProcessor copyProcessor;
+    readonly ProcessingQueue processingQueue = new();
     readonly ProgressControl progressControl;
 }
 
@@ -105,4 +117,4 @@ record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
 record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
 record ExifItem(int Index, string Name);
 record ExifReturnItem(int Index, DateTime ExifTime);
-record Copy(string SourcePath, String destinationPath, string[] Items);
+record FileItems(string SourcePath, String destinationPath, string[] Items);

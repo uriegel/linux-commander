@@ -12,8 +12,11 @@ class ProcessingQueue
     {
         lock (locker)
         {
-            var fi = new FileInfo(job.Source);
-            totalBytes += fi.Length;
+            if (File.Exists(job.Source))
+            {
+                var fi = new FileInfo(job.Source);
+                totalBytes += fi.Length;
+            }
             jobs.Enqueue(job);
             if (proccessingThread == null)
             {
@@ -43,19 +46,26 @@ class ProcessingQueue
                 {
                     case ProcessingAction.Copy:
                         JobCopy(job);
-                    break;
+                        break;
+                    case ProcessingAction.Delete:
+                        JobDelete(job);
+                        break;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 // TODO Capture exception
-                var fi = new FileInfo(job.Source);
-                OnProgress?.Invoke(this, new(totalBytes, fi.Length));     
+                if (File.Exists(job.Source))
+                {
+                    var fi = new FileInfo(job.Source);
+                    OnProgress?.Invoke(this, new(totalBytes, fi.Length));
+                }
             }
         }
     }
 
     void JobCopy(ProcessingJob job) => GFile.Copy(job.Source, job.Destination, FileCopyFlags.None, Progress);
+    void JobDelete(ProcessingJob job) => GFile.Trash(job.Source);
 
     void Progress(long current, long total)
         => OnProgress?.Invoke(this, new(totalBytes, current));
@@ -63,14 +73,14 @@ class ProcessingQueue
     readonly Queue<ProcessingJob> jobs = new();
     readonly object locker = new();
     long totalBytes;
-
     Thread proccessingThread;
 }
 
 enum ProcessingAction
 {
     Copy, 
-    Move
+    Move,
+    Delete
 }
 
 record ProcessingJob(ProcessingAction Action, string Source, string Destination);

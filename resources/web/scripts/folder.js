@@ -242,10 +242,8 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO CopyFile to CopyProcessor
 // TODO refresh when job finished
-// TODO CopyFile File
-// TODO CopyFile Folder
+// TODO CopyFile Folder: Recursive getfiles
 // TODO CopyFile Source == Destination
 // TODO CopyFile Recursion
 // TODO MoveFile to CopyProcessor
