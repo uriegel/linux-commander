@@ -85,9 +85,9 @@ class WebServer
             Method = Method.GET;
             Path = "/commander";
         }
-        public override async Task ProcessAsync(IRequest request, IRequestHeaders headers, Response response)
+        public override async Task<bool> ProcessAsync(IRequest request, IRequestHeaders headers, Response response)
         {
-            var query = new UrlComponents(headers.Url[11..]);
+            var query = new UrlComponents(headers.Url, Path);
             switch (query.Path)
             {
                 case "geticon":
@@ -106,6 +106,7 @@ class WebServer
                     await response.SendNotFoundAsync();
                     break;
             }
+            return true;
         }
     }
     readonly Server server;
