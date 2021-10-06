@@ -11,7 +11,7 @@ class WebServer
     public void Start() => server.Start();
     public void Stop() => server.Stop();
 
-    public WebServer(ProgressControl progressControl, Revealer progressRevealer)
+    public WebServer(ProgressControl progressControl, Revealer progressRevealer, Action<string> refresh)
     {
         var startTime = DateTime.Now;
         this.progressControl = progressControl;
@@ -21,8 +21,11 @@ class WebServer
                 progressRevealer.IsRevealed = true;
             progressControl.Progress = (float)args.Current / args.Total;
             if (progressRevealer.IsRevealed && progressControl.Progress == 1)
+            {
                 progressRevealer.IsRevealed = false;
-
+                foreach (var id in args.IDs)
+                    refresh(id);
+            }
         };
 
         var routeWebSite = FileServing.Create(startTime);
@@ -54,7 +57,7 @@ class WebServer
                     var items = input.RequestParam.Get<FileItems>();
                     foreach (var item in items.Items)
                         processingQueue.AddJob(
-                            new ProcessingJob(ProcessingAction.Copy, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
+                            new ProcessingJob(items.Id, ProcessingAction.Copy, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
                         );
                     break;
                 }
@@ -63,7 +66,7 @@ class WebServer
                     var items = input.RequestParam.Get<FileItems>();
                     foreach (var item in items.Items)
                         processingQueue.AddJob(
-                            new ProcessingJob(ProcessingAction.Delete, Path.Combine(items.SourcePath, item), null)
+                            new ProcessingJob(items.Id, ProcessingAction.Delete, Path.Combine(items.SourcePath, item), null)
                         );
                     break;
                 }
@@ -126,4 +129,4 @@ record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
 record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
 record ExifItem(int Index, string Name);
 record ExifReturnItem(int Index, DateTime ExifTime);
-record FileItems(string SourcePath, String destinationPath, string[] Items);
+record FileItems(string Id, string SourcePath, String destinationPath, string[] Items);

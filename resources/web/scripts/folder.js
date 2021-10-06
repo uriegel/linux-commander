@@ -242,18 +242,15 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO refresh when job finished
 // TODO CopyFile Folder: Recursive getfiles
 // TODO CopyFile Source == Destination
 // TODO CopyFile Recursion
 // TODO MoveFile to CopyProcessor
-// TODO Delete 
 // TODO Delete with progress
+// TODO refresh when delete job finished
 // TODO Processor: CanAction 
 // TODO CreateFolder
 // TODO Rename
-// TODO Copy
-// TODO Copy: progress control in status bar
 // TODO Move
 // TODO Copy with Copy Paste (from external or from internal)
 // TODO When a path is not available anymore: fallback to root

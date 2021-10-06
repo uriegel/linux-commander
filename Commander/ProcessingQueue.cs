@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using GtkDotNet;
 
@@ -17,6 +18,8 @@ class ProcessingQueue
                 var fi = new FileInfo(job.Source);
                 totalBytes += fi.Length;
             }
+            if (!ids.Contains(job.id))
+                ids = ids.Concat(new[] { job.id }).ToArray();
             jobs.Enqueue(job);
             if (proccessingThread == null)
             {
@@ -60,8 +63,7 @@ class ProcessingQueue
                 if (File.Exists(job.Source))
                 {
                     var fi = new FileInfo(job.Source);
-                    // TODO: wrong file length, call Progress
-                    OnProgress?.Invoke(this, new(totalBytes, fi.Length));
+                    Progress(fi.Length, fi.Length);
                 }
             }
         }
@@ -72,12 +74,14 @@ class ProcessingQueue
 
     void Progress(long current, long total)
     {
-        OnProgress?.Invoke(this, new(totalBytes, current + alreadyProcessedBytes));
+        OnProgress?.Invoke(this, new(ids, totalBytes, current + alreadyProcessedBytes));
         if (total == current)
             alreadyProcessedBytes += total;
     }
 
     readonly Queue<ProcessingJob> jobs = new();
+
+    string[] ids = new string[0];
     readonly object locker = new();
     long totalBytes;
 
@@ -92,5 +96,5 @@ enum ProcessingAction
     Delete
 }
 
-record ProcessingJob(ProcessingAction Action, string Source, string Destination);
+record ProcessingJob(string id, ProcessingAction Action, string Source, string Destination);
 

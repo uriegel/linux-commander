@@ -19,7 +19,7 @@ initializeCallbacks(onTheme, onShowHidden, show => {
     onShowViewer(show, currentPath)
     folderLeft.onResize()
     folderRight.onResize()
-})
+}, refresh)
 
 function getItemsTypes(selectedItems) {
     const types = selectedItems
@@ -44,6 +44,11 @@ const onPathChanged = evt => {
     currentPath = evt.detail.path
     refreshViewer(evt.detail.path)
     setTitle(evt.detail.path, evt.detail.dirs, evt.detail.files)
+}
+
+function refresh(folderId) {
+    const folder = folderId == "folderLeft" ? folderLeft : folderRight
+    folder.reloadItems()
 }
 
 folderLeft.addEventListener("pathChanged", onPathChanged)
@@ -75,6 +80,7 @@ async function onCopy(itemsToCopy, path) {
     activeFolder.setFocus()
     if (res.result == RESULT_OK)
         await request("copy", {
+            id: activeFolder.id,
             sourcePath: activeFolder.getCurrentPath(),
             destinationPath: path,
             items: itemsToCopy.map(n => n.name)
@@ -101,6 +107,7 @@ async function onDelete(itemsToDelete) {
     activeFolder.setFocus()
     if (res.result == RESULT_OK)
         await request("delete", {
+            id: activeFolder.id,
             sourcePath: activeFolder.getCurrentPath(),
             items: itemsToDelete.map(n => n.name)
         })

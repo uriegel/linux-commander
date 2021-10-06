@@ -10,9 +10,10 @@ app.Run(() =>
     var window = new Window(builder.GetObject("window"));
     var headerBar = new HeaderBar(builder.GetObject("headerbar"));
     var progressRevealer = new Revealer(builder.GetObject("ProgressRevealer"));
-    var webServer = new WebServer(new ProgressControl(builder.GetObject("ProgressArea")), progressRevealer);
-    webServer.Start();
     var webView = new WebView();
+    var webServer = new WebServer(new ProgressControl(builder.GetObject("ProgressArea")), progressRevealer, Refresh);
+
+    webServer.Start();
 
     var themeAction = new GtkAction("themes", "themeAdwaita", SetTheme);
     app.AddActions(new[] {
@@ -79,5 +80,6 @@ app.Run(() =>
     void SetTheme(string theme) => webView.RunJavascript($"setTheme('{theme}')");
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
     void showViewer(bool show) => webView.RunJavascript($"showViewer({(show?"true":"false")})");
+    void Refresh(string id) => webView.RunJavascript($"refresh('{id}')");
 });
 

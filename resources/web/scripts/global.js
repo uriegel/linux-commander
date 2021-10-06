@@ -1,13 +1,19 @@
-function initializeCallbacks(onTheme, onShowHidden, onShowViewer) {
+function initializeCallbacks(onTheme, onShowHidden, onShowViewer, onRefresh) {
     onThemeCallback = onTheme
     onShowHiddenCallback = onShowHidden
     onShowViewerCallback = onShowViewer
+    onRefreshCallback = onRefresh
 }
 
 function setTheme(theme) {
     initialTheme = theme
     if (onThemeCallback)
         onThemeCallback(theme)
+}
+
+function refresh(id) {
+    if (onRefreshCallback)
+        onRefreshCallback(id)
 }
 
 function sendMessageToWebView(command, param) {
