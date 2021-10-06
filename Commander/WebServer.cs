@@ -11,11 +11,19 @@ class WebServer
     public void Start() => server.Start();
     public void Stop() => server.Stop();
 
-    public WebServer(ProgressControl progressControl)
+    public WebServer(ProgressControl progressControl, Revealer progressRevealer)
     {
         var startTime = DateTime.Now;
         this.progressControl = progressControl;
-        this.processingQueue.OnProgress += (s, args) => progressControl.Progress = args.Current / args.Total;
+        this.processingQueue.OnProgress += (s, args) =>
+        {
+            if (!progressRevealer.IsRevealed)
+                progressRevealer.IsRevealed = true;
+            progressControl.Progress = (float)args.Current / args.Total;
+            if (progressRevealer.IsRevealed && progressControl.Progress == 1)
+                progressRevealer.IsRevealed = false;
+
+        };
 
         var routeWebSite = FileServing.Create(startTime);
         var routeService = new JsonService("/commander", async input =>

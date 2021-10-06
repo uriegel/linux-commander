@@ -37,6 +37,8 @@ class ProcessingQueue
                 {
                     proccessingThread = null;
                     // TODO Signal end
+                    alreadyProcessedBytes = 0;
+                    totalBytes = 0;
                     return;
                 }
             }
@@ -58,6 +60,7 @@ class ProcessingQueue
                 if (File.Exists(job.Source))
                 {
                     var fi = new FileInfo(job.Source);
+                    // TODO: wrong file length, call Progress
                     OnProgress?.Invoke(this, new(totalBytes, fi.Length));
                 }
             }
@@ -68,11 +71,17 @@ class ProcessingQueue
     void JobDelete(ProcessingJob job) => GFile.Trash(job.Source);
 
     void Progress(long current, long total)
-        => OnProgress?.Invoke(this, new(totalBytes, current));
+    {
+        OnProgress?.Invoke(this, new(totalBytes, current + alreadyProcessedBytes));
+        if (total == current)
+            alreadyProcessedBytes += total;
+    }
 
     readonly Queue<ProcessingJob> jobs = new();
     readonly object locker = new();
     long totalBytes;
+
+    long alreadyProcessedBytes = 0;
     Thread proccessingThread;
 }
 

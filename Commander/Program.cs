@@ -10,7 +10,7 @@ app.Run(() =>
     var window = new Window(builder.GetObject("window"));
     var headerBar = new HeaderBar(builder.GetObject("headerbar"));
     var progressRevealer = new Revealer(builder.GetObject("ProgressRevealer"));
-    var webServer = new WebServer(new ProgressControl(builder.GetObject("ProgressArea")));
+    var webServer = new WebServer(new ProgressControl(builder.GetObject("ProgressArea")), progressRevealer);
     webServer.Start();
     var webView = new WebView();
 
