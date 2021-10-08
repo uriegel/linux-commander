@@ -80,7 +80,7 @@ async function onCopy(itemsToCopy, path) {
     activeFolder.setFocus()
     if (res.result == RESULT_OK)
         await request("copy", {
-            id: activeFolder.id,
+            id: getInactiveFolder().id,
             sourcePath: activeFolder.getCurrentPath(),
             destinationPath: path,
             items: itemsToCopy.map(n => n.name)
@@ -135,6 +135,8 @@ function onShowHidden(hidden) {
 
 folderLeft.setFocus()
 
+const getInactiveFolder = () => activeFolder == folderLeft ? folderRight : folderLeft
+
 document.addEventListener("keydown", async evt => {
     switch (evt.which) {
         case 118: // F7
@@ -152,8 +154,7 @@ document.addEventListener("keydown", async evt => {
             evt.stopPropagation()
             break
         case 120: { // F9
-            const inactiveFolder = activeFolder == folderLeft ? folderRight : folderLeft
-            inactiveFolder.changePath(activeFolder.getCurrentPath())
+            getInactiveFolder().changePath(activeFolder.getCurrentPath())
             evt.preventDefault()
             evt.stopPropagation()
             break

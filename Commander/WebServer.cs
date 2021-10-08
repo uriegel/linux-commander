@@ -11,22 +11,9 @@ class WebServer
     public void Start() => server.Start();
     public void Stop() => server.Stop();
 
-    public WebServer(ProgressControl progressControl, Revealer progressRevealer, Action<string> refresh)
+    public WebServer(ProcessingQueue processingQueue)
     {
         var startTime = DateTime.Now;
-        this.progressControl = progressControl;
-        this.processingQueue.OnProgress += (s, args) =>
-        {
-            if (!progressRevealer.IsRevealed)
-                progressRevealer.IsRevealed = true;
-            progressControl.Progress = (float)args.Current / args.Total;
-            if (progressRevealer.IsRevealed && progressControl.Progress == 1)
-            {
-                progressRevealer.IsRevealed = false;
-                foreach (var id in args.IDs)
-                    refresh(id);
-            }
-        };
 
         var routeWebSite = FileServing.Create(startTime);
         var routeService = new JsonService("/commander", async input =>
@@ -121,8 +108,6 @@ class WebServer
         }
     }
     readonly Server server;
-    readonly ProcessingQueue processingQueue = new();
-    readonly ProgressControl progressControl;
 }
 
 record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);

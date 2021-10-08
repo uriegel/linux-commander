@@ -2,6 +2,9 @@
 using GtkDotNet;
    
 var app = new Application("de.uriegel.commander");
+
+ProcessingQueue processingQueue = new();
+
 app.Run(() =>
 {
     app.RegisterResources();
@@ -11,7 +14,22 @@ app.Run(() =>
     var headerBar = new HeaderBar(builder.GetObject("headerbar"));
     var progressRevealer = new Revealer(builder.GetObject("ProgressRevealer"));
     var webView = new WebView();
-    var webServer = new WebServer(new ProgressControl(builder.GetObject("ProgressArea")), progressRevealer, Refresh);
+
+    var progressControl = new ProgressControl(builder.GetObject("ProgressArea"));
+    processingQueue.OnProgress += (s, args) =>
+    {
+        if (!progressRevealer.IsRevealed)
+            progressRevealer.IsRevealed = true;
+        progressControl.Progress = (float)args.Current / args.Total;
+    };
+    processingQueue.Finish += (s, args) =>
+    {
+        progressRevealer.IsRevealed = false;
+        foreach (var id in args.IDs)
+            Refresh(id);
+    };
+
+    var webServer = new WebServer(processingQueue);
 
     webServer.Start();
 

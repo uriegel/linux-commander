@@ -8,18 +8,24 @@ using GtkDotNet;
 class ProcessingQueue
 {
     public event EventHandler<ProgressEventArgs> OnProgress;
+    public event EventHandler<FinishEventArgs> Finish;
 
-    public void AddJob(ProcessingJob job)
+    public void AddJob(ProcessingJob processingJob)
     {
         lock (locker)
         {
-            if (File.Exists(job.Source))
+            long length = 1;
+            if (processingJob.Action == ProcessingAction.Delete)
+                totalBytes += length;
+            else if (File.Exists(processingJob.Source))
             {
-                var fi = new FileInfo(job.Source);
-                totalBytes += fi.Length;
+                var fi = new FileInfo(processingJob.Source);
+                length = fi.Length;
+                totalBytes += length;
             }
-            if (!ids.Contains(job.id))
-                ids = ids.Concat(new[] { job.id }).ToArray();
+            Job job = new(processingJob, length);
+            if (!ids.Contains(processingJob.Id))
+                ids = ids.Concat(new[] { processingJob.Id }).ToArray();
             jobs.Enqueue(job);
             if (proccessingThread == null)
             {
@@ -33,53 +39,56 @@ class ProcessingQueue
     {
         while (true)
         {
-            ProcessingJob job;
+            Job job;
             lock (locker)
             {
                 if (!jobs.TryDequeue(out job))
                 {
+                    Finish?.Invoke(this, new(ids));
                     proccessingThread = null;
-                    // TODO Signal end
                     alreadyProcessedBytes = 0;
                     totalBytes = 0;
+                    ids = new string[0];
                     return;
                 }
             }
             try
             {
-                switch (job.Action)
+                switch (job.ProcessingJob.Action)
                 {
                     case ProcessingAction.Copy:
                         JobCopy(job);
                         break;
                     case ProcessingAction.Delete:
-                        JobDelete(job);
+                        JobDelete(job.ProcessingJob);
                         break;
                 }
             }
             catch (Exception e)
             {
                 // TODO Capture exception
-                if (File.Exists(job.Source))
-                {
-                    var fi = new FileInfo(job.Source);
-                    Progress(fi.Length, fi.Length);
-                }
+                alreadyProcessedBytes += job.FileSize;
             }
         }
     }
 
-    void JobCopy(ProcessingJob job) => GFile.Copy(job.Source, job.Destination, FileCopyFlags.None, Progress);
-    void JobDelete(ProcessingJob job) => GFile.Trash(job.Source);
-
-    void Progress(long current, long total)
+    void JobCopy(Job job)
     {
-        OnProgress?.Invoke(this, new(ids, totalBytes, current + alreadyProcessedBytes));
-        if (total == current)
-            alreadyProcessedBytes += total;
+        GFile.Copy(job.ProcessingJob.Source, job.ProcessingJob.Destination, FileCopyFlags.None, Progress);
+        alreadyProcessedBytes += job.FileSize;
     }
 
-    readonly Queue<ProcessingJob> jobs = new();
+    void JobDelete(ProcessingJob job)
+    {
+        GFile.Trash(job.Source);
+        Progress(1, 1);
+        alreadyProcessedBytes += 1;
+    }
+
+    void Progress(long current, long total) 
+        => OnProgress?.Invoke(this, new(totalBytes, current + alreadyProcessedBytes));
+    
+    readonly Queue<Job> jobs = new();
 
     string[] ids = new string[0];
     readonly object locker = new();
@@ -96,5 +105,6 @@ enum ProcessingAction
     Delete
 }
 
-record ProcessingJob(string id, ProcessingAction Action, string Source, string Destination);
+record ProcessingJob(string Id, ProcessingAction Action, string Source, string Destination);
+record Job(ProcessingJob ProcessingJob, long FileSize);
 
