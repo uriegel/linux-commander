@@ -238,7 +238,12 @@ class DialogBoxComponent extends HTMLElement {
         this.btnCancel.onfocus = () => this.focusButton(true)
         this.btnCancel.onblur = () => this.focusButton(false)
 
-        this.input.onfocus = () => setTimeout(() => this.input.select())
+        this.input.onfocus = () => setTimeout(() => {
+            if (this.inputSelectRange)
+                this.input.setSelectionRange(this.inputSelectRange[0], this.inputSelectRange[1])
+            else
+                this.input.select()
+        })
 
         this.dialog.addEventListener("focusin", () => this.focusIndex = 
             this.focusables.findIndex(n => n == this.shadowRoot.activeElement || n == document.activeElement))
@@ -374,8 +379,11 @@ class DialogBoxComponent extends HTMLElement {
             this.dialogContainer.classList.remove("leftTranslated")
             this.dialogContainer.classList.remove("rightTranslated")
             this.focusables = []
-            if (settings.input)
+            if (settings.input) {
                 this.focusables.push(this.input)
+                if (settings.inputSelectRange)
+                    this.inputSelectRange = settings.inputSelectRange
+            }
             if (settings.extendedFocusables)
                 this.focusables = this.focusables.concat(settings.extendedFocusables)
             setWidths()
