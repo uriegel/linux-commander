@@ -8,6 +8,7 @@ using UwebServer.Routes;
 
 class WebServer
 {
+    public event EventHandler<RefreshEventArgs> OnRefresh;
     public void Start() => server.Start();
     public void Stop() => server.Stop();
 
@@ -65,6 +66,16 @@ class WebServer
                             new ProcessingJob(new [] {items.Id}, ProcessingAction.Delete, Path.Combine(items.SourcePath, item), null)
                         );
                     break;
+                }
+                case "rename":
+                {
+                    var item = input.RequestParam.Get<RenameItem>();
+                    if (item.isDirectory)
+                        Directory.Move(Path.Combine(item.Path, item.item), Path.Combine(item.Path, item.newName));
+                    else
+                        File.Move(Path.Combine(item.Path, item.item), Path.Combine(item.Path, item.newName));
+                        OnRefresh?.Invoke(this, new(item.Id));
+                        break;
                 }
                 default:
                     break;
@@ -124,3 +135,4 @@ record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
 record ExifItem(int Index, string Name);
 record ExifReturnItem(int Index, DateTime ExifTime);
 record FileItems(string Id, string[] Ids, string SourcePath, String destinationPath, string[] Items);
+record RenameItem(string Id, string Path, string item, string newName, bool isDirectory);

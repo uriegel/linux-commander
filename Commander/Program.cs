@@ -30,6 +30,7 @@ app.Run(() =>
     };
 
     var webServer = new WebServer(processingQueue);
+    webServer.OnRefresh += (s, e) => Refresh(e.Id);
 
     webServer.Start();
 

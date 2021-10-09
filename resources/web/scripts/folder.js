@@ -129,6 +129,12 @@ class Folder extends HTMLElement {
                     this.table.refresh()
                     break
                 }
+                case 113: { // F2
+                    const selectedItems = this.getSelectedItems()
+                    if (selectedItems.length == 1)
+                        this.dispatchEvent(new CustomEvent('rename', { detail: selectedItems }))
+                }
+                break
                 case 116: { // F5
                     const selectedItems = this.getSelectedItems()
                     if (selectedItems.length > 0)
@@ -250,15 +256,11 @@ class Folder extends HTMLElement {
 customElements.define('folder-table', Folder)
 
 // TODO CopyFile Folder: Recursive getfiles
+// TODO CopyFile: overwrite
 // TODO CopyFile Source == Destination
 // TODO CopyFile Recursion
-// TODO MoveFile to CopyProcessor
-// TODO Delete with progress
-// TODO refresh when delete job finished
 // TODO Processor: CanAction 
 // TODO CreateFolder
-// TODO Rename
-// TODO Move
 // TODO Copy with Copy Paste (from external or from internal)
 // TODO When a path is not available anymore: fallback to root
 // TODO ProgressControl: multiple progresses: show in ProgressBars in popovermenu, show latest in ProgressPie

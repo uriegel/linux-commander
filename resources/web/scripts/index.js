@@ -55,6 +55,8 @@ folderLeft.addEventListener("pathChanged", onPathChanged)
 folderRight.addEventListener("pathChanged", onPathChanged)
 folderLeft.addEventListener("tab", () => folderRight.setFocus())
 folderRight.addEventListener("tab", () => folderLeft.setFocus())
+folderLeft.addEventListener("rename", evt => onRename(evt.detail))
+folderRight.addEventListener("rename", evt => onRename(evt.detail))
 folderLeft.addEventListener("delete", evt => onDelete(evt.detail))
 folderRight.addEventListener("delete", evt => onDelete(evt.detail))
 folderLeft.addEventListener("copy", evt => onCopy(evt.detail, folderRight.getCurrentPath()))
@@ -115,6 +117,40 @@ async function onMove(itemsToMove, path) {
             items: itemsToMove.map(n => n.name)
         })
     }
+}
+
+async function onRename(itemToRename) {
+    const itemsType = getItemsTypes(itemToRename)
+    const text = itemsType == FILE 
+        ? "Datei umbenennen"
+        : "Ordner umbenennen"
+    
+    const getInputRange = () => {
+        const pos = itemToRename[0].name.lastIndexOf(".")
+        if (pos == -1)
+            return [0, itemToRename[0].name.length]
+        else
+            return [0, pos]
+    }
+
+    const res = await dialog.show({
+        text,
+        input: true,
+        inputText: itemToRename[0].name,
+        inputSelectRange: getInputRange(),
+        btnOk: true,
+        btnCancel: true,
+        defBtnOk: true
+    })    
+    activeFolder.setFocus()
+    if (res.result == RESULT_OK)
+        await request("rename", {
+            id: activeFolder.id,
+            path: activeFolder.getCurrentPath(),
+            item: itemToRename[0].name,
+            newName: res.input,
+            isDirectory: itemsType == DIRECTORY
+        })
 }
 
 async function onDelete(itemsToDelete) {
