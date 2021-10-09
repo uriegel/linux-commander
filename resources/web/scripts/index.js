@@ -59,6 +59,8 @@ folderLeft.addEventListener("delete", evt => onDelete(evt.detail))
 folderRight.addEventListener("delete", evt => onDelete(evt.detail))
 folderLeft.addEventListener("copy", evt => onCopy(evt.detail, folderRight.getCurrentPath()))
 folderRight.addEventListener("copy", evt => onCopy(evt.detail, folderLeft.getCurrentPath()))
+folderLeft.addEventListener("move", evt => onMove(evt.detail, folderRight.getCurrentPath()))
+folderRight.addEventListener("move", evt => onMove(evt.detail, folderLeft.getCurrentPath()))
 
 async function onCopy(itemsToCopy, path) {
     const itemsType = getItemsTypes(itemsToCopy)
@@ -85,6 +87,34 @@ async function onCopy(itemsToCopy, path) {
             destinationPath: path,
             items: itemsToCopy.map(n => n.name)
         })
+}
+
+async function onMove(itemsToMove, path) {
+    const itemsType = getItemsTypes(itemsToMove)
+    const text = itemsType == FILE 
+        ? itemsToMove.length == 1 
+            ? "Möchtest Du die Datei verschieben?"
+            : "Möchtest Du die Dateien verschieben?"
+        : itemsType == DIRECTORY
+        ?  itemsToMove.length == 1 
+            ? "Möchtest Du den Ordner verschieben?"
+            : "Möchtest Du die Ordner verschieben?"
+        : "Möchtest Du die Einträge verschieben?"
+
+    const res = await dialog.show({
+        text,
+        btnOk: true,
+        btnCancel: true
+    })    
+    activeFolder.setFocus()
+    if (res.result == RESULT_OK) {
+        await request("move", {
+            ids: [ activeFolder.id, getInactiveFolder().id ],
+            sourcePath: activeFolder.getCurrentPath(),
+            destinationPath: path,
+            items: itemsToMove.map(n => n.name)
+        })
+    }
 }
 
 async function onDelete(itemsToDelete) {

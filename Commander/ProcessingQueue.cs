@@ -24,8 +24,7 @@ class ProcessingQueue
                 totalBytes += length;
             }
             Job job = new(processingJob, length);
-            if (!ids.Contains(processingJob.Id))
-                ids = ids.Concat(new[] { processingJob.Id }).ToArray();
+            ids = ids.Concat(processingJob.ids).Distinct().ToArray();
             jobs.Enqueue(job);
             if (proccessingThread == null)
             {
@@ -59,6 +58,9 @@ class ProcessingQueue
                     case ProcessingAction.Copy:
                         JobCopy(job);
                         break;
+                    case ProcessingAction.Move:
+                        JobMove(job);
+                        break;
                     case ProcessingAction.Delete:
                         JobDelete(job.ProcessingJob);
                         break;
@@ -75,6 +77,12 @@ class ProcessingQueue
     void JobCopy(Job job)
     {
         GFile.Copy(job.ProcessingJob.Source, job.ProcessingJob.Destination, FileCopyFlags.None, Progress);
+        alreadyProcessedBytes += job.FileSize;
+    }
+
+    void JobMove(Job job)
+    {
+        GFile.Move(job.ProcessingJob.Source, job.ProcessingJob.Destination, FileCopyFlags.None, Progress);
         alreadyProcessedBytes += job.FileSize;
     }
 
@@ -105,6 +113,6 @@ enum ProcessingAction
     Delete
 }
 
-record ProcessingJob(string Id, ProcessingAction Action, string Source, string Destination);
+record ProcessingJob(string[] ids, ProcessingAction Action, string Source, string Destination);
 record Job(ProcessingJob ProcessingJob, long FileSize);
 

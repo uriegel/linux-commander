@@ -44,7 +44,16 @@ class WebServer
                     var items = input.RequestParam.Get<FileItems>();
                     foreach (var item in items.Items)
                         processingQueue.AddJob(
-                            new ProcessingJob(items.Id, ProcessingAction.Copy, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
+                            new ProcessingJob(new [] {items.Id}, ProcessingAction.Copy, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
+                        );
+                    break;
+                }
+                case "move":
+                {
+                    var items = input.RequestParam.Get<FileItems>();
+                    foreach (var item in items.Items)
+                        processingQueue.AddJob(
+                            new ProcessingJob(items.Ids, ProcessingAction.Move, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
                         );
                     break;
                 }
@@ -53,7 +62,7 @@ class WebServer
                     var items = input.RequestParam.Get<FileItems>();
                     foreach (var item in items.Items)
                         processingQueue.AddJob(
-                            new ProcessingJob(items.Id, ProcessingAction.Delete, Path.Combine(items.SourcePath, item), null)
+                            new ProcessingJob(new [] {items.Id}, ProcessingAction.Delete, Path.Combine(items.SourcePath, item), null)
                         );
                     break;
                 }
@@ -114,4 +123,4 @@ record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
 record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
 record ExifItem(int Index, string Name);
 record ExifReturnItem(int Index, DateTime ExifTime);
-record FileItems(string Id, string SourcePath, String destinationPath, string[] Items);
+record FileItems(string Id, string[] Ids, string SourcePath, String destinationPath, string[] Items);

@@ -129,10 +129,17 @@ class Folder extends HTMLElement {
                     this.table.refresh()
                     break
                 }
-                case 116: // F5
+                case 116: { // F5
                     const selectedItems = this.getSelectedItems()
                     if (selectedItems.length > 0)
                         this.dispatchEvent(new CustomEvent('copy', { detail: selectedItems }))
+                }
+                break
+                case 117: { // F6
+                    const selectedItems = this.getSelectedItems()
+                    if (selectedItems.length > 0)
+                        this.dispatchEvent(new CustomEvent('move', { detail: selectedItems }))
+                }
                 break
             }
         })
