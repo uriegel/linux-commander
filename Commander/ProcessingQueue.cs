@@ -72,7 +72,7 @@ class ProcessingQueue
                 alreadyProcessedBytes += job.FileSize;
             }
         }
-    }
+    }       
 
     void JobCopy(Job job)
     {

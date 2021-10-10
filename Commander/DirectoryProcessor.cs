@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,6 +35,65 @@ static class DirectoryProcessor
         return new ExifReturnItem(exifItem.Index, dateTime);
     }
 
+    public static void CopyFiles(ProcessingQueue processingQueue, FileItems items)
+    {
+        foreach (var item in items.Items)
+            processingQueue.AddJob(
+                new ProcessingJob(new [] {items.Id}, ProcessingAction.Copy, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
+            );
+    }
+
+    public static void MoveFiles(ProcessingQueue processingQueue, FileItems items)
+    {
+        foreach (var item in items.Items)
+            processingQueue.AddJob(
+                new ProcessingJob(items.Ids, ProcessingAction.Move, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
+            );
+    }
+
+    public static void DeleteFiles(ProcessingQueue processingQueue, FileItems items)
+    {
+        foreach (var item in items.Items)
+            processingQueue.AddJob(
+                new ProcessingJob(new[] { items.Id }, ProcessingAction.Delete, Path.Combine(items.SourcePath, item), null)
+            );
+    }
+
+    public static void RenameFile(RenameItem item)
+    {
+        try
+        {
+            if (item.isDirectory)
+                Directory.Move(Path.Combine(item.Path, item.item), Path.Combine(item.Path, item.newName));
+            else
+                File.Move(Path.Combine(item.Path, item.item), Path.Combine(item.Path, item.newName));
+        }
+        catch (IOException ae) when (ae.HResult == 13)
+        {
+            throw new WebViewException("Zugriff verweigert", new [] { item.Id });
+        }
+        catch (IOException ive) when (ive.HResult == 22)
+        {
+            throw new WebViewException("Name ungültig", new [] { item.Id });
+        }
+        catch (IOException ee) when (ee.HResult == -2146232800)
+        {
+            throw new WebViewException("Der eingegebene Name unterscheidet sich nicht vom bisherigen", new [] { item.Id });
+        }
+    }
+
+    public static void CreateFolder(CreateFolder item)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(item.Path, item.newName));
+        }
+        catch (UnauthorizedAccessException)
+        {
+            throw new WebViewException("Zugriff verweigert", new [] { item.Id });
+        }
+    }
+
     static IEnumerable<T> GetSafeItems<T>(Func<IEnumerable<T>> func)
     {
         try
@@ -49,3 +107,11 @@ static class DirectoryProcessor
         }
     }
 }
+
+record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
+record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
+record ExifItem(int Index, string Name);
+record ExifReturnItem(int Index, DateTime ExifTime);
+record FileItems(string Id, string[] Ids, string SourcePath, String destinationPath, string[] Items);
+record RenameItem(string Id, string Path, string item, string newName, bool isDirectory);
+record CreateFolder(string Id, string Path, string newName);

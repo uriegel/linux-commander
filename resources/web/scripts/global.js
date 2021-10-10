@@ -1,8 +1,9 @@
-function initializeCallbacks(onTheme, onShowHidden, onShowViewer, onRefresh) {
+function initializeCallbacks(onTheme, onShowHidden, onShowViewer, onRefresh, onException) {
     onThemeCallback = onTheme
     onShowHiddenCallback = onShowHidden
     onShowViewerCallback = onShowViewer
     onRefreshCallback = onRefresh
+    onExceptionCallback = onException
 }
 
 function setTheme(theme) {
@@ -18,6 +19,11 @@ function refresh(id) {
 
 function sendMessageToWebView(command, param) {
     alert(`!!webmsg!!${command}!!${param}`)
+}
+
+function exception(message) {
+    if (onExceptionCallback)
+        onExceptionCallback(message)
 }
 
 function setTitle(title, dirs, files) {

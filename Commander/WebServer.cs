@@ -1,14 +1,13 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GtkDotNet;
 using UwebServer;
 using UwebServer.Routes;
 
 class WebServer
 {
     public event EventHandler<RefreshEventArgs> OnRefresh;
+    public event EventHandler<ExceptionEventArgs> OnException;
     public void Start() => server.Start();
     public void Stop() => server.Stop();
 
@@ -19,73 +18,47 @@ class WebServer
         var routeWebSite = FileServing.Create(startTime);
         var routeService = new JsonService("/commander", async input =>
         {
-            switch (input.Path)
+            try
             {
-                case "getitems":
+                switch (input.Path)
                 {
-                    var getItems = input.RequestParam.Get<GetItems>();
-                    var items = DirectoryProcessor.GetItems(getItems.Path, getItems.HiddenIncluded, getItems.Id);
-                    return items;
+                    case "getitems":
+                        var getItems = input.RequestParam.Get<GetItems>();
+                        var items = DirectoryProcessor.GetItems(getItems.Path, getItems.HiddenIncluded, getItems.Id);
+                        return items;
+                    case "getroot":
+                        return await RootProcessor.GetItemsAsync();
+                    case "getexifs":
+                        var getExifs = input.RequestParam.Get<GetExifs>();
+                        return getExifs.ExifItems
+                            .Select(n => DirectoryProcessor.GetExifData(getExifs.path, n))
+                            .Where(n => n != null);
+                    case "copy":
+                        DirectoryProcessor.CopyFiles(processingQueue, input.RequestParam.Get<FileItems>());
+                        break;
+                    case "move":
+                        DirectoryProcessor.MoveFiles(processingQueue, input.RequestParam.Get<FileItems>());
+                        break;
+                    case "delete":
+                        DirectoryProcessor.DeleteFiles(processingQueue, input.RequestParam.Get<FileItems>());
+                        break;
+                    case "rename":
+                        var renameItem = input.RequestParam.Get<RenameItem>();
+                        DirectoryProcessor.RenameFile(renameItem);
+                        OnRefresh?.Invoke(this, new(renameItem.Id));
+                        break;
+                    case "createFolder":
+                        var createFolderItem = input.RequestParam.Get<CreateFolder>();
+                        DirectoryProcessor.CreateFolder(createFolderItem);
+                        OnRefresh?.Invoke(this, new(createFolderItem.Id));
+                        break;
+                    default:
+                        break;
                 }
-                case "getroot":
-                {
-                    var getItems = input.RequestParam.Get<GetItems>();
-                    var items = await RootProcessor.GetItemsAsync();
-                    return items;
-                }
-                case "getexifs":
-                {
-                    var getExifs = input.RequestParam.Get<GetExifs>();
-                    return getExifs.ExifItems
-                        .Select(n => DirectoryProcessor.GetExifData(getExifs.path, n))
-                        .Where(n => n != null);
-                }
-                case "copy":
-                {
-                    var items = input.RequestParam.Get<FileItems>();
-                    foreach (var item in items.Items)
-                        processingQueue.AddJob(
-                            new ProcessingJob(new [] {items.Id}, ProcessingAction.Copy, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
-                        );
-                    break;
-                }
-                case "move":
-                {
-                    var items = input.RequestParam.Get<FileItems>();
-                    foreach (var item in items.Items)
-                        processingQueue.AddJob(
-                            new ProcessingJob(items.Ids, ProcessingAction.Move, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
-                        );
-                    break;
-                }
-                case "delete":
-                {
-                    var items = input.RequestParam.Get<FileItems>();
-                    foreach (var item in items.Items)
-                        processingQueue.AddJob(
-                            new ProcessingJob(new [] {items.Id}, ProcessingAction.Delete, Path.Combine(items.SourcePath, item), null)
-                        );
-                    break;
-                }
-                case "rename":
-                {
-                    var item = input.RequestParam.Get<RenameItem>();
-                    if (item.isDirectory)
-                        Directory.Move(Path.Combine(item.Path, item.item), Path.Combine(item.Path, item.newName));
-                    else
-                        File.Move(Path.Combine(item.Path, item.item), Path.Combine(item.Path, item.newName));
-                    OnRefresh?.Invoke(this, new(item.Id));
-                    break;
-                }
-                case "createFolder":
-                {
-                    var item = input.RequestParam.Get<CreateFolder>();
-                    Directory.CreateDirectory(Path.Combine(item.Path, item.newName));
-                    OnRefresh?.Invoke(this, new(item.Id));
-                    break;
-                }
-                default:
-                    break;
+            }
+            catch (WebViewException wve)
+            {
+                OnException?.Invoke(this, new(wve.Message, wve.IDs));
             }
             return new { };
         });
@@ -137,10 +110,3 @@ class WebServer
     readonly Server server;
 }
 
-record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
-record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
-record ExifItem(int Index, string Name);
-record ExifReturnItem(int Index, DateTime ExifTime);
-record FileItems(string Id, string[] Ids, string SourcePath, String destinationPath, string[] Items);
-record RenameItem(string Id, string Path, string item, string newName, bool isDirectory);
-record CreateFolder(string Id, string Path, string newName);

@@ -31,6 +31,12 @@ app.Run(() =>
 
     var webServer = new WebServer(processingQueue);
     webServer.OnRefresh += (s, e) => Refresh(e.Id);
+    webServer.OnException += (s, e) =>
+    {
+        foreach (var id in e.IDs)
+            Refresh(id);
+        SendException(e.Exception);
+    };
 
     webServer.Start();
 
@@ -100,5 +106,6 @@ app.Run(() =>
     void showHidden(bool show) => webView.RunJavascript($"showHidden({(show?"true":"false")})");
     void showViewer(bool show) => webView.RunJavascript($"showViewer({(show?"true":"false")})");
     void Refresh(string id) => webView.RunJavascript($"refresh('{id}')");
+    void SendException(string exception) => webView.RunJavascript($"exception('{exception}')");
 });
 

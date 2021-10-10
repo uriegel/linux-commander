@@ -19,7 +19,7 @@ initializeCallbacks(onTheme, onShowHidden, show => {
     onShowViewer(show, currentPath)
     folderLeft.onResize()
     folderRight.onResize()
-}, refresh)
+}, refresh, onException)
 
 function getItemsTypes(selectedItems) {
     const types = selectedItems
@@ -49,6 +49,18 @@ const onPathChanged = evt => {
 function refresh(folderId) {
     const folder = folderId == "folderLeft" ? folderLeft : folderRight
     folder.reloadItems()
+}
+
+function onException(text) {
+    setTimeout(async () => {
+        await dialog.show({
+            text,
+            btnOk: true
+        })
+        activeFolder.setFocus()        
+    },
+    // TODO stack MessageBoxes
+    500)
 }
 
 folderLeft.addEventListener("pathChanged", onPathChanged)
