@@ -260,15 +260,15 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Delete Access Denied: Exception in progressingQueue
-// TODO Delete other errors: Fehler aufgetreten
 // TODO Copy, Move: No access, path not found
 // TODO CopyFile Folder: Recursive getfiles
 // TODO CopyFile: overwrite
 // TODO CopyFile Source == Destination
 // TODO CopyFile Recursion
 // TODO Processor: CanAction 
-// TODO CreateFolder
+// TODO Show trashinfo (show trash)
+// TODO Undelete files
+// TODO Empty trash
 // TODO Copy with Copy Paste (from external or from internal)
 // TODO When a path is not available anymore: fallback to root
 // TODO ProgressControl: multiple progresses: show in ProgressBars in popovermenu, show latest in ProgressPie

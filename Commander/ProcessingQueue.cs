@@ -9,6 +9,7 @@ class ProcessingQueue
 {
     public event EventHandler<ProgressEventArgs> OnProgress;
     public event EventHandler<FinishEventArgs> Finish;
+    public event EventHandler<ExceptionEventArgs> OnException;
 
     public void AddJob(ProcessingJob processingJob)
     {
@@ -36,23 +37,19 @@ class ProcessingQueue
 
     void Process()
     {
-        while (true)
+        try
         {
-            Job job;
-            lock (locker)
+            while (true)
             {
-                if (!jobs.TryDequeue(out job))
+                Job job;
+                lock (locker)
                 {
-                    Finish?.Invoke(this, new(ids));
-                    proccessingThread = null;
-                    alreadyProcessedBytes = 0;
-                    totalBytes = 0;
-                    ids = new string[0];
-                    return;
+                    if (!jobs.TryDequeue(out job))
+                    {
+                        Stop();
+                        return;
+                    }
                 }
-            }
-            try
-            {
                 switch (job.ProcessingJob.Action)
                 {
                     case ProcessingAction.Copy:
@@ -66,11 +63,27 @@ class ProcessingQueue
                         break;
                 }
             }
-            catch (Exception e)
-            {
-                // TODO Capture exception
-                alreadyProcessedBytes += job.FileSize;
-            }
+        }
+        catch (DeleteException)
+        {
+            OnException?.Invoke(this, new("Die Datei kann nicht gelöscht werden", ids));
+            jobs.Clear();
+            Stop();
+        }
+        catch (Exception)
+        {
+            OnException?.Invoke(this, new("Fehler aufgetreten", ids));
+            jobs.Clear();
+            Stop();
+        }
+
+        void Stop()
+        {
+            Finish?.Invoke(this, new(ids));
+            proccessingThread = null;
+            alreadyProcessedBytes = 0;
+            totalBytes = 0;
+            ids = new string[0];
         }
     }       
 
@@ -88,9 +101,16 @@ class ProcessingQueue
 
     void JobDelete(ProcessingJob job)
     {
-        GFile.Trash(job.Source);
-        Progress(1, 1);
-        alreadyProcessedBytes += 1;
+        try
+        {
+            GFile.Trash(job.Source);
+            Progress(1, 1);
+            alreadyProcessedBytes += 1;
+        }
+        catch 
+        {
+            throw new DeleteException();
+        }
     }
 
     void Progress(long current, long total) 

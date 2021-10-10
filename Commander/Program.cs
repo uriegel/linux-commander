@@ -28,15 +28,18 @@ app.Run(() =>
         foreach (var id in args.IDs)
             Refresh(id);
     };
+    processingQueue.OnException += OnException;
 
     var webServer = new WebServer(processingQueue);
     webServer.OnRefresh += (s, e) => Refresh(e.Id);
-    webServer.OnException += (s, e) =>
+    webServer.OnException += OnException;
+
+    void OnException(object s, ExceptionEventArgs e) 
     {
         foreach (var id in e.IDs)
             Refresh(id);
         SendException(e.Exception);
-    };
+    }
 
     webServer.Start();
 
