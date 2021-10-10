@@ -147,6 +147,11 @@ class Folder extends HTMLElement {
                         this.dispatchEvent(new CustomEvent('move', { detail: selectedItems }))
                 }
                 break
+                case 118: { // F7
+                    const selectedItems = this.getSelectedItems()
+                    this.dispatchEvent(new CustomEvent('createFolder', { detail: selectedItems }))
+                }
+                break
             }
         })
 

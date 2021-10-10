@@ -74,8 +74,15 @@ class WebServer
                         Directory.Move(Path.Combine(item.Path, item.item), Path.Combine(item.Path, item.newName));
                     else
                         File.Move(Path.Combine(item.Path, item.item), Path.Combine(item.Path, item.newName));
-                        OnRefresh?.Invoke(this, new(item.Id));
-                        break;
+                    OnRefresh?.Invoke(this, new(item.Id));
+                    break;
+                }
+                case "createFolder":
+                {
+                    var item = input.RequestParam.Get<CreateFolder>();
+                    Directory.CreateDirectory(Path.Combine(item.Path, item.newName));
+                    OnRefresh?.Invoke(this, new(item.Id));
+                    break;
                 }
                 default:
                     break;
@@ -136,3 +143,4 @@ record ExifItem(int Index, string Name);
 record ExifReturnItem(int Index, DateTime ExifTime);
 record FileItems(string Id, string[] Ids, string SourcePath, String destinationPath, string[] Items);
 record RenameItem(string Id, string Path, string item, string newName, bool isDirectory);
+record CreateFolder(string Id, string Path, string newName);

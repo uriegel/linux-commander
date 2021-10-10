@@ -63,6 +63,8 @@ folderLeft.addEventListener("copy", evt => onCopy(evt.detail, folderRight.getCur
 folderRight.addEventListener("copy", evt => onCopy(evt.detail, folderLeft.getCurrentPath()))
 folderLeft.addEventListener("move", evt => onMove(evt.detail, folderRight.getCurrentPath()))
 folderRight.addEventListener("move", evt => onMove(evt.detail, folderLeft.getCurrentPath()))
+folderLeft.addEventListener("createFolder", evt => onCreateFolder(evt.detail))
+folderRight.addEventListener("createFolder", evt => onCreateFolder(evt.detail))
 
 async function onCopy(itemsToCopy, path) {
     const itemsType = getItemsTypes(itemsToCopy)
@@ -179,6 +181,25 @@ async function onDelete(itemsToDelete) {
         })
 }
 
+async function onCreateFolder(selectedItem) {
+
+    const res = await dialog.show({
+        text: "Neuen Ordner anlegen",
+        input: true,
+        inputText: selectedItem.length == 1 ? selectedItem[0].name : "",
+        btnOk: true,
+        btnCancel: true,
+        defBtnOk: true
+    })    
+    activeFolder.setFocus()
+    if (res.result == RESULT_OK)
+        await request("createFolder", {
+            id: activeFolder.id,
+            path: activeFolder.getCurrentPath(),
+            newName: res.input
+        })
+}
+
 function onTheme(theme) {
     ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {
         document.body.classList.remove(n)
@@ -205,20 +226,6 @@ const getInactiveFolder = () => activeFolder == folderLeft ? folderRight : folde
 
 document.addEventListener("keydown", async evt => {
     switch (evt.which) {
-        case 118: // F7
-            const item = activeFolder.getSelectedItem()
-            const res = await dialog.show({
-                text: "Ordner anlegen",
-                input: true,
-                inputText: item != ".." ? item : "",
-                defBtnOk: true,
-                btnOk: true,
-                btnCancel: true
-            })    
-            activeFolder.setFocus()
-            evt.preventDefault()
-            evt.stopPropagation()
-            break
         case 120: { // F9
             getInactiveFolder().changePath(activeFolder.getCurrentPath())
             evt.preventDefault()
