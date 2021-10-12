@@ -40,7 +40,7 @@ class WebServer
                         DirectoryProcessor.MoveFiles(processingQueue, input.RequestParam.Get<FileItems>());
                         break;
                     case "delete":
-                        DirectoryProcessor.DeleteFiles(processingQueue, input.RequestParam.Get<FileItems>());
+                        DirectoryProcessor.DeleteFiles(processingQueue, input.RequestParam.Get<DeleteItems>());
                         break;
                     case "rename":
                         var renameItem = input.RequestParam.Get<RenameItem>();

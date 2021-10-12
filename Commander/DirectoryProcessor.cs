@@ -37,7 +37,8 @@ static class DirectoryProcessor
 
     public static void CopyFiles(ProcessingQueue processingQueue, FileItems items)
     {
-        foreach (var item in items.Items)
+        var files = GetFileInfos(items.SourcePath, items.Directories, items.Files);
+        foreach (var item in files)
             processingQueue.AddJob(
                 new ProcessingJob(new [] {items.Id}, ProcessingAction.Copy, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
             );
@@ -45,13 +46,14 @@ static class DirectoryProcessor
 
     public static void MoveFiles(ProcessingQueue processingQueue, FileItems items)
     {
-        foreach (var item in items.Items)
+        var files = GetFileInfos(items.SourcePath, items.Directories, items.Files);
+        foreach (var item in files)
             processingQueue.AddJob(
                 new ProcessingJob(items.Ids, ProcessingAction.Move, Path.Combine(items.SourcePath, item), Path.Combine(items.destinationPath, item))
             );
     }
 
-    public static void DeleteFiles(ProcessingQueue processingQueue, FileItems items)
+    public static void DeleteFiles(ProcessingQueue processingQueue, DeleteItems items)
     {
         foreach (var item in items.Items)
             processingQueue.AddJob(
@@ -106,12 +108,45 @@ static class DirectoryProcessor
             return Enumerable.Empty<T>();
         }
     }
+
+    static IEnumerable<string> GetFileInfos(string path, string[] directories, string[] files)
+    {
+        foreach (var file in files)
+            yield return file;
+        foreach (var dir in directories)
+            foreach (var file in GetFileInfos(path, dir))
+                yield return file;
+
+        IEnumerable<string> GetFileInfos(string path, string subPath = "")
+        {
+            foreach (var file in EnumFiles(path, subPath))
+                yield return file;
+            foreach (var dir in EnumDirs(path, subPath))
+                foreach (var file in GetFileInfos(path, dir))
+                    yield return file;
+
+            IEnumerable<string> EnumFiles(string path, string subPath)
+                => GetSafeItems<string>(() => Directory.EnumerateFiles(Path.Combine(path, subPath)).Select(n =>
+                    {
+                        var fi = new FileInfo(n);
+                        return Path.Combine(subPath, fi.Name);
+                    }));
+
+            IEnumerable<string> EnumDirs(string path, string subPath)
+                => GetSafeItems<string>(() => Directory.EnumerateDirectories(Path.Combine(path, subPath)).Select(n =>
+                    {
+                        var fi = new DirectoryInfo(n);
+                        return Path.Combine(subPath, fi.Name);
+                    }));
+        }
+    }
 }
 
 record GetItems(string Id, int RequestId, string Path, bool HiddenIncluded);
 record GetExifs(string Id, int RequestId, string path, ExifItem[] ExifItems);
 record ExifItem(int Index, string Name);
 record ExifReturnItem(int Index, DateTime ExifTime);
-record FileItems(string Id, string[] Ids, string SourcePath, String destinationPath, string[] Items);
+record FileItems(string Id, string[] Ids, string SourcePath, String destinationPath, string[] Directories, string[] Files);
+record DeleteItems(string Id, string[] Ids, string SourcePath, String destinationPath, string[] Items);
 record RenameItem(string Id, string Path, string item, string newName, bool isDirectory);
 record CreateFolder(string Id, string Path, string newName);

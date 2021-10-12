@@ -260,7 +260,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Copy, Move: No access, path not found
+// TODO Copy, Move: No access, path not found, target directory not existing
 // TODO CopyFile Folder: Recursive getfiles
 // TODO CopyFile: overwrite
 // TODO CopyFile Source == Destination

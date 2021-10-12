@@ -101,7 +101,8 @@ async function onCopy(itemsToCopy, path) {
             id: getInactiveFolder().id,
             sourcePath: activeFolder.getCurrentPath(),
             destinationPath: path,
-            items: itemsToCopy.map(n => n.name)
+            directories: itemsToCopy.filter(n => n.isDirectory).map(n => n.name),
+            files: itemsToCopy.filter(n => !n.isDirectory).map(n => n.name)
         })
 }
 
@@ -128,7 +129,8 @@ async function onMove(itemsToMove, path) {
             ids: [ activeFolder.id, getInactiveFolder().id ],
             sourcePath: activeFolder.getCurrentPath(),
             destinationPath: path,
-            items: itemsToMove.map(n => n.name)
+            directories: itemsToMove.filter(n => n.isDirectory).map(n => n.name),
+            files: itemsToMove.filter(n => !n.isDirectory).map(n => n.name)
         })
     }
 }
@@ -189,7 +191,7 @@ async function onDelete(itemsToDelete) {
         await request("delete", {
             id: activeFolder.id,
             sourcePath: activeFolder.getCurrentPath(),
-            items: itemsToDelete.map(n => n.name)
+            Items: itemsToDelete.map(n => n.name)
         })
 }
 
