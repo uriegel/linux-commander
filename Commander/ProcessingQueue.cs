@@ -70,6 +70,24 @@ class ProcessingQueue
             jobs.Clear();
             Stop();
         }
+        catch (AccessDeniedException)
+        {
+            OnException?.Invoke(this, new("Zugriff verweigert", ids));
+            jobs.Clear();
+            Stop();
+        }
+        catch (TargetExistingException)
+        {
+            OnException?.Invoke(this, new("Die Zieldatei existiert bereits", ids));
+            jobs.Clear();
+            Stop();
+        }
+        catch (SourceNotFoundException)
+        {
+            OnException?.Invoke(this, new("Die zu kopierende Datei ist nicht vorhanden", ids));
+            jobs.Clear();
+            Stop();
+        }
         catch (Exception)
         {
             OnException?.Invoke(this, new("Fehler aufgetreten", ids));
@@ -89,13 +107,13 @@ class ProcessingQueue
 
     void JobCopy(Job job)
     {
-        GFile.Copy(job.ProcessingJob.Source, job.ProcessingJob.Destination, FileCopyFlags.None, Progress);
+        GFile.Copy(job.ProcessingJob.Source, job.ProcessingJob.Destination, FileCopyFlags.Overwrite, true, Progress);
         alreadyProcessedBytes += job.FileSize;
     }
 
     void JobMove(Job job)
     {
-        GFile.Move(job.ProcessingJob.Source, job.ProcessingJob.Destination, FileCopyFlags.None, Progress);
+        GFile.Move(job.ProcessingJob.Source, job.ProcessingJob.Destination, FileCopyFlags.Overwrite, true, Progress);
         alreadyProcessedBytes += job.FileSize;
     }
 

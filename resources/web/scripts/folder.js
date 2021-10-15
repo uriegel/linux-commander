@@ -219,7 +219,8 @@ class Folder extends HTMLElement {
         if (!fromBacklog) {
             this.backPosition++
             this.backtrack.length = this.backPosition
-            this.backtrack.push(path)
+            if (this.backPosition == 0 || this.backtrack[this.backPosition - 1] != path)
+                this.backtrack.push(path)
         }
     }
 
@@ -260,9 +261,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
-// TODO Copy, Move: No access, path not found, target directory not existing
-// TODO CopyFile Folder: Recursive getfiles
-// TODO CopyFile: overwrite
+// TODO CopyFile: Show conflicts
 // TODO CopyFile Source == Destination
 // TODO CopyFile Recursion
 // TODO Processor: CanAction 
