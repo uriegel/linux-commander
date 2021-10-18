@@ -13,10 +13,10 @@
     <file>web/scripts/index.js</file>
     <file>web/scripts/viewer.js</file>
     <file>web/scripts/requests.js</file>
-    <file>web/scripts/components/DialogBoxComponent.js</file>
+    <file>web/scripts/components/DialogBox.js</file>
     <file>web/scripts/components/gridsplitter.js</file>
     <file>web/scripts/components/pdfviewer.js</file>
-    <file>web/scripts/components/virtualtablecomponent.js</file>
+    <file>web/scripts/components/virtualtable.js</file>
     <file>web/scripts/processors/directory.js</file>
     <file>web/scripts/processors/processor.js</file>
     <file>web/scripts/processors/renderTools.js</file>

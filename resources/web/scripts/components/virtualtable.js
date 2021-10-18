@@ -16,7 +16,7 @@
     window.addEventListener("mouseup", mouseUp)
 }
 
-class VirtualTableComponent extends HTMLElement {
+class VirtualTable extends HTMLElement {
 
     get position() { return this._position }
     set position(value) {
@@ -25,6 +25,43 @@ class VirtualTableComponent extends HTMLElement {
     }
     constructor() {
         super()
+
+        var style = document.createElement("style")
+        document.head.appendChild(style)
+        style.sheet.insertRule(`:root {
+            --vtc-color: black;
+            --vtc-background-color: white;
+            --vtc-caption-color: white;
+            --vtc-selected-background-color: blue;
+            --vtc-caption-background-color: blue;
+            --vtc-caption-background-hover-color: #0063ff;
+            --vtc-caption-separator-color: white;
+            --vtc-selected-color:  white;
+            --vtc-selected-background-color: blue;
+            --vtc-current-color: lightgray;
+            --vtc-current-focus-color: red;
+
+            --vtc-top: 0px;
+
+            --vtc-font-size: 100%;
+            --vtc-scrollbar-width: 16px;
+            --vtc-scrollbar-border-color: gray;
+            --vtc-scrollbar-border-width: 1px;
+            --vtc-scrollbar-background-color: white;
+            --vtc-scrollbar-button-background-color: white;
+            --vtc-scrollbar-button-color: #666;
+            --vtc-scrollbar-button-hover-color: #555
+            --vtc-scrollbar-button-active-color: #444
+            --vtc-scrollbar-button-hover-background-color: rgb(209, 209, 209);
+            --vtc-scrollbar-button-active-background-color: #aaa;
+            --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
+            --vtc-scrollbar-grip-hover-color: #bbb;
+            --vtc-scrollbar-grip-active-color: #999;
+            --vtc-scrollbar-grip-right: 0px;
+            --vtc-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
+            --vtc-scrollbar-right-margin: 15px;
+        }`)
+
         this.items = []
         this.scrollPosition = 0
         this.attachShadow({ mode: 'open'})
@@ -32,39 +69,6 @@ class VirtualTableComponent extends HTMLElement {
         const template = document.createElement('template')
         template.innerHTML = `  
             <style>
-                :host {
-                    --vtc-color: black;
-                    --vtc-background-color: white;
-                    --vtc-caption-color: white;
-                    --vtc-selected-background-color: blue;
-                    --vtc-caption-background-color: blue;
-                    --vtc-caption-background-hover-color: #0063ff;
-                    --vtc-caption-separator-color: white;
-                    --vtc-selected-color:  white;
-                    --vtc-selected-background-color: blue;
-                    --vtc-current-color: lightgray;
-                    --vtc-current-focus-color: red;
-
-                    --vtc-top: 0px;
-
-                    --vtc-font-size: 100%;
-                    --vtc-scrollbar-width: 16px;
-                    --vtc-scrollbar-border-color: gray;
-                    --vtc-scrollbar-border-width: 1px;
-                    --vtc-scrollbar-background-color: white;
-                    --vtc-scrollbar-button-background-color: white;
-                    --vtc-scrollbar-button-color: #666;
-                    --vtc-scrollbar-button-hover-color: #555
-                    --vtc-scrollbar-button-active-color: #444
-                    --vtc-scrollbar-button-hover-background-color: rgb(209, 209, 209);
-                    --vtc-scrollbar-button-active-background-color: #aaa;
-                    --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
-                    --vtc-scrollbar-grip-hover-color: #bbb;
-                    --vtc-scrollbar-grip-active-color: #999;
-                    --vtc-scrollbar-grip-right: 0px;
-                    --vtc-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
-                    --vtc-scrollbar-right-margin: 15px;
-                }
                 .tableroot {
                     top: var(--vtc-top);
                     position: absolute;
@@ -564,7 +568,7 @@ class VirtualTableComponent extends HTMLElement {
 
     setRestriction(restrictCallback) { this.restrictCallback = restrictCallback }
 
-    themeChanged() {
+    reRender() {
         this.measureItemHeight()
         this.measureItemsPerPage()
         this.render()    
@@ -865,4 +869,4 @@ class VirtualTableComponent extends HTMLElement {
     }
 }
 
-customElements.define('virtual-table-component', VirtualTableComponent)
+customElements.define('virtual-table', VirtualTable)

@@ -1,11 +1,6 @@
 const template = document.createElement('template')
 template.innerHTML = `  
     <style>
-        :host {
-            --gridsplitter-grip-color : gray;
-            --gridsplitter-grip-hover-color : rgb(94, 94, 94);
-            --gridsplitter-grip-active-color : rgb(61, 61, 61);
-        }
         #splitterGrid {
             display:flex;
             flex-grow: 1;
@@ -61,7 +56,16 @@ export var VERTICAL = "VERTICAL"
 class GridSplitter extends HTMLElement {
     constructor() {
         super()
-        this.attachShadow({ mode: 'open'})
+
+        var style = document.createElement("style")
+        document.head.appendChild(style)
+        style.sheet.insertRule(`:root {
+            --gridsplitter-grip-color : gray;
+            --gridsplitter-grip-hover-color : rgb(94, 94, 94);
+            --gridsplitter-grip-active-color : rgb(61, 61, 61);
+        }`)
+    
+        this.attachShadow({ mode: 'open' })
         this.shadowRoot.appendChild(template.content.cloneNode(true))
         this.splitterGrid = this.shadowRoot.getElementById("splitterGrid")
         this.splitter = this.shadowRoot.getElementById("splitter")

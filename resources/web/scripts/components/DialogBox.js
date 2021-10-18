@@ -7,36 +7,40 @@ export const RESULT_YES = 2
 export const RESULT_NO = 3
 export const RESULT_CANCEL = 4
 
-class DialogBoxComponent extends HTMLElement {
+class DialogBox extends HTMLElement {
     constructor() {
         super()
+
+        var style = document.createElement("style")
+        document.head.appendChild(style)
+        style.sheet.insertRule(`:root {
+            --dbc-main-background-color: white;
+            --dbc-main-color: black;
+            --dbc-fader-color: rgba(0, 0, 0, 0.50);            
+            --dbc-button-color: white;
+            --dbc-button-background-color: blue;
+            --dbc-button-hover-background-color: #7979ff;
+            --dbc-button-active-background-color: #01018e;
+            --dbc-button-focus-color: blue;    
+            --dbc-button-margin: 20px 30px 30px 30px;
+            --dbc-button-flexgrow: 0;
+            --dbc-button-marginleft: 5px;
+            --dbc-button-cornerradius: 3px;
+            --dbc-button-bordercolor: transparent;
+            --dbc-button-borderstyle: none;
+            --dbc-button-borderwidth: 0px;
+            --dbc-button-buttomradius: 3px;
+            --dbc-button-padding: 2px 7px;
+            --dbc-button-outlinestyle: solid;
+            --dbc-button-outlineoffset: 1px;
+            --dbc-input-selection-color: blue;
+        }`)
+
         this.attachShadow({ mode: 'open'})
         
         const template = document.createElement('template')
         template.innerHTML = `  
             <style>
-                :host {
-                    --dbc-main-background-color: white;
-                    --dbc-main-color: black;
-                    --dbc-fader-color: rgba(0, 0, 0, 0.50);            
-                    --dbc-button-color: white;
-                    --dbc-button-background-color: blue;
-                    --dbc-button-hover-background-color: #7979ff;
-                    --dbc-button-active-background-color: #01018e;
-                    --dbc-button-focus-color: blue;    
-                    --dbc-button-margin: 20px 30px 30px 30px;
-                    --dbc-button-flexgrow: 0;
-                    --dbc-button-marginleft: 5px;
-                    --dbc-button-cornerradius: 3px;
-                    --dbc-button-bordercolor: transparent;
-                    --dbc-button-borderstyle: none;
-                    --dbc-button-borderwidth: 0px;
-                    --dbc-button-buttomradius: 3px;
-                    --dbc-button-padding: 2px 7px;
-                    --dbc-button-outlinestyle: solid;
-                    --dbc-button-outlineoffset: 1px;
-                    --dbc-input-selection-color: blue;
-                }
                 .dialogroot {
                     position: absolute;
                     width: 100%;
@@ -475,4 +479,4 @@ class DialogBoxComponent extends HTMLElement {
     }
 }
 
-customElements.define('dialog-box-component', DialogBoxComponent)
+customElements.define('dialog-box', DialogBox)

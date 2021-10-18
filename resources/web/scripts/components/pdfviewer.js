@@ -1,10 +1,6 @@
 const template = document.createElement('template')
 template.innerHTML = `  
     <style>
-        :host {
-            --pdfviewer-background-color : gray;
-			--pdfviewer-color : white;
-        }
         #control {
 			display: flex;
     		flex-direction: column;
@@ -44,7 +40,15 @@ template.innerHTML = `
 // TODO Thumbnails
 class PdfViewer extends HTMLElement {
     constructor() {
-        super()
+		super()
+		
+		var style = document.createElement("style")
+        document.head.appendChild(style)
+        style.sheet.insertRule(`:root {
+            --pdfviewer-background-color : gray;
+			--pdfviewer-color : white;
+        }`)
+
         this.attachShadow({ mode: 'open'})
         this.shadowRoot.appendChild(template.content.cloneNode(true))
         this.control = this.shadowRoot.getElementById("control")

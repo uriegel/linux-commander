@@ -3,11 +3,6 @@ const viewerImg = document.getElementById('viewerImg')
 const viewerPdf = document.getElementById('viewerPdf')
 const viewerVideo = document.getElementById('viewerVideo')
 
-export function onTheme(theme) {
-    ["themeAdwaita", "themeAdwaitaDark"].forEach(n => viewerSplitter.classList.remove(n))
-    viewerSplitter.classList.add(theme)    
-}
-
 export function onShowViewer(show, path) {
     if (show == undefined)
         show = !viewerActive

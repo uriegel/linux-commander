@@ -1,4 +1,4 @@
-import './components/virtualtablecomponent.js'
+import './components/virtualtable.js'
 import { getProcessor } from './processors/processor.js'
 
 class Folder extends HTMLElement {
@@ -10,10 +10,10 @@ class Folder extends HTMLElement {
         this.innerHTML = `
             <div class=folder>
                 <input class=pathInput></input>
-                <virtual-table-component additionalStyle='${additionalStyle}'></virtual-table-component>
+                <virtual-table additionalStyle='${additionalStyle}'></virtual-table>
             </div`
         
-        this.table = this.getElementsByTagName("VIRTUAL-TABLE-COMPONENT")[0]
+        this.table = this.getElementsByTagName("VIRTUAL-TABLE")[0]
         this.backtrack = []
         this.backPosition = -1
         this.pathInput = this.getElementsByTagName("INPUT")[0]
@@ -26,16 +26,14 @@ class Folder extends HTMLElement {
     
     changeTheme(theme) {
         ["themeAdwaita", "themeAdwaitaDark"].forEach(n => {
-            this.table.classList.remove(n)
             this.pathInput.classList.remove(n)
         })
-        this.table.classList.add(theme)    
         this.pathInput.classList.add(theme)    
-        this.table.themeChanged()
+        this.table.reRender()
     }
 
     onResize() {
-        this.table.themeChanged()
+        this.table.reRender()
     }
 
     showHidden(hidden) {
