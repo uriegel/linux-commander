@@ -301,6 +301,7 @@ class VirtualTable extends HTMLElement {
         this.downButton = buttons[1]
 
         this.restrictionInput = this.shadowRoot.getElementById("restrictionInput")
+        this.itemsPerPage = -1
     }
 
     connectedCallback() {
@@ -598,7 +599,11 @@ class VirtualTable extends HTMLElement {
         }
     }
 
-    measureItemsPerPage() { this.itemsPerPage = Math.floor((this.tableroot.clientHeight - this.headRow.clientHeight) / this.itemHeight) }
+    measureItemsPerPage() {
+        return this.itemsPerPage = this.itemHeight
+            ? Math.floor((this.tableroot.clientHeight - this.headRow.clientHeight) / this.itemHeight)
+            : -1
+    }
     
     measureItemHeight() {
         if (this.items.length > 0) {
@@ -832,7 +837,7 @@ class VirtualTable extends HTMLElement {
         const gripHeight = Math.max(this.scrollbarElement.clientHeight * (this.itemsPerPage / this.items.length || 1), 10)
         this.scrollbarGrip.style.top = (this.scrollbarElement.clientHeight - gripHeight) * (this.scrollPosition / (range -1))
         this.scrollbarGrip.style.height = `${gripHeight}px`
-        if (this.itemsPerPage > this.items.length - 1) {
+        if (this.itemsPerPage == -1 || this.itemsPerPage > this.items.length - 1) {
             this.scrollbar.classList.add('hidden')
             this.tableroot.classList.remove('scrollbarActive')
         }
