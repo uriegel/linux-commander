@@ -835,7 +835,7 @@ class VirtualTable extends HTMLElement {
     renderScrollbarGrip() {
         const range = Math.max(0, this.items.length - this.itemsPerPage) + 1
         const gripHeight = Math.max(this.scrollbarElement.clientHeight * (this.itemsPerPage / this.items.length || 1), 10)
-        this.scrollbarGrip.style.top = (this.scrollbarElement.clientHeight - gripHeight) * (this.scrollPosition / (range -1))
+        this.scrollbarGrip.style.top = `${(this.scrollbarElement.clientHeight - gripHeight) * (this.scrollPosition / (range - 1))}px` 
         this.scrollbarGrip.style.height = `${gripHeight}px`
         if (this.itemsPerPage == -1 || this.itemsPerPage > this.items.length - 1) {
             this.scrollbar.classList.add('hidden')
