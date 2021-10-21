@@ -3,7 +3,6 @@
   <gresource prefix="/de/uriegel/commander">
     <file>main_window.glade</file>
     <file>kirk.png</file>
-    <file>style.css</file>
     <file>web/index.html</file>
     <file>web/styles/themes/adwaita-dark.css</file>
     <file>web/styles/themes/adwaita.css</file>
