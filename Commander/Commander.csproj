@@ -18,7 +18,13 @@
     <EmbeddedResource Include="../resources/resources.gresource" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <Target Name="PreBuildDebug" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" BeforeTargets="PreBuildEvent">
+    <Exec Command="npm run builddev" />
+    <Exec Command="cd ../resources&#xD;&#xA;glib-compile-resources resources.xml" />
+  </Target>
+
+  <Target Name="PreBuildRelease" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" BeforeTargets="PreBuildEvent">
+    <Exec Command="npm run build" />
     <Exec Command="cd ../resources&#xD;&#xA;glib-compile-resources resources.xml" />
   </Target>
 
