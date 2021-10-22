@@ -260,6 +260,7 @@ class Folder extends HTMLElement {
 
 customElements.define('folder-table', Folder)
 
+// TODO Selection blue only in focused folder, in unfocused gray
 // TODO CopyFile: Show conflicts
 // TODO CopyFile Source == Destination
 // TODO CopyFile Recursion
