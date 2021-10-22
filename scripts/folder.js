@@ -1,4 +1,4 @@
-import './components/virtualtable.js'
+import 'virtual-table-component'
 import { getProcessor } from './processors/processor.js'
 
 class Folder extends HTMLElement {
