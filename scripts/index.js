@@ -1,5 +1,6 @@
 import 'grid-splitter'
 import 'web-dialog-box'
+import { RESULT_OK } from 'web-dialog-box'
 import './components/pdfviewer.js'
 import './folder.js'
 import { request } from "./requests.js"
@@ -12,11 +13,6 @@ const dialog = document.querySelector('dialog-box')
 const DIRECTORY = 1
 const FILE = 2
 const BOTH = 3
-
-const RESULT_OK = 1
-// const RESULT_YES = 2
-// const RESULT_NO = 3
-// const RESULT_CANCEL = 4
 
 initializeCallbacks(onTheme, onShowHidden, show => {
     onShowViewer(show, currentPath)
