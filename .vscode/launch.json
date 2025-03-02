@@ -5,11 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": "Commander",
             "type": "coreclr",
             "request": "launch",
+            "requireExactSource": true, 
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Commander/bin/Debug/net5.0/linux-x64/Commander.dll",
+            "program": "${workspaceFolder}/Commander/bin/Debug/net8.0/linux-x64/Commander.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

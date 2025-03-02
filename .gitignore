@@ -1,9 +1,3 @@
-main.glade~
-resources/main_window.glade~
-resources/resources.gresource
 Commander/bin
 Commander/obj
-/.vs
-node_modules
-package-lock.json
-resources/web/dist
+

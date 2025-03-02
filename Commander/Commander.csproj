@@ -1,31 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PublishSingleFile>true</PublishSingleFile>
-    <PublishTrimmed>true</PublishTrimmed>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>Latest</LangVersion>
+    <PublishSingleFile>true</PublishSingleFile>
 	  <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-	  <TargetFramework>net5.0</TargetFramework>
-    <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="URiegel.WebServer" Version="0.5.0" />
-    <PackageReference Include="GtkDotNet" Version="5.5.0" />
+    <PackageReference Include="Gtk4DotNet" Version="7.0.7-beta-7" />
   </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="../resources/resources.gresource" />
-  </ItemGroup>
-
-  <Target Name="PreBuildDebug" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" BeforeTargets="PreBuildEvent">
-    <Exec Command="npm run builddev" />
-    <Exec Command="cd ../resources&#xD;&#xA;glib-compile-resources resources.xml" />
-  </Target>
-
-  <Target Name="PreBuildRelease" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" BeforeTargets="PreBuildEvent">
-    <Exec Command="npm run build" />
-    <Exec Command="cd ../resources&#xD;&#xA;glib-compile-resources resources.xml" />
-  </Target>
 
 </Project>
