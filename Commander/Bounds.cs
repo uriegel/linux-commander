@@ -38,7 +38,6 @@ record Bounds(int? X, int? Y, int? Width, int? Height, bool IsMaximized)
             .SideEffect(d => d.EnsureDirectoryExists())
             .AppendPath("bounds.json")
             .ReadAllTextFromFilePath()
-            .SideEffect(Console.WriteLine)
             ?.Deserialize<Bounds>(Json.Defaults)
             ?? new(null, null, null, null, false);
 
