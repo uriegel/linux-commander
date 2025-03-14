@@ -21,13 +21,15 @@
       </object>
     </property>
     <child>
-      <object class="GtkPaned">
+      <object class="GtkPaned" id="paned">
         <property name="orientation">horizontal</property>
         <child type="start">
-          <object class="ColumnView" id="columnview-left"/>
+          <object class="ColumnView" id="columnview-left">
+          </object>
         </child>
         <child type="end">
-          <object class="ColumnView" id="columnview-right"/>
+          <object class="ColumnView" id="columnview-right">
+          </object>
         </child>
       </object>
     </child>    

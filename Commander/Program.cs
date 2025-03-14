@@ -14,8 +14,4 @@ Application
             .Show())
         .Run(0, IntPtr.Zero);
 
-// TODO CsTools 7.23.2 in GtkDotNet
-// TODO Paned position controlling like webview: resize with relative position (30% or 50 % ...)
-// TODO Json defaults to CsTools
-// TODO protected void Initialize() MainWindow
 

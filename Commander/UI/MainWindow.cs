@@ -9,23 +9,18 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
     public static void Register(ApplicationHandle app)
         => app.SubClass(new MainWindowClass());
 
-    protected override async void OnCreate()
+    protected override void OnCreate() => Handle.InitTemplate();
+
+    protected override void Initialize()
     {
-        Handle.InitTemplate();
+        var paned = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("paned");
+        Handle.OnRealize(w =>
+            {
+                var width = w.GetWidth();
+                paned?.SetPosition(width / 2);
+            });
+        Handle.OnSizeChanged((w, _) => paned?.SetPosition(w / 2));
 
-
-
-        // TODO 
-        await Task.Delay(10);
-
-        Initialize();
-    }
-
-    protected void Initialize()
-    {
-        //Handle
-        // .GetTemplateChild<ButtonHandle, ApplicationWindowHandle>("devtools")
-        // ?.OnClicked(webView.ShowDevTools);
         // TODO Add to descriptions in Gtk4DotNet:
         // TODO <Ctrl>F3  b e f o r e  <F3> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Handle.AddActions(
