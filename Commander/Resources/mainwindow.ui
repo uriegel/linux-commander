@@ -21,7 +21,19 @@
       </object>
     </property>
     <child>
-
+      <object class="GtkPaned">
+        <property name="orientation">Horizontal</property>
+        <child type="start">
+          <object class="GtkButton">
+            <property name="label">Button 1</property>
+          </object>
+        </child>
+        <child type="end">
+          <object class="GtkButton">
+            <property name="label">Button 2</property>
+          </object>
+        </child>
+      </object>
     </child>    
   </template>
   <menu id="main-menu">
