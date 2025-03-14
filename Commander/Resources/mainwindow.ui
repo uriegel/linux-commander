@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <interface>
-  <template class="MainWindow" parent="GtkApplicationWindow">
+  <template class="ManagedApplicationWindow" parent="GtkApplicationWindow">
+  <property name="title">Commander</property>
     <property name="titlebar">
       <object class="AdwHeaderBar">
         <child type="end">

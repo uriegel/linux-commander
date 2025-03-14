@@ -1,11 +1,12 @@
 ﻿using GtkDotNet;
+using GtkDotNet.Controls;
 
 const string appId = "de.uriegel.commander";
 Application
     .NewAdwaita(appId)
         .OnActivate(app => app
-            .SubClass(new MainWindow.MainWindowClass())
-            .CustomWindow("MainWindow")
+            .SubClass(ManagedApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
+            .ManagedApplicationWindow()
             .SaveBounds(appId, 600, 800)
             .Show())
         .Run(0, IntPtr.Zero);

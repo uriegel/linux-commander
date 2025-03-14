@@ -1,19 +1,31 @@
+using System.Threading.Tasks;
 using GtkDotNet;
+using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
 
-class MainWindow(nint obj) : SubClassInst<ApplicationWindowHandle>(obj)
+class MainWindow(nint obj) : ManagedApplicationWindow(obj)
 {
     public static void Register(ApplicationHandle app)
         => app.SubClass(new MainWindowClass());
 
-    protected override void OnCreate() => Handle.InitTemplate();
+    protected override async void OnCreate()
+    {
+        Handle.InitTemplate();
 
-    protected override void Initialize()
+
+
+        // TODO 
+        await Task.Delay(10);
+
+        Initialize();
+    }
+
+    protected void Initialize()
     {
         //Handle
-            // .GetTemplateChild<ButtonHandle, ApplicationWindowHandle>("devtools")
-            // ?.OnClicked(webView.ShowDevTools);
+        // .GetTemplateChild<ButtonHandle, ApplicationWindowHandle>("devtools")
+        // ?.OnClicked(webView.ShowDevTools);
         // TODO Add to descriptions in Gtk4DotNet:
         // TODO <Ctrl>F3  b e f o r e  <F3> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Handle.AddActions(
