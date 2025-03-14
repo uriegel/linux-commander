@@ -4,6 +4,8 @@ using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 
+namespace Settings;
+
 static class WindowHandleExtensions
 {
     public static THandle SaveBounds<THandle>(this THandle window, string appId, int defaultWidth, int defaultHeight)

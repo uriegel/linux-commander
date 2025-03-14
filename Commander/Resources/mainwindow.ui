@@ -22,16 +22,12 @@
     </property>
     <child>
       <object class="GtkPaned">
-        <property name="orientation">Horizontal</property>
+        <property name="orientation">horizontal</property>
         <child type="start">
-          <object class="GtkButton">
-            <property name="label">Button 1</property>
-          </object>
+          <object class="ColumnView" id="columnview-left"/>
         </child>
         <child type="end">
-          <object class="GtkButton">
-            <property name="label">Button 2</property>
-          </object>
+          <object class="ColumnView" id="columnview-right"/>
         </child>
       </object>
     </child>    
