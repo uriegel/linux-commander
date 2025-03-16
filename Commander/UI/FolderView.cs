@@ -12,8 +12,8 @@ class FolderView(nint obj) : ColumnViewSubClassed(obj)
     public uint FindPos(nint item)
     {
         var model = columnView.GetModel<SelectionHandle>();
-        var items = model.GetItems<GObjectHandle>();
-        return (uint)(items?.TakeWhile(n => n.GetInternalHandle() != item).Count() ?? -1);
+        var items = model.GetRawItems();
+        return (uint)(items.TakeWhile(n => n != item).Count());
     }
 
     protected override void OnCreate()
