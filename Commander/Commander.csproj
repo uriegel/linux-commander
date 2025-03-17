@@ -18,6 +18,9 @@
     <EmbeddedResource Include="./Resources/mainwindow.ui">
       <LogicalName>mainwindow</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/style.css">
+      <LogicalName>style</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

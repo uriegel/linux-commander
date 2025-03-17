@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -9,7 +8,13 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
     public static void Register(ApplicationHandle app)
         => app.SubClass(new MainWindowClass());
 
-    protected override void OnCreate() => Handle.InitTemplate();
+    protected override void OnCreate()
+    {
+        Handle.InitTemplate();
+        StyleContext.AddProviderForDisplay(
+            Display.GetDefault(),
+            CssProvider.New().FromResource("style"), StyleProviderPriority.Application);
+    } 
 
     protected override void Initialize()
     {

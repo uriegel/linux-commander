@@ -1,0 +1,10 @@
+listview row {
+    font-size: smaller;
+    font-family: "Noto Sans";
+    color: #444;
+}
+    
+listview row  cell {
+    padding: 1px;
+}
+    

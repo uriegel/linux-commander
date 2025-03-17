@@ -3,6 +3,7 @@ using CsTools.Extensions;
 
 using static GtkDotNet.Controls.ColumnViewSubClassed;
 using static CsTools.ProcessCmd;
+using Microsoft.VisualBasic;
 
 namespace Controllers;
 
@@ -17,24 +18,26 @@ class Root() : Controller<RootItem>, IController
     {
         var rootItems = await
         (from n in RunAsync("lsblk", "--bytes --output SIZE,NAME,LABEL,MOUNTPOINT,FSTYPE")
-        let driveLines = n.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-        let titles = driveLines[0]
-        let columnPositions = new[]
-        {
+         let driveLines = n.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+         let titles = driveLines[0]
+         let columnPositions = new[]
+         {
                 0,
                 titles.IndexOf("NAME"),
                 titles.IndexOf("LABEL"),
                 titles.IndexOf("MOUNT"),
                 titles.IndexOf("FSTYPE")
             }
-        select
-            (from n in driveLines
-                .Skip(1)
-                .Append("home")
-             where FilterDrives(n, columnPositions)
-             let item = CreateRootItem(n, columnPositions)
-            // orderby item.IsMounted descending, item.Name
-             select item));
+         select
+             (from n in driveLines
+                 .Skip(1)
+                 .Append("home")
+              where FilterDrives(n, columnPositions)
+              let item = CreateRootItem(n, columnPositions)
+              orderby item.IsMounted descending, item.Name
+              select item));
+
+        Insert(rootItems);
     }
 
     #endregion
@@ -45,28 +48,29 @@ class Root() : Controller<RootItem>, IController
                     Title = "Name",
                     Expanded = true,
                     Resizeable = true,
-                    // OnItemSetup = OnIconName,
-            // OnItemBind = OnIconNameBind
+                    OnLabelBind = i => i.Name
+                    //OnItemSetup = OnIconName,
+                    //OnItemBind = OnIconNameBind
         },
             new()
                 {
                     Title = "Bezeichnung",
                     Expanded = true,
                     Resizeable = true,
-                    //OnLabelBind = i => i.Id
+                    OnLabelBind = i => i.Description
             },
             new()
                 {
                     Title = "Mountpoint",
                     Expanded = true,
                     Resizeable = true,
-                    //OnLabelBind = i => i.Active ? "Yes" : "No",
+                    OnLabelBind = i => i.MountPoint
             },
             new()
                 {
                     Title = "Größe",
                     Resizeable = true,
-                    //OnLabelBind = i => i.Active ? "Yes" : "No",
+                    OnLabelBind = i => i.Size.ToString()
             }
             ];
 

@@ -3,6 +3,10 @@ using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 
+// TODO size column like Commander
+// TODO ellipse wrapping in cell
+// TODO root Icons
+
 class FolderView(nint obj) : ColumnViewSubClassed(obj)
 {
     public uint FindPos(nint item)
@@ -24,7 +28,7 @@ class FolderView(nint obj) : ColumnViewSubClassed(obj)
     }
     protected override CustomColumnViewHandle CreateHandle(nint obj) => new(obj);
 
-    static readonly IController controller = new Root();
+    readonly IController controller = new Root();
 }
 
 class FolderViewClass() : ColumnViewSubClassedClass("ColumnView", p => new FolderView(p)) { }
