@@ -8,6 +8,9 @@ namespace Commander.UI;
 
 class FolderView(nint obj) : ColumnViewSubClassed(obj)
 {
+    public static FolderView? GetInstance(CustomColumnViewHandle handle)
+        => GetInstance(handle.GetInternalHandle()) as FolderView;
+
     public uint FindPos(nint item)
     {
         var model = columnView.GetModel<SelectionHandle>();
