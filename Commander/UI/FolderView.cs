@@ -15,19 +15,22 @@ class FolderView(nint obj) : ColumnViewSubClassed(obj)
         return (uint)items.TakeWhile(n => n != item).Count();
     }
 
+    public event EventHandler? OnFocus;
+
     protected override void OnCreate()
     {
         OnActivate(OnActivate);
         controller.Set(this);
         controller.Fill();
+        Handle.AddController(EventControllerFocus.New().OnEnter(OnFocusEnter));
     }
 
     protected override void OnFinalize()
-    {
-        Console.WriteLine("ColumnView finalized");
-    }
+        => Console.WriteLine("ColumnView finalized");
 
     protected override CustomColumnViewHandle CreateHandle(nint obj) => new(obj);
+
+    void OnFocusEnter() => OnFocus?.Invoke(this, new());
 
     void OnActivate(uint pos) => controller.OnActivate(pos);
 

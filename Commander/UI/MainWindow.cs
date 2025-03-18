@@ -1,4 +1,3 @@
-using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -27,16 +26,6 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 var width = w.GetWidth();
                 paned?.SetPosition(width / 2);
             });
-        paned?.AddController(EventControllerKey.New().OnKeyPressed((_, k, m)
-            => {
-                if (k == 23)
-                {
-                    Paned.OnTab(paned, m);
-                    return true;
-                }
-                else
-                    return false;
-            }));
         Handle.OnSizeChanged((w, _) => paned?.SetPosition(w / 2));
 
         // TODO Add to descriptions in Gtk4DotNet:

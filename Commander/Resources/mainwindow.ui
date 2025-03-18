@@ -21,7 +21,7 @@
       </object>
     </property>
     <child>
-      <object class="GtkPaned" id="paned">
+      <object class="FolderViewPaned" id="paned">
         <property name="orientation">horizontal</property>
         <child type="start">
           <object class="ColumnView" id="columnview-left">

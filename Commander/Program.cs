@@ -9,6 +9,7 @@ Application
     .NewAdwaita(appId)
         .OnActivate(app => app
             .SubClass(ManagedApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
+            .SubClass(new FolderViewPanedClass(p => new FolderViewPaned(p)))
             .SubClass(new FolderViewClass())
             .ManagedApplicationWindow()
             .SaveBounds(appId, 600, 800)
