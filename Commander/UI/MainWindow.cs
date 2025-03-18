@@ -3,6 +3,8 @@ using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
 
+namespace Commander.UI;
+
 class MainWindow(nint obj) : ManagedApplicationWindow(obj)
 {
     public static void Register(ApplicationHandle app)
@@ -14,7 +16,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
         StyleContext.AddProviderForDisplay(
             Display.GetDefault(),
             CssProvider.New().FromResource("style"), StyleProviderPriority.Application);
-    } 
+    }
 
     protected override void Initialize()
     {
@@ -42,7 +44,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
             ]);
     }
-    
+
     public class MainWindowClass()
         : SubClass<ApplicationWindowHandle>(GTypeEnum.ApplicationWindow, "MainWindow", p => new MainWindow(p))
     {

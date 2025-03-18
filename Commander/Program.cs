@@ -1,7 +1,8 @@
 ﻿using GtkDotNet;
 using GtkDotNet.Controls;
 
-using Settings;
+using Commander.Settings;
+using Commander.UI;
 
 const string appId = "de.uriegel.commander";
 Application

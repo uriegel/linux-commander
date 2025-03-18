@@ -1,14 +1,10 @@
-using Controllers;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 
+using Commander.Controllers;
 
-// TODO Controller for Controllers
-// TODO OnPathChanged when enter or double click
-// TODO Check if Controller changed => new Controller
-// TODO changePath in controller
-// TODO DirectoryController
+namespace Commander.UI;
 
 class FolderView(nint obj) : ColumnViewSubClassed(obj)
 {
@@ -21,6 +17,7 @@ class FolderView(nint obj) : ColumnViewSubClassed(obj)
 
     protected override void OnCreate()
     {
+        OnActivate(OnActivate);
         controller.Set(this);
         controller.Fill();
     }
@@ -29,9 +26,12 @@ class FolderView(nint obj) : ColumnViewSubClassed(obj)
     {
         Console.WriteLine("ColumnView finalized");
     }
+
     protected override CustomColumnViewHandle CreateHandle(nint obj) => new(obj);
 
-    readonly IController controller = new Root();
+    void OnActivate(uint pos) => controller.OnActivate(pos);
+
+    readonly FolderController controller = new();
 }
 
 class FolderViewClass() : ColumnViewSubClassedClass("ColumnView", p => new FolderView(p)) { }

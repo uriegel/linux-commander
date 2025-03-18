@@ -5,8 +5,9 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 using static CsTools.ProcessCmd;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
+using Commander.UI;
 
-namespace Controllers;
+namespace Commander.Controllers;
 
 class Root() : Controller<RootItem>, IController
 {
@@ -17,6 +18,7 @@ class Root() : Controller<RootItem>, IController
 
     public async void Fill()
     {
+        // TODO Fill sda when there is no sda1 (daten)
         var rootItems = await
         (from n in RunAsync("lsblk", "--bytes --output SIZE,NAME,LABEL,MOUNTPOINT,FSTYPE")
          let driveLines = n.Split('\n', StringSplitOptions.RemoveEmptyEntries)
@@ -39,6 +41,14 @@ class Root() : Controller<RootItem>, IController
               select item));
 
         Insert(rootItems);
+    }
+
+    public string? OnActivate(uint pos)
+    {
+        // TODO when not mounted, mount
+        var item = GetItem(pos);
+        Console.WriteLine($"Eintrag ausgewählt: {item}");
+        return item?.MountPoint;
     }
 
     #endregion
@@ -130,7 +140,10 @@ class Root() : Controller<RootItem>, IController
         };
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
-        box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass(string.IsNullOrEmpty(item.MountPoint) ? "hiddenItem" : "");
+        if (string.IsNullOrEmpty(item.MountPoint))
+            box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem");  // TODO AddCssClass(cls, bool add)
+        else
+            box?.GetParent<WidgetHandle>()?.GetParent().RemoveCssClass("hiddenItem");
     }        
 }
 

@@ -4,7 +4,7 @@ using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 
-namespace Settings;
+namespace Commander.Settings;
 
 static class WindowHandleExtensions
 {
