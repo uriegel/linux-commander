@@ -3,7 +3,12 @@ using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 
-// TODO unmounted with opacity 0.6
+
+// TODO Controller for Controllers
+// TODO OnPathChanged when enter or double click
+// TODO Check if Controller changed => new Controller
+// TODO changePath in controller
+// TODO DirectoryController
 
 class FolderView(nint obj) : ColumnViewSubClassed(obj)
 {

@@ -7,3 +7,6 @@ listview row  cell {
     padding: 1px;
 }
     
+listview row.hiddenItem {
+    opacity: 0.5;
+}

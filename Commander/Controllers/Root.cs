@@ -44,41 +44,41 @@ class Root() : Controller<RootItem>, IController
     #endregion
 
     public override Column<RootItem>[] GetColumns()
-        => [ new()
-                {
-                    Title = "Name",
-                    Expanded = true,
-                    Resizeable = true,
-                    OnItemSetup = ()
-                        => Box
-                            .New(Orientation.Horizontal)
-                            .Append(Image.NewFromIconName("mail", IconSize.Menu).MarginStart(3).MarginEnd(3))
-                            .Append(Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End)),
-                    OnItemBind = OnIconNameBind
-                },
-                new()
-                {
-                    Title = "Bezeichnung",
-                    Expanded = true,
-                    Resizeable = true,
-                    OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End),
-                    OnLabelBind = i => i.Description
+        => [
+            new()
+            {
+                Title = "Name",
+                Expanded = true,
+                Resizeable = true,
+                OnItemSetup = ()
+                    => Box
+                        .New(Orientation.Horizontal)
+                        .Append(Image.NewFromIconName("mail", IconSize.Menu).MarginStart(3).MarginEnd(3))
+                        .Append(Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End)),
+                OnItemBind = OnIconNameBind
             },
             new()
-                {
-                    Title = "Mountpoint",
-                    Expanded = true,
-                    Resizeable = true,
-                    OnLabelBind = i => i.MountPoint
+            {
+                Title = "Bezeichnung",
+                Expanded = true,
+                Resizeable = true,
+                OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End),
+                OnLabelBind = i => i.Description
             },
             new()
-                {
-                    Title = "Größe",
-                    Resizeable = true,
-                    OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
-                    OnLabelBind = i => i.Size.ToString()
-            }
-            ];
+            {
+                Title = "Mountpoint",
+                Expanded = true,
+                Resizeable = true,
+                OnLabelBind = i => i.MountPoint
+            },
+            new()
+            {
+                Title = "Größe",
+                Resizeable = true,
+                OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
+                OnLabelBind = i => i.Size.ToString()
+            }];
 
     RootItem CreateRootItem(string driveString, int[] columnPositions)
     {
@@ -127,9 +127,10 @@ class Root() : Controller<RootItem>, IController
         {
             DriveType.Home => "user-home",
             _ => "drive-removable-media-symbolic"
-        };   
+        };
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
+        box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass(string.IsNullOrEmpty(item.MountPoint) ? "hiddenItem" : "");
     }        
 }
 
