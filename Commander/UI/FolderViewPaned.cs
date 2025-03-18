@@ -15,7 +15,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         {
             if (k == 23)
             {
-                Console.WriteLine("Habe den Täb auch hier direkt");
+                GetInactiveFolderView()?.GrabFocus();
                 return true;
             }
             else
@@ -29,15 +29,24 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         if (cvhl != null && cvhr != null)
         {
             folderViewLeft = FolderView.GetInstance(cvhl);
+            folderViewActive = folderViewLeft;
+            folderViewActive?.GrabFocus();
+            if (folderViewLeft != null)
+                folderViewLeft.OnFocus += (s, e) => folderViewActive = folderViewLeft;
             folderViewRight = FolderView.GetInstance(cvhr);
+            if (folderViewRight != null)
+                folderViewRight.OnFocus += (s, e) => folderViewActive = folderViewRight;
         }
     }
 
     protected override PanedHandle CreateHandle(nint obj) => new(obj);
     protected override void OnFinalize() => Console.WriteLine("FolderViewPaned finalized");
 
+    FolderView? GetInactiveFolderView() => folderViewActive == folderViewLeft ? folderViewRight : folderViewLeft;
+
     FolderView? folderViewLeft;
     FolderView? folderViewRight;
+    FolderView? folderViewActive;
 }
 
 class FolderViewPanedClass(Func<nint, FolderViewPaned> constructor)

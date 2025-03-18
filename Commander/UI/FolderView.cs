@@ -20,6 +20,8 @@ class FolderView(nint obj) : ColumnViewSubClassed(obj)
 
     public event EventHandler? OnFocus;
 
+    public void GrabFocus() => columnView.GrabFocus();
+
     protected override void OnCreate()
     {
         OnActivate(OnActivate);
