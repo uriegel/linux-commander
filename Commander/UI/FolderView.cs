@@ -3,9 +3,7 @@ using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 
-// TODO size column like Commander
-// TODO ellipse wrapping in cell
-// TODO root Icons
+// TODO unmounted with opacity 0.6
 
 class FolderView(nint obj) : ColumnViewSubClassed(obj)
 {

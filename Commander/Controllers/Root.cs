@@ -3,7 +3,8 @@ using CsTools.Extensions;
 
 using static GtkDotNet.Controls.ColumnViewSubClassed;
 using static CsTools.ProcessCmd;
-using Microsoft.VisualBasic;
+using GtkDotNet;
+using GtkDotNet.SafeHandles;
 
 namespace Controllers;
 
@@ -48,15 +49,19 @@ class Root() : Controller<RootItem>, IController
                     Title = "Name",
                     Expanded = true,
                     Resizeable = true,
-                    OnLabelBind = i => i.Name
-                    //OnItemSetup = OnIconName,
-                    //OnItemBind = OnIconNameBind
-        },
-            new()
+                    OnItemSetup = ()
+                        => Box
+                            .New(Orientation.Horizontal)
+                            .Append(Image.NewFromIconName("mail", IconSize.Menu).MarginStart(3).MarginEnd(3))
+                            .Append(Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End)),
+                    OnItemBind = OnIconNameBind
+                },
+                new()
                 {
                     Title = "Bezeichnung",
                     Expanded = true,
                     Resizeable = true,
+                    OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End),
                     OnLabelBind = i => i.Description
             },
             new()
@@ -70,6 +75,7 @@ class Root() : Controller<RootItem>, IController
                 {
                     Title = "Größe",
                     Resizeable = true,
+                    OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
                     OnLabelBind = i => i.Size.ToString()
             }
             ];
@@ -87,7 +93,7 @@ class Root() : Controller<RootItem>, IController
                 0,
                 CsTools.Directory.GetHomeDir(),
                 true,
-                "")
+                DriveType.Home)
             : new(
                 GetString(1, 2).TrimName(),
                 GetString(2, 3),
@@ -96,8 +102,13 @@ class Root() : Controller<RootItem>, IController
                     ?? 0,
                 mountPoint,
                 mountPoint.Length > 0,
-                driveString[columnPositions[4]..]
-                    .Trim()
+                driveString[columnPositions[4]..].Trim() switch
+                {
+                    "ext4" => DriveType.Ext4,
+                    "ntfs" => DriveType.Ntfs,
+                    "vfat" => DriveType.Vfat,
+                    _ => DriveType.Unknown
+                }
             );
         string GetString(int pos1, int pos2)
             => driveString[columnPositions[pos1]..columnPositions[pos2]].Trim();
@@ -106,6 +117,20 @@ class Root() : Controller<RootItem>, IController
     static bool FilterDrives(string driveString, int[] columnPositions) =>
         driveString == "home"
         || driveString[columnPositions[1]] > '~';
+
+    static void OnIconNameBind(ListItemHandle listItem, RootItem item)
+    {
+        var box = listItem.GetChild<BoxHandle>();
+        var image = box?.GetFirstChild<ImageHandle>();
+        var label = image?.GetNextSibling<LabelHandle>();
+        var icon = item.DriveType switch
+        {
+            DriveType.Home => "user-home",
+            _ => "drive-removable-media-symbolic"
+        };   
+        image?.SetFromIconName(icon, IconSize.Menu);
+        label?.Set(item.Name);
+    }        
 }
 
 
@@ -123,37 +148,13 @@ record RootItem(
     long Size,
     string MountPoint,
     bool IsMounted,
-    string DriveType);
+    DriveType DriveType);
 
-// class Controller : Controller<Type2>
-// {
-//     public Controller()
-//     {
-//         MultiSelection = true;
-//         EnableRubberband = true;
-//     }
-
-
-//     public void Fill() => Insert([
-//         .. Enumerable.Range(1, 100_000).Select(n => new Type2($"item{n}@dom.de", $"ID-{n}", n % 3 == 0))]);
-
-//     static BoxHandle OnIconName()
-//         => Box
-//             .New(Orientation.Horizontal)
-//             .Append(Image.NewFromIconName("mail", IconSize.Button))
-//             .Append(Label.New("").HAlign(Align.Start).MarginStart(5));
-
-//     static void OnIconNameBind(ListItemHandle listItem, Type2 item)
-//     {
-//         var box = listItem.GetChild<BoxHandle>();
-//         var image = box.GetFirstChild<ImageHandle>();
-//         var label = image.GetNextSibling<LabelHandle>();
-//         if (item.Active)
-//             image.SetFromIconName("mail-read", IconSize.LargeToolbar);
-//         else
-//             image.SetFromIconName("mail-unread", IconSize.LargeToolbar);
-//         label.Set(item.EMail);
-//         var itemHandle = listItem.GetItem<GObjectHandle>();
-//         box.SetData("data", itemHandle.GetInternalHandle());
-//     }
-// }
+enum DriveType
+{
+    Unknown,
+    Ext4,
+    Ntfs,
+    Vfat,
+    Home
+}
