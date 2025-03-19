@@ -1,11 +1,13 @@
 using CsTools.Async;
 using CsTools.Extensions;
 
-using static GtkDotNet.Controls.ColumnViewSubClassed;
-using static CsTools.ProcessCmd;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
+using Commander.Enums;
 using Commander.UI;
+
+using static GtkDotNet.Controls.ColumnViewSubClassed;
+using static CsTools.ProcessCmd;
 
 namespace Commander.Controllers;
 
@@ -40,9 +42,6 @@ class Root : Controller<RootItem>, IController
         Insert(rootItems);
     }
 
-    public Root(FolderView folderView)
-        => folderView.SetController(this);
-
     public string? OnActivate(uint pos)
     {
         // TODO when not mounted, mount
@@ -52,6 +51,9 @@ class Root : Controller<RootItem>, IController
     }
 
     #endregion
+
+    public Root(FolderView folderView)
+        => folderView.SetController(this);
 
     public override Column<RootItem>[] GetColumns()
         => [
@@ -103,7 +105,7 @@ class Root : Controller<RootItem>, IController
                 0,
                 CsTools.Directory.GetHomeDir(),
                 true,
-                DriveType.Home)
+                DriveKind.Home)
             : new(
                 GetString(1, 2).TrimName(),
                 GetString(2, 3),
@@ -114,10 +116,10 @@ class Root : Controller<RootItem>, IController
                 mountPoint.Length > 0,
                 driveString[columnPositions[4]..].Trim() switch
                 {
-                    "ext4" => DriveType.Ext4,
-                    "ntfs" => DriveType.Ntfs,
-                    "vfat" => DriveType.Vfat,
-                    _ => DriveType.Unknown
+                    "ext4" => DriveKind.Ext4,
+                    "ntfs" => DriveKind.Ntfs,
+                    "vfat" => DriveKind.Vfat,
+                    _ => DriveKind.Unknown
                 }
             );
         string GetString(int pos1, int pos2)
@@ -133,9 +135,9 @@ class Root : Controller<RootItem>, IController
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
         var label = image?.GetNextSibling<LabelHandle>();
-        var icon = item.DriveType switch
+        var icon = item.DriveKind switch
         {
-            DriveType.Home => "user-home",
+            DriveKind.Home => "user-home",
             _ => "drive-removable-media-symbolic"
         };
         image?.SetFromIconName(icon, IconSize.Menu);
@@ -144,7 +146,7 @@ class Root : Controller<RootItem>, IController
             box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem");  // TODO AddCssClass(cls, bool add)
         else
             box?.GetParent<WidgetHandle>()?.GetParent().RemoveCssClass("hiddenItem");
-    }        
+    }
 }
 
 
@@ -162,13 +164,5 @@ record RootItem(
     long Size,
     string MountPoint,
     bool IsMounted,
-    DriveType DriveType);
+    DriveKind DriveKind);
 
-enum DriveType
-{
-    Unknown,
-    Ext4,
-    Ntfs,
-    Vfat,
-    Home
-}

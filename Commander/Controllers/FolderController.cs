@@ -29,10 +29,8 @@ class FolderController(FolderView folderView)
                     controller = new Root(folderView);
                 break;
             default:
-
-                // TODO directory
-                if (controller is not Root)
-                    controller = new Root(folderView);
+                if (controller is not Directory)
+                    controller = new Directory(folderView);
                 break;
 
         }
