@@ -11,7 +11,7 @@ using static CsTools.ProcessCmd;
 
 namespace Commander.Controllers;
 
-class Root : Controller<RootItem>, IController
+class RootController : Controller<RootItem>, IController
 {
     #region IController
 
@@ -52,7 +52,7 @@ class Root : Controller<RootItem>, IController
 
     #endregion
 
-    public Root(FolderView folderView)
+    public RootController(FolderView folderView)
         => folderView.SetController(this);
 
     public override Column<RootItem>[] GetColumns()
@@ -148,7 +148,6 @@ class Root : Controller<RootItem>, IController
             box?.GetParent<WidgetHandle>()?.GetParent().RemoveCssClass("hiddenItem");
     }
 }
-
 
 static class Extensions
 {

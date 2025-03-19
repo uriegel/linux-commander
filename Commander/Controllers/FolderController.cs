@@ -25,17 +25,17 @@ class FolderController(FolderView folderView)
         switch (path)
         {
             case "root":
-                if (controller is not Root)
-                    controller = new Root(folderView);
+                if (controller is not RootController)
+                    controller = new RootController(folderView);
                 break;
             default:
-                if (controller is not Directory)
-                    controller = new Directory(folderView);
+                if (controller is not DirectoryController)
+                    controller = new DirectoryController(folderView);
                 break;
 
         }
     }
 
-    IController controller = new Root(folderView);
+    IController controller = new RootController(folderView);
 }
 
