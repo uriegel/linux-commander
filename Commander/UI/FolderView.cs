@@ -29,8 +29,8 @@ class FolderView : ColumnViewSubClassed
     protected override void OnCreate()
     {
         OnActivate(OnActivate);
-        controller.Fill();
         Handle.AddController(EventControllerFocus.New().OnEnter(OnFocusEnter));
+        controller.ChangePath("root");
     }
 
     protected override void OnFinalize()

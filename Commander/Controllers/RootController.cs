@@ -15,7 +15,7 @@ class RootController : Controller<RootItem>, IController
 {
     #region IController
 
-    public async void Fill()
+    public async void Fill(string path)
     {
         // TODO Fill sda when there is no sda1 (daten)
         var rootItems = await
