@@ -9,7 +9,7 @@ namespace Commander.Controllers;
 // TODO FolderType (parent/folder/item)
 // TODO Icon for those types
 // TODO sort parent -> folder by name -> item by sort
-// TODO SortModel detect descending /ascending
+// TODO SortModel detect descending /ascending, but only item sort to outside
 
 class DirectoryController : Controller<DirectoryItem>, IController
 {
