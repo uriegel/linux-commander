@@ -6,8 +6,12 @@ using Commander.Controllers;
 
 namespace Commander.UI;
 
-class FolderView(nint obj) : ColumnViewSubClassed(obj)
+class FolderView : ColumnViewSubClassed
 {
+    public FolderView(nint obj) 
+        : base(obj)
+        => controller = new(this);
+
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderView;
 
@@ -25,7 +29,6 @@ class FolderView(nint obj) : ColumnViewSubClassed(obj)
     protected override void OnCreate()
     {
         OnActivate(OnActivate);
-        controller.Set(this);
         controller.Fill();
         Handle.AddController(EventControllerFocus.New().OnEnter(OnFocusEnter));
     }
@@ -39,7 +42,7 @@ class FolderView(nint obj) : ColumnViewSubClassed(obj)
 
     void OnActivate(uint pos) => controller.OnActivate(pos);
 
-    readonly FolderController controller = new();
+    readonly FolderController controller;
 }
 
 class FolderViewClass() : ColumnViewSubClassedClass("ColumnView", p => new FolderView(p)) { }

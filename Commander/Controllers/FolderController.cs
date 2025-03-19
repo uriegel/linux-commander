@@ -7,22 +7,37 @@ namespace Commander.Controllers;
 // TODO changePath in controller
 // TODO DirectoryController
 
-class FolderController
+class FolderController(FolderView folderView)
 {
-    public void Set(FolderView folderView) => controller.Set(folderView);
-
     public void Fill() => controller.Fill();
 
-    public IController? OnActivate(uint pos)
+    public void OnActivate(uint pos)
     {
         var newPath = controller.OnActivate(pos);
         if (!string.IsNullOrEmpty(newPath))
         {
-            // detect new controller
-            Console.WriteLine($"Neuer Pfad: {newPath}");
+            DetectController(newPath);
         }
-        return null;
     }
 
-    IController controller = new Root();
+    void DetectController(string path)
+    {
+        switch (path)
+        {
+            case "root":
+                if (controller is not Root)
+                    controller = new Root(folderView);
+                break;
+            default:
+
+                // TODO directory
+                if (controller is not Root)
+                    controller = new Root(folderView);
+                break;
+
+        }
+    }
+
+    IController controller = new Root(folderView);
 }
+

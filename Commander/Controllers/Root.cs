@@ -9,12 +9,9 @@ using Commander.UI;
 
 namespace Commander.Controllers;
 
-class Root() : Controller<RootItem>, IController
+class Root : Controller<RootItem>, IController
 {
     #region IController
-
-    public void Set(FolderView folderView)
-        => folderView.SetController(this);
 
     public async void Fill()
     {
@@ -42,6 +39,9 @@ class Root() : Controller<RootItem>, IController
 
         Insert(rootItems);
     }
+
+    public Root(FolderView folderView)
+        => folderView.SetController(this);
 
     public string? OnActivate(uint pos)
     {
