@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Commander.UI;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
@@ -7,6 +6,11 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO FolderType (parent/folder/item)
+// TODO Icon for those types
+// TODO sort parent -> folder by name -> item by sort
+// TODO SortModel detect descending /ascending
+
 class DirectoryController : Controller<DirectoryItem>, IController
 {
     #region IController
@@ -14,6 +18,8 @@ class DirectoryController : Controller<DirectoryItem>, IController
     public async void Fill(string path)
     {
         var result = await Task.Factory.StartNew(() => DirectoryProcessing.GetFiles(path));
+        RemoveAll();
+        Insert(result.Items);
     }
 
     public string? OnActivate(uint pos)
@@ -45,7 +51,7 @@ class DirectoryController : Controller<DirectoryItem>, IController
                 Title = "Datum",
                 Resizeable = true,
                 OnItemSetup = () => Label.New(),
-                OnLabelBind = i => i.Date.ToString()
+                OnLabelBind = i => i.Time.ToString()
             },
             new()
             {
@@ -65,4 +71,4 @@ class DirectoryController : Controller<DirectoryItem>, IController
     }
 }
 
-record DirectoryItem(string Name, DateTime Date, long Size);
+

@@ -8,12 +8,10 @@ static class DirectoryProcessing
         return MakeFilesResult(new DirFileInfo(
                     [.. info
                         .GetDirectories()
-                        .Select(DirectoryItem.CreateDirItem)
-                        .OrderBy(n => n.Name)],
-                        info
+                        .Select(DirectoryItem.CreateDirItem)],
+                    [.. info
                         .GetFiles()
-                        .Select(DirectoryItem.CreateFileItem)
-                        .ToArray()));
+                        .Select(DirectoryItem.CreateFileItem)]));
 
         GetFilesResult MakeFilesResult(DirFileInfo dirFileInfo)
             => new([.. dirFileInfo.Directories, .. dirFileInfo.Files],
