@@ -1,5 +1,3 @@
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
@@ -36,6 +34,8 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
                 folderViewRight.OnFocus += (s, e) => folderViewActive = folderViewRight;
+            await Task.Delay(100);
+            folderViewActive?.GrabFocus();
         }
     }
 

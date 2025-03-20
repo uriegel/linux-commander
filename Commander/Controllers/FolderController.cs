@@ -23,11 +23,17 @@ class FolderController(FolderView folderView)
         {
             case "root":
                 if (controller is not RootController)
+                {
+                    controller.Dispose();
                     controller = new RootController(folderView);
+                }
                 break;
             default:
                 if (controller is not DirectoryController)
+                {
+                    controller.Dispose();
                     controller = new DirectoryController(folderView);
+                }
                 break;
         }
     }

@@ -39,7 +39,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 // new("adaptpath", Events.MenuAction.Apply("ADAPT_PATH"), "F9"),
                 // new("delete", Events.MenuAction.Apply("DELETE")),
                 // new("refresh", Events.MenuAction.Apply("REFRESH"), "<Ctrl>R"),
-                // new("showhidden", false, Events.ShowHiddenAction, "<Ctrl>H"),
+                new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
                 // new("devtools", webView.ShowDevTools, "<Ctrl><Shift>I"),
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
             ]);

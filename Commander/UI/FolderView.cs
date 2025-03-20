@@ -3,6 +3,7 @@ using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 
 using Commander.Controllers;
+using System.ComponentModel;
 
 namespace Commander.UI;
 
@@ -28,6 +29,7 @@ class FolderView : ColumnViewSubClassed
 
     protected override void OnCreate()
     {
+        Actions.Instance.PropertyChanged += OnActionChanged;
         OnActivate(OnActivate);
         Handle.AddController(EventControllerFocus.New().OnEnter(OnFocusEnter));
         controller.ChangePath("root");
@@ -37,6 +39,16 @@ class FolderView : ColumnViewSubClassed
         => Console.WriteLine("ColumnView finalized");
 
     protected override CustomColumnViewHandle CreateHandle(nint obj) => new(obj);
+
+    void OnActionChanged(object? _, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case "ShowHidden":
+                FilterChanged(Actions.Instance.ShowHidden ? FilterChange.LessStrict : FilterChange.MoreStrict);
+                break;
+        }
+    }
 
     void OnFocusEnter() => OnFocus?.Invoke(this, new());
 

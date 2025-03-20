@@ -1,3 +1,5 @@
+using Commander.Enums;
+
 namespace Commander;
 
 static class DirectoryProcessing
@@ -8,13 +10,18 @@ static class DirectoryProcessing
         return MakeFilesResult(new DirFileInfo(
                     [.. info
                         .GetDirectories()
+                        .OrderBy(n => n.Name)
                         .Select(DirectoryItem.CreateDirItem)],
                     [.. info
                         .GetFiles()
+                        .OrderBy(n => n.Name)
                         .Select(DirectoryItem.CreateFileItem)]));
 
         GetFilesResult MakeFilesResult(DirFileInfo dirFileInfo)
-            => new([.. dirFileInfo.Directories, .. dirFileInfo.Files],
+            => new([
+                DirectoryItem.CreateParentItem(),
+                .. dirFileInfo.Directories,
+                .. dirFileInfo.Files],
                     info.FullName,
                     dirFileInfo.Directories.Length,
                     dirFileInfo.Files.Length);
@@ -22,40 +29,53 @@ static class DirectoryProcessing
 }
 
 record DirectoryItem(
+    ItemKind Kind,
     string Name,
     long Size,
     bool IsDirectory,
     //string? IconPath,
     bool IsHidden,
-    DateTime Time
+    DateTime? Time
 ) {
+    public static DirectoryItem CreateParentItem()
+        => new(
+            ItemKind.Parent,
+            "..",
+            -1,
+            true,
+            //            null,
+            false,
+            null);
+
     public static DirectoryItem CreateDirItem(DirectoryInfo info)
         => new(
+            ItemKind.Folder,
             info.Name,
-            0,
+            -1,
             true,
-//            null,
+            //            null,
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
             info.LastWriteTime);
 
     public static DirectoryItem CreateFileItem(FileInfo info)
         => new(
+            ItemKind.Item,
             info.Name,
             info.Length,
             false,
 //            Directory.GetIconPath(info),
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
             info.LastWriteTime);
-    public static DirectoryItem? CreateMaybeFileItem(FileInfo info)
-        => info.Exists
-            ? new(
-                info.Name,
-                info.Length,
-                false,
-  //              Directory.GetIconPath(info),
-                (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
-                info.LastWriteTime)
-            : null;
+//     public static DirectoryItem? CreateMaybeFileItem(FileInfo info)
+//         => info.Exists
+//             ? new(
+//                 info.Name,
+//                 info.Length,
+//                 false,
+//   //              Directory.GetIconPath(info),
+//                 (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
+//                 info.LastWriteTime)
+//             : null;
 };
 
 record DirFileInfo(

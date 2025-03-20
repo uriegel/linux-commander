@@ -89,7 +89,7 @@ class RootController : Controller<RootItem>, IController
                 Title = "Größe",
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
-                OnLabelBind = i => i.Size.ToString()
+                OnLabelBind = i => i.Size != 0 ? i.Size.ToString() : ""
             }];
 
     RootItem CreateRootItem(string driveString, int[] columnPositions)
