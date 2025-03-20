@@ -10,6 +10,7 @@ namespace Commander.Controllers;
 
 // TODO Don't select old folder but set focus to
 // TODO Implement actions for up, down, home, end, pgup, pgdown, but only when the specified columnview has focus
+// TODO gtk_widget_get_focus_child, gtk_widget_get_last_child 
 
 // TODO Selections: * check if item can be selectable (like parent or root item)
 // TODO Selections: * or selection in items  (2nd choice)

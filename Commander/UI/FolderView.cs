@@ -23,7 +23,25 @@ class FolderView : ColumnViewSubClassed
         return (uint)items.TakeWhile(n => n != item).Count();
     }
 
-    public event EventHandler? OnFocus;
+    public void OnDown(WindowHandle window)
+    {
+        // TODO WidgetHandle or ColumnViewRowHandle
+        // g_type_name
+        var widget = window.GetFocus<WidgetHandle>();
+        if (!widget.IsInvalid && widget.GetName() == "GtkColumnViewRowWidget")
+        {
+            var next = widget.GetNextSibling<WidgetHandle>();
+            if (!next.IsInvalid && next.GetName() == "GtkColumnViewRowWidget")
+            {
+                var sibling = widget.GetNextSibling<WidgetHandle>();
+                if (!sibling.IsInvalid)
+                    sibling.GrabFocus();
+            }
+        }
+    }
+
+    public event EventHandler? OnFocusEnter;
+    public event EventHandler? OnFocusLeave;
 
     public void GrabFocus() => columnView.GrabFocus();
 
@@ -31,7 +49,10 @@ class FolderView : ColumnViewSubClassed
     {
         Actions.Instance.PropertyChanged += OnActionChanged;
         OnActivate(OnActivate);
-        Handle.AddController(EventControllerFocus.New().OnEnter(OnFocusEnter));
+        Handle.AddController(EventControllerFocus
+                                .New()
+                                .OnEnter(FocusEnter)
+                                .OnLeave(FocusLeave));
         controller.ChangePath("root");
     }
 
@@ -50,7 +71,8 @@ class FolderView : ColumnViewSubClassed
         }
     }
 
-    void OnFocusEnter() => OnFocus?.Invoke(this, new());
+    void FocusEnter() => OnFocusEnter?.Invoke(this, new());
+    void FocusLeave() => OnFocusLeave?.Invoke(this, new());
 
     void OnActivate(uint pos) => controller.OnActivate(pos);
 

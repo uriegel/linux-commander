@@ -1,3 +1,4 @@
+using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -20,13 +21,14 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
 
     protected override void Initialize()
     {
-        var paned = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("paned");
+        var panedHandle = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("paned");
+        var paned = panedHandle != null ? FolderViewPaned.GetInstance(panedHandle) : null;
         Handle.OnRealize(w =>
             {
                 var width = w.GetWidth();
-                paned?.SetPosition(width / 2);
+                panedHandle?.SetPosition(width / 2);
             });
-        Handle.OnSizeChanged((w, _) => paned?.SetPosition(w / 2));
+        Handle.OnSizeChanged((w, _) => panedHandle?.SetPosition(w / 2));
         Handle.AddActions(
             [
                 // new("togglePreviewMode", Events.MenuAction.Apply("TOGGLE_PREVIEW"), "<Ctrl>F3"),
@@ -39,7 +41,11 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
                 // new("devtools", webView.ShowDevTools, "<Ctrl><Shift>I"),
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
+                new("downLeft", () => paned?.OnLeftDown(Handle), "Down"),
+                new("downRight", () => paned?.OnRightDown(Handle), "Down"),
             ]);
+        IActionMap.GetAction("downLeft").SetEnabled(false);
+        IActionMap.GetAction("downRight").SetEnabled(false);
     }
 
     public class MainWindowClass()

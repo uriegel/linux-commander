@@ -6,6 +6,13 @@ namespace Commander.UI;
 
 class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 {
+    public static FolderViewPaned? GetInstance(PanedHandle handle)
+        => GetInstance(handle.GetInternalHandle()) as FolderViewPaned;
+
+    public void OnLeftDown(WindowHandle window) => folderViewLeft?.OnDown(window);
+
+    public void OnRightDown(WindowHandle window) => folderViewRight?.OnDown(window);
+
     protected override async void OnCreate()
     {
         Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m)
@@ -28,14 +35,28 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         {
             folderViewLeft = FolderView.GetInstance(cvhl);
             folderViewActive = folderViewLeft;
-            folderViewActive?.GrabFocus();
             if (folderViewLeft != null)
-                folderViewLeft.OnFocus += (s, e) => folderViewActive = folderViewLeft;
+            {
+                folderViewLeft.OnFocusEnter += (s, e) =>
+                {
+                    folderViewActive = folderViewLeft;
+                    IActionMap.GetAction("downLeft").SetEnabled(true);
+                };
+                folderViewLeft.OnFocusLeave += (s, e) => IActionMap.GetAction("downLeft").SetEnabled(false);
+            }
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
-                folderViewRight.OnFocus += (s, e) => folderViewActive = folderViewRight;
+            {
+                folderViewRight.OnFocusEnter += (s, e) =>
+                {
+                    folderViewActive = folderViewRight;
+                    IActionMap.GetAction("downRight").SetEnabled(true);
+                };
+                folderViewRight.OnFocusLeave += (s, e) => IActionMap.GetAction("downRight").SetEnabled(false);
+            }
             await Task.Delay(100);
             folderViewActive?.GrabFocus();
+            IActionMap.GetAction("downLeft").SetEnabled(true);
         }
     }
 
