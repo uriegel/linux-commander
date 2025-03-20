@@ -8,8 +8,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO sort parent -> folder by name -> item by sort
-// TODO SortModel detect descending /ascending, but only item sort to outside
+// TODO changePath, save currentPath, CurrentPath is property in Controller
 // TODO File Icons
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
@@ -43,6 +42,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
                 Title = "Name",
                 Expanded = true,
                 Resizeable = true,
+                OnSort = OnNameSort,
                 OnItemSetup = ()
                     => Box
                         .New(Orientation.Horizontal)
@@ -54,12 +54,14 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             {
                 Title = "Datum",
                 Resizeable = true,
+                OnSort = OnTimeSort,
                 OnItemSetup = () => Label.New(),
                 OnLabelBind = i => i.Time.ToString() ?? ""
             },
             new()
             {
                 Title = "Größe",
+                OnSort = OnSizeSort,
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
                 OnLabelBind = i => i.Size != -1 ? i.Size.ToString() : ""
@@ -86,8 +88,45 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             box?.GetParent<WidgetHandle>()?.GetParent().RemoveCssClass("hiddenItem");
     }
 
-    bool Filter(DirectoryItem item)
-        => !item.IsHidden || Actions.Instance.ShowHidden;
+    static int? OnFolderOrParentSort(DirectoryItem a, DirectoryItem b, bool desc)
+    {
+        int? res = (a.Kind, b.Kind) switch
+        {
+            (ItemKind.Parent, _) => -1,
+            (_, ItemKind.Parent) => 1,
+            (ItemKind.Folder, ItemKind.Item) => -1,
+            (ItemKind.Item, ItemKind.Folder) => 1,
+            (ItemKind.Folder, ItemKind.Folder) => string.Compare(a.Name, b.Name),
+            _ => null
+        };
+        return res != null
+            ? desc
+                ? -res
+                : res
+            : null;
+    }
+
+    bool Filter(DirectoryItem item) => !item.IsHidden || Actions.Instance.ShowHidden;
+
+    int OnNameSort(DirectoryItem a, DirectoryItem b, bool desc)
+        => OnFolderOrParentSort(a, b, desc) ?? string.Compare(a.Name, b.Name);
+    int OnTimeSort(DirectoryItem a, DirectoryItem b, bool desc)
+        => OnFolderOrParentSort(a, b, desc)
+            ?? (a.Time.HasValue && b.Time.HasValue
+            ? (a.Time.Value - b.Time.Value).TotalMilliseconds > 0
+            ? 1
+            : (a.Time.Value - b.Time.Value).TotalMilliseconds < 0
+            ? -1
+            : 0
+            : 0);
+
+    int OnSizeSort(DirectoryItem a, DirectoryItem b, bool desc)
+        => OnFolderOrParentSort(a, b, desc)
+            ?? (a.Size > b.Size
+            ? 1
+            : a.Size < b.Size
+            ? -1
+            : 0);
 
     #region IDisposable
 
