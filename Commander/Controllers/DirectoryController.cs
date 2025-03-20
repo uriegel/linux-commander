@@ -11,7 +11,7 @@ namespace Commander.Controllers;
 // TODO Add to descriptions in Gtk4DotNet:
 // TODO <Ctrl>F3  b e f o r e  <F3> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-// TODO change path to parent: select last folder
+// TODO change path to parent: select last folder: ColumnView.ScrollTo
 // TODO parent of root folder -> root Controller
 // TODO File Icons
 
