@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Commander.Enums;
 using Commander.UI;
 using GtkDotNet;
@@ -8,23 +7,35 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO changePath, save currentPath, CurrentPath is property in Controller
+// TODO AddCssClass(cls, bool add)
+// TODO Add to descriptions in Gtk4DotNet:
+// TODO <Ctrl>F3  b e f o r e  <F3> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// TODO change path to parent: select last folder
+// TODO parent of root folder -> root Controller
 // TODO File Icons
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
     #region IController
 
+    public string CurrentPath { get; private set; } = "";
+
     public async void Fill(string path)
     {
         var result = await Task.Factory.StartNew(() => DirectoryProcessing.GetFiles(path));
+        CurrentPath = result.Path;
         RemoveAll();
         Insert(result.Items);
     }
 
     public string? OnActivate(uint pos)
     {
-        return null;
+        var item = GetItem(pos);
+        if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
+            return Path.Combine(CurrentPath, item.Name);
+        else
+            return null;
     }
 
     #endregion

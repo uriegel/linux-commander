@@ -15,6 +15,8 @@ class RootController : Controller<RootItem>, IController
 {
     #region IController
 
+    public string CurrentPath { get; } = "root";
+
     public async void Fill(string path)
     {
         // TODO Fill sda when there is no sda1 (daten)
@@ -46,7 +48,6 @@ class RootController : Controller<RootItem>, IController
     {
         // TODO when not mounted, mount
         var item = GetItem(pos);
-        Console.WriteLine($"Eintrag ausgewählt: {item}");
         return item?.MountPoint;
     }
 
