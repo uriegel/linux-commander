@@ -9,7 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 namespace Commander.Controllers;
 
 // TODO Implement actions for up, down, home, end, pgup, pgdown, but only when the specified columnview has focus
-// TODO border in css, focused with color selected theme background color perhaps more percent, unfocused with transparent
 
 // TODO Selections: * check if item can be selectable (like parent or root item)
 // TODO Selections: * or selection in items  (2nd choice)
