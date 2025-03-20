@@ -17,7 +17,7 @@ class RootController : Controller<RootItem>, IController
 
     public string CurrentPath { get; } = "root";
 
-    public async void Fill(string path)
+    public async Task<int> Fill(string path)
     {
         // TODO Fill sda when there is no sda1 (daten)
         var rootItems = await
@@ -42,6 +42,7 @@ class RootController : Controller<RootItem>, IController
               select item));
 
         Insert(rootItems);
+        return -1;
     }
 
     public string? OnActivate(uint pos)
@@ -143,10 +144,7 @@ class RootController : Controller<RootItem>, IController
         };
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
-        if (string.IsNullOrEmpty(item.MountPoint))
-            box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem");  // TODO AddCssClass(cls, bool add)
-        else
-            box?.GetParent<WidgetHandle>()?.GetParent().RemoveCssClass("hiddenItem");
+        box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem", string.IsNullOrEmpty(item.MountPoint));
     }
 }
 

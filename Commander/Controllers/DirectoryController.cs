@@ -1,5 +1,6 @@
 using Commander.Enums;
 using Commander.UI;
+using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 
@@ -7,13 +8,10 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO AddCssClass(cls, bool add)
-// TODO Add to descriptions in Gtk4DotNet:
-// TODO <Ctrl>F3  b e f o r e  <F3> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-// TODO change path to parent: select last folder: ColumnView.ScrollTo
 // TODO parent of root folder -> root Controller
 // TODO File Icons
+// TODO change path to parent: select last folder: ColumnView.ScrollTo SelectItem with focus control
+
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
@@ -21,12 +19,20 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 
     public string CurrentPath { get; private set; } = "";
 
-    public async void Fill(string path)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns>The position of the last path</returns>
+    public async Task<int> Fill(string path)
     {
         var result = await Task.Factory.StartNew(() => DirectoryProcessing.GetFiles(path));
+        var oldPath = CurrentPath;
         CurrentPath = result.Path;
         RemoveAll();
         Insert(result.Items);
+
+        return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 
     public string? OnActivate(uint pos)
@@ -93,10 +99,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
         label?.Set(item.Name);
-        if (item.IsHidden)
-            box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem");  // TODO AddCssClass(cls, bool add)
-        else
-            box?.GetParent<WidgetHandle>()?.GetParent().RemoveCssClass("hiddenItem");
+        box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem", item.IsHidden);
     }
 
     static int? OnFolderOrParentSort(DirectoryItem a, DirectoryItem b, bool desc)
@@ -138,6 +141,23 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             : a.Size < b.Size
             ? -1
             : 0);
+
+    int FindPos(Func<DirectoryItem, bool> predicate)
+    {
+        uint i = 0;
+        while (true)
+        {
+            var item = GetItem(i);
+            if (item == null)
+                return -1;
+            else
+            {
+                if (predicate(item))
+                    return (int)i;
+            }
+            i++;
+        }
+    }
 
     #region IDisposable
 

@@ -5,7 +5,7 @@ namespace Commander.Controllers;
 interface IController : IDisposable
 {
     string CurrentPath { get; }
-    void Fill(string path);
+    Task<int> Fill(string path);
 
     string? OnActivate(uint pos);
 

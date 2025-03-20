@@ -27,9 +27,6 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 paned?.SetPosition(width / 2);
             });
         Handle.OnSizeChanged((w, _) => paned?.SetPosition(w / 2));
-
-        // TODO Add to descriptions in Gtk4DotNet:
-        // TODO <Ctrl>F3  b e f o r e  <F3> !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Handle.AddActions(
             [
                 // new("togglePreviewMode", Events.MenuAction.Apply("TOGGLE_PREVIEW"), "<Ctrl>F3"),

@@ -11,10 +11,16 @@ class FolderController(FolderView folderView)
             ChangePath(newPath);
     }
 
-    public void ChangePath(string path)
+    public async void ChangePath(string path)
     {
         DetectController(path);
-        controller?.Fill(path);
+        if (controller != null)
+        {
+            var lastPos = await controller.Fill(path);
+            if (lastPos != -1)
+                folderView.SelectItem((uint)lastPos, true);
+        }
+
     }
 
     void DetectController(string path)
