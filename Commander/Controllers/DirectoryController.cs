@@ -8,9 +8,10 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO parent of root folder -> root Controller
-// TODO File Icons
+// TODO Selections: * check if item can be selectable (like parent or root item)
+// TODO Selections: * or selection in items  (2nd choice)
 // TODO change path to parent: select last folder: ColumnView.ScrollTo SelectItem with focus control
+// TODO File Icons
 
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
@@ -39,7 +40,10 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
     {
         var item = GetItem(pos);
         if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
-            return Path.Combine(CurrentPath, item.Name);
+            if (CurrentPath != "/")
+                return Path.Combine(CurrentPath, item.Name);
+            else
+                return "root";
         else
             return null;
     }

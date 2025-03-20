@@ -41,6 +41,7 @@ class RootController : Controller<RootItem>, IController
               orderby item.IsMounted descending, item.Name
               select item));
 
+        RemoveAll();
         Insert(rootItems);
         return -1;
     }
