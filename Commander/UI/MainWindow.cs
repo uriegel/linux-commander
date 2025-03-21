@@ -1,4 +1,3 @@
-using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -41,11 +40,8 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
                 // new("devtools", webView.ShowDevTools, "<Ctrl><Shift>I"),
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
-                new("downLeft", () => paned?.OnLeftDown(Handle), "Down"),
-                new("downRight", () => paned?.OnRightDown(Handle), "Down"),
+                new("down", () => paned?.OnDown(Handle), "Down"),
             ]);
-        IActionMap.GetAction("downLeft").SetEnabled(false);
-        IActionMap.GetAction("downRight").SetEnabled(false);
     }
 
     public class MainWindowClass()

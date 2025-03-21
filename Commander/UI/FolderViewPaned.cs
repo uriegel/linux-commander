@@ -9,9 +9,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
     public static FolderViewPaned? GetInstance(PanedHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderViewPaned;
 
-    public void OnLeftDown(WindowHandle window) => folderViewLeft?.OnDown(window);
-
-    public void OnRightDown(WindowHandle window) => folderViewRight?.OnDown(window);
+    public void OnDown(WindowHandle window) => folderViewActive?.OnDown(window);
 
     protected override async void OnCreate()
     {
@@ -40,9 +38,9 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 folderViewLeft.OnFocusEnter += (s, e) =>
                 {
                     folderViewActive = folderViewLeft;
-                    IActionMap.GetAction("downLeft").SetEnabled(true);
+                    IActionMap.GetAction("down").SetEnabled(true);
                 };
-                folderViewLeft.OnFocusLeave += (s, e) => IActionMap.GetAction("downLeft").SetEnabled(false);
+                folderViewLeft.OnFocusLeave += (s, e) => IActionMap.GetAction("down").SetEnabled(false);
             }
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
@@ -50,13 +48,13 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 folderViewRight.OnFocusEnter += (s, e) =>
                 {
                     folderViewActive = folderViewRight;
-                    IActionMap.GetAction("downRight").SetEnabled(true);
+                    IActionMap.GetAction("down").SetEnabled(true);
                 };
-                folderViewRight.OnFocusLeave += (s, e) => IActionMap.GetAction("downRight").SetEnabled(false);
+                folderViewRight.OnFocusLeave += (s, e) => IActionMap.GetAction("down").SetEnabled(false);
             }
             await Task.Delay(100);
             folderViewActive?.GrabFocus();
-            IActionMap.GetAction("downLeft").SetEnabled(true);
+            IActionMap.GetAction("down").SetEnabled(true);
         }
     }
 

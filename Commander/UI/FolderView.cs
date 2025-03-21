@@ -25,19 +25,20 @@ class FolderView : ColumnViewSubClassed
 
     public void OnDown(WindowHandle window)
     {
-        // TODO WidgetHandle or ColumnViewRowHandle
-        // g_type_name
+        // TODO g_type_name
         var widget = window.GetFocus<WidgetHandle>();
         if (!widget.IsInvalid && widget.GetName() == "GtkColumnViewRowWidget")
-        {
-            var next = widget.GetNextSibling<WidgetHandle>();
-            if (!next.IsInvalid && next.GetName() == "GtkColumnViewRowWidget")
-            {
-                var sibling = widget.GetNextSibling<WidgetHandle>();
-                if (!sibling.IsInvalid)
-                    sibling.GrabFocus();
-            }
-        }
+            columnView.ScrollTo(8, ListScrollFlags.ScrollFocus);
+
+        // {
+        //     var next = widget.GetNextSibling<WidgetHandle>();
+        //     if (!next.IsInvalid && next.GetName() == "GtkColumnViewRowWidget")
+        //     {
+        //         var sibling = widget.GetNextSibling<WidgetHandle>();
+        //         if (!sibling.IsInvalid)
+        //             sibling.GrabFocus();
+        //     }
+        // }
     }
 
     public event EventHandler? OnFocusEnter;
@@ -47,6 +48,7 @@ class FolderView : ColumnViewSubClassed
 
     protected override void OnCreate()
     {
+        MultiSelection = true;
         Actions.Instance.PropertyChanged += OnActionChanged;
         OnActivate(OnActivate);
         Handle.AddController(EventControllerFocus
