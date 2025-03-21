@@ -11,9 +11,9 @@ namespace Commander.Controllers;
 // TODO pgup, pgdown: check size of list view / size of rowItem
 // TODO gtk_widget_get_width() or gtk_widget_get_height() chatgpt Detecting widow size GTK4
 
-// TODO Selections: * check if item can be selectable (like parent or root item)
-// TODO Selections: * or selection in items  (2nd choice)
-// TODO change path to parent: select last folder: ColumnView.ScrollTo SelectItem with focus control
+// TODO Selections: * check if item can be selectable (like parent or root item): unselect not selectable
+// TODO Selections: click: when only one is selected: unselect it
+
 // TODO File Icons
 
 
