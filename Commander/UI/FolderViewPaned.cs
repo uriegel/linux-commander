@@ -10,6 +10,10 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         => GetInstance(handle.GetInternalHandle()) as FolderViewPaned;
 
     public void OnDown(WindowHandle window) => folderViewActive?.OnDown(window);
+    public void OnUp(WindowHandle window) => folderViewActive?.OnUp(window);
+
+    public void OnHome() => folderViewActive?.OnHome();
+    public void OnEnd() => folderViewActive?.OnEnd();
 
     protected override async void OnCreate()
     {
@@ -39,8 +43,17 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 {
                     folderViewActive = folderViewLeft;
                     IActionMap.GetAction("down").SetEnabled(true);
+                    IActionMap.GetAction("up").SetEnabled(true);
+                    IActionMap.GetAction("home").SetEnabled(true);
+                    IActionMap.GetAction("end").SetEnabled(true);
                 };
-                folderViewLeft.OnFocusLeave += (s, e) => IActionMap.GetAction("down").SetEnabled(false);
+                folderViewLeft.OnFocusLeave += (s, e) =>
+                {
+                    IActionMap.GetAction("down").SetEnabled(false); IActionMap.GetAction("down").SetEnabled(false);
+                    IActionMap.GetAction("up").SetEnabled(false);
+                    IActionMap.GetAction("home").SetEnabled(false);
+                    IActionMap.GetAction("end").SetEnabled(false);
+                };
             }
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
@@ -49,8 +62,17 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 {
                     folderViewActive = folderViewRight;
                     IActionMap.GetAction("down").SetEnabled(true);
+                    IActionMap.GetAction("up").SetEnabled(true);
+                    IActionMap.GetAction("home").SetEnabled(true);
+                    IActionMap.GetAction("end").SetEnabled(true);
                 };
-                folderViewRight.OnFocusLeave += (s, e) => IActionMap.GetAction("down").SetEnabled(false);
+                folderViewRight.OnFocusLeave += (s, e) =>
+                {
+                    IActionMap.GetAction("down").SetEnabled(false);
+                    IActionMap.GetAction("up").SetEnabled(false);
+                    IActionMap.GetAction("home").SetEnabled(false);
+                    IActionMap.GetAction("end").SetEnabled(false);
+                };
             }
             await Task.Delay(100);
             folderViewActive?.GrabFocus();

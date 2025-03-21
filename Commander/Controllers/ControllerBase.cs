@@ -1,18 +1,17 @@
+using System.Runtime.InteropServices;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 abstract class ControllerBase<T> : Controller<T>
-    where T: class
+    where T : class
 {
     public int GetFocusedItemPos(WindowHandle window)
     {
-        // TODO g_type_name
         var row = window.GetFocus<WidgetHandle>();
         if (!row.IsInvalid && row.GetName() == "GtkColumnViewRowWidget")
         {
             ListItemHandle listItem = new(row.GetData("listitem"));
-
             // TODO so
             // var model = columnView.GetModel<SelectionHandle>();
             // var items = model.GetRawItems();
@@ -20,16 +19,12 @@ abstract class ControllerBase<T> : Controller<T>
             // TODO check max count and -1!
 
             var focusedItem = listItem.GetObject<T>();
-            var idx = 0;
-            foreach (var item in Items())
-            {
-                if (item == focusedItem)
-                    break;
-                idx++;
-            }
-            return idx;
+
+            return Items().TakeWhile(n => n != focusedItem).Count();
         }
         else
             return -1;
     }
+
+    public int ItemsCount() => RawItems().Count();
 }

@@ -12,6 +12,8 @@ interface IController : IDisposable
 
     int GetFocusedItemPos(WindowHandle window);
 
+    int ItemsCount();
+
     void IDisposable.Dispose() { }
 
     static void AttachListItem(ListItemHandle listItem)

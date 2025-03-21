@@ -41,6 +41,9 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 // new("devtools", webView.ShowDevTools, "<Ctrl><Shift>I"),
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
                 new("down", () => paned?.OnDown(Handle), "Down"),
+                new("up", () => paned?.OnUp(Handle), "Up"),
+                new("home", () => paned?.OnHome(), "Home"),
+                new("end", () => paned?.OnEnd(), "End"),
             ]);
     }
 

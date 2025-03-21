@@ -8,12 +8,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO g_type_name "GtkColumnViewRowWidget"
-// TODO MultiSelection not working
-
-// TODO Don't select old folder but set focus to
-// TODO Implement actions for up, down, home, end, pgup, pgdown, but only when the specified columnview has focus
-// TODO gtk_widget_get_focus_child, gtk_widget_get_last_child 
+// TODO pgup, pgdown: check size of list view / size of rowItem
 
 // TODO Selections: * check if item can be selectable (like parent or root item)
 // TODO Selections: * or selection in items  (2nd choice)

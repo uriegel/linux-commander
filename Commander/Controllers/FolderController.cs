@@ -19,12 +19,12 @@ class FolderController(FolderView folderView)
         {
             var lastPos = await controller.Fill(path);
             if (lastPos != -1)
-                folderView.SelectItem((uint)lastPos, true);
+                folderView.ScrollTo((uint)lastPos);
         }
-
     }
 
     public int GetFocusedItemPos(WindowHandle window) => controller.GetFocusedItemPos(window);
+    public int ItemsCount() => controller.ItemsCount();
 
     void DetectController(string path)
     {

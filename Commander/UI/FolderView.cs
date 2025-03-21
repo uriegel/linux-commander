@@ -11,16 +11,31 @@ class FolderView : ColumnViewSubClassed
 {
     public FolderView(nint obj)
         : base(obj)
-        => controller = new(this);
-
+    {
+        MultiSelection = true;
+        controller = new(this);
+    }
+    
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderView;
+
+    public void ScrollTo(uint pos) => columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);
 
     public void OnDown(WindowHandle window)
     {
         var pos = controller.GetFocusedItemPos(window);
         columnView.ScrollTo((uint)pos + 1, ListScrollFlags.ScrollFocus);
     }
+
+    public void OnUp(WindowHandle window)
+    {
+        var pos = controller.GetFocusedItemPos(window);
+        columnView.ScrollTo((uint)Math.Max(pos - 1, 0), ListScrollFlags.ScrollFocus);
+    }
+
+    public void OnHome() => columnView.ScrollTo(0, ListScrollFlags.ScrollFocus);
+
+    public void OnEnd() => columnView.ScrollTo((uint)(controller.ItemsCount() - 1), ListScrollFlags.ScrollFocus);
 
     public event EventHandler? OnFocusEnter;
     public event EventHandler? OnFocusLeave;
@@ -29,7 +44,6 @@ class FolderView : ColumnViewSubClassed
 
     protected override void OnCreate()
     {
-        MultiSelection = true;
         Actions.Instance.PropertyChanged += OnActionChanged;
         OnActivate(OnActivate);
         Handle.AddController(EventControllerFocus
