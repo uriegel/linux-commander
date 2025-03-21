@@ -21,7 +21,7 @@ namespace Commander.Controllers;
 // TODO File Icons
 
 
-class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
+class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
     #region IController
 
@@ -53,21 +53,6 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
                 return "root";
         else
             return null;
-    }
-
-    // TODO Generic function
-    public uint GetRowItemPos(WidgetHandle row)
-    {
-        ListItemHandle listItem = new(row.GetData("listitem"));
-        var rootItem = listItem.GetObject<DirectoryItem>();
-        uint idx = 0;
-        foreach (var item in Items())
-        {
-            if (item == rootItem)
-                break;
-            idx++;
-        }
-        return idx;
     }
 
     #endregion

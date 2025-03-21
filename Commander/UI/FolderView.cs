@@ -9,41 +9,17 @@ namespace Commander.UI;
 
 class FolderView : ColumnViewSubClassed
 {
-    public FolderView(nint obj) 
+    public FolderView(nint obj)
         : base(obj)
         => controller = new(this);
 
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderView;
 
-    public uint FindPos(nint item)
-    {
-        var model = columnView.GetModel<SelectionHandle>();
-        var items = model.GetRawItems();
-        return (uint)items.TakeWhile(n => n != item).Count();
-    }
-
-    // TODO
     public void OnDown(WindowHandle window)
     {
-        // TODO g_type_name
-        var row = window.GetFocus<WidgetHandle>();
-        if (!row.IsInvalid && row.GetName() == "GtkColumnViewRowWidget")
-        {
-            // TODO In Controller
-            var pos = controller.GetRowItemPos(row);
-            columnView.ScrollTo(pos + 1, ListScrollFlags.ScrollFocus);
-            //controller.
-        }
-        // {
-        //     var next = widget.GetNextSibling<WidgetHandle>();
-        //     if (!next.IsInvalid && next.GetName() == "GtkColumnViewRowWidget")
-        //     {
-        //         var sibling = widget.GetNextSibling<WidgetHandle>();
-        //         if (!sibling.IsInvalid)
-        //             sibling.GrabFocus();
-        //     }
-        // }
+        var pos = controller.GetFocusedItemPos(window);
+        columnView.ScrollTo((uint)pos + 1, ListScrollFlags.ScrollFocus);
     }
 
     public event EventHandler? OnFocusEnter;

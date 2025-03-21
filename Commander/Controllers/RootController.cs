@@ -11,7 +11,7 @@ using static CsTools.ProcessCmd;
 
 namespace Commander.Controllers;
 
-class RootController : Controller<RootItem>, IController
+class RootController : ControllerBase<RootItem>, IController
 {
     #region IController
 
@@ -51,21 +51,6 @@ class RootController : Controller<RootItem>, IController
         // TODO when not mounted, mount
         var item = GetItem(pos);
         return item?.MountPoint;
-    }
-
-    // TODO Generic function
-    public uint GetRowItemPos(WidgetHandle row)
-    {
-        ListItemHandle listItem = new(row.GetData("listitem"));
-        var rootItem = listItem.GetObject<RootItem>();
-        uint idx = 0;
-        foreach (var item in Items())
-        {
-            if (item == rootItem)
-                break;
-            idx++;
-        }
-        return idx;
     }
 
     #endregion

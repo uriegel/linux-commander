@@ -10,7 +10,7 @@ interface IController : IDisposable
 
     string? OnActivate(uint pos);
 
-    uint GetRowItemPos(WidgetHandle row);
+    int GetFocusedItemPos(WindowHandle window);
 
     void IDisposable.Dispose() { }
 

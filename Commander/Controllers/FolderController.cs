@@ -5,10 +5,6 @@ namespace Commander.Controllers;
 
 class FolderController(FolderView folderView)
 {
-
-    // TODO
-    public uint GetRowItemPos(WidgetHandle widget) => controller.GetRowItemPos(widget);
-
     public void OnActivate(uint pos)
     {
         var newPath = controller.OnActivate(pos);
@@ -27,6 +23,8 @@ class FolderController(FolderView folderView)
         }
 
     }
+
+    public int GetFocusedItemPos(WindowHandle window) => controller.GetFocusedItemPos(window);
 
     void DetectController(string path)
     {
