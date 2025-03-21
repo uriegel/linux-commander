@@ -9,6 +9,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 namespace Commander.Controllers;
 
 // TODO pgup, pgdown: check size of list view / size of rowItem
+// TODO gtk_widget_get_width() or gtk_widget_get_height() chatgpt Detecting widow size GTK4
 
 // TODO Selections: * check if item can be selectable (like parent or root item)
 // TODO Selections: * or selection in items  (2nd choice)
