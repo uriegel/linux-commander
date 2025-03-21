@@ -53,6 +53,21 @@ class RootController : Controller<RootItem>, IController
         return item?.MountPoint;
     }
 
+    // TODO Generic function
+    public uint GetRowItemPos(WidgetHandle row)
+    {
+        ListItemHandle listItem = new(row.GetData("listitem"));
+        var rootItem = listItem.GetObject<RootItem>();
+        uint idx = 0;
+        foreach (var item in Items())
+        {
+            if (item == rootItem)
+                break;
+            idx++;
+        }
+        return idx;
+    }
+
     #endregion
 
     public RootController(FolderView folderView)
@@ -133,8 +148,9 @@ class RootController : Controller<RootItem>, IController
         driveString == "home"
         || driveString[columnPositions[1]] > '~';
 
-    static void OnIconNameBind(ListItemHandle listItem, RootItem item)
+    void OnIconNameBind(ListItemHandle listItem, RootItem item)
     {
+        IController.AttachListItem(listItem);
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
         var label = image?.GetNextSibling<LabelHandle>();

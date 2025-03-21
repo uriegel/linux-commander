@@ -1,4 +1,5 @@
-using Commander.UI;
+using GtkDotNet;
+using GtkDotNet.SafeHandles;
 
 namespace Commander.Controllers;
 
@@ -9,5 +10,15 @@ interface IController : IDisposable
 
     string? OnActivate(uint pos);
 
-    void IDisposable.Dispose() {}
+    uint GetRowItemPos(WidgetHandle row);
+
+    void IDisposable.Dispose() { }
+
+    static void AttachListItem(ListItemHandle listItem)
+    {
+        var widget = listItem.GetChild<WidgetHandle>();
+        var row = widget?.GetParent().GetParent();
+        if (row != null && row.GetName() == "GtkColumnViewRowWidget")
+            row.SetData("listitem", listItem.GetInternalHandle());
+    }   
 }

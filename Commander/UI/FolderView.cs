@@ -23,13 +23,18 @@ class FolderView : ColumnViewSubClassed
         return (uint)items.TakeWhile(n => n != item).Count();
     }
 
+    // TODO
     public void OnDown(WindowHandle window)
     {
         // TODO g_type_name
-        var widget = window.GetFocus<WidgetHandle>();
-        if (!widget.IsInvalid && widget.GetName() == "GtkColumnViewRowWidget")
-            columnView.ScrollTo(8, ListScrollFlags.ScrollFocus);
-
+        var row = window.GetFocus<WidgetHandle>();
+        if (!row.IsInvalid && row.GetName() == "GtkColumnViewRowWidget")
+        {
+            // TODO In Controller
+            var pos = controller.GetRowItemPos(row);
+            columnView.ScrollTo(pos + 1, ListScrollFlags.ScrollFocus);
+            //controller.
+        }
         // {
         //     var next = widget.GetNextSibling<WidgetHandle>();
         //     if (!next.IsInvalid && next.GetName() == "GtkColumnViewRowWidget")

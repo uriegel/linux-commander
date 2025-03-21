@@ -1,9 +1,14 @@
 using Commander.UI;
+using GtkDotNet.SafeHandles;
 
 namespace Commander.Controllers;
 
 class FolderController(FolderView folderView)
 {
+
+    // TODO
+    public uint GetRowItemPos(WidgetHandle widget) => controller.GetRowItemPos(widget);
+
     public void OnActivate(uint pos)
     {
         var newPath = controller.OnActivate(pos);

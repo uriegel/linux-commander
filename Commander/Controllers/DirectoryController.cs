@@ -8,9 +8,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-
-// TODO attach item ptr to GtkColumnViewRowWidget so you can get it from the focused item
-// TODO Instead of GrabFocus call ColumnView.ScrollTo
 // TODO g_type_name "GtkColumnViewRowWidget"
 // TODO MultiSelection not working
 
@@ -58,6 +55,21 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             return null;
     }
 
+    // TODO Generic function
+    public uint GetRowItemPos(WidgetHandle row)
+    {
+        ListItemHandle listItem = new(row.GetData("listitem"));
+        var rootItem = listItem.GetObject<DirectoryItem>();
+        uint idx = 0;
+        foreach (var item in Items())
+        {
+            if (item == rootItem)
+                break;
+            idx++;
+        }
+        return idx;
+    }
+
     #endregion
 
     public DirectoryController(FolderView folderView)
@@ -102,6 +114,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
     {
+        IController.AttachListItem(listItem);
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
         var label = image?.GetNextSibling<LabelHandle>();
