@@ -8,7 +8,8 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Items are not being freed
+// TODO Items are not being freed: FindPos
+// TODO Gtk4 Diagnostic counters (dlegates, actions, managedObjects (setDiagnostics) 
 
 // TODO root: select all: nothing is selected
 // TODO folder: select all: all is selected but the parent item : unselect not selectable
@@ -38,7 +39,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var oldPath = CurrentPath;
         CurrentPath = result.Path;
         Insert(result.Items);
-        return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
+        return 0;  //FindPos(n => n.Name == oldPath.SubstringAfterLast('/')); // Memory buster!
     }
 
     public string? OnActivate(uint pos)
@@ -88,7 +89,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             new()
             {
                 Title = "Größe",
-                OnSort = OnSizeSort,        
+                OnSort = OnSizeSort,
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
                 OnLabelBind = i => i.Size != -1 ? i.Size.ToString() : ""
