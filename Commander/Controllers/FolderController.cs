@@ -26,7 +26,8 @@ class FolderController(FolderView folderView)
     public int GetFocusedItemPos(WindowHandle window) => controller.GetFocusedItemPos(window);
     public int ItemsCount() => controller.ItemsCount();
 
-    public void OnSelectionChanged(nint model, uint pos, uint count) => controller.OnSelectionChanged(model, pos, count);
+    public void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl)
+        => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
     void DetectController(string path)
     {
         switch (path)

@@ -52,7 +52,7 @@ class RootController : ControllerBase<RootItem>, IController
         return item?.MountPoint;
     }
 
-    public void OnSelectionChanged(nint model, uint pos, uint count) => model.UnselectRange(pos, count);
+    public void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl) => model.UnselectRange(pos, count);
 
     #endregion
 

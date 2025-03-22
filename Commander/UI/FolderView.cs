@@ -16,7 +16,7 @@ class FolderView : ColumnViewSubClassed
         OnSelectionChanged = SelectionChanged;
         controller = new(this);
     }
-    
+
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderView;
 
@@ -67,6 +67,16 @@ class FolderView : ColumnViewSubClassed
                                 .New()
                                 .OnEnter(FocusEnter)
                                 .OnLeave(FocusLeave));
+        columnView?.AddController(GestureClick.New().OnPressed((i, d, b) =>
+        {
+            var status = columnView.GetDisplay().GetDefaultSeat().GetKeyboard().GetModifierState();
+            mouseButton = true;
+            mouseButtonCtrl = status.HasFlag(KeyModifiers.Control);
+        })).AddController(GestureClick.New().OnReleased((i, d, b) =>
+        {
+            mouseButton = false;
+            mouseButtonCtrl = false;
+        }));
         controller.ChangePath("root");
     }
 
@@ -100,7 +110,7 @@ class FolderView : ColumnViewSubClassed
             return 0;
     }
 
-    void SelectionChanged(nint model, uint pos, uint count) => controller.OnSelectionChanged(model, pos, count);
+    void SelectionChanged(nint model, uint pos, uint count) => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
 
     void FocusEnter() => OnFocusEnter?.Invoke(this, EventArgs.Empty);
     void FocusLeave() => OnFocusLeave?.Invoke(this, EventArgs.Empty);
@@ -108,6 +118,8 @@ class FolderView : ColumnViewSubClassed
     void OnActivate(uint pos) => controller.OnActivate(pos);
 
     readonly FolderController controller;
+    bool mouseButton;
+    bool mouseButtonCtrl;
 }
 
 class FolderViewClass() : ColumnViewSubClassedClass("ColumnView", p => new FolderView(p)) { }

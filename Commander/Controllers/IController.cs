@@ -14,7 +14,7 @@ interface IController : IDisposable
 
     int ItemsCount();
 
-    void OnSelectionChanged(nint model, uint pos, uint count);
+    void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl);
 
     void IDisposable.Dispose() { }
 

@@ -8,8 +8,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Selections: click: when only one is selected: unselect it
-
 // TODO Selections: Actions: SelecetAll, SelectNone, Ins, Select till start, Select till end, check space 
 
 // TODO File Icons
@@ -52,8 +50,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             return null;
     }
 
-    public void OnSelectionChanged(nint model, uint pos, uint count)
+    public void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl)
     {
+        if (mouseButton && !mouseButtonCtrl && count == 1)
+            model.UnselectRange(pos, 1);
         model.UnselectRange(0, 1);
     }
 
