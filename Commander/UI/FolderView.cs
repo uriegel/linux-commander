@@ -24,13 +24,29 @@ class FolderView : ColumnViewSubClassed
     public void OnDown(WindowHandle window)
     {
         var pos = controller.GetFocusedItemPos(window);
-        columnView.ScrollTo((uint)pos + 1, ListScrollFlags.ScrollFocus);
+        var count = controller.ItemsCount();
+        columnView.ScrollTo((uint)Math.Min(pos + 1, count - 1), ListScrollFlags.ScrollFocus);
     }
 
     public void OnUp(WindowHandle window)
     {
         var pos = controller.GetFocusedItemPos(window);
         columnView.ScrollTo((uint)Math.Max(pos - 1, 0), ListScrollFlags.ScrollFocus);
+    }
+
+    public void OnPageDown(WindowHandle window)
+    {
+        var pageSize = GetNumberOfVisibleRows(window);
+        var pos = controller.GetFocusedItemPos(window);
+        var count = controller.ItemsCount();
+        columnView.ScrollTo((uint)Math.Min(pos + pageSize, count - 1), ListScrollFlags.ScrollFocus);
+    }
+
+    public void OnPageUp(WindowHandle window)
+    {
+        var pageSize = GetNumberOfVisibleRows(window);
+        var pos = controller.GetFocusedItemPos(window);
+        columnView.ScrollTo((uint)Math.Max(pos - pageSize, 0), ListScrollFlags.ScrollFocus);
     }
 
     public void OnHome() => columnView.ScrollTo(0, ListScrollFlags.ScrollFocus);
@@ -66,6 +82,21 @@ class FolderView : ColumnViewSubClassed
                 FilterChanged(Actions.Instance.ShowHidden ? FilterChange.LessStrict : FilterChange.MoreStrict);
                 break;
         }
+    }
+
+    int GetNumberOfVisibleRows(WindowHandle window)
+    {
+        var row = window.GetFocus<WidgetHandle>();
+        if (!row.IsInvalid && row.GetName() == "GtkColumnViewRowWidget")
+        {
+            var parent = row.GetParent();
+            var columnViewHeight = parent.GetHeight();
+            var rowHeight = row.GetHeight();
+            var countOfRows = columnViewHeight / (rowHeight + 2);
+            return countOfRows;
+        }
+        else
+            return 0;
     }
 
     void FocusEnter() => OnFocusEnter?.Invoke(this, new());

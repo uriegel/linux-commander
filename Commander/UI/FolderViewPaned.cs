@@ -11,7 +11,8 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
     public void OnDown(WindowHandle window) => folderViewActive?.OnDown(window);
     public void OnUp(WindowHandle window) => folderViewActive?.OnUp(window);
-
+    public void OnPageDown(WindowHandle window) => folderViewActive?.OnPageDown(window);
+    public void OnPageUp(WindowHandle window) => folderViewActive?.OnPageUp(window);
     public void OnHome() => folderViewActive?.OnHome();
     public void OnEnd() => folderViewActive?.OnEnd();
 
@@ -39,21 +40,12 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
             folderViewActive = folderViewLeft;
             if (folderViewLeft != null)
             {
-                folderViewLeft.OnFocusEnter += (s, e) =>
+                folderViewLeft.OnFocusEnter += (s, e) => 
                 {
                     folderViewActive = folderViewLeft;
-                    IActionMap.GetAction("down").SetEnabled(true);
-                    IActionMap.GetAction("up").SetEnabled(true);
-                    IActionMap.GetAction("home").SetEnabled(true);
-                    IActionMap.GetAction("end").SetEnabled(true);
+                    EnableKeyNavigation(true);
                 };
-                folderViewLeft.OnFocusLeave += (s, e) =>
-                {
-                    IActionMap.GetAction("down").SetEnabled(false); IActionMap.GetAction("down").SetEnabled(false);
-                    IActionMap.GetAction("up").SetEnabled(false);
-                    IActionMap.GetAction("home").SetEnabled(false);
-                    IActionMap.GetAction("end").SetEnabled(false);
-                };
+                folderViewLeft.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
             }
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
@@ -61,18 +53,9 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 folderViewRight.OnFocusEnter += (s, e) =>
                 {
                     folderViewActive = folderViewRight;
-                    IActionMap.GetAction("down").SetEnabled(true);
-                    IActionMap.GetAction("up").SetEnabled(true);
-                    IActionMap.GetAction("home").SetEnabled(true);
-                    IActionMap.GetAction("end").SetEnabled(true);
+                    EnableKeyNavigation(true);
                 };
-                folderViewRight.OnFocusLeave += (s, e) =>
-                {
-                    IActionMap.GetAction("down").SetEnabled(false);
-                    IActionMap.GetAction("up").SetEnabled(false);
-                    IActionMap.GetAction("home").SetEnabled(false);
-                    IActionMap.GetAction("end").SetEnabled(false);
-                };
+                folderViewRight.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
             }
             await Task.Delay(100);
             folderViewActive?.GrabFocus();
@@ -82,6 +65,16 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
     protected override PanedHandle CreateHandle(nint obj) => new(obj);
     protected override void OnFinalize() => Console.WriteLine("FolderViewPaned finalized");
+
+    void EnableKeyNavigation(bool enable)
+    {
+        IActionMap.GetAction("down").SetEnabled(enable);
+        IActionMap.GetAction("up").SetEnabled(enable);
+        IActionMap.GetAction("pageDown").SetEnabled(enable);
+        IActionMap.GetAction("pageUp").SetEnabled(enable);
+        IActionMap.GetAction("home").SetEnabled(enable);
+        IActionMap.GetAction("end").SetEnabled(enable);
+    }
 
     FolderView? GetInactiveFolderView() => folderViewActive == folderViewLeft ? folderViewRight : folderViewLeft;
 

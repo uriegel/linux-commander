@@ -8,14 +8,13 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO pgup, pgdown: check size of list view / size of rowItem
-// TODO gtk_widget_get_width() or gtk_widget_get_height() chatgpt Detecting widow size GTK4
-
 // TODO Selections: * check if item can be selectable (like parent or root item): unselect not selectable
 // TODO Selections: click: when only one is selected: unselect it
 
 // TODO File Icons
 
+// TODO GTK4 GetRawItems for scrolling
+// TODO GTK4 GetAncester (of type)
 
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
@@ -43,7 +42,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     {
         var item = GetItem(pos);
         if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
-            if (CurrentPath != "/")
+            if (CurrentPath != "/" || item.Kind != ItemKind.Parent)
                 return Path.Combine(CurrentPath, item.Name);
             else
                 return "root";

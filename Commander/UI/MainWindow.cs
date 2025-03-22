@@ -38,10 +38,12 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 // new("delete", Events.MenuAction.Apply("DELETE")),
                 // new("refresh", Events.MenuAction.Apply("REFRESH"), "<Ctrl>R"),
                 new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
-                // new("devtools", webView.ShowDevTools, "<Ctrl><Shift>I"),
+                new("devtools", () => GC.Collect(), "<Ctrl><Shift>I"),
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
                 new("down", () => paned?.OnDown(Handle), "Down"),
                 new("up", () => paned?.OnUp(Handle), "Up"),
+                new("pageDown", () => paned?.OnPageDown(Handle), "Page_Down"),
+                new("pageUp", () => paned?.OnPageUp(Handle), "Page_Up"),
                 new("home", () => paned?.OnHome(), "Home"),
                 new("end", () => paned?.OnEnd(), "End"),
             ]);
