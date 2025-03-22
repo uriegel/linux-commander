@@ -56,6 +56,7 @@ class FolderView : ColumnViewSubClassed
 
     public void OnSelectAll() => controller.SelectAll();
     public void OnSelectNone() => controller.SelectNone();
+    public void OnSelectCurrent(WindowHandle window) => controller.SelectCurrent(window);
 
     // TODO to Gtk4
     public void SetSelection(uint start, int count)
@@ -70,6 +71,19 @@ class FolderView : ColumnViewSubClassed
     {
         var model = columnView.GetModel<SelectionHandle>();
         model.UnselectAll();
+    }
+
+    public void SelectCurrent(WindowHandle window)
+    {
+        var pos = controller.GetFocusedItemPos(window);
+        var count = controller.ItemsCount();
+        var model = columnView.GetModel<SelectionHandle>();
+        var isSelected = model.IsSelected((uint)pos);
+        if (isSelected)
+            model.UnselectItem((uint)pos);
+        else
+            model.SelectItem((uint)pos, false);
+        columnView.ScrollTo((uint)Math.Min(pos + 1, count - 1), ListScrollFlags.ScrollFocus);
     }
 
     public event EventHandler? OnFocusEnter;

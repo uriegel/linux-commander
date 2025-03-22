@@ -19,6 +19,7 @@ interface IController : IDisposable
 
     void SelectAll(FolderView folderView);
     void SelectNone(FolderView folderView);
+    void SelectCurrent(FolderView folderView, WindowHandle window);
 
     void IDisposable.Dispose() { }
 

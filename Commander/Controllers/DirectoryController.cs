@@ -8,7 +8,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Selections: Actions: Ins, Select till start, Select till end
+// TODO Selections: Actions: Select till start, Select till end
 
 // TODO File Icons
 
@@ -26,6 +26,7 @@ namespace Commander.Controllers;
 // TODO GTK4 GetAncester (of type)
 // TODO GTK4 SetSelection
 // TODO GTK4 UnselectAll
+// TODO GTK4 replace uint with int
 
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
@@ -68,6 +69,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public void SelectAll(FolderView folderView) => folderView.SetSelection(0, -1);
     public void SelectNone(FolderView folderView) => folderView.UnselectAll();
+    public void SelectCurrent(FolderView folderView, WindowHandle window) => folderView.SelectCurrent(window);
 
     #endregion
 

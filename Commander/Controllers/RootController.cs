@@ -56,6 +56,7 @@ class RootController : ControllerBase<RootItem>, IController
 
     public void SelectAll(FolderView folderView) {}
     public void SelectNone(FolderView folderView) {}
+    public void SelectCurrent(FolderView folderView, WindowHandle window) {}
 
     #endregion
 

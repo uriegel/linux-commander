@@ -18,6 +18,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
     
     public void SelectAll() => folderViewActive?.OnSelectAll();
     public void SelectNone() => folderViewActive?.OnSelectNone();
+    public void SelectCurrent(WindowHandle window) => folderViewActive?.OnSelectCurrent(window);
 
     protected override async void OnCreate()
     {

@@ -48,6 +48,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 new("end", () => paned?.OnEnd(), "End"),
                 new("selectall", () => paned?.SelectAll(), "KP_Add"),
                 new("selectnone", () => paned?.SelectNone(), "KP_Subtract"),
+                new("selectcurrent", () => paned?.SelectCurrent(Handle), "Insert"),
             ]);
     }
 

@@ -31,6 +31,8 @@ class FolderController(FolderView folderView)
 
     public void SelectAll() => controller.SelectAll(folderView);
     public void SelectNone() => controller.SelectNone(folderView);
+    public void SelectCurrent(WindowHandle window) => controller.SelectCurrent(folderView, window);
+
     void DetectController(string path)
     {
         switch (path)
