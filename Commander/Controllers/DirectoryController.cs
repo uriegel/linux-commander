@@ -8,8 +8,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Selections: Actions: Select till start, Select till end
-
 // TODO File Icons
 
 // TODO GtkActionBar in ui as status bar
@@ -70,6 +68,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     public void SelectAll(FolderView folderView) => folderView.SetSelection(0, -1);
     public void SelectNone(FolderView folderView) => folderView.UnselectAll();
     public void SelectCurrent(FolderView folderView, WindowHandle window) => folderView.SelectCurrent(window);
+    public void SelectToStart(FolderView folderView, WindowHandle window) => folderView.SelectToStart(window);
+    public void SelectToEnd(FolderView folderView, WindowHandle window) => folderView.SelectToEnd(window);
 
     #endregion
 

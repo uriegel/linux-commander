@@ -32,6 +32,8 @@ class FolderController(FolderView folderView)
     public void SelectAll() => controller.SelectAll(folderView);
     public void SelectNone() => controller.SelectNone(folderView);
     public void SelectCurrent(WindowHandle window) => controller.SelectCurrent(folderView, window);
+    public void SelectToStart(WindowHandle window) => controller.SelectToStart(folderView, window);
+    public void SelectToEnd(WindowHandle window) => controller.SelectToEnd(folderView, window);
 
     void DetectController(string path)
     {
