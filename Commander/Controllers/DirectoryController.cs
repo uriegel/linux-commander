@@ -8,7 +8,10 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Selections: * check if item can be selectable (like parent or root item): unselect not selectable
+// TODO root: select all: nothing is selected
+// TODO folder: select all: all is selected but the parent item : unselect not selectable
+// TODO folder: select all: border color of selected items
+
 // TODO Selections: click: when only one is selected: unselect it
 
 // TODO File Icons
