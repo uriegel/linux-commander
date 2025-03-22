@@ -8,6 +8,8 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO Items are not being freed
+
 // TODO root: select all: nothing is selected
 // TODO folder: select all: all is selected but the parent item : unselect not selectable
 // TODO folder: select all: border color of selected items
@@ -37,7 +39,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         CurrentPath = result.Path;
         RemoveAll();
         Insert(result.Items);
-
         return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 
