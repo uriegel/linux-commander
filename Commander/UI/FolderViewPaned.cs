@@ -15,6 +15,9 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
     public void OnPageUp(WindowHandle window) => folderViewActive?.OnPageUp(window);
     public void OnHome() => folderViewActive?.OnHome();
     public void OnEnd() => folderViewActive?.OnEnd();
+    
+    public void SelectAll() => folderViewActive?.OnSelectAll();
+    public void SelectNone() => folderViewActive?.OnSelectNone();
 
     protected override async void OnCreate()
     {
@@ -40,7 +43,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
             folderViewActive = folderViewLeft;
             if (folderViewLeft != null)
             {
-                folderViewLeft.OnFocusEnter += (s, e) => 
+                folderViewLeft.OnFocusEnter += (s, e) =>
                 {
                     folderViewActive = folderViewLeft;
                     EnableKeyNavigation(true);

@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using static GtkDotNet.Controls.ColumnViewSubClassed;

@@ -28,6 +28,9 @@ class FolderController(FolderView folderView)
 
     public void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl)
         => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
+
+    public void SelectAll() => controller.SelectAll(folderView);
+    public void SelectNone() => controller.SelectNone(folderView);
     void DetectController(string path)
     {
         switch (path)

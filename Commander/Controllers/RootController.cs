@@ -54,6 +54,9 @@ class RootController : ControllerBase<RootItem>, IController
 
     public void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl) => model.UnselectRange(pos, count);
 
+    public void SelectAll(FolderView folderView) {}
+    public void SelectNone(FolderView folderView) {}
+
     #endregion
 
     public RootController(FolderView folderView)

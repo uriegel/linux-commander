@@ -8,7 +8,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Selections: Actions: SelecetAll, SelectNone, Ins, Select till start, Select till end, check space 
+// TODO Selections: Actions: Ins, Select till start, Select till end
 
 // TODO File Icons
 
@@ -24,6 +24,8 @@ namespace Commander.Controllers;
 // TODO Gtk4 Diagnostic counters (delegates, actions, managedObjects (setDiagnostics) 
 // TODO GTK4 GetRawItems for scrolling
 // TODO GTK4 GetAncester (of type)
+// TODO GTK4 SetSelection
+// TODO GTK4 UnselectAll
 
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
@@ -63,6 +65,9 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             model.UnselectRange(pos, 1);
         model.UnselectRange(0, 1);
     }
+
+    public void SelectAll(FolderView folderView) => folderView.SetSelection(0, -1);
+    public void SelectNone(FolderView folderView) => folderView.UnselectAll();
 
     #endregion
 

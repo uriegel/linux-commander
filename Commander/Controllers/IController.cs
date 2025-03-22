@@ -1,3 +1,4 @@
+using Commander.UI;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 
@@ -15,6 +16,9 @@ interface IController : IDisposable
     int ItemsCount();
 
     void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl);
+
+    void SelectAll(FolderView folderView);
+    void SelectNone(FolderView folderView);
 
     void IDisposable.Dispose() { }
 

@@ -54,6 +54,24 @@ class FolderView : ColumnViewSubClassed
 
     public void OnEnd() => columnView.ScrollTo((uint)(controller.ItemsCount() - 1), ListScrollFlags.ScrollFocus);
 
+    public void OnSelectAll() => controller.SelectAll();
+    public void OnSelectNone() => controller.SelectNone();
+
+    // TODO to Gtk4
+    public void SetSelection(uint start, int count)
+    {
+        var model = columnView.GetModel<SelectionHandle>();
+        if (start == 0 && count == -1)
+            model.SelectAll();
+    }
+
+    // TODO to Gtk4
+    public void UnselectAll()
+    {
+        var model = columnView.GetModel<SelectionHandle>();
+        model.UnselectAll();
+    }
+
     public event EventHandler? OnFocusEnter;
     public event EventHandler? OnFocusLeave;
 

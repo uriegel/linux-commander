@@ -46,6 +46,8 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 new("pageUp", () => paned?.OnPageUp(Handle), "Page_Up"),
                 new("home", () => paned?.OnHome(), "Home"),
                 new("end", () => paned?.OnEnd(), "End"),
+                new("selectall", () => paned?.SelectAll(), "KP_Add"),
+                new("selectnone", () => paned?.SelectNone(), "KP_Subtract"),
             ]);
     }
 
