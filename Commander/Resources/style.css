@@ -6,12 +6,12 @@ listview row {
     border-color: transparent;
 }
 
+listview row:selected {
+    border-color: color-mix(in srgb, @theme_selected_bg_color 25%, transparent);
+}
+
 listview row:focus {
-	border-width: 1px;
-	border-style: solid;
     border-color: color-mix(in srgb, @theme_selected_bg_color 60%, transparent);
-    font-size: smaller;
-    font-family: "Noto Sans";
 }
 
 listview row cell {

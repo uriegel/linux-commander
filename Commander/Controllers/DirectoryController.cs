@@ -8,8 +8,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO folder: select all: border color of selected items
-
 // TODO Selections: click: when only one is selected: unselect it
 
 // TODO Selections: Actions: SelecetAll, SelectNone, Ins, Select till start, Select till end, check space 
@@ -18,7 +16,7 @@ namespace Commander.Controllers;
 
 // TODO GtkActionBar in ui as status bar
 
-// TODO Gtk4 Diagnostic counters (dlegates, actions, managedObjects (setDiagnostics) 
+// TODO Gtk4 Diagnostic counters (delegates, actions, managedObjects (setDiagnostics) 
 // TODO GTK4 GetRawItems for scrolling
 // TODO GTK4 GetAncester (of type)
 
