@@ -21,3 +21,8 @@ listview row cell {
 listview row.hiddenItem {
     opacity: 0.5;
 }
+
+actionbar {
+    font-size: smaller;
+    font-family: "Noto Sans";
+}

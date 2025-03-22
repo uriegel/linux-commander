@@ -21,14 +21,69 @@
       </object>
     </property>
     <child>
-      <object class="FolderViewPaned" id="paned">
-        <property name="orientation">horizontal</property>
-        <child type="start">
-          <object class="ColumnView" id="columnview-left">
-          </object>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkPaned">
+            <property name="vexpand">True</property>
+            <property name="orientation">vertical</property>
+            <child type="start">
+              <object class="FolderViewPaned" id="paned">
+                <property name="orientation">horizontal</property>
+                <property name="vexpand">True</property>
+                <child type="start">
+                  <object class="ColumnView" id="columnview-left">
+                  </object>
+                </child>
+                <child type="end">
+                  <object class="ColumnView" id="columnview-right">
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkRevealer" id="revealer">
+                <property name="visible">false</property>
+                <property name="vexpand">False</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">Vorschauansicht</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>            
         </child>
-        <child type="end">
-          <object class="ColumnView" id="columnview-right">
+        <child>
+          <object class="GtkActionBar">
+            <property name="vexpand">False</property>
+            <child>
+              <object class="GtkBox">
+                <child> 
+                  <object class="GtkLabel">
+                    <property name="hexpand">False</property>
+                    <property name="label">Statusbar -Ansicht des Commanders</property>
+                  </object>
+                </child>
+                <child> 
+                  <object class="GtkLabel">
+                    <property name="hexpand">True</property>
+                  </object>
+                </child>
+                <child> 
+                  <object class="GtkLabel">
+                    <property name="hexpand">False</property>
+                    <property name="label">5 Verz.</property>
+                  </object>
+                </child>
+                <child> 
+                  <object class="GtkLabel">
+                    <property name="hexpand">False</property>
+                    <property name="label">15 Dateien</property>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </child>
       </object>
