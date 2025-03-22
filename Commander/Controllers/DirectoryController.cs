@@ -8,11 +8,13 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO File Icons
-// TODO Restriction with overlay
-
 // TODO GtkActionBar in ui as status bar: path, count of files, count of folders, count of selected items
 // TODO GtkActionBar show errors in red
+// TODO GtkActionBar show info in blue
+
+// TODO Restriction with overlay: GtkSearchBar
+
+// TODO File Icons
 
 // TODO Navigation viewer with web view
 // TODO Image viewer
