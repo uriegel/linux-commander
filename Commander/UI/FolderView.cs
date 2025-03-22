@@ -99,8 +99,8 @@ class FolderView : ColumnViewSubClassed
             return 0;
     }
 
-    void FocusEnter() => OnFocusEnter?.Invoke(this, new());
-    void FocusLeave() => OnFocusLeave?.Invoke(this, new());
+    void FocusEnter() => OnFocusEnter?.Invoke(this, EventArgs.Empty);
+    void FocusLeave() => OnFocusLeave?.Invoke(this, EventArgs.Empty);
 
     void OnActivate(uint pos) => controller.OnActivate(pos);
 

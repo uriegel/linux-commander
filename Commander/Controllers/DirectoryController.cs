@@ -37,7 +37,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var result = await Task.Factory.StartNew(() => DirectoryProcessing.GetFiles(path));
         var oldPath = CurrentPath;
         CurrentPath = result.Path;
-        RemoveAll();
         Insert(result.Items);
         return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
@@ -89,7 +88,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             new()
             {
                 Title = "Größe",
-                OnSort = OnSizeSort,
+                OnSort = OnSizeSort,        
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
                 OnLabelBind = i => i.Size != -1 ? i.Size.ToString() : ""
