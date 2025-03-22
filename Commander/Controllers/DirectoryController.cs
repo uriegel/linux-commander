@@ -8,17 +8,17 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Items are not being freed: FindPos
-// TODO Gtk4 Diagnostic counters (dlegates, actions, managedObjects (setDiagnostics) 
-
 // TODO root: select all: nothing is selected
 // TODO folder: select all: all is selected but the parent item : unselect not selectable
 // TODO folder: select all: border color of selected items
 
 // TODO Selections: click: when only one is selected: unselect it
 
+// TODO Selections: Actions: SelecetAll, SelectNone, Ins, Select till start, Select till end, check space 
+
 // TODO File Icons
 
+// TODO Gtk4 Diagnostic counters (dlegates, actions, managedObjects (setDiagnostics) 
 // TODO GTK4 GetRawItems for scrolling
 // TODO GTK4 GetAncester (of type)
 
@@ -39,7 +39,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var oldPath = CurrentPath;
         CurrentPath = result.Path;
         Insert(result.Items);
-        return 0;  //FindPos(n => n.Name == oldPath.SubstringAfterLast('/')); // Memory buster!
+        return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 
     public string? OnActivate(uint pos)

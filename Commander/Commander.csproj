@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gtk4DotNet" Version="7.0.20-beta-20" />
+    <PackageReference Include="Gtk4DotNet" Version="7.0.22-beta-22" />
   </ItemGroup>
 
   <ItemGroup>
