@@ -8,7 +8,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO folder: select all: all is selected but the parent item : unselect not selectable
 // TODO folder: select all: border color of selected items
 
 // TODO Selections: click: when only one is selected: unselect it
@@ -55,7 +54,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             return null;
     }
 
-    public void OnSelectionChanged(nint model, uint pos, uint count) { }
+    public void OnSelectionChanged(nint model, uint pos, uint count)
+    {
+        model.UnselectRange(0, 1);
+    }
 
     #endregion
 
