@@ -14,6 +14,13 @@ namespace Commander.Controllers;
 
 // TODO GtkActionBar in ui as status bar
 
+// TODO Restriction with overlay
+
+// TODO Navigation viewer with web view
+// TODO Image viewer
+// TODO Media viewer
+// TODO Pdf viewer
+
 // TODO Gtk4 Diagnostic counters (delegates, actions, managedObjects (setDiagnostics) 
 // TODO GTK4 GetRawItems for scrolling
 // TODO GTK4 GetAncester (of type)
