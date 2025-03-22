@@ -8,7 +8,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO root: select all: nothing is selected
 // TODO folder: select all: all is selected but the parent item : unselect not selectable
 // TODO folder: select all: border color of selected items
 
@@ -17,6 +16,8 @@ namespace Commander.Controllers;
 // TODO Selections: Actions: SelecetAll, SelectNone, Ins, Select till start, Select till end, check space 
 
 // TODO File Icons
+
+// TODO GtkActionBar in ui as status bar
 
 // TODO Gtk4 Diagnostic counters (dlegates, actions, managedObjects (setDiagnostics) 
 // TODO GTK4 GetRawItems for scrolling
@@ -53,6 +54,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         else
             return null;
     }
+
+    public void OnSelectionChanged(nint model, uint pos, uint count) { }
 
     #endregion
 

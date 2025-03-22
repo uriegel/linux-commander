@@ -13,6 +13,7 @@ class FolderView : ColumnViewSubClassed
         : base(obj)
     {
         MultiSelection = true;
+        OnSelectionChanged = SelectionChanged;
         controller = new(this);
     }
     
@@ -98,6 +99,8 @@ class FolderView : ColumnViewSubClassed
         else
             return 0;
     }
+
+    void SelectionChanged(nint model, uint pos, uint count) => controller.OnSelectionChanged(model, pos, count);
 
     void FocusEnter() => OnFocusEnter?.Invoke(this, EventArgs.Empty);
     void FocusLeave() => OnFocusLeave?.Invoke(this, EventArgs.Empty);

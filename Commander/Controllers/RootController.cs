@@ -52,6 +52,8 @@ class RootController : ControllerBase<RootItem>, IController
         return item?.MountPoint;
     }
 
+    public void OnSelectionChanged(nint model, uint pos, uint count) => model.UnselectRange(pos, count);
+
     #endregion
 
     public RootController(FolderView folderView)

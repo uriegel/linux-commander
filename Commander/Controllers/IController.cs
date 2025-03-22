@@ -14,6 +14,8 @@ interface IController : IDisposable
 
     int ItemsCount();
 
+    void OnSelectionChanged(nint model, uint pos, uint count);
+
     void IDisposable.Dispose() { }
 
     static void AttachListItem(ListItemHandle listItem)
