@@ -20,19 +20,19 @@ class FolderView : ColumnViewSubClassed
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderView;
 
-    public void ScrollTo(uint pos) => columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);
+    public void ScrollTo(int pos) => columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);
 
     public void OnDown(WindowHandle window)
     {
         var pos = controller.GetFocusedItemPos(window);
         var count = controller.ItemsCount();
-        columnView.ScrollTo((uint)Math.Min(pos + 1, count - 1), ListScrollFlags.ScrollFocus);
+        columnView.ScrollTo(Math.Min(pos + 1, count - 1), ListScrollFlags.ScrollFocus);
     }
 
     public void OnUp(WindowHandle window)
     {
         var pos = controller.GetFocusedItemPos(window);
-        columnView.ScrollTo((uint)Math.Max(pos - 1, 0), ListScrollFlags.ScrollFocus);
+        columnView.ScrollTo(Math.Max(pos - 1, 0), ListScrollFlags.ScrollFocus);
     }
 
     public void OnPageDown(WindowHandle window)
@@ -40,19 +40,19 @@ class FolderView : ColumnViewSubClassed
         var pageSize = GetNumberOfVisibleRows(window);
         var pos = controller.GetFocusedItemPos(window);
         var count = controller.ItemsCount();
-        columnView.ScrollTo((uint)Math.Min(pos + pageSize, count - 1), ListScrollFlags.ScrollFocus);
+        columnView.ScrollTo(Math.Min(pos + pageSize, count - 1), ListScrollFlags.ScrollFocus);
     }
 
     public void OnPageUp(WindowHandle window)
     {
         var pageSize = GetNumberOfVisibleRows(window);
         var pos = controller.GetFocusedItemPos(window);
-        columnView.ScrollTo((uint)Math.Max(pos - pageSize, 0), ListScrollFlags.ScrollFocus);
+        columnView.ScrollTo(Math.Max(pos - pageSize, 0), ListScrollFlags.ScrollFocus);
     }
 
     public void OnHome() => columnView.ScrollTo(0, ListScrollFlags.ScrollFocus);
 
-    public void OnEnd() => columnView.ScrollTo((uint)(controller.ItemsCount() - 1), ListScrollFlags.ScrollFocus);
+    public void OnEnd() => columnView.ScrollTo(controller.ItemsCount() - 1, ListScrollFlags.ScrollFocus);
 
     public void OnSelectAll() => controller.SelectAll();
     public void OnSelectNone() => controller.SelectNone();
@@ -80,19 +80,19 @@ class FolderView : ColumnViewSubClassed
         var pos = controller.GetFocusedItemPos(window);
         var count = controller.ItemsCount();
         var model = columnView.GetModel<SelectionHandle>();
-        var isSelected = model.IsSelected((uint)pos);
+        var isSelected = model.IsSelected(pos);
         if (isSelected)
-            model.UnselectItem((uint)pos);
+            model.UnselectItem(pos);
         else
-            model.SelectItem((uint)pos, false);
-        columnView.ScrollTo((uint)Math.Min(pos + 1, count - 1), ListScrollFlags.ScrollFocus);
+            model.SelectItem(pos, false);
+        columnView.ScrollTo(Math.Min(pos + 1, count - 1), ListScrollFlags.ScrollFocus);
     }
 
     public void SelectToStart(WindowHandle window)
     {
         var pos = controller.GetFocusedItemPos(window);
         var model = columnView.GetModel<SelectionHandle>();
-        model.SelectRange(0, (uint)(pos + 1), true);
+        model.SelectRange(0, pos + 1, true);
     }
 
     public void SelectToEnd(WindowHandle window)
@@ -100,7 +100,7 @@ class FolderView : ColumnViewSubClassed
         var pos = controller.GetFocusedItemPos(window);
         var count = controller.ItemsCount();
         var model = columnView.GetModel<SelectionHandle>();
-        model.SelectRange((uint)pos, (uint)(count - pos), true);
+        model.SelectRange(pos, count - pos, true);
     }
 
     public event EventHandler? OnFocusEnter;
@@ -159,12 +159,12 @@ class FolderView : ColumnViewSubClassed
             return 0;
     }
 
-    void SelectionChanged(nint model, uint pos, uint count) => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
+    void SelectionChanged(nint model, int pos, int count) => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
 
     void FocusEnter() => OnFocusEnter?.Invoke(this, EventArgs.Empty);
     void FocusLeave() => OnFocusLeave?.Invoke(this, EventArgs.Empty);
 
-    void OnActivate(uint pos) => controller.OnActivate(pos);
+    void OnActivate(int pos) => controller.OnActivate(pos);
 
     readonly FolderController controller;
     bool mouseButton;

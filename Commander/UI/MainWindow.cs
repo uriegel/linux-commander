@@ -38,7 +38,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 // new("delete", Events.MenuAction.Apply("DELETE")),
                 // new("refresh", Events.MenuAction.Apply("REFRESH"), "<Ctrl>R"),
                 new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
-                new("devtools", Diagnose, "<Ctrl><Shift>I"),
+                new("devtools", Gtk.ShowDiagnostics, "<Ctrl><Shift>I"),
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
                 new("down", () => paned?.OnDown(Handle), "Down"),
                 new("up", () => paned?.OnUp(Handle), "Up"),
@@ -69,12 +69,5 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
 
     protected override void OnFinalize() => Console.WriteLine("Window finalized");
     protected override ApplicationWindowHandle CreateHandle(nint obj) => new(obj);
-
-    void Diagnose()
-    {
-        GC.Collect();
-        GC.Collect();
-        Console.WriteLine($"Total memory: {System.Diagnostics.Process.GetCurrentProcess().WorkingSet64:N0}, managed: {GC.GetTotalMemory(true):N0}");
-    }
 }
 

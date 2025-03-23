@@ -8,6 +8,9 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO to Gtk4 SetSelection(uint start, int count)
+// TODO to Gtk4 UnselectAll()
+
 // TODO GtkActionBar in ui as status bar: path, count of files, count of folders, count of selected items
 // TODO GtkActionBar show errors in red
 // TODO GtkActionBar show info in blue
@@ -21,14 +24,7 @@ namespace Commander.Controllers;
 // TODO Media viewer
 // TODO Pdf viewer
 
-// TODO Gtk4 Diagnostic counters (delegates, actions, managedObjects (setDiagnostics) 
-// TODO GTK4 GetRawItems for scrolling
-// TODO GTK4 GetAncester (of type)
-// TODO GTK4 SetSelection
-// TODO GTK4 UnselectAll
-// TODO GTK4 replace uint with int
-
-class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
+class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
     #region IController
 
@@ -48,7 +44,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 
-    public string? OnActivate(uint pos)
+    public string? OnActivate(int pos)
     {
         var item = GetItem(pos);
         if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
@@ -60,7 +56,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             return null;
     }
 
-    public void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl)
+    public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
     {
         if (mouseButton && !mouseButtonCtrl && count == 1)
             model.UnselectRange(pos, 1);
@@ -117,7 +113,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
     {
-        IController.AttachListItem(listItem);
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
         var label = image?.GetNextSibling<LabelHandle>();
@@ -175,7 +170,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     int FindPos(Func<DirectoryItem, bool> predicate)
     {
-        uint i = 0;
+        var i = 0;
         while (true)
         {
             var item = GetItem(i);

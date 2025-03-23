@@ -11,7 +11,7 @@ using static CsTools.ProcessCmd;
 
 namespace Commander.Controllers;
 
-class RootController : ControllerBase<RootItem>, IController
+class RootController : Controller<RootItem>, IController
 {
     #region IController
 
@@ -45,14 +45,14 @@ class RootController : ControllerBase<RootItem>, IController
         return -1;
     }
 
-    public string? OnActivate(uint pos)
+    public string? OnActivate(int pos)
     {
         // TODO when not mounted, mount
         var item = GetItem(pos);
         return item?.MountPoint;
     }
 
-    public void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl) => model.UnselectRange(pos, count);
+    public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl) => model.UnselectRange(pos, count);
 
     public void SelectAll(FolderView folderView) {}
     public void SelectNone(FolderView folderView) {}
@@ -142,7 +142,6 @@ class RootController : ControllerBase<RootItem>, IController
 
     void OnIconNameBind(ListItemHandle listItem, RootItem item)
     {
-        IController.AttachListItem(listItem);
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
         var label = image?.GetNextSibling<LabelHandle>();

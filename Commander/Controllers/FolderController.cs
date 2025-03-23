@@ -5,7 +5,7 @@ namespace Commander.Controllers;
 
 class FolderController(FolderView folderView)
 {
-    public void OnActivate(uint pos)
+    public void OnActivate(int pos)
     {
         var newPath = controller.OnActivate(pos);
         if (!string.IsNullOrEmpty(newPath))
@@ -19,14 +19,14 @@ class FolderController(FolderView folderView)
         {
             var lastPos = await controller.Fill(path);
             if (lastPos != -1)
-                folderView.ScrollTo((uint)lastPos);
+                folderView.ScrollTo(lastPos);
         }
     }
 
-    public int GetFocusedItemPos(WindowHandle window) => controller.GetFocusedItemPos(window);
+    public int GetFocusedItemPos(WindowHandle window) => controller.GetFocusedItemPos();
     public int ItemsCount() => controller.ItemsCount();
 
-    public void OnSelectionChanged(nint model, uint pos, uint count, bool mouseButton, bool mouseButtonCtrl)
+    public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
         => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
 
     public void SelectAll() => controller.SelectAll(folderView);
