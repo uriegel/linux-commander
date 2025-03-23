@@ -1,3 +1,4 @@
+using Commander.DataContexts;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
@@ -52,6 +53,13 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                     EnableKeyNavigation(true);
                 };
                 folderViewLeft.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
+                folderViewLeft.PosChanged += (s, e) => MainContext.Instance.CurrentPath = e.CurrentPath;
+                folderViewLeft.ItemsCountChanged += (s, e) =>
+                {
+                    MainContext.Instance.CurrentDirectories = e.Directories.ToString();
+                    MainContext.Instance.CurrentFiles = e.Items.ToString();
+                };
+                 
             }
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
@@ -62,6 +70,12 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                     EnableKeyNavigation(true);
                 };
                 folderViewRight.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
+                folderViewRight.PosChanged += (s, e) => MainContext.Instance.CurrentPath = e.CurrentPath;
+                folderViewRight.ItemsCountChanged += (s, e) =>
+                {
+                    MainContext.Instance.CurrentDirectories = e.Directories.ToString();
+                    MainContext.Instance.CurrentFiles = e.Items.ToString();
+                };
             }
             await Task.Delay(100);
             folderViewActive?.GrabFocus();

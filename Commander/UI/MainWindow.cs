@@ -32,6 +32,10 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
         Handle.DataContext(MainContext.Instance);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("statusText")
             ?.Binding("label", "CurrentPath", BindingFlags.Default);
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelDirs")
+            ?.Binding("label", "CurrentDirectories", BindingFlags.Default);
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelFiles")
+            ?.Binding("label", "CurrentFiles", BindingFlags.Default);
         Handle.AddActions(
             [
                 // new("togglePreviewMode", Events.MenuAction.Apply("TOGGLE_PREVIEW"), "<Ctrl>F3"),

@@ -17,12 +17,15 @@ class RootController : Controller<RootItem>, IController
 
     public string CurrentPath { get; } = "root";
 
+    public int Directories { get; private set; }
+    public int Files { get; } 
+
     public string? GetItemPath(int pos) => GetItem(pos)?.MountPoint;
 
     public async Task<int> Fill(string path)
     {
         // TODO Fill sda when there is no sda1 (daten)
-        var rootItems = await
+        var rootItems = (await
         (from n in RunAsync("lsblk", "--bytes --output SIZE,NAME,LABEL,MOUNTPOINT,FSTYPE")
          let driveLines = n.Split('\n', StringSplitOptions.RemoveEmptyEntries)
          let titles = driveLines[0]
@@ -41,9 +44,11 @@ class RootController : Controller<RootItem>, IController
               where FilterDrives(n, columnPositions)
               let item = CreateRootItem(n, columnPositions)
               orderby item.IsMounted descending, item.Name
-              select item));
+              select item)))
+            .ToArray();
 
         Insert(rootItems);
+        Directories = rootItems.Length;
         return -1;
     }
 

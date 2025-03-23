@@ -9,7 +9,11 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO GtkActionBar in ui as status bar: path, count of files, count of folders, count of selected items
+// TODO GtkActionBar on folder changed
+// TODO GtkActionBar dont count hidden when not visible
+// TODO GtkActionBar switch hwen hidden are visible
+// TODO GtkActionBar switch to int
+// TODO GtkActionBar count of selected items
 // TODO GtkActionBar show errors in red
 // TODO GtkActionBar show info in blue
 
@@ -32,6 +36,9 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 
     public string CurrentPath { get; private set; } = "";
 
+    public int Directories { get; private set; }
+    public int Files { get; private set; }
+
     public string? GetItemPath(int pos) => Path.Combine(CurrentPath, GetItem(pos)?.Name ?? "");
 
     /// <summary>
@@ -45,6 +52,8 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         var oldPath = CurrentPath;
         CurrentPath = result.Path;
         Insert(result.Items);
+        Directories = result.DirCount;
+        Files = result.FileCount;
         return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 

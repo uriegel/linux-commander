@@ -5,6 +5,7 @@ using GtkDotNet.SafeHandles;
 using Commander.Controllers;
 using System.ComponentModel;
 using Commander.DataContexts;
+using Commander.EventArg;
 
 namespace Commander.UI;
 
@@ -12,12 +13,16 @@ class FolderView : ColumnViewSubClassed
 {
     public int CurrentPos { get; private set; } = -1;
 
+    public event EventHandler<PosChangedEventArgs>? PosChanged; 
+    public event EventHandler<ItemsCountChangedEventArgs>? ItemsCountChanged;
+
     public FolderView(nint obj)
         : base(obj)
     {
         MultiSelection = true;
         OnSelectionChanged = SelectionChanged;
         controller = new(this);
+        controller.ItemsCountChanged += (s, e) => ItemsCountChanged?.Invoke(this, e);
     }
 
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
@@ -134,7 +139,7 @@ class FolderView : ColumnViewSubClassed
         if (newPos != CurrentPos)
         {
             CurrentPos = newPos;
-            MainContext.Instance.CurrentPath = controller.GetItemPath(CurrentPos);
+            PosChanged?.Invoke(this, new(controller.GetItemPath(CurrentPos)));
         }
     }
 
@@ -200,7 +205,12 @@ class FolderView : ColumnViewSubClassed
         CheckCurrentChanged(controller.GetFocusedItemPos());
     }
 
-    void FocusEnter() => OnFocusEnter?.Invoke(this, EventArgs.Empty);
+    void FocusEnter()
+    {
+        OnFocusEnter?.Invoke(this, EventArgs.Empty);
+        PosChanged?.Invoke(this, new(controller.GetItemPath(CurrentPos)));
+    } 
+
     void FocusLeave() => OnFocusLeave?.Invoke(this, EventArgs.Empty);
 
     void OnActivate(int pos) => controller.OnActivate(pos);

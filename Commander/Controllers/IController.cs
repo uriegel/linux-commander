@@ -5,6 +5,8 @@ namespace Commander.Controllers;
 interface IController : IDisposable
 {
     string CurrentPath { get; }
+    int Directories { get; }
+    int Files { get; }
 
     string? GetItemPath(int pos);
 
