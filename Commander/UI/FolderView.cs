@@ -127,6 +127,8 @@ class FolderView : ColumnViewSubClassed
         model.SelectRange(pos, count - pos, true);
     }
 
+    public SelectionHandle GetSelectionModel() => columnView.GetModel<SelectionHandle>();
+
     void CheckCurrentChanged(int newPos)
     {
         if (newPos != CurrentPos)
@@ -134,7 +136,6 @@ class FolderView : ColumnViewSubClassed
             CurrentPos = newPos;
             MainContext.Instance.CurrentPath = controller.GetItemPath(CurrentPos);
         }
-
     }
 
     public event EventHandler? OnFocusEnter;

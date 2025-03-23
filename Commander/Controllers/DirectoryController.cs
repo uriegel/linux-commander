@@ -9,12 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO 10 000 items: select all: enumerable with gtk_selection_model_is_selected all selected items
-
-// TODO to Gtk4 Binding type int
-// TODO to Gtk4 SetSelection(uint start, int count)
-// TODO to Gtk4 UnselectAll()
-
 // TODO GtkActionBar in ui as status bar: path, count of files, count of folders, count of selected items
 // TODO GtkActionBar show errors in red
 // TODO GtkActionBar show info in blue
@@ -27,6 +21,10 @@ namespace Commander.Controllers;
 // TODO Image viewer
 // TODO Media viewer
 // TODO Pdf viewer
+
+// TODO to Gtk4 Binding type int
+// TODO to Gtk4 SetSelection(uint start, int count)
+// TODO to Gtk4 UnselectAll()
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
@@ -82,6 +80,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         EnableRubberband = true;
         folderView.SetController(this);
         OnFilter = Filter;
+        selectionModel = folderView.GetSelectionModel();
     }
 
     public override Column<DirectoryItem>[] GetColumns() =>
@@ -116,6 +115,24 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
                 OnLabelBind = i => i.Size != -1 ? i.Size.ToString() : ""
             }
         ];
+
+    IEnumerable<DirectoryItem> GetSelectedItems()
+    {
+        var count = ItemsCount();
+        var idx = 0;
+        while (true)
+        {
+            if (selectionModel.IsSelected(idx))
+            {
+                var res = selectionModel.GetItem<DirectoryItem>(idx);
+                if (res != null)
+                    yield return res;
+            }
+            idx++;
+            if (idx == count)
+                yield break;
+        }
+    }
 
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
     {
@@ -190,6 +207,8 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             i++;
         }
     }
+
+    SelectionHandle selectionModel;
 
     #region IDisposable
 

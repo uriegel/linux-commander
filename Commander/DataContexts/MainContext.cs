@@ -14,7 +14,7 @@ class MainContext : INotifyPropertyChanged
             OnChanged(nameof(CurrentPath));
         }
     }
-    string? _CurrentPath = "Das soll er sein";
+    string? _CurrentPath;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
