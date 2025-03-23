@@ -9,8 +9,8 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
     public static FolderViewPaned? GetInstance(PanedHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderViewPaned;
 
-    public void OnDown(WindowHandle window) => folderViewActive?.OnDown(window);
-    public void OnUp(WindowHandle window) => folderViewActive?.OnUp(window);
+    public void OnDown() => folderViewActive?.OnDown();
+    public void OnUp() => folderViewActive?.OnUp();
     public void OnPageDown(WindowHandle window) => folderViewActive?.OnPageDown(window);
     public void OnPageUp(WindowHandle window) => folderViewActive?.OnPageUp(window);
     public void OnHome() => folderViewActive?.OnHome();
@@ -18,9 +18,9 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
     
     public void SelectAll() => folderViewActive?.OnSelectAll();
     public void SelectNone() => folderViewActive?.OnSelectNone();
-    public void SelectCurrent(WindowHandle window) => folderViewActive?.OnSelectCurrent(window);
-    public void SelectToStart(WindowHandle window) => folderViewActive?.OnSelectToStart(window);
-    public void SelectToEnd(WindowHandle window) => folderViewActive?.OnSelectToEnd(window);
+    public void SelectCurrent() => folderViewActive?.OnSelectCurrent();
+    public void SelectToStart() => folderViewActive?.OnSelectToStart();
+    public void SelectToEnd() => folderViewActive?.OnSelectToEnd();
 
     protected override async void OnCreate()
     {

@@ -4,11 +4,14 @@ using GtkDotNet.SafeHandles;
 
 using Commander.Controllers;
 using System.ComponentModel;
+using Commander.DataContexts;
 
 namespace Commander.UI;
 
 class FolderView : ColumnViewSubClassed
 {
+    public int CurrentPos { get; private set; } = -1;
+
     public FolderView(nint obj)
         : base(obj)
     {
@@ -20,45 +23,66 @@ class FolderView : ColumnViewSubClassed
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderView;
 
-    public void ScrollTo(int pos) => columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);
-
-    public void OnDown(WindowHandle window)
+    public void ScrollTo(int pos)
     {
-        var pos = controller.GetFocusedItemPos(window);
-        var count = controller.ItemsCount();
-        columnView.ScrollTo(Math.Min(pos + 1, count - 1), ListScrollFlags.ScrollFocus);
+        columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);
+        CheckCurrentChanged(pos);
     }
 
-    public void OnUp(WindowHandle window)
+    public void OnDown()
     {
-        var pos = controller.GetFocusedItemPos(window);
-        columnView.ScrollTo(Math.Max(pos - 1, 0), ListScrollFlags.ScrollFocus);
+        var pos = controller.GetFocusedItemPos();
+        var count = controller.ItemsCount();
+        var newPos = Math.Min(pos + 1, count - 1);
+        columnView.ScrollTo(newPos, ListScrollFlags.ScrollFocus);
+        CheckCurrentChanged(newPos);
+    }
+
+    public void OnUp()
+    {
+        var pos = controller.GetFocusedItemPos();
+        var newPos = Math.Max(pos - 1, 0);
+        columnView.ScrollTo(newPos, ListScrollFlags.ScrollFocus);
+        CheckCurrentChanged(newPos);
     }
 
     public void OnPageDown(WindowHandle window)
     {
         var pageSize = GetNumberOfVisibleRows(window);
-        var pos = controller.GetFocusedItemPos(window);
+        var pos = controller.GetFocusedItemPos();
         var count = controller.ItemsCount();
-        columnView.ScrollTo(Math.Min(pos + pageSize, count - 1), ListScrollFlags.ScrollFocus);
+        var newPos = Math.Min(pos + pageSize, count - 1);
+        columnView.ScrollTo(newPos, ListScrollFlags.ScrollFocus);
+        CheckCurrentChanged(newPos);
     }
 
     public void OnPageUp(WindowHandle window)
     {
         var pageSize = GetNumberOfVisibleRows(window);
-        var pos = controller.GetFocusedItemPos(window);
-        columnView.ScrollTo(Math.Max(pos - pageSize, 0), ListScrollFlags.ScrollFocus);
+        var pos = controller.GetFocusedItemPos();
+        var newPos = Math.Max(pos - pageSize, 0);
+        columnView.ScrollTo(newPos, ListScrollFlags.ScrollFocus);
+        CheckCurrentChanged(newPos);
     }
 
-    public void OnHome() => columnView.ScrollTo(0, ListScrollFlags.ScrollFocus);
+    public void OnHome()
+    {
+        columnView.ScrollTo(0, ListScrollFlags.ScrollFocus);
+        CheckCurrentChanged(0);
+    }
 
-    public void OnEnd() => columnView.ScrollTo(controller.ItemsCount() - 1, ListScrollFlags.ScrollFocus);
+    public void OnEnd()
+    {
+        var newPos = controller.ItemsCount() - 1;
+        columnView.ScrollTo(newPos, ListScrollFlags.ScrollFocus);
+        CheckCurrentChanged(newPos);
+    }
 
     public void OnSelectAll() => controller.SelectAll();
     public void OnSelectNone() => controller.SelectNone();
-    public void OnSelectCurrent(WindowHandle window) => controller.SelectCurrent(window);
-    public void OnSelectToStart(WindowHandle window) => controller.SelectToStart(window);
-    public void OnSelectToEnd(WindowHandle window) => controller.SelectToEnd(window);
+    public void OnSelectCurrent() => controller.SelectCurrent();
+    public void OnSelectToStart() => controller.SelectToStart();
+    public void OnSelectToEnd() => controller.SelectToEnd();
 
     // TODO to Gtk4
     public void SetSelection(uint start, int count)
@@ -75,9 +99,9 @@ class FolderView : ColumnViewSubClassed
         model.UnselectAll();
     }
 
-    public void SelectCurrent(WindowHandle window)
+    public void SelectCurrent()
     {
-        var pos = controller.GetFocusedItemPos(window);
+        var pos = controller.GetFocusedItemPos();
         var count = controller.ItemsCount();
         var model = columnView.GetModel<SelectionHandle>();
         var isSelected = model.IsSelected(pos);
@@ -88,19 +112,29 @@ class FolderView : ColumnViewSubClassed
         columnView.ScrollTo(Math.Min(pos + 1, count - 1), ListScrollFlags.ScrollFocus);
     }
 
-    public void SelectToStart(WindowHandle window)
+    public void SelectToStart()
     {
-        var pos = controller.GetFocusedItemPos(window);
+        var pos = controller.GetFocusedItemPos();
         var model = columnView.GetModel<SelectionHandle>();
         model.SelectRange(0, pos + 1, true);
     }
 
-    public void SelectToEnd(WindowHandle window)
+    public void SelectToEnd()
     {
-        var pos = controller.GetFocusedItemPos(window);
+        var pos = controller.GetFocusedItemPos();
         var count = controller.ItemsCount();
         var model = columnView.GetModel<SelectionHandle>();
         model.SelectRange(pos, count - pos, true);
+    }
+
+    void CheckCurrentChanged(int newPos)
+    {
+        if (newPos != CurrentPos)
+        {
+            CurrentPos = newPos;
+            MainContext.Instance.CurrentPath = controller.GetItemPath(CurrentPos);
+        }
+
     }
 
     public event EventHandler? OnFocusEnter;
@@ -159,7 +193,11 @@ class FolderView : ColumnViewSubClassed
             return 0;
     }
 
-    void SelectionChanged(nint model, int pos, int count) => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
+    void SelectionChanged(nint model, int pos, int count)
+    {
+        controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
+        CheckCurrentChanged(controller.GetFocusedItemPos());
+    }
 
     void FocusEnter() => OnFocusEnter?.Invoke(this, EventArgs.Empty);
     void FocusLeave() => OnFocusLeave?.Invoke(this, EventArgs.Empty);

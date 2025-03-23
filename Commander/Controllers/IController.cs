@@ -1,11 +1,13 @@
 using Commander.UI;
-using GtkDotNet.SafeHandles;
 
 namespace Commander.Controllers;
 
 interface IController : IDisposable
 {
     string CurrentPath { get; }
+
+    string? GetItemPath(int pos);
+
     Task<int> Fill(string path);
 
     string? OnActivate(int pos);
@@ -17,9 +19,9 @@ interface IController : IDisposable
 
     void SelectAll(FolderView folderView);
     void SelectNone(FolderView folderView);
-    void SelectCurrent(FolderView folderView, WindowHandle window);
-    void SelectToStart(FolderView folderView, WindowHandle window);
-    void SelectToEnd(FolderView folderView, WindowHandle window);
+    void SelectCurrent(FolderView folderView);
+    void SelectToStart(FolderView folderView);
+    void SelectToEnd(FolderView folderView);
 
     void IDisposable.Dispose() { }
 }

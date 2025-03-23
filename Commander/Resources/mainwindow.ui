@@ -60,9 +60,8 @@
             <child>
               <object class="GtkBox">
                 <child> 
-                  <object class="GtkLabel">
+                  <object class="GtkLabel" id="statusText">
                     <property name="hexpand">False</property>
-                    <property name="label">Statusbar -Ansicht des Commanders</property>
                   </object>
                 </child>
                 <child> 
@@ -71,15 +70,26 @@
                   </object>
                 </child>
                 <child> 
-                  <object class="GtkLabel">
+                  <object class="GtkLabel" id="labelDirs">
                     <property name="hexpand">False</property>
-                    <property name="label">5 Verz.</property>
                   </object>
                 </child>
                 <child> 
                   <object class="GtkLabel">
                     <property name="hexpand">False</property>
-                    <property name="label">15 Dateien</property>
+                    <property name="label"> Verz.</property>
+                  </object>
+                </child>
+                <child> 
+                  <object class="GtkLabel" id="labelFiles">
+                    <property name="margin-start">5</property>
+                    <property name="hexpand">False</property>
+                  </object>
+                </child>
+                <child> 
+                  <object class="GtkLabel">
+                    <property name="hexpand">False</property>
+                    <property name="label"> Dateien</property>
                   </object>
                 </child>
               </object>

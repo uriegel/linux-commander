@@ -1,3 +1,4 @@
+using Commander.DataContexts;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -28,6 +29,9 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 panedHandle?.SetPosition(width / 2);
             });
         Handle.OnSizeChanged((w, _) => panedHandle?.SetPosition(w / 2));
+        Handle.DataContext(MainContext.Instance);
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("statusText")
+            ?.Binding("label", "CurrentPath", BindingFlags.Default);
         Handle.AddActions(
             [
                 // new("togglePreviewMode", Events.MenuAction.Apply("TOGGLE_PREVIEW"), "<Ctrl>F3"),
@@ -40,17 +44,17 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                 new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
                 new("devtools", Gtk.ShowDiagnostics, "<Ctrl><Shift>I"),
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
-                new("down", () => paned?.OnDown(Handle), "Down"),
-                new("up", () => paned?.OnUp(Handle), "Up"),
+                new("down", () => paned?.OnDown(), "Down"),
+                new("up", () => paned?.OnUp(), "Up"),
                 new("pageDown", () => paned?.OnPageDown(Handle), "Page_Down"),
                 new("pageUp", () => paned?.OnPageUp(Handle), "Page_Up"),
                 new("home", () => paned?.OnHome(), "Home"),
                 new("end", () => paned?.OnEnd(), "End"),
                 new("selectall", () => paned?.SelectAll(), "KP_Add"),
                 new("selectnone", () => paned?.SelectNone(), "KP_Subtract"),
-                new("selectcurrent", () => paned?.SelectCurrent(Handle), "Insert"),
-                new("selectToStart", () => paned?.SelectToStart(Handle), "<Shift>Home"),
-                new("selectToEnd", () => paned?.SelectToEnd(Handle), "<Shift>End"),
+                new("selectcurrent", () => paned?.SelectCurrent(), "Insert"),
+                new("selectToStart", () => paned?.SelectToStart(), "<Shift>Home"),
+                new("selectToEnd", () => paned?.SelectToEnd(), "<Shift>End"),
             ]);
     }
 

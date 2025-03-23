@@ -1,10 +1,13 @@
 using Commander.UI;
-using GtkDotNet.SafeHandles;
 
 namespace Commander.Controllers;
 
 class FolderController(FolderView folderView)
 {
+    public string CurrentPath { get => controller.CurrentPath; }
+
+    public string? GetItemPath(int pos) => controller.GetItemPath(pos);
+
     public void OnActivate(int pos)
     {
         var newPath = controller.OnActivate(pos);
@@ -23,7 +26,7 @@ class FolderController(FolderView folderView)
         }
     }
 
-    public int GetFocusedItemPos(WindowHandle window) => controller.GetFocusedItemPos();
+    public int GetFocusedItemPos() => controller.GetFocusedItemPos();
     public int ItemsCount() => controller.ItemsCount();
 
     public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
@@ -31,9 +34,9 @@ class FolderController(FolderView folderView)
 
     public void SelectAll() => controller.SelectAll(folderView);
     public void SelectNone() => controller.SelectNone(folderView);
-    public void SelectCurrent(WindowHandle window) => controller.SelectCurrent(folderView, window);
-    public void SelectToStart(WindowHandle window) => controller.SelectToStart(folderView, window);
-    public void SelectToEnd(WindowHandle window) => controller.SelectToEnd(folderView, window);
+    public void SelectCurrent() => controller.SelectCurrent(folderView);
+    public void SelectToStart() => controller.SelectToStart(folderView);
+    public void SelectToEnd() => controller.SelectToEnd(folderView);
 
     void DetectController(string path)
     {

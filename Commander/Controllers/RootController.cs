@@ -17,6 +17,8 @@ class RootController : Controller<RootItem>, IController
 
     public string CurrentPath { get; } = "root";
 
+    public string? GetItemPath(int pos) => GetItem(pos)?.MountPoint;
+
     public async Task<int> Fill(string path)
     {
         // TODO Fill sda when there is no sda1 (daten)
@@ -56,9 +58,9 @@ class RootController : Controller<RootItem>, IController
 
     public void SelectAll(FolderView folderView) {}
     public void SelectNone(FolderView folderView) {}
-    public void SelectCurrent(FolderView folderView, WindowHandle window) {}
-    public void SelectToStart(FolderView folderView, WindowHandle window) {}
-    public void SelectToEnd(FolderView folderView, WindowHandle window) {}
+    public void SelectCurrent(FolderView folderView) {}
+    public void SelectToStart(FolderView folderView) {}
+    public void SelectToEnd(FolderView folderView) {}
 
     #endregion
 

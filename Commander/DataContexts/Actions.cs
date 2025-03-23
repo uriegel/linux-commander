@@ -1,7 +1,6 @@
 using System.ComponentModel;
-using System.Transactions;
 
-namespace Commander;
+namespace Commander.DataContexts;
 
 class Actions : INotifyPropertyChanged
 {

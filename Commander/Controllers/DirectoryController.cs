@@ -1,3 +1,4 @@
+using Commander.DataContexts;
 using Commander.Enums;
 using Commander.UI;
 using CsTools.Extensions;
@@ -8,6 +9,9 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO 10 000 items: select all: enumerable with gtk_selection_model_is_selected all selected items
+
+// TODO to Gtk4 Binding type int
 // TODO to Gtk4 SetSelection(uint start, int count)
 // TODO to Gtk4 UnselectAll()
 
@@ -29,6 +33,8 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
     #region IController
 
     public string CurrentPath { get; private set; } = "";
+
+    public string? GetItemPath(int pos) => Path.Combine(CurrentPath, GetItem(pos)?.Name ?? "");
 
     /// <summary>
     /// 
@@ -65,9 +71,9 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 
     public void SelectAll(FolderView folderView) => folderView.SetSelection(0, -1);
     public void SelectNone(FolderView folderView) => folderView.UnselectAll();
-    public void SelectCurrent(FolderView folderView, WindowHandle window) => folderView.SelectCurrent(window);
-    public void SelectToStart(FolderView folderView, WindowHandle window) => folderView.SelectToStart(window);
-    public void SelectToEnd(FolderView folderView, WindowHandle window) => folderView.SelectToEnd(window);
+    public void SelectCurrent(FolderView folderView) => folderView.SelectCurrent();
+    public void SelectToStart(FolderView folderView) => folderView.SelectToStart();
+    public void SelectToEnd(FolderView folderView) => folderView.SelectToEnd();
 
     #endregion
 
