@@ -89,21 +89,6 @@ class FolderView : ColumnViewSubClassed
     public void OnSelectToStart() => controller.SelectToStart();
     public void OnSelectToEnd() => controller.SelectToEnd();
 
-    // TODO to Gtk4
-    public void SetSelection(uint start, int count)
-    {
-        var model = columnView.GetModel<SelectionHandle>();
-        if (start == 0 && count == -1)
-            model.SelectAll();
-    }
-
-    // TODO to Gtk4
-    public void UnselectAll()
-    {
-        var model = columnView.GetModel<SelectionHandle>();
-        model.UnselectAll();
-    }
-
     public void SelectCurrent()
     {
         var pos = controller.GetFocusedItemPos();

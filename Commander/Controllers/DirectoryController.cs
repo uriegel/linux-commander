@@ -19,21 +19,16 @@ namespace Commander.Controllers;
 
 // TODO Restriction with overlay: GtkSearchBar
 
-// TODO File Icons
-
 // TODO Navigation viewer with web view
 // TODO Image viewer
 // TODO Media viewer
 // TODO Pdf viewer
 
-// TODO Gtk4 ApplicationWindowHandle window = new(window1.GetInternalHandle());
-// TODO Gtk4 GtkEditable startediting
-// TODO Gtk4 GtkEditable binding only to string, not null
-// TODO Gtk4 GtkEditable two way binding to text recursion
-// TODO Gtk4 focus control
-// TODO to Gtk4 Binding type int
-// TODO to Gtk4 SetSelection(uint start, int count)
-// TODO to Gtk4 UnselectAll()
+    // TODO Gtk4 GtkEditable startediting
+    // TODO Gtk4 GtkEditable binding only to string, not null
+    // TODO Gtk4 GtkEditable two way binding to text recursion
+    // TODO Gtk4 GtkEditable focus control
+    // TODO to Gtk4 Binding type int
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
@@ -81,7 +76,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         model.UnselectRange(0, 1);
     }
 
-    public void SelectAll(FolderView folderView) => folderView.SetSelection(0, -1);
+    public void SelectAll(FolderView folderView) => folderView.SelectAll();
     public void SelectNone(FolderView folderView) => folderView.UnselectAll();
     public void SelectCurrent(FolderView folderView) => folderView.SelectCurrent();
     public void SelectToStart(FolderView folderView) => folderView.SelectToStart();
@@ -157,12 +152,27 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         {
             ItemKind.Parent => "go-up",
             ItemKind.Folder => "folder-open",
-            _ => "text-x-generic-template"
+            _ => GetIconName(item.Name)
         };
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
         label?.Set(item.Name);
         box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem", item.IsHidden);
+    }
+    static string GetIconName(string fileName)
+    {
+        var ct = ContentType.Guess(fileName);
+        if (ct != null)
+        {
+            using var icon = ContentType.GetIcon(ct);
+            return icon
+                    .ThemedNames()
+                    .Where(Display.GetDefault().GetIconTheme().HasIcon) // TODO Skip(1), symbolic icons
+                    .FirstOrDefault()
+                 ?? "text-x-generic-template";
+        }
+        else
+            return "text-x-generic-template";
     }
 
     static int? OnFolderOrParentSort(DirectoryItem a, DirectoryItem b, bool desc)

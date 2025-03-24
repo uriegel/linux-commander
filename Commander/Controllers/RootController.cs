@@ -155,7 +155,8 @@ class RootController : Controller<RootItem>, IController
         var icon = item.DriveKind switch
         {
             DriveKind.Home => "user-home",
-            _ => "drive-removable-media-symbolic"
+            //_ => "drive-removable-media-symbolic"
+            _ => "drive-removable-media"
         };
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);

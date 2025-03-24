@@ -39,11 +39,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
         await Task.Delay(1);
 
-        var window1 = Handle.GetAncestor<WindowHandle>();
-
-        // TODO Gtk4!
-        ApplicationWindowHandle window = new(window1.GetInternalHandle());
-
+        var window = Handle.GetAncestor<ApplicationWindowHandle>();
         var cvhl = window.GetTemplateChild<CustomColumnViewHandle, ApplicationWindowHandle>("columnview-left");
         var cvhr = window.GetTemplateChild<CustomColumnViewHandle, ApplicationWindowHandle>("columnview-right");
         if (cvhl != null && cvhr != null)
