@@ -25,12 +25,15 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
     protected override async void OnCreate()
     {
-        Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m)
-            =>
+        Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m) =>
         {
-            if (k == 23 && !m.HasFlag(KeyModifiers.Shift))
+            if (k == 23)
             {
-                GetInactiveFolderView()?.GrabFocus();
+
+                if (!m.HasFlag(KeyModifiers.Shift))
+                    GetInactiveFolderView()?.GrabFocus();
+                else
+                    folderViewActive?.StartPathEditing();
                 return true;
             }
             else

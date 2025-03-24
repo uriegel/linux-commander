@@ -30,9 +30,11 @@ class FolderView : ColumnViewSubClassed
         async void OnCreated()
         {
             await Task.Delay(1);
-            Handle
-                .GetParent()
-                .DataContext(Context).GetFirstChild<EditableLabelHandle>().OnNotify("editing",
+            pathEditing = Handle
+                            .GetParent()
+                            .DataContext(Context)
+                            .GetFirstChild<EditableLabelHandle>();
+            pathEditing.OnNotify("editing",
                     e =>
                     {
                         if ((bool)e.GetProperty("editing", typeof(bool))! == false)
@@ -48,6 +50,8 @@ class FolderView : ColumnViewSubClassed
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
         => GetInstance(handle.GetInternalHandle()) as FolderView;
 
+    public void StartPathEditing() => pathEditing.StartEditing();
+    
     public void ScrollTo(int pos)
     {
         columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);
@@ -221,6 +225,7 @@ class FolderView : ColumnViewSubClassed
     void OnActivate(int pos) => controller.OnActivate(pos);
 
     readonly FolderController controller;
+    EditableLabelHandle pathEditing = new(0);
     bool mouseButton;
     bool mouseButtonCtrl;
 }
