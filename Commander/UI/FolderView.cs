@@ -13,7 +13,9 @@ class FolderView : ColumnViewSubClassed
 {
     public int CurrentPos { get; private set; } = -1;
 
-    public event EventHandler<PosChangedEventArgs>? PosChanged; 
+    public FolderContext Context { get; } = new();
+
+    public event EventHandler<PosChangedEventArgs>? PosChanged;
     public event EventHandler<ItemsCountChangedEventArgs>? ItemsCountChanged;
 
     public FolderView(nint obj)
@@ -23,6 +25,24 @@ class FolderView : ColumnViewSubClassed
         OnSelectionChanged = SelectionChanged;
         controller = new(this);
         controller.ItemsCountChanged += (s, e) => ItemsCountChanged?.Invoke(this, e);
+        OnCreated();
+
+        async void OnCreated()
+        {
+            await Task.Delay(1);
+            Handle
+                .GetParent()
+                .DataContext(Context).GetFirstChild<EditableLabelHandle>().OnNotify("editing",
+                    e =>
+                    {
+                        if ((bool)e.GetProperty("editing", typeof(bool))! == false)
+                        {
+                            columnView.GrabFocus();
+                            if (!string.IsNullOrEmpty(Context.CurrentPath))
+                                controller.ChangePath(Context.CurrentPath);
+                        }
+                    }).Binding("text", "CurrentPath", BindingFlags.Bidirectional);
+        }
     }
 
     public static FolderView? GetInstance(CustomColumnViewHandle handle)
@@ -194,7 +214,7 @@ class FolderView : ColumnViewSubClassed
     {
         OnFocusEnter?.Invoke(this, EventArgs.Empty);
         PosChanged?.Invoke(this, new(controller.GetItemPath(CurrentPos)));
-    } 
+    }
 
     void FocusLeave() => OnFocusLeave?.Invoke(this, EventArgs.Empty);
 

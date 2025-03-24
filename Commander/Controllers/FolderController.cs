@@ -1,3 +1,4 @@
+using Commander.DataContexts;
 using Commander.EventArg;
 using Commander.UI;
 
@@ -7,7 +8,7 @@ class FolderController(FolderView folderView)
 {
     public string CurrentPath { get => controller.CurrentPath; }
 
-    public event EventHandler<ItemsCountChangedEventArgs>? ItemsCountChanged; 
+    public event EventHandler<ItemsCountChangedEventArgs>? ItemsCountChanged;
 
     public string? GetItemPath(int pos) => controller.GetItemPath(pos);
 
@@ -27,6 +28,7 @@ class FolderController(FolderView folderView)
             if (lastPos != -1)
                 folderView.ScrollTo(lastPos);
             ItemsCountChanged?.Invoke(this, new(controller.Directories, controller.Files));
+            folderView.Context.CurrentPath = controller.CurrentPath;
         }
     }
 
