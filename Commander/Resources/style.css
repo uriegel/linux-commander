@@ -6,6 +6,11 @@ listview row {
     border-color: transparent;
 }
 
+editablelabel {
+    font-size: smaller;
+    font-family: "Noto Sans";
+}
+
 listview row:selected {
     border-color: color-mix(in srgb, @theme_selected_bg_color 25%, transparent);
 }

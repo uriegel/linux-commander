@@ -28,7 +28,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m)
             =>
         {
-            if (k == 23)
+            if (k == 23 && !m.HasFlag(KeyModifiers.Shift))
             {
                 GetInactiveFolderView()?.GrabFocus();
                 return true;
@@ -39,8 +39,13 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
         await Task.Delay(1);
 
-        var cvhl = Handle.GetStartChild<CustomColumnViewHandle>();
-        var cvhr = Handle.GetEndChild<CustomColumnViewHandle>();
+        var window1 = Handle.GetAncestor<WindowHandle>();
+
+        // TODO Gtk4!
+        ApplicationWindowHandle window = new(window1.GetInternalHandle());
+
+        var cvhl = window.GetTemplateChild<CustomColumnViewHandle, ApplicationWindowHandle>("columnview-left");
+        var cvhr = window.GetTemplateChild<CustomColumnViewHandle, ApplicationWindowHandle>("columnview-right");
         if (cvhl != null && cvhr != null)
         {
             folderViewLeft = FolderView.GetInstance(cvhl);

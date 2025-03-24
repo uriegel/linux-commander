@@ -32,11 +32,31 @@
                 <property name="orientation">horizontal</property>
                 <property name="vexpand">True</property>
                 <child type="start">
-                  <object class="ColumnView" id="columnview-left">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkEditableLabel">
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ColumnView" id="columnview-left">
+                        <property name="vexpand">True</property>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <child type="end">
-                  <object class="ColumnView" id="columnview-right">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkEditableLabel">
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ColumnView" id="columnview-right">
+                        <property name="vexpand">True</property>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>

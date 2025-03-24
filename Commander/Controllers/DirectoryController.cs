@@ -11,7 +11,7 @@ namespace Commander.Controllers;
 
 // TODO GtkActionBar on folder changed
 // TODO GtkActionBar dont count hidden when not visible
-// TODO GtkActionBar switch hwen hidden are visible
+// TODO GtkActionBar switch when hidden are visible
 // TODO GtkActionBar switch to int
 // TODO GtkActionBar count of selected items
 // TODO GtkActionBar show errors in red
@@ -26,6 +26,10 @@ namespace Commander.Controllers;
 // TODO Media viewer
 // TODO Pdf viewer
 
+// TODO Gtk4 ApplicationWindowHandle window = new(window1.GetInternalHandle());
+// TODO Gtk4 GtkEditable startediting
+// TODO Gtk4 GtkEditable two way binding to text
+// TODO Gtk4 focus control
 // TODO to Gtk4 Binding type int
 // TODO to Gtk4 SetSelection(uint start, int count)
 // TODO to Gtk4 UnselectAll()
