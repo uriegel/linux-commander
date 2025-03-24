@@ -28,7 +28,8 @@ namespace Commander.Controllers;
 
 // TODO Gtk4 ApplicationWindowHandle window = new(window1.GetInternalHandle());
 // TODO Gtk4 GtkEditable startediting
-// TODO Gtk4 GtkEditable two way binding to text
+// TODO Gtk4 GtkEditable binding only to string, not null
+// TODO Gtk4 GtkEditable two way binding to text recursion
 // TODO Gtk4 focus control
 // TODO to Gtk4 Binding type int
 // TODO to Gtk4 SetSelection(uint start, int count)
