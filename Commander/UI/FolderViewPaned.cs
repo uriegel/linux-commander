@@ -60,8 +60,8 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 folderViewLeft.PosChanged += (s, e) => MainContext.Instance.CurrentPath = e.CurrentPath;
                 folderViewLeft.ItemsCountChanged += (s, e) =>
                 {
-                    MainContext.Instance.CurrentDirectories = e.Directories.ToString();
-                    MainContext.Instance.CurrentFiles = e.Items.ToString();
+                    MainContext.Instance.CurrentDirectories = e.Directories;
+                    MainContext.Instance.CurrentFiles = e.Items;
                 };
                  
             }
@@ -77,8 +77,8 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 folderViewRight.PosChanged += (s, e) => MainContext.Instance.CurrentPath = e.CurrentPath;
                 folderViewRight.ItemsCountChanged += (s, e) =>
                 {
-                    MainContext.Instance.CurrentDirectories = e.Directories.ToString();
-                    MainContext.Instance.CurrentFiles = e.Items.ToString();
+                    MainContext.Instance.CurrentDirectories = e.Directories;
+                    MainContext.Instance.CurrentFiles = e.Items;
                 };
             }
             await Task.Delay(100);

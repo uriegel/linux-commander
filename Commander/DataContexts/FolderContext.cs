@@ -4,7 +4,7 @@ namespace Commander.DataContexts;
 
 class FolderContext : INotifyPropertyChanged
 {
-    public string? CurrentPath
+    public string CurrentPath
     {
         get => _CurrentPath;
         set
@@ -13,7 +13,7 @@ class FolderContext : INotifyPropertyChanged
             OnChanged(nameof(CurrentPath));
         }
     }
-    string? _CurrentPath;
+    string _CurrentPath = "";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

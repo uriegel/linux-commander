@@ -17,7 +17,7 @@ class MainContext : INotifyPropertyChanged
     }
     string? _CurrentPath;
 
-    public string? CurrentFiles
+    public int CurrentFiles
     {
         get => _CurrentFiles;
         set
@@ -26,9 +26,9 @@ class MainContext : INotifyPropertyChanged
             OnChanged(nameof(CurrentFiles));
         }
     }
-    string? _CurrentFiles;
+    int _CurrentFiles;
     
-    public string? CurrentDirectories
+    public int CurrentDirectories
     {
         get => _CurrentDirectories;
         set
@@ -37,7 +37,7 @@ class MainContext : INotifyPropertyChanged
             OnChanged(nameof(CurrentDirectories));
         }
     }
-    string? _CurrentDirectories;
+    int _CurrentDirectories;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

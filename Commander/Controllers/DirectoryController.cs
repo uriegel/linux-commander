@@ -12,23 +12,18 @@ namespace Commander.Controllers;
 // TODO GtkActionBar on folder changed
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
-// TODO GtkActionBar switch to int
 // TODO GtkActionBar count of selected items
 // TODO GtkActionBar show errors in red
 // TODO GtkActionBar show info in blue
 
 // TODO Restriction with overlay: GtkSearchBar
 
+// TODO Exif datas directly on the items, refresh view
+
 // TODO Navigation viewer with web view
 // TODO Image viewer
 // TODO Media viewer
 // TODO Pdf viewer
-
-    // TODO Gtk4 GtkEditable startediting
-    // TODO Gtk4 GtkEditable binding only to string, not null
-    // TODO Gtk4 GtkEditable two way binding to text recursion
-    // TODO Gtk4 GtkEditable focus control
-    // TODO to Gtk4 Binding type int
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
