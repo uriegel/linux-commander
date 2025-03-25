@@ -91,10 +91,10 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
         window
             .GetTemplateChild<WidgetHandle, ApplicationWindowHandle>("restriction-left")
-            ?.Binding("search-mode-enabled", "Restricting", BindingFlags.Default);
+            ?.Binding("search-mode-enabled", "Restricting", BindingFlags.Bidirectional);
         window
             .GetTemplateChild<WidgetHandle, ApplicationWindowHandle>("restriction-right")
-            ?.Binding("search-mode-enabled", "Restricting", BindingFlags.Default);
+            ?.Binding("search-mode-enabled", "Restricting", BindingFlags.Bidirectional);
     }
 
     protected override PanedHandle CreateHandle(nint obj) => new(obj);
