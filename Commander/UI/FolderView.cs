@@ -46,12 +46,22 @@ class FolderView : ColumnViewSubClassed
                         }
                     }).Binding("text", "CurrentPath", BindingFlags.Bidirectional);
             controller.ItemsCountChanged += (s, e) => ItemsCountChanged?.Invoke(this, e);
-            Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m) =>
+            _ = Handle.AddController(EventControllerKey.New().OnKeyPressed((c, k, m) =>
             {
                 if (k == 9)
                     StopRestriction();
+                else if (k == 22)
+                {
+                    MainContext.Instance.Restriction = MainContext.Instance.Restriction?[..^1];
+                    FilterChanged(FilterChange.LessStrict);
+                }
                 else
-                    MainContext.Instance.Restriction = "RestrictedText";
+                {
+
+                    var key = (char)gdk_keyval_to_unicode(c);
+                    MainContext.Instance.Restriction += key;
+                    FilterChanged(FilterChange.MoreStrict);
+                }
                 return false;
             }));
         }
@@ -236,9 +246,13 @@ class FolderView : ColumnViewSubClassed
     {
         StopRestriction();
         OnFocusLeave?.Invoke(this, EventArgs.Empty);
-    } 
+    }
 
-    void StopRestriction() => MainContext.Instance.Restriction = null;
+    void StopRestriction()
+    {
+        MainContext.Instance.Restriction = null;
+        FilterChanged(FilterChange.LessStrict);
+    }
 
     void OnActivate(int pos) => controller.OnActivate(pos);
 
@@ -246,6 +260,9 @@ class FolderView : ColumnViewSubClassed
     EditableLabelHandle pathEditing = new(0);
     bool mouseButton;
     bool mouseButtonCtrl;
+    
+    [System.Runtime.InteropServices.DllImport("libgtk-4.so.1")]
+    private static extern int gdk_keyval_to_unicode(int keyval);
 }
 
 class FolderViewClass() : ColumnViewSubClassedClass("ColumnView", p => new FolderView(p)) { }

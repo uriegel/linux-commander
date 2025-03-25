@@ -9,12 +9,8 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO GtkActionBar on folder changed
-// TODO GtkActionBar dont count hidden when not visible
-// TODO GtkActionBar switch when hidden are visible
-// TODO GtkActionBar count of selected items
-// TODO GtkActionBar show errors in red
-// TODO GtkActionBar show info in blue
+// TODO On restriction: check if controller supports this
+// TODO On restriction: check if restriction is found
 
 // TODO Exif datas directly on the items, refresh view
 
@@ -23,9 +19,16 @@ namespace Commander.Controllers;
 // TODO Media viewer
 // TODO Pdf viewer
 
+// TODO GtkActionBar on folder changed
+// TODO GtkActionBar dont count hidden when not visible
+// TODO GtkActionBar switch when hidden are visible
+// TODO GtkActionBar count of selected items
+// TODO GtkActionBar show errors in red
+// TODO GtkActionBar show info in blue
+
 // TODO To Gtk4 EditableLabel editing
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
-
+// TODO To Gtk4 int gdk_keyval_to_unicode(int keyval);
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
@@ -70,7 +73,8 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
     {
         if (mouseButton && !mouseButtonCtrl && count == 1)
             model.UnselectRange(pos, 1);
-        model.UnselectRange(0, 1);
+        if (MainContext.Instance.Restriction == null)
+            model.UnselectRange(0, 1);
     }
 
     public void SelectAll(FolderView folderView) => folderView.SelectAll();
@@ -190,7 +194,10 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             : null;
     }
 
-    bool Filter(DirectoryItem item) => !item.IsHidden || Actions.Instance.ShowHidden;
+    bool Filter(DirectoryItem item)
+        => (!item.IsHidden || Actions.Instance.ShowHidden)
+            && (MainContext.Instance.Restriction == null
+                || item.Name.StartsWith(MainContext.Instance.Restriction, StringComparison.CurrentCultureIgnoreCase));
 
     int OnNameSort(DirectoryItem a, DirectoryItem b, bool desc)
         => OnFolderOrParentSort(a, b, desc) ?? string.Compare(a.Name, b.Name);
