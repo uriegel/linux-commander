@@ -9,6 +9,9 @@ using Commander.EventArg;
 
 namespace Commander.UI;
 
+// TODO Esc closes the searchbar
+// TODO ChangePath closes the searchbar
+
 class FolderView : ColumnViewSubClassed
 {
     public int CurrentPos { get; private set; } = -1;
@@ -24,7 +27,6 @@ class FolderView : ColumnViewSubClassed
         MultiSelection = true;
         OnSelectionChanged = SelectionChanged;
         controller = new(this);
-        controller.ItemsCountChanged += (s, e) => ItemsCountChanged?.Invoke(this, e);
         OnCreated();
 
         async void OnCreated()
@@ -44,6 +46,12 @@ class FolderView : ColumnViewSubClassed
                                 controller.ChangePath(Context.CurrentPath);
                         }
                     }).Binding("text", "CurrentPath", BindingFlags.Bidirectional);
+            controller.ItemsCountChanged += (s, e) => ItemsCountChanged?.Invoke(this, e);
+            Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m) =>
+            {
+                Context.Restricting = true;
+                return false;
+            }));
         }
     }
 
@@ -51,7 +59,7 @@ class FolderView : ColumnViewSubClassed
         => GetInstance(handle.GetInternalHandle()) as FolderView;
 
     public void StartPathEditing() => pathEditing.StartEditing();
-    
+
     public void ScrollTo(int pos)
     {
         columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);

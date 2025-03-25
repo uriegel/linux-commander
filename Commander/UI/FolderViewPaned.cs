@@ -85,6 +85,16 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
             folderViewActive?.GrabFocus();
             IActionMap.GetAction("down").SetEnabled(true);
         }
+
+        // TODO To Gtk4
+        await Task.Delay(1);
+
+        window
+            .GetTemplateChild<WidgetHandle, ApplicationWindowHandle>("restriction-left")
+            ?.Binding("search-mode-enabled", "Restricting", BindingFlags.Default);
+        window
+            .GetTemplateChild<WidgetHandle, ApplicationWindowHandle>("restriction-right")
+            ?.Binding("search-mode-enabled", "Restricting", BindingFlags.Default);
     }
 
     protected override PanedHandle CreateHandle(nint obj) => new(obj);

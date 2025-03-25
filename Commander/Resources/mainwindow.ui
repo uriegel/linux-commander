@@ -39,6 +39,15 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkSearchBar" id="restriction-left">
+                        <property name="focusable">false</property>
+                        <child>
+                          <object class="GtkSearchEntry">
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
                       <object class="ColumnView" id="columnview-left">
                         <property name="vexpand">True</property>
                       </object>
@@ -50,6 +59,15 @@
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkEditableLabel">
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSearchBar" id="restriction-right">
+                        <property name="focusable">false</property>
+                        <child>
+                          <object class="GtkSearchEntry">
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>
