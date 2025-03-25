@@ -16,8 +16,6 @@ namespace Commander.Controllers;
 // TODO GtkActionBar show errors in red
 // TODO GtkActionBar show info in blue
 
-// TODO Restriction with overlay: GtkSearchBar
-
 // TODO Exif datas directly on the items, refresh view
 
 // TODO Navigation viewer with web view

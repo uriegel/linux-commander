@@ -29,6 +29,7 @@ class FolderController(FolderView folderView)
                 folderView.ScrollTo(lastPos);
             ItemsCountChanged?.Invoke(this, new(controller.Directories, controller.Files));
             folderView.Context.CurrentPath = controller.CurrentPath;
+            folderView.OnPathChanged();
         }
     }
 

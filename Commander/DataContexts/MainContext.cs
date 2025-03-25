@@ -17,6 +17,17 @@ class MainContext : INotifyPropertyChanged
     }
     string? _CurrentPath;
 
+    public string? Restriction
+    {
+        get => _Restriction;
+        set
+        {
+            _Restriction = value;
+            OnChanged(nameof(Restriction));
+        }
+    }
+    string? _Restriction;
+    
     public int CurrentFiles
     {
         get => _CurrentFiles;

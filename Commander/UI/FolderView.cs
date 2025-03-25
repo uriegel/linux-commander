@@ -9,7 +9,6 @@ using Commander.EventArg;
 
 namespace Commander.UI;
 
-// TODO Esc closes the searchbar
 // TODO ChangePath closes the searchbar
 
 class FolderView : ColumnViewSubClassed
@@ -49,7 +48,10 @@ class FolderView : ColumnViewSubClassed
             controller.ItemsCountChanged += (s, e) => ItemsCountChanged?.Invoke(this, e);
             Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m) =>
             {
-                Context.Restricting = true;
+                if (k == 9)
+                    StopRestriction();
+                else
+                    MainContext.Instance.Restriction = "RestrictedText";
                 return false;
             }));
         }
@@ -59,6 +61,8 @@ class FolderView : ColumnViewSubClassed
         => GetInstance(handle.GetInternalHandle()) as FolderView;
 
     public void StartPathEditing() => pathEditing.StartEditing();
+
+    public void OnPathChanged() => StopRestriction();
 
     public void ScrollTo(int pos)
     {
@@ -228,7 +232,13 @@ class FolderView : ColumnViewSubClassed
         PosChanged?.Invoke(this, new(controller.GetItemPath(CurrentPos)));
     }
 
-    void FocusLeave() => OnFocusLeave?.Invoke(this, EventArgs.Empty);
+    void FocusLeave()
+    {
+        StopRestriction();
+        OnFocusLeave?.Invoke(this, EventArgs.Empty);
+    } 
+
+    void StopRestriction() => MainContext.Instance.Restriction = null;
 
     void OnActivate(int pos) => controller.OnActivate(pos);
 
