@@ -9,8 +9,6 @@ using Commander.EventArg;
 
 namespace Commander.UI;
 
-// TODO ChangePath closes the searchbar
-
 class FolderView : ColumnViewSubClassed
 {
     public int CurrentPos { get; private set; } = -1;
@@ -181,6 +179,16 @@ class FolderView : ColumnViewSubClassed
     public event EventHandler? OnFocusLeave;
 
     public void GrabFocus() => columnView.GrabFocus();
+
+    public void Refresh()
+    {
+        var pos = controller.GetFocusedItemPos();
+        var model = columnView.GetModel<SelectionHandle>();
+        var nil = new SelectionHandle();
+        columnView.SetModel(nil);
+        columnView.SetModel(model);
+        ScrollTo(pos);
+    }
 
     protected override void OnCreate()
     {
