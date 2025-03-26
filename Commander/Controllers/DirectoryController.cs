@@ -11,17 +11,21 @@ namespace Commander.Controllers;
 
 // TODO Exif datas directly on the items, refresh view
 
-// TODO Navigation viewer with web view
-// TODO Image viewer
-// TODO Media viewer
-// TODO Pdf viewer
-
 // TODO GtkActionBar on folder changed
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
 // TODO GtkActionBar count of selected items
 // TODO GtkActionBar show errors in red
 // TODO GtkActionBar show info in blue
+
+// TODO Menu actions like adapt view
+// TODO Save folder pathes
+// TODO Backspace history
+
+// TODO Navigation viewer with web view
+// TODO Image viewer
+// TODO Media viewer
+// TODO Pdf viewer
 
 // TODO To Gtk4 EditableLabel editing
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
