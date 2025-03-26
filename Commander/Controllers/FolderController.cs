@@ -24,7 +24,7 @@ class FolderController(FolderView folderView)
         var newController = DetectController(path);
         if (controller != null)
         {
-            var lastPos = await controller.Fill(path);
+            var lastPos = await controller.Fill(path, folderView);
             if (lastPos != -1)
                 folderView.ScrollTo(lastPos);
             ItemsCountChanged?.Invoke(this, new(controller.Directories, controller.Files));

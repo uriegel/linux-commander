@@ -22,7 +22,7 @@ class RootController : Controller<RootItem>, IController
 
     public string? GetItemPath(int pos) => GetItem(pos)?.MountPoint;
 
-    public async Task<int> Fill(string path)
+    public async Task<int> Fill(string path, FolderView folderView)
     {
         // TODO Fill sda when there is no sda1 (daten)
         var rootItems = (await

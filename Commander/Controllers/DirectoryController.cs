@@ -9,8 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Exif datas directly on the items, refresh view
-
 // TODO GtkActionBar on folder changed
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
@@ -48,11 +46,14 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
     /// </summary>
     /// <param name="path"></param>
     /// <returns>The position of the last path</returns>
-    public async Task<int> Fill(string path)
+    public async Task<int> Fill(string path, FolderView folderView)
     {
+        cancellation.Cancel();
+        cancellation = new();
         var result = await Task.Factory.StartNew(() => DirectoryProcessing.GetFiles(path));
         var oldPath = CurrentPath;
         CurrentPath = result.Path;
+        StartExifResolving(result.Items, folderView);
         Insert(result.Items);
         Directories = result.DirCount;
         Files = result.FileCount;
@@ -119,7 +120,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
                 Resizeable = true,
                 OnSort = OnTimeSort,
                 OnItemSetup = () => Label.New(),
-                OnLabelBind = i => i.Time.ToString() ?? ""
+                OnItemBind = OnTimeBind
             },
             new()
             {
@@ -149,6 +150,20 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         }
     }
 
+    void StartExifResolving(DirectoryItem[] items, FolderView folderView)
+    {
+        var token = cancellation.Token;
+        Task.Run(() =>
+        {
+            foreach (var item in items
+                                    .Where(item => !token.IsCancellationRequested
+                                            && (item.Name.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase)
+                                                || item.Name.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase))))
+                item.ExifData = ExifReader.GetExifData(CurrentPath.AppendPath(item.Name));
+            Gtk.Dispatch(() => folderView.Refresh());
+        });     
+    }
+
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
     {
         var box = listItem.GetChild<BoxHandle>();
@@ -162,9 +177,16 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         };
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
-        label?.Set(item.Name);
         box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem", item.IsHidden);
     }
+
+    static void OnTimeBind(ListItemHandle listItem, DirectoryItem item)
+    {
+        var label = listItem.GetChild<LabelHandle>();
+        label?.Set(item.ExifData?.DateTime.ToString() ?? item.Time.ToString() ?? "");
+        label?.AddCssClass("exif", item.ExifData?.DateTime != null);
+    }
+    
     static string GetIconName(string fileName)
     {
         var ct = ContentType.Guess(fileName);
@@ -180,6 +202,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         else
             return "text-x-generic-template";
     }
+
 
     static int? OnFolderOrParentSort(DirectoryItem a, DirectoryItem b, bool desc)
     {
@@ -241,7 +264,8 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         }
     }
 
-    SelectionHandle selectionModel;
+    readonly SelectionHandle selectionModel;
+    CancellationTokenSource cancellation = new();
 
     #region IDisposable
 
@@ -259,6 +283,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             if (disposing)
             {
                 // Verwalteten Zustand (verwaltete Objekte) bereinigen
+                cancellation.Cancel();
                 OnFilter = null;
             }
 

@@ -33,17 +33,17 @@ record DirectoryItem(
     string Name,
     long Size,
     bool IsDirectory,
-    //string? IconPath,
     bool IsHidden,
     DateTime? Time
 ) {
+    public ExifData? ExifData { get; set; }
+
     public static DirectoryItem CreateParentItem()
         => new(
             ItemKind.Parent,
             "..",
             -1,
             true,
-            //            null,
             false,
             null);
 
@@ -53,7 +53,6 @@ record DirectoryItem(
             info.Name,
             -1,
             true,
-            //            null,
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
             info.LastWriteTime);
 
@@ -63,7 +62,6 @@ record DirectoryItem(
             info.Name,
             info.Length,
             false,
-//            Directory.GetIconPath(info),
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
             info.LastWriteTime);
 //     public static DirectoryItem? CreateMaybeFileItem(FileInfo info)

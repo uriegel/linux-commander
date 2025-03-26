@@ -23,6 +23,10 @@ listview row cell {
     padding: 0px;
 }
 
+listview row .exif {
+    color: yellow;
+}
+
 listview row.hiddenItem {
     opacity: 0.5;
 }

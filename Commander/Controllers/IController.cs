@@ -10,7 +10,7 @@ interface IController : IDisposable
 
     string? GetItemPath(int pos);
 
-    Task<int> Fill(string path);
+    Task<int> Fill(string path, FolderView folderView);
 
     string? OnActivate(int pos);
 
