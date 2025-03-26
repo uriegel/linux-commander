@@ -59,6 +59,8 @@ class RootController : Controller<RootItem>, IController
         return item?.MountPoint;
     }
 
+    public bool CheckRestriction(string searchKey) => false;
+
     public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl) => model.UnselectRange(pos, count);
 
     public void SelectAll(FolderView folderView) {}

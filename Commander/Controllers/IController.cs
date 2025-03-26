@@ -17,6 +17,8 @@ interface IController : IDisposable
     int GetFocusedItemPos();
     int ItemsCount();
 
+    bool CheckRestriction(string searchKey);
+
     void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl);
 
     void SelectAll(FolderView folderView);

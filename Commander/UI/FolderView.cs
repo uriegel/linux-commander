@@ -57,10 +57,13 @@ class FolderView : ColumnViewSubClassed
                 }
                 else
                 {
-
                     var key = (char)gdk_keyval_to_unicode(c);
-                    MainContext.Instance.Restriction += key;
-                    FilterChanged(FilterChange.MoreStrict);
+                    var searchKey = MainContext.Instance.Restriction + key;
+                    if (controller.CheckRestriction(searchKey))
+                    {
+                        MainContext.Instance.Restriction = searchKey;
+                        FilterChanged(FilterChange.MoreStrict);
+                    }
                 }
                 return false;
             }));

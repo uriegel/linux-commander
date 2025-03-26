@@ -33,6 +33,8 @@ class FolderController(FolderView folderView)
         }
     }
 
+    public bool CheckRestriction(string searchKey) => controller.CheckRestriction(searchKey);
+
     public int GetFocusedItemPos() => controller.GetFocusedItemPos();
     public int ItemsCount() => controller.ItemsCount();
 

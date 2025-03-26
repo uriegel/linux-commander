@@ -9,7 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO On restriction: check if controller supports this
 // TODO On restriction: check if restriction is found
 
 // TODO Exif datas directly on the items, refresh view
@@ -29,6 +28,7 @@ namespace Commander.Controllers;
 // TODO To Gtk4 EditableLabel editing
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
 // TODO To Gtk4 int gdk_keyval_to_unicode(int keyval);
+// TODO To Gtk4 Binding reacts on all Property changes
 
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
@@ -68,6 +68,8 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         else
             return null;
     }
+
+    public bool CheckRestriction(string searchKey) => true;
 
     public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
     {
