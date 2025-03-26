@@ -24,7 +24,7 @@ listview row cell {
 }
 
 listview row .exif {
-    color: yellow;
+    color: color-mix(in srgb, @theme_fg_color 50%, blue);
 }
 
 listview row.hiddenItem {
