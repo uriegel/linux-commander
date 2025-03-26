@@ -9,8 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO On restriction: check if restriction is found
-
 // TODO Exif datas directly on the items, refresh view
 
 // TODO Navigation viewer with web view
@@ -69,7 +67,8 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             return null;
     }
 
-    public bool CheckRestriction(string searchKey) => true;
+    public bool CheckRestriction(string searchKey)
+        => Items().Any(n => n.Name.StartsWith(searchKey, StringComparison.CurrentCultureIgnoreCase));
 
     public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
     {
