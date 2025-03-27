@@ -4,17 +4,22 @@ using GtkDotNet.Controls;
 using Commander.Settings;
 using Commander.UI;
 using WebServerLight;
+using Commander;
 
 const string appId = "de.uriegel.commander";
 {
+    Gtk.ShowDiagnostics();
+
     ServerBuilder
         .New()
         .Http(20000)
         .WebsiteFromResource()
-        //            .WebSocket(Events.Create)
+        .Get(WebRequests.OnGet)
         .UseRange()
         .Build()
         .Start();            
+
+    Gtk.ShowDiagnostics();
 
     using var app = Application
         .NewAdwaita(appId)
