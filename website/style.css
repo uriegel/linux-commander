@@ -13,7 +13,7 @@ body {
         background-color: rgb(32, 32, 32);
     } 
 }
-#viewerImg {
+#viewer {
     position: absolute;
     left: 0;
     top: 0;
@@ -26,4 +26,18 @@ body {
 
 .hidden {
     display: none;
+}
+
+.bothViewer {
+    display: flex
+}
+
+.bothViewer>div {
+    flex-grow: 1;
+    width: 50%;
+}
+
+.viewerDiv {
+    position: relative;
+    height: 100vh;
 }

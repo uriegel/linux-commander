@@ -46,7 +46,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
             ?.Binding("label", "CurrentFiles", BindingFlags.Default);
         Handle.AddActions(
             [
-                // new("togglePreviewMode", Events.MenuAction.Apply("TOGGLE_PREVIEW"), "<Ctrl>F3"),
+                new("togglePreviewMode", Viewer.TogglePreview, "<Ctrl>F3"),
                 new("showpreview", false, show => Viewer.Show(Handle, viewer, show), "F3"),
                 // new("copy", Events.MenuAction.Apply("COPY"), "F5"),
                 // new("createfolder", Events.MenuAction.Apply("CREATE_FOLDER"), "F7"),

@@ -33,6 +33,10 @@ static class Viewer
 
     }
 
+    public static void TogglePreview()
+        => webView?.RunJavascript($"togglePreview()");
+
+
     static void PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainContext.SelectedPath))
