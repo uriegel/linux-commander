@@ -23,6 +23,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
     {
         var panedHandle = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("paned");
         var paned = panedHandle != null ? FolderViewPaned.GetInstance(panedHandle) : null;
+        var viewer = Handle.GetTemplateChild<WidgetHandle, ApplicationWindowHandle>("viewer");
         Handle.OnRealize(w =>
             {
                 var width = w.GetWidth();
@@ -43,7 +44,17 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
         Handle.AddActions(
             [
                 // new("togglePreviewMode", Events.MenuAction.Apply("TOGGLE_PREVIEW"), "<Ctrl>F3"),
-                // new("showpreview", false, Events.PreviewAction, "F3"),
+                new("showpreview", false, show =>
+                    {
+                        viewer?.SetVisible(show);
+                        if (initial)
+                        {
+                            // TODO Maximize window 
+                            initial = false;
+                            var viewerPaned = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("viewerPaned");
+                            viewerPaned?.SetPosition(Handle.GetHeight() / 2);
+                        }
+                    }, "F3"),
                 // new("copy", Events.MenuAction.Apply("COPY"), "F5"),
                 // new("createfolder", Events.MenuAction.Apply("CREATE_FOLDER"), "F7"),
                 // new("adaptpath", Events.MenuAction.Apply("ADAPT_PATH"), "F9"),
@@ -81,5 +92,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
 
     protected override void OnFinalize() => Console.WriteLine("Window finalized");
     protected override ApplicationWindowHandle CreateHandle(nint obj) => new(obj);
+
+    bool initial = true;
 }
 
