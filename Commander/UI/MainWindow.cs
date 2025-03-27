@@ -13,6 +13,9 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
 
     protected override void OnCreate()
     {
+        var webkitType = GType.Get(GTypeEnum.WebKitWebView);
+        GType.Ensure(webkitType);
+
         Handle.InitTemplate();
         StyleContext.AddProviderForDisplay(
             Display.GetDefault(),

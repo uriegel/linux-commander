@@ -62,9 +62,8 @@
               </object>
             </child>
             <child type="end">
-              <object class="GtkLabel" id="viewer">
+              <object class="WebKitWebView" id="viewer">
                 <property name="visible">false</property>
-                <property name="label">Vorschauansicht</property>
               </object>
             </child>
           </object>            
