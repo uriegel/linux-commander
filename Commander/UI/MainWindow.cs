@@ -57,7 +57,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                             var viewerPaned = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("viewerPaned");
                             viewerPaned?.SetPosition(Handle.GetHeight() / 2);
                             var webView = Handle.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("viewer");
-                            webView?.LoadUri("https://github.com/uriegel");
+                            webView?.LoadUri("http://localhost:20000");
                             
                         }
                     }, "F3"),

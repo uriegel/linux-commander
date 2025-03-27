@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Gtk4DotNet" Version="7.0.27-beta-27" />
+    <PackageReference Include="WebServerLight" Version="0.0.15-beta-15" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="./Resources/style.css">
       <LogicalName>style</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="../website/index.html">
+      <LogicalName>/index.html</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
 
