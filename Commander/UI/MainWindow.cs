@@ -56,6 +56,9 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
                             initial = false;
                             var viewerPaned = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("viewerPaned");
                             viewerPaned?.SetPosition(Handle.GetHeight() / 2);
+                            var webView = Handle.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("viewer");
+                            webView?.LoadUri("https://github.com/uriegel");
+                            
                         }
                     }, "F3"),
                 // new("copy", Events.MenuAction.Apply("COPY"), "F5"),
