@@ -14,12 +14,11 @@ namespace Commander.Controllers;
 // TODO Media viewer
 // TODO Pdf viewer
 
-// TODO GtkActionBar on folder changed
-// TODO GtkActionBar dont count hidden when not visible
-// TODO GtkActionBar switch when hidden are visible
 // TODO GtkActionBar count of selected items
 // TODO GtkActionBar show errors in red
 // TODO GtkActionBar show info in blue
+// TODO GtkActionBar dont count hidden when not visible
+// TODO GtkActionBar switch when hidden are visible
 
 // TODO Menu actions like adapt view
 // TODO Save folder pathes

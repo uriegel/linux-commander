@@ -5,16 +5,16 @@ namespace Commander.DataContexts;
 class Actions : INotifyPropertyChanged
 {
     public static Actions Instance = new();
+
     public bool ShowHidden
     {
-        get => _ShowHidden;
+        get => field;
         set
         {
-            _ShowHidden = value;
+            field = value;
             OnChanged(nameof(ShowHidden));
         }
     }
-    bool _ShowHidden;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

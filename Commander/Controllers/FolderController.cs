@@ -1,5 +1,3 @@
-using Commander.DataContexts;
-using Commander.EventArg;
 using Commander.UI;
 
 namespace Commander.Controllers;
@@ -7,8 +5,6 @@ namespace Commander.Controllers;
 class FolderController(FolderView folderView)
 {
     public string CurrentPath { get => controller.CurrentPath; }
-
-    public event EventHandler<ItemsCountChangedEventArgs>? ItemsCountChanged;
 
     public string? GetItemPath(int pos) => controller.GetItemPath(pos);
 
@@ -21,13 +17,15 @@ class FolderController(FolderView folderView)
 
     public async void ChangePath(string path)
     {
-        var newController = DetectController(path);
+        DetectController(path);
         if (controller != null)
         {
             var lastPos = await controller.Fill(path, folderView);
             if (lastPos != -1)
                 folderView.ScrollTo(lastPos);
-            ItemsCountChanged?.Invoke(this, new(controller.Directories, controller.Files));
+
+            folderView.Context.CurrentDirectories = controller.Directories;
+            folderView.Context.CurrentFiles = controller.Files;
             folderView.Context.CurrentPath = controller.CurrentPath;
             folderView.OnPathChanged();
         }

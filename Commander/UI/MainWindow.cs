@@ -31,7 +31,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
         Handle.OnSizeChanged((w, _) => panedHandle?.SetPosition(w / 2));
         Handle.DataContext(MainContext.Instance);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("statusText")
-            ?.Binding("label", "CurrentPath", BindingFlags.Default)
+            ?.Binding("label", "SelectedPath", BindingFlags.Default)
             ?.Binding("visible", "Restriction", BindingFlags.Default, s => s == null);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("restrictionText")
             ?.Binding("label", "Restriction", BindingFlags.Default)

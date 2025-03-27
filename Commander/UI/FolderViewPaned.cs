@@ -49,21 +49,16 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         {
             folderViewLeft = FolderView.GetInstance(cvhl);
             folderViewActive = folderViewLeft;
+            MainContext.Instance.ChangeFolderContext(folderViewLeft?.Context);
             if (folderViewLeft != null)
             {
                 folderViewLeft.OnFocusEnter += (s, e) =>
                 {
                     folderViewActive = folderViewLeft;
+                    MainContext.Instance.ChangeFolderContext(folderViewActive?.Context);
                     EnableKeyNavigation(true);
                 };
                 folderViewLeft.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
-                folderViewLeft.PosChanged += (s, e) => MainContext.Instance.CurrentPath = e.CurrentPath;
-                folderViewLeft.ItemsCountChanged += (s, e) =>
-                {
-                    MainContext.Instance.CurrentDirectories = e.Directories;
-                    MainContext.Instance.CurrentFiles = e.Items;
-                };
-                 
             }
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
@@ -71,15 +66,10 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 folderViewRight.OnFocusEnter += (s, e) =>
                 {
                     folderViewActive = folderViewRight;
+                    MainContext.Instance.ChangeFolderContext(folderViewActive?.Context);
                     EnableKeyNavigation(true);
                 };
                 folderViewRight.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
-                folderViewRight.PosChanged += (s, e) => MainContext.Instance.CurrentPath = e.CurrentPath;
-                folderViewRight.ItemsCountChanged += (s, e) =>
-                {
-                    MainContext.Instance.CurrentDirectories = e.Directories;
-                    MainContext.Instance.CurrentFiles = e.Items;
-                };
             }
             await Task.Delay(100);
             folderViewActive?.GrabFocus();

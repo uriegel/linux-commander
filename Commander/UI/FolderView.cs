@@ -15,9 +15,6 @@ class FolderView : ColumnViewSubClassed
 
     public FolderContext Context { get; } = new();
 
-    public event EventHandler<PosChangedEventArgs>? PosChanged;
-    public event EventHandler<ItemsCountChangedEventArgs>? ItemsCountChanged;
-
     public FolderView(nint obj)
         : base(obj)
     {
@@ -43,7 +40,6 @@ class FolderView : ColumnViewSubClassed
                                 controller.ChangePath(Context.CurrentPath);
                         }
                     }).Binding("text", "CurrentPath", BindingFlags.Bidirectional);
-            controller.ItemsCountChanged += (s, e) => ItemsCountChanged?.Invoke(this, e);
             _ = Handle.AddController(EventControllerKey.New().OnKeyPressed((c, k, m) =>
             {
                 if (k == 9)
@@ -171,7 +167,7 @@ class FolderView : ColumnViewSubClassed
         if (newPos != CurrentPos)
         {
             CurrentPos = newPos;
-            PosChanged?.Invoke(this, new(controller.GetItemPath(CurrentPos)));
+            Context.SelectedPath = controller.GetItemPath(CurrentPos);
         }
     }
 
@@ -247,11 +243,7 @@ class FolderView : ColumnViewSubClassed
         CheckCurrentChanged(controller.GetFocusedItemPos());
     }
 
-    void FocusEnter()
-    {
-        OnFocusEnter?.Invoke(this, EventArgs.Empty);
-        PosChanged?.Invoke(this, new(controller.GetItemPath(CurrentPos)));
-    }
+    void FocusEnter() => OnFocusEnter?.Invoke(this, EventArgs.Empty);
 
     void FocusLeave()
     {

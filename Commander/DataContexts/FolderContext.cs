@@ -6,14 +6,43 @@ class FolderContext : INotifyPropertyChanged
 {
     public string CurrentPath
     {
-        get => _CurrentPath;
+        get => field;
         set
         {
-            _CurrentPath = value;
+            field = value;
             OnChanged(nameof(CurrentPath));
         }
+    } = "";
+
+    public int CurrentFiles
+    {
+        get => field;
+        set
+        {
+            field = value;
+            OnChanged(nameof(CurrentFiles));
+        }
     }
-    string _CurrentPath = "";
+    
+    public int CurrentDirectories
+    {
+        get => field;
+        set
+        {
+            field = value;
+            OnChanged(nameof(CurrentDirectories));
+        }
+    }
+
+     public string? SelectedPath
+    {
+        get => field;
+        set
+        {
+            field = value;
+            OnChanged(nameof(SelectedPath));
+        }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

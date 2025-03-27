@@ -6,51 +6,79 @@ class MainContext : INotifyPropertyChanged
 {
     public static MainContext Instance = new();
 
-    public string? CurrentPath
+    public string? SelectedPath
     {
-        get => _CurrentPath;
+        get => field;
         set
         {
-            _CurrentPath = value;
-            OnChanged(nameof(CurrentPath));
+            field = value;
+            OnChanged(nameof(SelectedPath));
         }
     }
-    string? _CurrentPath;
 
     public string? Restriction
     {
-        get => _Restriction;
+        get => field;
         set
         {
-            _Restriction = value;
+            field = value;
             OnChanged(nameof(Restriction));
         }
     }
-    string? _Restriction;
     
     public int CurrentFiles
     {
-        get => _CurrentFiles;
+        get => field;
         set
         {
-            _CurrentFiles = value;
+            field = value;
             OnChanged(nameof(CurrentFiles));
         }
     }
-    int _CurrentFiles;
     
     public int CurrentDirectories
     {
-        get => _CurrentDirectories;
+        get => field;
         set
         {
-            _CurrentDirectories = value;
+            field = value;
             OnChanged(nameof(CurrentDirectories));
         }
     }
-    int _CurrentDirectories;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public void ChangeFolderContext(FolderContext? folderContext)
+    {
+        if (folderContext != null)
+        {
+            if (this.folderContext != null)
+                this.folderContext.PropertyChanged -= FolderContextPropertyChanged;
+            this.folderContext = folderContext;
+            this.folderContext.PropertyChanged += FolderContextPropertyChanged;
+            CurrentDirectories = folderContext.CurrentDirectories;
+            CurrentFiles = folderContext.CurrentFiles;
+            SelectedPath = folderContext.SelectedPath;
+        }
+    }
+    void FolderContextPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (folderContext != null)
+            switch (e.PropertyName)
+            {
+                case nameof(CurrentDirectories):
+                    CurrentDirectories = folderContext.CurrentDirectories;
+                    break;
+                case nameof(CurrentFiles):
+                    CurrentFiles = folderContext.CurrentFiles;
+                    break;
+                case nameof(SelectedPath):
+                    SelectedPath = folderContext.SelectedPath;
+                    break;
+            }
+    }
+
+    FolderContext? folderContext;
 
     void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
 }
