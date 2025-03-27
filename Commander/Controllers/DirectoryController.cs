@@ -9,6 +9,11 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO Navigation viewer with web view
+// TODO Image viewer
+// TODO Media viewer
+// TODO Pdf viewer
+
 // TODO GtkActionBar on folder changed
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
@@ -19,11 +24,6 @@ namespace Commander.Controllers;
 // TODO Menu actions like adapt view
 // TODO Save folder pathes
 // TODO Backspace history
-
-// TODO Navigation viewer with web view
-// TODO Image viewer
-// TODO Media viewer
-// TODO Pdf viewer
 
 // TODO To Gtk4 EditableLabel editing
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
@@ -161,7 +161,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
                                                 || item.Name.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase))))
                 item.ExifData = ExifReader.GetExifData(CurrentPath.AppendPath(item.Name));
             Gtk.Dispatch(() => folderView.Refresh());
-        });     
+        });
     }
 
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
@@ -186,7 +186,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         label?.Set(item.ExifData?.DateTime.ToString() ?? item.Time.ToString() ?? "");
         label?.AddCssClass("exif", item.ExifData?.DateTime != null);
     }
-    
+
     static string GetIconName(string fileName)
     {
         var ct = ContentType.Guess(fileName);
@@ -231,10 +231,10 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         => OnFolderOrParentSort(a, b, desc) ?? string.Compare(a.Name, b.Name);
     int OnTimeSort(DirectoryItem a, DirectoryItem b, bool desc)
         => OnFolderOrParentSort(a, b, desc)
-            ?? (a.Time.HasValue && b.Time.HasValue
-            ? (a.Time.Value - b.Time.Value).TotalMilliseconds > 0
+            ?? (a.GetDateTime().HasValue && b.GetDateTime().HasValue
+            ? (a.GetDateTime()!.Value - b.GetDateTime()!.Value).TotalMilliseconds > 0
             ? 1
-            : (a.Time.Value - b.Time.Value).TotalMilliseconds < 0
+            : (a.GetDateTime()!.Value - b.GetDateTime()!.Value).TotalMilliseconds < 0
             ? -1
             : 0
             : 0);
