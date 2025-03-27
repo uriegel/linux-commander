@@ -63,6 +63,16 @@
             </child>
             <child type="end">
               <object class="WebKitWebView" id="viewer">
+                <property name="camera-capture-state">active</property>
+                <property name="display-capture-state">active</property>
+                <property name="microphone-capture-state">active</property>
+                <property name="settings">
+                  <object class="WebKitSettings">
+                    <property name="enable-developer-extras">True</property>
+                    <property name="enable-media-capabilities">True</property>
+                    <property name="enable-webrtc">True</property>
+                  </object>
+                </property>
                 <property name="visible">false</property>
               </object>
             </child>
