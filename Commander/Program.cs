@@ -10,15 +10,16 @@ const string appId = "de.uriegel.commander";
 {
     Gtk.ShowDiagnostics();
 
-    ServerBuilder
-        .New()
-        .Http(20000)
-        .WebsiteFromResource()
-        .Get(WebRequests.OnGet)
-        .UseRange()
-        .Build()
-        .Start();            
-
+    var server =
+        ServerBuilder
+            .New()
+            .Http(20000)
+            .WebsiteFromResource()
+            .Get(WebRequests.OnGet)
+            .UseRange()
+            .Build();
+    server.Start();
+    
     Gtk.ShowDiagnostics();
 
     using var app = Application

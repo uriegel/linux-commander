@@ -1,3 +1,18 @@
+body {
+	/* font-family: arial; */
+  	margin: 0;
+  	/* -webkit-font-smoothing: antialiased;
+  	-moz-osx-font-smoothing: grayscale; */
+	padding: 0px;
+	overflow: hidden;
+	height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: rgb(32, 32, 32);
+    } 
+}
 #viewerImg {
     position: absolute;
     left: 0;
@@ -9,3 +24,6 @@
     max-height: 100%;
 }
 
+.hidden {
+    display: none;
+}
