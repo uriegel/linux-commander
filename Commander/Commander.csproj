@@ -26,6 +26,9 @@
     <EmbeddedResource Include="../website/index.html">
       <LogicalName>/index.html</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="../website/style.css">
+      <LogicalName>/style.css</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
