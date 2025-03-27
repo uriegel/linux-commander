@@ -29,6 +29,9 @@
     <EmbeddedResource Include="../website/style.css">
       <LogicalName>/style.css</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="../website/script.js">
+      <LogicalName>/script.js</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

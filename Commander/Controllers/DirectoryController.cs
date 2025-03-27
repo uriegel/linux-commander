@@ -157,6 +157,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
             foreach (var item in items
                                     .Where(item => !token.IsCancellationRequested
                                             && (item.Name.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase)
+                                                || item.Name.EndsWith(".jpeg", StringComparison.InvariantCultureIgnoreCase)
                                                 || item.Name.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase))))
                 item.ExifData = ExifReader.GetExifData(CurrentPath.AppendPath(item.Name));
             Gtk.Dispatch(() => folderView.Refresh());

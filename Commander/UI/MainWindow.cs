@@ -47,20 +47,7 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
         Handle.AddActions(
             [
                 // new("togglePreviewMode", Events.MenuAction.Apply("TOGGLE_PREVIEW"), "<Ctrl>F3"),
-                new("showpreview", false, show =>
-                    {
-                        viewer?.SetVisible(show);
-                        if (initial)
-                        {
-                            // TODO Maximize window 
-                            initial = false;
-                            var viewerPaned = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("viewerPaned");
-                            viewerPaned?.SetPosition(Handle.GetHeight() / 2);
-                            var webView = Handle.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("viewer");
-                            webView?.LoadUri("http://localhost:20000");
-                            
-                        }
-                    }, "F3"),
+                new("showpreview", false, show => Viewer.Show(Handle, viewer, show), "F3"),
                 // new("copy", Events.MenuAction.Apply("COPY"), "F5"),
                 // new("createfolder", Events.MenuAction.Apply("CREATE_FOLDER"), "F7"),
                 // new("adaptpath", Events.MenuAction.Apply("ADAPT_PATH"), "F9"),
@@ -98,7 +85,5 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
 
     protected override void OnFinalize() => Console.WriteLine("Window finalized");
     protected override ApplicationWindowHandle CreateHandle(nint obj) => new(obj);
-
-    bool initial = true;
 }
 

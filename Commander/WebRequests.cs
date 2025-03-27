@@ -22,7 +22,7 @@ static class WebRequests
             {
                 using var file = File.OpenRead(filepath);
                 var ext = filepath?.GetFileExtension()?.ToLowerInvariant() ?? ".txt";
-                var mime = ext == ".png" || ext == ".jpg" || ext == ".pdf" || ext == ".mp4" || ext == ".mkv" || ext == ".mp3"
+                var mime = ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".pdf" || ext == ".mp4" || ext == ".mkv" || ext == ".mp3"
                     ? MimeType.Get(ext)!
                     : MimeTypes.TextPlain;
                 if (mime != MimeTypes.TextPlain || !file.IsBinary())
