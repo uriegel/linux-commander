@@ -1,10 +1,14 @@
 
 import { Map, Marker } from "./leaflet"
+import "./imageviewer.js"
+import { test } from "./imageviewer.js"
 declare const L: typeof import("./leaflet")
 
 const viewer = document.getElementById('viewer') as HTMLImageElement
 const viewerContainer = document.getElementById('viewerContainer')
 const viewerDiv = document.getElementById('viewerDiv')
+
+test("Das kommt vom script modul")
 
 let previewMode = 0
 let locationLatitude: number|undefined

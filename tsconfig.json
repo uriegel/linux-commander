@@ -3,6 +3,7 @@
         "target": "ES2023",
         "lib": ["ES2023", "DOM", "DOM.Iterable"],
         "strict": true,
+        "module": "es6",
         "outDir": "./website/script",
         "noUnusedLocals": true,
         "noUnusedParameters": true,
