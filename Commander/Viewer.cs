@@ -40,7 +40,7 @@ static class Viewer
 
     static void PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainContext.SelectedPath))
+        if (e.PropertyName == nameof(MainContext.SelectedPath) || e.PropertyName == nameof(MainContext.ExifData))
             SetValues();
     }
 

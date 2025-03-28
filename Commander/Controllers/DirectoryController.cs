@@ -9,6 +9,8 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO Location only mode
+
 // TODO Media viewer
 // TODO Pdf viewer
 // TODO track viewer
@@ -39,7 +41,7 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 
     public string? GetItemPath(int pos) => Path.Combine(CurrentPath, GetItem(pos)?.Name ?? "");
 
-    public ExifData? GetExifData(int pos)  => GetItem(pos)?.ExifData;
+    public ExifData? GetExifData(int pos) => GetItem(pos)?.ExifData;
 
     /// <summary>
     /// 

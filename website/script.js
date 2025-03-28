@@ -6,6 +6,8 @@ var previewMode = 0
 var locationLatitude = null
 var locationLongitude = null
 var mapdiv
+var map = null
+var marker = null
 
 function setPath(path, lat, long) {
     locationLatitude = lat
@@ -16,6 +18,15 @@ function setPath(path, lat, long) {
     {
         viewer.src = `/getfile?path=${path}`     
         viewer.classList.remove("hidden")
+        if (locationLatitude && locationLongitude) {
+            mapdiv.classList.remove('hidden')  
+            map.setView([locationLatitude, locationLongitude])
+            if (marker)
+                marker.remove()
+            marker = L.marker([locationLatitude, locationLongitude]).addTo(map)
+        } else {
+            mapdiv.classList.add('hidden')  
+        }
     }
     else
         viewer.classList.add("hidden")
@@ -32,16 +43,17 @@ function togglePreview() {
             mapdiv = document.createElement("div")
             viewerContainer.append(mapdiv)
             mapdiv.id = "map"
-            const map = L.map('map').setView([locationLatitude, locationLongitude], 13)
+            map = L.map('map').setView([locationLatitude, locationLongitude], 13)
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
-            var marker = L.marker([locationLatitude, locationLongitude]).addTo(map)
+            marker = L.marker([locationLatitude, locationLongitude]).addTo(map)
         }
         else {
             viewerContainer.classList.remove("bothViewer")
             viewerContainer.removeChild(mapdiv)
+            map = null
         }
     }
 }
