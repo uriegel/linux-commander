@@ -32,6 +32,9 @@
     <EmbeddedResource Include="../website/script.js">
       <LogicalName>/script.js</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="../website/globals.js">
+      <LogicalName>/globals.js</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

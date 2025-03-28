@@ -9,7 +9,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO WebComponent for image with location view with template and ts modules and complete control
+// TODO WebComponent for image with location view with template and complete control
 
 // TODO Media viewer
 // TODO Pdf viewer

@@ -34,8 +34,8 @@ static class Viewer
 
     }
 
-    public static void TogglePreview()
-        => webView?.RunJavascript($"togglePreview()");
+    public static void ToggleView()
+        => webView?.RunJavascript($"toggleView()");
 
 
     static void PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -45,7 +45,12 @@ static class Viewer
     }
 
     static void SetValues()
-       => webView?.RunJavascript($"setPath('{MainContext.Instance.SelectedPath}', {MainContext.Instance.ExifData?.Latitude?.ToString(CultureInfo.InvariantCulture)}, {MainContext.Instance.ExifData?.Longitude?.ToString((CultureInfo.InvariantCulture))})"); 
+    {
+        if (MainContext.Instance.ExifData?.Latitude != null && MainContext.Instance.ExifData?.Longitude != null)
+            webView?.RunJavascript($"setPath('{MainContext.Instance.SelectedPath}', {MainContext.Instance.ExifData?.Latitude?.ToString(CultureInfo.InvariantCulture)}, {MainContext.Instance.ExifData?.Longitude?.ToString(CultureInfo.InvariantCulture)})"); 
+        else
+            webView?.RunJavascript($"setPath('{MainContext.Instance.SelectedPath}')"); 
+    }
 
     static WebViewHandle? webView;
     static bool initial = true;

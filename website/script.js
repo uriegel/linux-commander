@@ -10,6 +10,9 @@ var mapdiv
 var map = null
 var marker = null
 
+registerSetPath(setPath)
+registerToggleViewFunc(toggleView)
+
 function setPath(path, lat, long) {
     locationLatitude = lat
     locationLongitude = long
@@ -35,7 +38,7 @@ function setPath(path, lat, long) {
         viewer.classList.add("hidden")
 }
 
-function togglePreview() {
+function toggleView() {
     if (locationLatitude && locationLongitude) {
         previewMode++
         if (previewMode > 2)
