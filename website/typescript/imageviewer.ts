@@ -11,11 +11,14 @@ export class ImageViewer extends HTMLElement {
         let template = document.getElementById("image-viewer") as HTMLTemplateElement
         let templateContent = template.content
         shadowRoot.appendChild(templateContent.cloneNode(true))
-
-        const image = shadowRoot.getElementById('viewer') as HTMLImageElement
-        if (image)
-            image.src = "http://localhost:20000/getfile?path=/home/uwe/uwe.jpg"
+        this.image = shadowRoot.getElementById('viewer') as HTMLImageElement
     }
+
+    set path(val: string) {
+        this.image.src = val
+    }
+
+    image: HTMLImageElement
 }
 
 export function test(str: string) {
