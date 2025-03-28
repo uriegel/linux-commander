@@ -1,19 +1,22 @@
 
-var viewer = document.getElementById('viewer')
-var viewerContainer = document.getElementById('viewerContainer')
-var viewerDiv = document.getElementById('viewerDiv')
+import { Map, Marker } from "./leaflet"
+declare const L: typeof import("./leaflet")
 
-var previewMode = 0
-var locationLatitude = null
-var locationLongitude = null
-var mapdiv
-var map = null
-var marker = null
+const viewer = document.getElementById('viewer') as HTMLImageElement
+const viewerContainer = document.getElementById('viewerContainer')
+const viewerDiv = document.getElementById('viewerDiv')
+
+let previewMode = 0
+let locationLatitude: number|undefined
+let locationLongitude: number|undefined
+let mapdiv: HTMLElement|null = null
+let map: Map|null = null
+let marker: Marker<any>|null = null
 
 registerSetPath(setPath)
 registerToggleViewFunc(toggleView)
 
-function setPath(path, lat, long) {
+function setPath(path: string, lat?: number, long?: number) {
     locationLatitude = lat
     locationLongitude = long
     console.log("exifDataVal", path, locationLatitude, locationLongitude)
@@ -22,7 +25,7 @@ function setPath(path, lat, long) {
     {
         viewer.src = `/getfile?path=${path}`     
         viewer.classList.remove("hidden")
-        if (mapdiv) {
+        if (mapdiv && map) {
             if (locationLatitude && locationLongitude) {
                 mapdiv.classList.remove('hidden')  
                 map.setView([locationLatitude, locationLongitude])
@@ -46,16 +49,17 @@ function toggleView() {
 
         switch (previewMode) {
             case 0:
-                viewerDiv.classList.remove("hidden")
-                viewerContainer.classList.remove("bothViewer")
-                viewerContainer.removeChild(mapdiv)
-                mapDiv = null
+                viewerDiv?.classList.remove("hidden")
+                viewerContainer?.classList.remove("bothViewer")
+                if (mapdiv)
+                    viewerContainer?.removeChild(mapdiv)
+                mapdiv = null
                 map = null
                 break
             case 1:
-                viewerContainer.classList.add("bothViewer")
+                viewerContainer?.classList.add("bothViewer")
                 mapdiv = document.createElement("div")
-                viewerContainer.append(mapdiv)
+                viewerContainer?.append(mapdiv)
                 mapdiv.id = "map"
                 map = L.map('map').setView([locationLatitude, locationLongitude], 13)
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -65,7 +69,7 @@ function toggleView() {
                 marker = L.marker([locationLatitude, locationLongitude]).addTo(map)
                 break
             case 2:
-                viewerDiv.classList.add("hidden")
+                viewerDiv?.classList.add("hidden")
                 if (map)
                     map.invalidateSize()
                 break
