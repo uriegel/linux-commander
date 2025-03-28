@@ -13,6 +13,11 @@ body {
         background-color: rgb(32, 32, 32);
     } 
 }
+
+#viewerContainer {
+    height: 100vh;
+}
+
 #viewer {
     position: absolute;
     left: 0;
@@ -34,10 +39,9 @@ body {
 
 .bothViewer>div {
     flex-grow: 1;
-    width: 50%;
 }
 
-.viewerDiv {
+#viewerDiv {
     position: relative;
     height: 100vh;
 }

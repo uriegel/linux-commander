@@ -9,8 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Location only mode
-
 // TODO Media viewer
 // TODO Pdf viewer
 // TODO track viewer
