@@ -9,8 +9,11 @@ class FolderContext : INotifyPropertyChanged
         get => field;
         set
         {
-            field = value;
-            OnChanged(nameof(CurrentPath));
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(CurrentPath));
+            }
         }
     } = "";
 
@@ -19,8 +22,11 @@ class FolderContext : INotifyPropertyChanged
         get => field;
         set
         {
-            field = value;
-            OnChanged(nameof(CurrentFiles));
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(CurrentFiles));
+            }
         }
     }
     
@@ -29,8 +35,11 @@ class FolderContext : INotifyPropertyChanged
         get => field;
         set
         {
-            field = value;
-            OnChanged(nameof(CurrentDirectories));
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(CurrentDirectories));
+            }
         }
     }
 
@@ -39,8 +48,24 @@ class FolderContext : INotifyPropertyChanged
         get => field;
         set
         {
-            field = value;
-            OnChanged(nameof(SelectedPath));
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(SelectedPath));
+            }
+        }
+    }
+
+    public ExifData? ExifData
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(ExifData));
+            }
         }
     }
 

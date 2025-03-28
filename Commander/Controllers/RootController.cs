@@ -21,6 +21,7 @@ class RootController : Controller<RootItem>, IController
     public int Files { get; } 
 
     public string? GetItemPath(int pos) => GetItem(pos)?.MountPoint;
+    public ExifData? GetExifData(int pos) => null;
 
     public async Task<int> Fill(string path, FolderView folderView)
     {

@@ -3,6 +3,7 @@ using GtkDotNet.SafeHandles;
 
 using Commander.DataContexts;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace Commander;
 
@@ -20,13 +21,13 @@ static class Viewer
             webView = window.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("viewer");
             webView?.LoadUri("http://localhost:20000");
             await Task.Delay(400);
-            webView?.RunJavascript($"setPath('{MainContext.Instance.SelectedPath}')");
+            SetValues();
         }
         if (show)
         {
             MainContext.Instance.PropertyChanged += PropertyChanged;
             await Task.Delay(100);
-            webView?.RunJavascript($"setPath('{MainContext.Instance.SelectedPath}')");
+            SetValues();
         }
         else
             MainContext.Instance.PropertyChanged -= PropertyChanged;
@@ -40,8 +41,11 @@ static class Viewer
     static void PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainContext.SelectedPath))
-            webView?.RunJavascript($"setPath('{MainContext.Instance.SelectedPath}')");
+            SetValues();
     }
+
+    static void SetValues()
+       => webView?.RunJavascript($"setPath('{MainContext.Instance.SelectedPath}', {MainContext.Instance.ExifData?.Latitude?.ToString(CultureInfo.InvariantCulture)}, {MainContext.Instance.ExifData?.Longitude?.ToString((CultureInfo.InvariantCulture))})"); 
 
     static WebViewHandle? webView;
     static bool initial = true;

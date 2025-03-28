@@ -10,6 +10,8 @@ interface IController : IDisposable
 
     string? GetItemPath(int pos);
 
+    ExifData? GetExifData(int pos);
+
     Task<int> Fill(string path, FolderView folderView);
 
     string? OnActivate(int pos);

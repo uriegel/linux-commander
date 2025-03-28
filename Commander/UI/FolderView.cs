@@ -168,6 +168,7 @@ class FolderView : ColumnViewSubClassed
         {
             CurrentPos = newPos;
             Context.SelectedPath = controller.GetItemPath(CurrentPos);
+            Context.ExifData = controller.GetExifData(CurrentPos);
         }
     }
 

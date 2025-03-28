@@ -7,6 +7,7 @@ class FolderController(FolderView folderView)
     public string CurrentPath { get => controller.CurrentPath; }
 
     public string? GetItemPath(int pos) => controller.GetItemPath(pos);
+    public ExifData? GetExifData(int pos) => controller.GetExifData(pos);
 
     public void OnActivate(int pos)
     {

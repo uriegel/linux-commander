@@ -11,8 +11,11 @@ class MainContext : INotifyPropertyChanged
         get => field;
         set
         {
-            field = value;
-            OnChanged(nameof(SelectedPath));
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(SelectedPath));
+            }
         }
     }
 
@@ -21,8 +24,11 @@ class MainContext : INotifyPropertyChanged
         get => field;
         set
         {
-            field = value;
-            OnChanged(nameof(Restriction));
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(Restriction));
+            }
         }
     }
     
@@ -31,8 +37,11 @@ class MainContext : INotifyPropertyChanged
         get => field;
         set
         {
-            field = value;
-            OnChanged(nameof(CurrentFiles));
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(CurrentFiles));
+            }
         }
     }
     
@@ -41,11 +50,27 @@ class MainContext : INotifyPropertyChanged
         get => field;
         set
         {
-            field = value;
-            OnChanged(nameof(CurrentDirectories));
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(CurrentDirectories));
+            }
         }
     }
 
+    public ExifData? ExifData
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(ExifData));
+            }
+        }
+    }
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void ChangeFolderContext(FolderContext? folderContext)
@@ -59,6 +84,7 @@ class MainContext : INotifyPropertyChanged
             CurrentDirectories = folderContext.CurrentDirectories;
             CurrentFiles = folderContext.CurrentFiles;
             SelectedPath = folderContext.SelectedPath;
+            ExifData = folderContext.ExifData;
         }
     }
     void FolderContextPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -74,6 +100,9 @@ class MainContext : INotifyPropertyChanged
                     break;
                 case nameof(SelectedPath):
                     SelectedPath = folderContext.SelectedPath;
+                    break;
+                case nameof(ExifData):
+                    ExifData = folderContext.ExifData;
                     break;
             }
     }
