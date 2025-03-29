@@ -1,4 +1,4 @@
-import { Map } from "./leaflet"
+import { LatLngExpression, Map, Polyline } from "./leaflet"
 declare const L: typeof import("./leaflet")
 
 type TrackInfo = {
@@ -56,10 +56,14 @@ export class TrackViewer extends HTMLElement {
             const maxLng = trk.reduce((prev, curr) => Math.max(prev, curr[1]), trk[0][1])
             const minLng = trk.reduce((prev, curr) => Math.min(prev, curr[1]), trk[0][1])
             this.map?.fitBounds([[maxLat, maxLng], [minLat, minLng]])
+            if (this.track)
+                this.track.remove()
+            this.track = L.polyline(trk as LatLngExpression[]).addTo(this.map)
         }
     }
 
     map: Map | null = null
+    track: Polyline<any>|null = null
 }
 
 async function getTrack(path: string): Promise<TrackInfo|null> {
