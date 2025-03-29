@@ -6,6 +6,21 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-    position: relative
+    position: relative;
 }
 
+.trackSlider {
+    background: "transparent";
+    width: 70vw;
+    display: flex;
+    opacity: 0.3;
+    transition: opacity 0.4s;
+}
+
+.trackSlider input {
+    flex-grow: 1;
+}
+
+.trackSlider:hover {
+    opacity: 1;
+}

@@ -53,16 +53,14 @@ export class TrackViewer extends HTMLElement {
                 const SliderControl = L.Control.extend({
                     onAdd: () => {
                         const container = L.DomUtil.create("div", "leaflet-bar leaflet-control")
-                        container.style.background = "transparent"
-                        container.style.padding = "5px"
-                      
+                        container.classList.add("trackSlider")
+                     
                         this.slider = L.DomUtil.create("input", "", container)
                         this.slider.type = "range"
                         this.slider.min = '0'
                         this.slider.max = `${this.trackPoints?.length}`
                         this.slider.value = '0'
-                        this.slider.style.width = "120px"
-                      
+                                              
                         // Prevent map zoom when interacting with slider
                         L.DomEvent.disableClickPropagation(container)
                       
@@ -75,7 +73,7 @@ export class TrackViewer extends HTMLElement {
                     },
                 })
                   
-                this.map.addControl(new SliderControl({ position: "topright" }))                
+                this.map.addControl(new SliderControl({ position: "bottomleft" }))                
             }    
 
             this.slider!.value = '0'
