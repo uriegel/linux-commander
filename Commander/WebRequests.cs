@@ -10,6 +10,7 @@ static class WebRequests
         request.Url switch
         {
             var url when url.StartsWith("/getfile") => ProcessFile(request),
+            var url when url.StartsWith("/gettrack") => GetTrack(request),
             _ => false.ToAsync()
         };
 
@@ -31,6 +32,26 @@ static class WebRequests
                 else
                     await request.Send404();
 
+                return true;
+            }
+            else
+                return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    static async Task<bool> GetTrack(IRequest request)
+    {
+        try
+        {
+            var filepath = request.QueryParts.GetValue("path");
+            if (filepath != null)
+            {
+                var track = TrackInfo.Get(filepath);
+                await request.SendJsonAsync(track);
                 return true;
             }
             else
