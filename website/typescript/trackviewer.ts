@@ -88,7 +88,7 @@ export class TrackViewer extends HTMLElement {
             this.track = L.polyline(this.trackPoints as LatLngExpression[]).addTo(this.map)
             if (this.marker)
                 this.marker.remove()
-            this.marker = L.marker([this.trackPoints[0][0], this.trackPoints[0][1]], { draggable: true, autoPan: true }).addTo(this.map)
+            this.marker = L.marker([this.trackPoints[0][0], this.trackPoints[0][1]], { autoPan: true }).addTo(this.map)
         }
     }
 
