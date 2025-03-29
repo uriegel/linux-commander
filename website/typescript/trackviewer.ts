@@ -41,8 +41,8 @@ export class TrackViewer extends HTMLElement {
 
     async setPath(path: string) {
         const track = await getTrack(path)
-        const trk = track?.trackPoints?.map(n => [n.latitude!, n.longitude!])
-        if (trk) {
+        this.trackPoints = track?.trackPoints?.map(n => [n.latitude!, n.longitude!])
+        if (this.trackPoints) {
             if (!this.map) {
                 this.map = L.map('trackContainer').setView([0, 0], 13)
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -52,51 +52,53 @@ export class TrackViewer extends HTMLElement {
 
                 const SliderControl = L.Control.extend({
                     onAdd: () => {
-                      let container = L.DomUtil.create("div", "leaflet-bar leaflet-control")
-                      container.style.background = "white"
-                      container.style.padding = "5px";
+                        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control")
+                        container.style.background = "transparent"
+                        container.style.padding = "5px"
                       
-                      let slider = L.DomUtil.create("input", "", container);
-                      slider.type = "range";
-                      slider.min = '0'
-                      slider.max = '100'
-                      slider.value = '0'
-                      slider.style.width = "120px"
+                        this.slider = L.DomUtil.create("input", "", container)
+                        this.slider.type = "range"
+                        this.slider.min = '0'
+                        this.slider.max = `${this.trackPoints?.length}`
+                        this.slider.value = '0'
+                        this.slider.style.width = "120px"
                       
-                      // Prevent map zoom when interacting with slider
-                      L.DomEvent.disableClickPropagation(container)
+                        // Prevent map zoom when interacting with slider
+                        L.DomEvent.disableClickPropagation(container)
                       
-                      slider.addEventListener("input", function () {
-                        // let percent = parseFloat(slider.value) / 100
-                        // let distance = percent * totalDistance
-                        // let newPos = getPointAtDistance(trackCoords, distance);
-                        // marker.setLatLng(newPos);
-                      })
+                        this.slider.addEventListener("input", () => {
+                            let percent = parseInt(this.slider!.value)
+                            this.marker?.setLatLng([this.trackPoints![percent][0], this.trackPoints![percent][1]], );
+                        })
                   
-                      return container
+                        return container
                     },
                 })
                   
                 this.map.addControl(new SliderControl({ position: "topright" }))                
             }    
 
-            const maxLat = trk.reduce((prev, curr) => Math.max(prev, curr[0]), trk[0][0])
-            const minLat = trk.reduce((prev, curr) => Math.min(prev, curr[0]), trk[0][0])
-            const maxLng = trk.reduce((prev, curr) => Math.max(prev, curr[1]), trk[0][1])
-            const minLng = trk.reduce((prev, curr) => Math.min(prev, curr[1]), trk[0][1])
+            this.slider!.value = '0'
+            this.slider!.max = `${this.trackPoints?.length}`
+            const maxLat = this.trackPoints.reduce((prev, curr) => Math.max(prev, curr[0]), this.trackPoints[0][0])
+            const minLat = this.trackPoints.reduce((prev, curr) => Math.min(prev, curr[0]), this.trackPoints[0][0])
+            const maxLng = this.trackPoints.reduce((prev, curr) => Math.max(prev, curr[1]), this.trackPoints[0][1])
+            const minLng = this.trackPoints.reduce((prev, curr) => Math.min(prev, curr[1]), this.trackPoints[0][1])
             this.map?.fitBounds([[maxLat, maxLng], [minLat, minLng]])
             if (this.track)
                 this.track.remove()
-            this.track = L.polyline(trk as LatLngExpression[]).addTo(this.map)
+            this.track = L.polyline(this.trackPoints as LatLngExpression[]).addTo(this.map)
             if (this.marker)
                 this.marker.remove()
-            this.marker = L.marker([trk[0][0], trk[0][1]], { draggable: true, autoPan: true }).addTo(this.map)
+            this.marker = L.marker([this.trackPoints[0][0], this.trackPoints[0][1]], { draggable: true, autoPan: true }).addTo(this.map)
         }
     }
 
     map: Map | null = null
     track: Polyline<any> | null = null
-    marker: Marker<any>|null = null    
+    trackPoints: number[][] | undefined
+    marker: Marker<any> | null = null    
+    slider: HTMLInputElement| undefined
 }
 
 async function getTrack(path: string): Promise<TrackInfo|null> {
