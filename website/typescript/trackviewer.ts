@@ -49,6 +49,35 @@ export class TrackViewer extends HTMLElement {
                     maxZoom: 19,
                     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 }).addTo(this.map)
+
+                const SliderControl = L.Control.extend({
+                    onAdd: () => {
+                      let container = L.DomUtil.create("div", "leaflet-bar leaflet-control")
+                      container.style.background = "white"
+                      container.style.padding = "5px";
+                      
+                      let slider = L.DomUtil.create("input", "", container);
+                      slider.type = "range";
+                      slider.min = '0'
+                      slider.max = '100'
+                      slider.value = '0'
+                      slider.style.width = "120px"
+                      
+                      // Prevent map zoom when interacting with slider
+                      L.DomEvent.disableClickPropagation(container)
+                      
+                      slider.addEventListener("input", function () {
+                        // let percent = parseFloat(slider.value) / 100
+                        // let distance = percent * totalDistance
+                        // let newPos = getPointAtDistance(trackCoords, distance);
+                        // marker.setLatLng(newPos);
+                      })
+                  
+                      return container
+                    },
+                })
+                  
+                this.map.addControl(new SliderControl({ position: "topright" }))                
             }    
 
             const maxLat = trk.reduce((prev, curr) => Math.max(prev, curr[0]), trk[0][0])
