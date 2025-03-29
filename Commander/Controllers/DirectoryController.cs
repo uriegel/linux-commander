@@ -9,7 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Pdf viewer
 // TODO track viewer
 
 // TODO GtkActionBar count of selected items
@@ -27,6 +26,10 @@ namespace Commander.Controllers;
 // TODO To Gtk4 int gdk_keyval_to_unicode(int keyval);
 // TODO To Gtk4 Binding reacts on all Property changes
 
+// TODO Pdf viewer: PdViewer in WebWindowNetCore
+// TODO Pdf viewer: PdViewer in Gtk4DotNet
+// TODO Pdf viewer
+// TODO Text viewer/editor
 class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 {
     #region IController
