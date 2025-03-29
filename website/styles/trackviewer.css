@@ -1,0 +1,11 @@
+#trackContainer {
+    flex-grow: 1;
+}
+
+#trackView {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative
+}
+

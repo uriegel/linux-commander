@@ -13,7 +13,7 @@ export class ImageViewer extends HTMLElement {
         const link = document.createElement("link")
         link.rel = "stylesheet"
         link.href = "../styles/imageviewer.css"
-        this.appendChild(link);
+        this.appendChild(link)
 
         let template = document.getElementById("image-viewer") as HTMLTemplateElement
         let templateContent = template.content
@@ -66,7 +66,7 @@ export class ImageViewer extends HTMLElement {
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         maxZoom: 19,
                         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    }).addTo(this.map);
+                    }).addTo(this.map)
                     this.marker = L.marker([this.locationVal.latitude, this.locationVal.longitude]).addTo(this.map)
                     break
                 case 2:
