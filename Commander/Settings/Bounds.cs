@@ -8,12 +8,12 @@ namespace Commander.Settings;
 
 static class WindowHandleExtensions
 {
-    public static THandle SaveBounds<THandle>(this THandle window, string appId, int defaultWidth, int defaultHeight)
+    public static THandle SaveBounds<THandle>(this THandle window, int defaultWidth, int defaultHeight)
         where THandle : WindowHandle
 
     {
         Bounds
-           .Retrieve(appId)
+           .Retrieve()
            .SideEffect(b => window.DefaultSize(b.Width ?? defaultWidth, b.Height ?? defaultHeight))
             .SideEffectIf(b => b.IsMaximized, _ => window.Maximize())
             .SideEffect(_ => window.OnClose(SaveBounds));
@@ -22,7 +22,7 @@ static class WindowHandleExtensions
         bool SaveBounds(WindowHandle window)
             => false.SideEffect(_ =>
                     Bounds
-                        .Save(appId, Bounds.Retrieve(appId) with
+                        .Save(Bounds.Retrieve() with
                         {
                             Width = window.GetWidth(),
                             Height = window.GetHeight(),
@@ -33,20 +33,20 @@ static class WindowHandleExtensions
 
 record Bounds(int? X, int? Y, int? Width, int? Height, bool IsMaximized)
 {
-    public static Bounds Retrieve(string id)
+    public static Bounds Retrieve()
         => Environment
             .GetFolderPath(Environment.SpecialFolder.ApplicationData)
-            .AppendPath(id)
+            .AppendPath(Globals.AppId)
             .SideEffect(d => d.EnsureDirectoryExists())
             .AppendPath("bounds.json")
             .ReadAllTextFromFilePath()
             ?.Deserialize<Bounds>(Json.Defaults)
             ?? new(null, null, null, null, false);
 
-    public static void Save(string id, Bounds bounds)
+    public static void Save(Bounds bounds)
         => Environment
             .GetFolderPath(Environment.SpecialFolder.ApplicationData)
-            .AppendPath(id)
+            .AppendPath(Globals.AppId)
             .SideEffect(d => d.EnsureDirectoryExists())
             .AppendPath("bounds.json")
             .WriteAllTextToFilePath(bounds.Serialize(Json.Defaults));

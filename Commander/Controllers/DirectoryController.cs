@@ -18,7 +18,6 @@ namespace Commander.Controllers;
 // TODO GtkActionBar switch when hidden are visible
 
 // TODO Menu actions like adapt view
-// TODO Save folder pathes
 // TODO Backspace history
 
 // TODO To Gtk4 EditableLabel editing

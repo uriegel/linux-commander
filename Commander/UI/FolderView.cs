@@ -175,6 +175,8 @@ class FolderView : ColumnViewSubClassed
     public event EventHandler? OnFocusEnter;
     public event EventHandler? OnFocusLeave;
 
+    public void ChangePath(string path) => controller.ChangePath(path);
+
     public void GrabFocus() => columnView.GrabFocus();
 
     public void Refresh()
@@ -205,7 +207,6 @@ class FolderView : ColumnViewSubClassed
             mouseButton = false;
             mouseButtonCtrl = false;
         }));
-        controller.ChangePath("root");
     }
 
     protected override void OnFinalize()

@@ -1,9 +1,11 @@
 using System.ComponentModel;
+using Commander.Settings;
 
 namespace Commander.DataContexts;
 
 class FolderContext : INotifyPropertyChanged
 {
+    public bool IsLeft { get; set; } 
     public string CurrentPath
     {
         get => field;
@@ -12,6 +14,10 @@ class FolderContext : INotifyPropertyChanged
             if (field != value)
             {
                 field = value;
+                if (IsLeft)
+                    Storage.SaveLeftPath(value);
+                else
+                    Storage.SaveRightPath(value);
                 OnChanged(nameof(CurrentPath));
             }
         }

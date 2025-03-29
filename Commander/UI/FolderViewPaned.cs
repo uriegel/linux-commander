@@ -1,4 +1,5 @@
 using Commander.DataContexts;
+using Commander.Settings;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
@@ -52,6 +53,8 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
             MainContext.Instance.ChangeFolderContext(folderViewLeft?.Context);
             if (folderViewLeft != null)
             {
+                folderViewLeft.Context.IsLeft = true;
+                folderViewLeft.ChangePath(Storage.Retrieve().LeftPath);
                 folderViewLeft.OnFocusEnter += (s, e) =>
                 {
                     folderViewActive = folderViewLeft;
@@ -63,6 +66,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
             {
+                folderViewRight.ChangePath(Storage.Retrieve().RightPath);
                 folderViewRight.OnFocusEnter += (s, e) =>
                 {
                     folderViewActive = folderViewRight;
@@ -71,6 +75,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                 };
                 folderViewRight.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
             }
+
             await Task.Delay(100);
             folderViewActive?.GrabFocus();
             IActionMap.GetAction("down").SetEnabled(true);
