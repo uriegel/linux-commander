@@ -14,23 +14,8 @@ body {
     } 
 }
 
-#viewerContainer {
-    height: 100vh;
-}
-
 .hidden {
     display: none;
 }
 
-.bothViewer {
-    display: flex
-}
 
-.bothViewer>div {
-    flex-grow: 1;
-}
-
-#viewerDiv {
-    position: relative;
-    height: 100vh;
-}

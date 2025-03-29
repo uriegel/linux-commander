@@ -16,15 +16,14 @@
 </head>
 <body>
     <template id="image-viewer">
-        <img id='viewer' alt="kein Bild gefunden" />
+        <div id='viewerContainer'>
+            <div id="viewerDiv">
+                <img id='viewer' alt="kein Bild gefunden" />
+            </div>
+        </div>
     </template>
 
-    <image-viewer class='hidden' id='viewer'></image-viewer>
-    <!-- <div id='viewerContainer'>
-        <div id="viewerDiv">
-            <img id='viewer' class='hidden' alt="kein Bild gefunden" />
-        </div>
-    </div> -->
+    <image-viewer class='hidden' id='imageViewer'></image-viewer>
     <script src="script/globals.js"></script>
     <script type="module" src="script/script.js"></script>
 </body>

@@ -1,3 +1,11 @@
+#viewerContainer {
+    height: 100vh;
+}
+
+#viewerDiv {
+    position: relative;
+    height: 100vh;
+}
 #viewer {
     position: absolute;
     left: 0;
@@ -7,4 +15,16 @@
     margin: auto;
     max-width: 100%;
     max-height: 100%;
+}
+
+.bothViewer {
+    display: flex
+}
+
+.bothViewer>div {
+    flex-grow: 1;
+}
+
+.hidden {
+    display: none;
 }
