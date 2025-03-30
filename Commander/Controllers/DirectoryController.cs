@@ -9,8 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO GtkActionBar show info in blue: binding to classlist?
-
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
 
@@ -18,8 +16,6 @@ namespace Commander.Controllers;
 // TODO Backspace history
 
 // TODO overlay show errors in red
-
-// TODO To Gtk4 Binding to css class
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
 // TODO Pdf viewer: PdViewer in Gtk4DotNet

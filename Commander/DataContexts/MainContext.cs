@@ -108,6 +108,7 @@ class MainContext : INotifyPropertyChanged
             {
                 field = value;
                 OnChanged(nameof(BackgroundAction));
+                OnChanged(nameof(StatusChoice));
             }
         }
     }
