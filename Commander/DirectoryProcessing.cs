@@ -23,8 +23,10 @@ static class DirectoryProcessing
                 .. dirFileInfo.Directories,
                 .. dirFileInfo.Files],
                     info.FullName,
-                    dirFileInfo.Directories.Length,
-                    dirFileInfo.Files.Length);
+                    dirFileInfo.Directories.Where(n => !n.IsHidden).Count(),
+                    dirFileInfo.Files.Where(n => !n.IsHidden).Count(),
+                    dirFileInfo.Directories.Where(n => n.IsHidden).Count(),
+                    dirFileInfo.Directories.Where(n => n.IsHidden).Count());
     }
 }
 
@@ -90,5 +92,7 @@ record GetFilesResult(
     DirectoryItem[] Items,
     string Path,
     int DirCount,
-    int FileCount
+    int FileCount,
+    int HiddenDirCount,
+    int HiddenFileCount
 );

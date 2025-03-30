@@ -18,8 +18,10 @@ class RootController : ControllerBase<RootItem>, IController
     public string CurrentPath { get; } = "root";
 
     public int Directories { get; private set; }
-    public int Files { get; } 
+    public int Files { get; }
 
+    public int HiddenDirectories { get; } = 0;
+    public int HiddenFiles { get; } = 0;
     public string? GetItemPath(int pos) => GetItem(pos)?.MountPoint;
     public ExifData? GetExifData(int pos) => null;
 

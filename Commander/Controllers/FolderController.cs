@@ -1,9 +1,21 @@
+using Commander.DataContexts;
 using Commander.UI;
 
 namespace Commander.Controllers;
 
-class FolderController(FolderView folderView)
+class FolderController
 {
+    public FolderController(FolderView folderView)
+    {
+        this.folderView = folderView;
+        controller = new RootController(folderView);
+        Actions.Instance.PropertyChanged += (s, e) =>
+        {
+            folderView.Context.CurrentDirectories = Actions.Instance.ShowHidden ? controller.Directories + controller.HiddenDirectories :  controller.Directories;
+            folderView.Context.CurrentFiles = Actions.Instance.ShowHidden ? controller.Files + controller.Files : controller.Files;
+        };
+    }
+
     public string CurrentPath { get => controller.CurrentPath; }
 
     public string? GetItemPath(int pos) => controller.GetItemPath(pos);
@@ -25,8 +37,8 @@ class FolderController(FolderView folderView)
             if (lastPos != -1)
                 folderView.ScrollTo(lastPos);
 
-            folderView.Context.CurrentDirectories = controller.Directories;
-            folderView.Context.CurrentFiles = controller.Files;
+            folderView.Context.CurrentDirectories = Actions.Instance.ShowHidden ? controller.Directories + controller.HiddenDirectories : controller.Directories;
+            folderView.Context.CurrentFiles = Actions.Instance.ShowHidden ? controller.Files + controller.Files : controller.Files;
             folderView.Context.CurrentPath = controller.CurrentPath;
             folderView.OnPathChanged();
         }
@@ -70,6 +82,7 @@ class FolderController(FolderView folderView)
         return false;
     }
 
-    IController controller = new RootController(folderView);
+    IController controller;
+    FolderView folderView;
 }
 

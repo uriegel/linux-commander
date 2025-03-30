@@ -84,9 +84,6 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
     {
         protected override void ClassInit(nint cls, nint _)
         {
-            // var webkitType = GType.Get(GTypeEnum.WebKitWebView);
-            // GType.Ensure(webkitType);
-            // var type = "WebKitWebView".TypeFromName();
             base.ClassInit(cls, _);
             InitTemplateFromResource(cls, "mainwindow");
         }

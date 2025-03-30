@@ -9,9 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO GtkActionBar dont count hidden when not visible
-// TODO GtkActionBar switch when hidden are visible
-
 // TODO Menu actions like adapt view
 // TODO Backspace history
 
@@ -33,6 +30,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public int Directories { get; private set; }
     public int Files { get; private set; }
+    public int HiddenDirectories { get; private set; }
+    public int HiddenFiles { get; private set; }
 
     public string? GetItemPath(int pos) => Path.Combine(CurrentPath, GetItem(pos)?.Name ?? "");
 
@@ -54,6 +53,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         Insert(result.Items);
         Directories = result.DirCount;
         Files = result.FileCount;
+        HiddenDirectories = result.HiddenDirCount;
+        HiddenFiles = result.HiddenFileCount;
         return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 

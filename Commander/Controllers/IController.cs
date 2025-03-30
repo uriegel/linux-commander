@@ -8,6 +8,9 @@ interface IController : IDisposable
     int Directories { get; }
     int Files { get; }
 
+    int HiddenDirectories { get; }
+    int HiddenFiles { get; }
+
     string? GetItemPath(int pos);
 
     ExifData? GetExifData(int pos);
