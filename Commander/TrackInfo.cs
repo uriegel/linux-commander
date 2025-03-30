@@ -28,7 +28,7 @@ static class TrackInfo
                 ?.Track
                 ?.TrackSegment
                 ?.TrackPoints
-                ?.Select(n => n.Speed)
+                ?.Select(n => old ? n.Speed ?? 0 : (n.Speed ?? 0) * 3.6f)
                 ?.Max() ?? 0,
             xmlTrackInfo
                 ?.Track

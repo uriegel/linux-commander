@@ -9,8 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO track viewer
-
 // TODO GtkActionBar count of selected items
 // TODO GtkActionBar show errors in red
 // TODO GtkActionBar show info in blue

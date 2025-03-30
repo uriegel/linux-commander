@@ -67,8 +67,12 @@ export class TrackViewer extends HTMLElement {
                         L.DomEvent.disableClickPropagation(container)
                       
                         this.slider.addEventListener("input", () => {
-                            let percent = parseInt(this.slider!.value)
-                            this.marker?.setLatLng([this.trackPoints![percent][0], this.trackPoints![percent][1]], )
+                            let position = parseInt(this.slider!.value)
+                            this.marker?.setLatLng([this.trackPoints![position][0], this.trackPoints![position][1]],)
+                            if (track?.trackPoints) {
+                                this.addValue(this.trackValues, ".speed", track.trackPoints[position].velocity?.toFixed(1))
+                                this.addValue(this.trackValues, ".heartRate", track.trackPoints[position].heartrate)
+                            }
                         })
                   
                         return container
@@ -79,6 +83,7 @@ export class TrackViewer extends HTMLElement {
                 const TableControl = L.Control.extend({
                     onAdd: () => {
                         const container = L.DomUtil.create("div", "leaflet-bar leaflet-control")
+                        container.classList.add("trackTable")
                         container.classList.add("trackStatistics")
                         const template = document.getElementById("track-statistics") as HTMLTemplateElement
                         container.appendChild(template.content.cloneNode(true)) 
@@ -87,6 +92,19 @@ export class TrackViewer extends HTMLElement {
                     },
                 });
                 this.map.addControl(new TableControl({ position: "topright" }))
+
+                const TrackValesControl = L.Control.extend({
+                    onAdd: () => {
+                        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control")
+                        container.classList.add("trackTable")
+                        container.classList.add("trackValues")
+                        const template = document.getElementById("track-values") as HTMLTemplateElement
+                        container.appendChild(template.content.cloneNode(true)) 
+                        this.trackValues = container.querySelector("table") as HTMLTableElement
+                        return container
+                    },
+                });
+                this.map.addControl(new TrackValesControl({ position: "bottomright" }))
             }    
 
             this.slider!.value = '0'
@@ -104,28 +122,30 @@ export class TrackViewer extends HTMLElement {
                 this.marker.remove()
             this.marker = L.marker([this.trackPoints[0][0], this.trackPoints[0][1]], { autoPan: true }).addTo(this.map)
 
-            const v1 = this.addStatisticValue(".dist", track?.distance.toFixed(1))
-            const v2 = this.addStatisticValue(".duration", this.formatDuration(track?.duration))
-            const v3 = this.addStatisticValue(".averageSpeed", track?.averageSpeed.toFixed(1))
-            const v4 = this.addStatisticValue(".maxSpeed", track?.maxSpeed.toFixed(1))
-            const v5 = this.addStatisticValue(".averageHeartRate", track?.averageHeartRate)
-            const v6 = this.addStatisticValue(".maxHeartRate", track?.maxHeartRate)
+            const v1 = this.addValue(this.statistics, ".dist", track?.distance.toFixed(1))
+            const v2 = this.addValue(this.statistics, ".duration", this.formatDuration(track?.duration))
+            const v3 = this.addValue(this.statistics, ".averageSpeed", track?.averageSpeed.toFixed(1))
+            const v4 = this.addValue(this.statistics, ".maxSpeed", track?.maxSpeed.toFixed(1))
+            const v5 = this.addValue(this.statistics, ".averageHeartRate", track?.averageHeartRate)
+            const v6 = this.addValue(this.statistics, ".maxHeartRate", track?.maxHeartRate)
             if (v1 || v2 || v3 || v4 || v5 || v6)
                 document.querySelector(".trackStatistics")?.classList.remove("hidden")
             else
                 document.querySelector(".trackStatistics")?.classList.add("hidden")
-                
+
+            this.addValue(this.trackValues, ".speed", undefined)
+            this.addValue(this.trackValues, ".heartRate", undefined)
         }
     }
 
-    addStatisticValue(cellClass: string, val?: number|string) {
+    addValue(table: HTMLTableElement|undefined, cellClass: string, val?: number|string) {
         if (val) {
-            const span = this.statistics?.querySelector(`${cellClass} span`) as HTMLSpanElement
+            const span = table?.querySelector(`${cellClass} span`) as HTMLSpanElement
             span.innerText = `${val}`
-            this.statistics?.querySelector(cellClass)?.classList.remove("hidden")
+            table?.querySelector(cellClass)?.classList.remove("hidden")
             return true
         } else {
-            this.statistics?.querySelector(cellClass)?.classList.add("hidden")
+            table?.querySelector(cellClass)?.classList.add("hidden")
             return false
         }
     }
@@ -143,7 +163,8 @@ export class TrackViewer extends HTMLElement {
     trackPoints: number[][] | undefined
     marker: Marker<any> | null = null    
     slider: HTMLInputElement | undefined
-    statistics: HTMLTableElement|undefined
+    statistics: HTMLTableElement | undefined
+    trackValues: HTMLTableElement | undefined
 }
 
 async function getTrack(path: string): Promise<TrackInfo|null> {
