@@ -9,15 +9,16 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO GtkActionBar show info in blue: binding to classlist?
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
+// TODO GtkActionBar show info in blue: binding to classlist?
 
 // TODO Menu actions like adapt view
 // TODO Backspace history
 
 // TODO overlay show errors in red
 
+// TODO To Gtk4 Binding to css class
 // TODO To Gtk4 EditableLabel editing
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
 // TODO To Gtk4 int gdk_keyval_to_unicode(int keyval);

@@ -51,6 +51,10 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
             ?.Binding("label", "CurrentDirectories", BindingFlags.Default);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelFiles")
             ?.Binding("label", "CurrentFiles", BindingFlags.Default);
+
+        //Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("actionBar")?.AddCssClass("info", true);
+        
+
         Handle.AddActions(
             [
                 new("toggleViewMode", Viewer.ToggleView, "<Ctrl>F3"),

@@ -35,3 +35,9 @@ actionbar {
     font-size: smaller;
     font-family: "Noto Sans";
 }
+
+actionbar.info>revealer>box{
+	background-color: color-mix(in srgb, @theme_selected_bg_color 25%, transparent);
+    
+}
+

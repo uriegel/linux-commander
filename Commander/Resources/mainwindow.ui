@@ -79,7 +79,7 @@
           </object>            
         </child>
         <child>
-          <object class="GtkActionBar">
+          <object class="GtkActionBar" id="actionBar">
             <property name="vexpand">False</property>
             <child>
               <object class="GtkBox">
