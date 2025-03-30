@@ -24,7 +24,12 @@ static class TrackInfo
                 ?.Select(n => n.HeartRate)
                 ?.Where(n => n != -1)
                 ?.Average() ?? 0),
-            0,
+            xmlTrackInfo
+                ?.Track
+                ?.TrackSegment
+                ?.TrackPoints
+                ?.Select(n => n.Speed)
+                ?.Max() ?? 0,
             xmlTrackInfo
                 ?.Track
                 ?.TrackSegment

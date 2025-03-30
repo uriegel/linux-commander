@@ -27,11 +27,13 @@
 
 .trackStatistics {
     background: rgba(255, 255, 255, 0.7);
-    padding: 10px;
-    width: 200px;
-    font-size: smaller;
+    padding: 5px;
 }
 .trackStatistics table {
     width: 100%;
+    border: 0px solid;
 }
 
+.trackStatistics th, .trackStatistics td {
+    border: 0px solid;
+}

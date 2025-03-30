@@ -104,21 +104,38 @@ export class TrackViewer extends HTMLElement {
                 this.marker.remove()
             this.marker = L.marker([this.trackPoints[0][0], this.trackPoints[0][1]], { autoPan: true }).addTo(this.map)
 
-            this.addStatisticValue(".dist", track?.distance)
-            this.addStatisticValue(".duration", track?.duration)
-            this.addStatisticValue(".averageSpeed", track?.averageSpeed)
-            this.addStatisticValue(".averageHeartRate", track?.averageHeartRate)
-            this.addStatisticValue(".maxHeartRate", track?.maxHeartRate)
+            const v1 = this.addStatisticValue(".dist", track?.distance.toFixed(1))
+            const v2 = this.addStatisticValue(".duration", this.formatDuration(track?.duration))
+            const v3 = this.addStatisticValue(".averageSpeed", track?.averageSpeed.toFixed(1))
+            const v4 = this.addStatisticValue(".maxSpeed", track?.maxSpeed.toFixed(1))
+            const v5 = this.addStatisticValue(".averageHeartRate", track?.averageHeartRate)
+            const v6 = this.addStatisticValue(".maxHeartRate", track?.maxHeartRate)
+            if (v1 || v2 || v3 || v4 || v5 || v6)
+                document.querySelector(".trackStatistics")?.classList.remove("hidden")
+            else
+                document.querySelector(".trackStatistics")?.classList.add("hidden")
+                
         }
     }
 
-    addStatisticValue(cellClass: string, val?: number) {
+    addStatisticValue(cellClass: string, val?: number|string) {
         if (val) {
             const span = this.statistics?.querySelector(`${cellClass} span`) as HTMLSpanElement
             span.innerText = `${val}`
             this.statistics?.querySelector(cellClass)?.classList.remove("hidden")
-        } else
+            return true
+        } else {
             this.statistics?.querySelector(cellClass)?.classList.add("hidden")
+            return false
+        }
+    }
+
+    formatDuration(duration?: number) {
+        return duration
+            ? duration / 3600 > 0
+            ? `${Math.floor(duration / 3600).toString().padStart(2, '0')}:${Math.floor((duration % 3600) / 60).toString().padStart(2, '0')}`
+            : `00:${Math.floor(duration / 60).toString().padStart(2, '0')}`
+            : undefined
     }
 
     map: Map | null = null
