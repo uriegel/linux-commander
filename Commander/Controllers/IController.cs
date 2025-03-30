@@ -21,7 +21,7 @@ interface IController : IDisposable
 
     bool CheckRestriction(string searchKey);
 
-    void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl);
+    int OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl);
 
     void SelectAll(FolderView folderView);
     void SelectNone(FolderView folderView);

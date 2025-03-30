@@ -11,7 +11,7 @@ using static CsTools.ProcessCmd;
 
 namespace Commander.Controllers;
 
-class RootController : Controller<RootItem>, IController
+class RootController : ControllerBase<RootItem>, IController
 {
     #region IController
 
@@ -62,9 +62,13 @@ class RootController : Controller<RootItem>, IController
 
     public bool CheckRestriction(string searchKey) => false;
 
-    public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl) => model.UnselectRange(pos, count);
+    public int OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
+    {
+        model.UnselectRange(pos, count);
+        return 0;
+    }
 
-    public void SelectAll(FolderView folderView) {}
+    public void SelectAll(FolderView folderView) { }
     public void SelectNone(FolderView folderView) {}
     public void SelectCurrent(FolderView folderView) {}
     public void SelectToStart(FolderView folderView) {}
@@ -72,7 +76,7 @@ class RootController : Controller<RootItem>, IController
 
     #endregion
 
-    public RootController(FolderView folderView)
+    public RootController(FolderView folderView) : base()
         => folderView.SetController(this);
 
     public override Column<RootItem>[] GetColumns()

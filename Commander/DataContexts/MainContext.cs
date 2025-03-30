@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Commander.Enums;
 
 namespace Commander.DataContexts;
 
@@ -15,6 +16,7 @@ class MainContext : INotifyPropertyChanged
             {
                 field = value;
                 OnChanged(nameof(SelectedPath));
+                OnChanged(nameof(StatusChoice));
             }
         }
     }
@@ -28,6 +30,7 @@ class MainContext : INotifyPropertyChanged
             {
                 field = value;
                 OnChanged(nameof(Restriction));
+                OnChanged(nameof(StatusChoice));
             }
         }
     }
@@ -58,6 +61,20 @@ class MainContext : INotifyPropertyChanged
         }
     }
 
+    public int SelectedFiles
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(SelectedFiles));
+                OnChanged(nameof(StatusChoice));
+            }
+        }
+    }
+
     public ExifData? ExifData
     {
         get => field;
@@ -70,7 +87,16 @@ class MainContext : INotifyPropertyChanged
             }
         }
     }
-    
+
+    public StatusChoice StatusChoice
+    {
+        get => Restriction?.Trim()?.Length > 0
+                ? StatusChoice.Restriction
+                : SelectedFiles > 0
+                ? StatusChoice.SelectedItems
+                : StatusChoice.Status;
+    }
+        
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void ChangeFolderContext(FolderContext? folderContext)
@@ -85,6 +111,7 @@ class MainContext : INotifyPropertyChanged
             CurrentFiles = folderContext.CurrentFiles;
             SelectedPath = folderContext.SelectedPath;
             ExifData = folderContext.ExifData;
+            SelectedFiles = folderContext.SelectedFiles;
         }
     }
     void FolderContextPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -103,6 +130,9 @@ class MainContext : INotifyPropertyChanged
                     break;
                 case nameof(ExifData):
                     ExifData = folderContext.ExifData;
+                    break;
+                case nameof(SelectedFiles):
+                    SelectedFiles = folderContext.SelectedFiles;
                     break;
             }
     }

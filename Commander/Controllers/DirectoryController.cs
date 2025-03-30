@@ -9,14 +9,14 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO GtkActionBar count of selected items
-// TODO GtkActionBar show errors in red
-// TODO GtkActionBar show info in blue
+// TODO GtkActionBar show info in blue: binding to classlist? another StatusChoice
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
 
 // TODO Menu actions like adapt view
 // TODO Backspace history
+
+// TODO overlay show errors in red
 
 // TODO To Gtk4 EditableLabel editing
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
@@ -27,7 +27,8 @@ namespace Commander.Controllers;
 // TODO Pdf viewer: PdViewer in Gtk4DotNet
 // TODO Pdf viewer
 // TODO Text viewer/editor
-class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
+// TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
+class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
     #region IController
 
@@ -74,12 +75,13 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
     public bool CheckRestriction(string searchKey)
         => Items().Any(n => n.Name.StartsWith(searchKey, StringComparison.CurrentCultureIgnoreCase));
 
-    public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
+    public int OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
     {
         if (mouseButton && !mouseButtonCtrl && count == 1)
             model.UnselectRange(pos, 1);
         if (MainContext.Instance.Restriction == null)
             model.UnselectRange(0, 1);
+        return GetSelectedItemsIndices().Count();
     }
 
     public void SelectAll(FolderView folderView) => folderView.SelectAll();
@@ -90,12 +92,11 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
 
     #endregion
 
-    public DirectoryController(FolderView folderView)
+    public DirectoryController(FolderView folderView) : base(folderView.GetSelectionModel())
     {
         EnableRubberband = true;
         folderView.SetController(this);
         OnFilter = Filter;
-        selectionModel = folderView.GetSelectionModel();
     }
 
     public override Column<DirectoryItem>[] GetColumns() =>
@@ -130,24 +131,6 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
                 OnLabelBind = i => i.Size != -1 ? i.Size.ToString() : ""
             }
         ];
-
-    IEnumerable<DirectoryItem> GetSelectedItems()
-    {
-        var count = ItemsCount();
-        var idx = 0;
-        while (true)
-        {
-            if (selectionModel.IsSelected(idx))
-            {
-                var res = selectionModel.GetItem<DirectoryItem>(idx);
-                if (res != null)
-                    yield return res;
-            }
-            idx++;
-            if (idx == count)
-                yield break;
-        }
-    }
 
     void StartExifResolving(DirectoryItem[] items, FolderView folderView)
     {
@@ -264,7 +247,6 @@ class DirectoryController : Controller<DirectoryItem>, IController, IDisposable
         }
     }
 
-    readonly SelectionHandle selectionModel;
     CancellationTokenSource cancellation = new();
 
     #region IDisposable

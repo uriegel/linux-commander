@@ -90,6 +90,12 @@
                   </object>
                 </child>
                 <child> 
+                  <object class="GtkLabel" id="selectedItemsText">
+                    <property name="hexpand">False</property>
+                    <property name="ellipsize">end</property>
+                  </object>
+                </child>
+                <child> 
                   <object class="GtkLabel" id="restrictionText">
                     <property name="hexpand">False</property>
                     <property name="ellipsize">end</property>

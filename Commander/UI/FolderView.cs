@@ -52,11 +52,14 @@ class FolderView : ColumnViewSubClassed
                 else
                 {
                     var key = (char)gdk_keyval_to_unicode(c);
-                    var searchKey = MainContext.Instance.Restriction + key;
-                    if (controller.CheckRestriction(searchKey))
+                    if (key != '\0')
                     {
-                        MainContext.Instance.Restriction = searchKey;
-                        FilterChanged(FilterChange.MoreStrict);
+                        var searchKey = MainContext.Instance.Restriction + key;
+                        if (controller.CheckRestriction(searchKey))
+                        {
+                            MainContext.Instance.Restriction = searchKey;
+                            FilterChanged(FilterChange.MoreStrict);
+                        }
                     }
                 }
                 return false;
@@ -241,7 +244,7 @@ class FolderView : ColumnViewSubClassed
 
     void SelectionChanged(nint model, int pos, int count)
     {
-        controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
+        Context.SelectedFiles = controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
         CheckCurrentChanged(controller.GetFocusedItemPos());
     }
 

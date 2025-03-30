@@ -37,7 +37,7 @@ class FolderController(FolderView folderView)
     public int GetFocusedItemPos() => controller.GetFocusedItemPos();
     public int ItemsCount() => controller.ItemsCount();
 
-    public void OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
+    public int OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
         => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
 
     public void SelectAll() => controller.SelectAll(folderView);

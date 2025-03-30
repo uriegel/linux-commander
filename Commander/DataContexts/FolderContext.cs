@@ -49,7 +49,20 @@ class FolderContext : INotifyPropertyChanged
         }
     }
 
-     public string? SelectedPath
+    public int SelectedFiles
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(SelectedFiles));
+            }
+        }
+    }
+
+    public string? SelectedPath
     {
         get => field;
         set

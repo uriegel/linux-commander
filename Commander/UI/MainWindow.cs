@@ -1,4 +1,5 @@
 using Commander.DataContexts;
+using Commander.Enums;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -36,10 +37,13 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
         Handle.DataContext(MainContext.Instance);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("statusText")
             ?.Binding("label", "SelectedPath", BindingFlags.Default)
-            ?.Binding("visible", "Restriction", BindingFlags.Default, s => s == null);
+            ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.Status);
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("selectedItemsText")
+            ?.Binding("label", "SelectedFiles", BindingFlags.Default, s =>  (int?)s == 1 ? "1 Eintrag selektiert": $"{s} Einträge selektiert")
+            ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.SelectedItems);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("restrictionText")
-            ?.Binding("label", "Restriction", BindingFlags.Default)
-            ?.Binding("visible", "Restriction", BindingFlags.Default, s => s != null);
+            ?.Binding("label", "Restriction", BindingFlags.Default, s => $"Einschränkung auf: {s}")
+            ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.Restriction);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelDirs")
             ?.Binding("label", "CurrentDirectories", BindingFlags.Default);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelFiles")
