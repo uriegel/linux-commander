@@ -36,21 +36,21 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
         Handle.OnSizeChanged((w, _) => panedHandle?.SetPosition(w / 2));
         Handle.DataContext(MainContext.Instance);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("statusText")
-            ?.Binding("label", "SelectedPath", BindingFlags.Default)
-            ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.Status);
+            ?.Binding("label", nameof(MainContext.SelectedPath), BindingFlags.Default)
+            ?.Binding("visible", nameof(MainContext.StatusChoice), BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.Status);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("selectedItemsText")
-            ?.Binding("label", "SelectedFiles", BindingFlags.Default, s => (int?)s == 1 ? "1 Eintrag selektiert" : $"{s} Einträge selektiert")
-            ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.SelectedItems);
+            ?.Binding("label", nameof(MainContext.SelectedFiles), BindingFlags.Default, s => (int?)s == 1 ? "1 Eintrag selektiert" : $"{s} Einträge selektiert")
+            ?.Binding("visible", nameof(MainContext.StatusChoice), BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.SelectedItems);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("restrictionText")
-            ?.Binding("label", "Restriction", BindingFlags.Default, s => $"Einschränkung auf: {s}")
-            ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.Restriction);
+            ?.Binding("label", nameof(MainContext.Restriction), BindingFlags.Default, s => $"Einschränkung auf: {s}")
+            ?.Binding("visible", nameof(MainContext.StatusChoice), BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.Restriction);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("backgroundActionText")
-            ?.Binding("label", "BackgroundAction", BindingFlags.Default, GetBackgroundAction)
-            ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.BackgroundAction);
+            ?.Binding("label", nameof(MainContext.BackgroundAction), BindingFlags.Default, GetBackgroundAction)
+            ?.Binding("visible", nameof(MainContext.StatusChoice), BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.BackgroundAction);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelDirs")
-            ?.Binding("label", "CurrentDirectories", BindingFlags.Default);
+            ?.Binding("label", nameof(MainContext.CurrentDirectories), BindingFlags.Default);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelFiles")
-            ?.Binding("label", "CurrentFiles", BindingFlags.Default);
+            ?.Binding("label", nameof(MainContext.CurrentFiles), BindingFlags.Default);
 
         //Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("actionBar")?.AddCssClass("info", true);
         

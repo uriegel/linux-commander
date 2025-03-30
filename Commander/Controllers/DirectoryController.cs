@@ -9,9 +9,10 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO GtkActionBar show info in blue: binding to classlist?
+
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
-// TODO GtkActionBar show info in blue: binding to classlist?
 
 // TODO Menu actions like adapt view
 // TODO Backspace history
@@ -19,16 +20,15 @@ namespace Commander.Controllers;
 // TODO overlay show errors in red
 
 // TODO To Gtk4 Binding to css class
-// TODO To Gtk4 EditableLabel editing
-// TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
-// TODO To Gtk4 int gdk_keyval_to_unicode(int keyval);
-// TODO To Gtk4 Binding reacts on all Property changes
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
 // TODO Pdf viewer: PdViewer in Gtk4DotNet
 // TODO Pdf viewer
 // TODO Text viewer/editor
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
+
+// TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
+
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
     #region IController

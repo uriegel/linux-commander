@@ -33,14 +33,14 @@ class FolderView : ColumnViewSubClassed
             pathEditing.OnNotify("editing",
                     e =>
                     {
-                        if ((bool)e.GetProperty("editing", typeof(bool))! == false)
+                        if (e.IsEditing())
                         {
                             columnView.GrabFocus();
                             if (!string.IsNullOrEmpty(Context.CurrentPath))
                                 controller.ChangePath(Context.CurrentPath);
                         }
-                    }).Binding("text", "CurrentPath", BindingFlags.Bidirectional);
-            _ = Handle.AddController(EventControllerKey.New().OnKeyPressed((c, k, m) =>
+                    }).Binding("text", nameof(FolderContext.CurrentPath), BindingFlags.Bidirectional);
+            _ = Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, k, m) =>
             {
                 if (k == 9)
                     StopRestriction();
@@ -51,10 +51,9 @@ class FolderView : ColumnViewSubClassed
                 }
                 else
                 {
-                    var key = (char)gdk_keyval_to_unicode(c);
-                    if (key != '\0')
+                    if (chr != '\0')
                     {
-                        var searchKey = MainContext.Instance.Restriction + key;
+                        var searchKey = MainContext.Instance.Restriction + chr;
                         if (controller.CheckRestriction(searchKey))
                         {
                             MainContext.Instance.Restriction = searchKey;
@@ -268,9 +267,6 @@ class FolderView : ColumnViewSubClassed
     EditableLabelHandle pathEditing = new(0);
     bool mouseButton;
     bool mouseButtonCtrl;
-    
-    [System.Runtime.InteropServices.DllImport("libgtk-4.so.1")]
-    private static extern int gdk_keyval_to_unicode(int keyval);
 }
 
 class FolderViewClass() : ColumnViewSubClassedClass("ColumnView", p => new FolderView(p)) { }
