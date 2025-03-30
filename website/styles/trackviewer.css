@@ -24,3 +24,14 @@
 .trackSlider:hover {
     opacity: 1;
 }
+
+.trackStatistics {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    width: 200px;
+    font-size: smaller;
+}
+.trackStatistics table {
+    width: 100%;
+}
+

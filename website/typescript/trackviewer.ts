@@ -8,6 +8,8 @@ type TrackInfo = {
     duration: number,
     averageSpeed: number,
     averageHeartRate: number,
+    maxSpeed: number,
+    maxHeartRate: number,
     trackPoints?: TrackPoint[] 
 }
 
@@ -66,18 +68,30 @@ export class TrackViewer extends HTMLElement {
                       
                         this.slider.addEventListener("input", () => {
                             let percent = parseInt(this.slider!.value)
-                            this.marker?.setLatLng([this.trackPoints![percent][0], this.trackPoints![percent][1]], );
+                            this.marker?.setLatLng([this.trackPoints![percent][0], this.trackPoints![percent][1]], )
                         })
                   
                         return container
                     },
                 })
-                  
                 this.map.addControl(new SliderControl({ position: "bottomleft" }))                
+
+                const TableControl = L.Control.extend({
+                    onAdd: () => {
+                        const container = L.DomUtil.create("div", "leaflet-bar leaflet-control")
+                        container.classList.add("trackStatistics")
+                        const template = document.getElementById("track-statistics") as HTMLTemplateElement
+                        container.appendChild(template.content.cloneNode(true)) 
+                        this.statistics = container.querySelector("table") as HTMLTableElement
+                        return container
+                    },
+                });
+                this.map.addControl(new TableControl({ position: "topright" }))
             }    
 
             this.slider!.value = '0'
             this.slider!.max = `${this.trackPoints?.length}`
+            
             const maxLat = this.trackPoints.reduce((prev, curr) => Math.max(prev, curr[0]), this.trackPoints[0][0])
             const minLat = this.trackPoints.reduce((prev, curr) => Math.min(prev, curr[0]), this.trackPoints[0][0])
             const maxLng = this.trackPoints.reduce((prev, curr) => Math.max(prev, curr[1]), this.trackPoints[0][1])
@@ -89,14 +103,30 @@ export class TrackViewer extends HTMLElement {
             if (this.marker)
                 this.marker.remove()
             this.marker = L.marker([this.trackPoints[0][0], this.trackPoints[0][1]], { autoPan: true }).addTo(this.map)
+
+            this.addStatisticValue(".dist", track?.distance)
+            this.addStatisticValue(".duration", track?.duration)
+            this.addStatisticValue(".averageSpeed", track?.averageSpeed)
+            this.addStatisticValue(".averageHeartRate", track?.averageHeartRate)
+            this.addStatisticValue(".maxHeartRate", track?.maxHeartRate)
         }
+    }
+
+    addStatisticValue(cellClass: string, val?: number) {
+        if (val) {
+            const span = this.statistics?.querySelector(`${cellClass} span`) as HTMLSpanElement
+            span.innerText = `${val}`
+            this.statistics?.querySelector(cellClass)?.classList.remove("hidden")
+        } else
+            this.statistics?.querySelector(cellClass)?.classList.add("hidden")
     }
 
     map: Map | null = null
     track: Polyline<any> | null = null
     trackPoints: number[][] | undefined
     marker: Marker<any> | null = null    
-    slider: HTMLInputElement| undefined
+    slider: HTMLInputElement | undefined
+    statistics: HTMLTableElement|undefined
 }
 
 async function getTrack(path: string): Promise<TrackInfo|null> {

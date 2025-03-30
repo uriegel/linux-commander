@@ -29,6 +29,29 @@
         </div>
     </template>
 
+    <template id="track-statistics">
+        <table border="1" text-align: center;">
+            <tr class="dist">
+                <td>Dist.</td><td><span></span>&nbsp;<abbr>km</abbr></td>
+            </tr>
+            <tr class="duration">
+                <td>Dauer</td><td><span></span></td>
+            </tr>
+            <tr class="averageSpeed">
+                <td>Ø</td><td><span></span>&nbsp;<abbr>km/h</abbr></td>
+            </tr>
+            <tr>
+                <td>Max</td><td>-</td>
+            </tr>
+            <tr class="averageHeartRate">
+                <td>Ø ❤️</td><td><span></span></td>
+            </tr>
+            <tr class="maxHeartRate">
+                <td>Max ❤️</td><td><span></span></td>
+            </tr>
+        </table>
+    </template>
+
     <image-viewer id='imageViewer' class='hidden'></image-viewer>
     <track-viewer id='trackViewer' class='hidden'></track-viewer>
     <video id='mediaPlayer' class='hidden' controls autoPlay />

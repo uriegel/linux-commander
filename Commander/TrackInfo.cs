@@ -1,8 +1,5 @@
 using System.Xml.Serialization;
-using CsTools.Extensions;
 using CsTools.Functional;
-using CsTools.HttpRequest;
-using static CsTools.Core;
 
 namespace Commander;
 
@@ -25,7 +22,16 @@ static class TrackInfo
                 ?.TrackSegment
                 ?.TrackPoints
                 ?.Select(n => n.HeartRate)
+                ?.Where(n => n != -1)
                 ?.Average() ?? 0),
+            0,
+            xmlTrackInfo
+                ?.Track
+                ?.TrackSegment
+                ?.TrackPoints
+                ?.Select(n => n.HeartRate)
+                ?.Where(n => n != -1)
+                ?.Max() ?? 0,
             xmlTrackInfo
                 ?.Track
                 ?.TrackSegment
@@ -45,6 +51,8 @@ record TrackInfoData(
     int Duration,
     float AverageSpeed,
     int AverageHeartRate,
+    float MaxSpeed,
+    int MaxHeartRate,
     TrackPoint[]? TrackPoints
 );
 
