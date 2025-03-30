@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Commander.Enums;
 using Commander.Settings;
 
 namespace Commander.DataContexts;
@@ -84,6 +85,19 @@ class FolderContext : INotifyPropertyChanged
             {
                 field = value;
                 OnChanged(nameof(ExifData));
+            }
+        }
+    }
+
+    public BackgroundAction BackgroundAction
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(BackgroundAction));
             }
         }
     }

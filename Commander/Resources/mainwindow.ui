@@ -102,6 +102,13 @@
                   </object>
                 </child>
                 <child> 
+                  <object class="GtkLabel" id="backgroundActionText">
+                    <property name="hexpand">False</property>
+                    <property name="hexpand">False</property>
+                    <property name="ellipsize">end</property>
+                  </object>
+                </child>
+                <child> 
                   <object class="GtkLabel">
                     <property name="hexpand">True</property>
                   </object>

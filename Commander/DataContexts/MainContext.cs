@@ -92,11 +92,26 @@ class MainContext : INotifyPropertyChanged
     {
         get => Restriction?.Trim()?.Length > 0
                 ? StatusChoice.Restriction
+                : BackgroundAction != BackgroundAction.None
+                ? StatusChoice.BackgroundAction
                 : SelectedFiles > 0
                 ? StatusChoice.SelectedItems
                 : StatusChoice.Status;
     }
         
+    public BackgroundAction BackgroundAction
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(BackgroundAction));
+            }
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public void ChangeFolderContext(FolderContext? folderContext)
@@ -111,6 +126,7 @@ class MainContext : INotifyPropertyChanged
             CurrentFiles = folderContext.CurrentFiles;
             SelectedPath = folderContext.SelectedPath;
             ExifData = folderContext.ExifData;
+            BackgroundAction = folderContext.BackgroundAction;
             SelectedFiles = folderContext.SelectedFiles;
         }
     }
@@ -133,6 +149,9 @@ class MainContext : INotifyPropertyChanged
                     break;
                 case nameof(SelectedFiles):
                     SelectedFiles = folderContext.SelectedFiles;
+                    break;
+                case nameof(BackgroundAction):
+                    BackgroundAction = folderContext.BackgroundAction;
                     break;
             }
     }

@@ -9,7 +9,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO GtkActionBar show info in blue: binding to classlist? another StatusChoice
+// TODO GtkActionBar show info in blue: binding to classlist?
 // TODO GtkActionBar dont count hidden when not visible
 // TODO GtkActionBar switch when hidden are visible
 
@@ -137,13 +137,21 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var token = cancellation.Token;
         Task.Run(() =>
         {
-            foreach (var item in items
-                                    .Where(item => !token.IsCancellationRequested
-                                            && (item.Name.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase)
-                                                || item.Name.EndsWith(".jpeg", StringComparison.InvariantCultureIgnoreCase)
-                                                || item.Name.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase))))
-                item.ExifData = ExifReader.GetExifData(CurrentPath.AppendPath(item.Name));
-            Gtk.Dispatch(() => folderView.Refresh());
+            folderView.Context.BackgroundAction = BackgroundAction.ExifDatas;
+            try
+            {
+                foreach (var item in items
+                                        .Where(item => !token.IsCancellationRequested
+                                                && (item.Name.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase)
+                                                    || item.Name.EndsWith(".jpeg", StringComparison.InvariantCultureIgnoreCase)
+                                                    || item.Name.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase))))
+                    item.ExifData = ExifReader.GetExifData(CurrentPath.AppendPath(item.Name));
+            }
+            finally
+            {
+                folderView.Context.BackgroundAction = BackgroundAction.None;
+                Gtk.Dispatch(() => folderView.Refresh());
+            }
         });
     }
 

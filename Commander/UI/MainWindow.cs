@@ -39,11 +39,14 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
             ?.Binding("label", "SelectedPath", BindingFlags.Default)
             ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.Status);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("selectedItemsText")
-            ?.Binding("label", "SelectedFiles", BindingFlags.Default, s =>  (int?)s == 1 ? "1 Eintrag selektiert": $"{s} Einträge selektiert")
+            ?.Binding("label", "SelectedFiles", BindingFlags.Default, s => (int?)s == 1 ? "1 Eintrag selektiert" : $"{s} Einträge selektiert")
             ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.SelectedItems);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("restrictionText")
             ?.Binding("label", "Restriction", BindingFlags.Default, s => $"Einschränkung auf: {s}")
             ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.Restriction);
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("backgroundActionText")
+            ?.Binding("label", "BackgroundAction", BindingFlags.Default, GetBackgroundAction)
+            ?.Binding("visible", "StatusChoice", BindingFlags.Default, s => (StatusChoice?)s == StatusChoice.BackgroundAction);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelDirs")
             ?.Binding("label", "CurrentDirectories", BindingFlags.Default);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("labelFiles")
@@ -89,5 +92,15 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
 
     protected override void OnFinalize() => Console.WriteLine("Window finalized");
     protected override ApplicationWindowHandle CreateHandle(nint obj) => new(obj);
+
+    string GetBackgroundAction(object? value)
+    {
+        if (value is BackgroundAction ba)
+        {
+            if (ba == BackgroundAction.ExifDatas)
+                return "Exif-Daten werden geholt...";
+        }
+        return "";
+    }
 }
 

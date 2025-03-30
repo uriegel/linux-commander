@@ -4,5 +4,6 @@ enum StatusChoice
 {
     Status,
     SelectedItems,
-    Restriction
+    Restriction,
+    BackgroundAction
 }
