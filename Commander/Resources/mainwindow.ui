@@ -24,10 +24,9 @@
       <object class="GtkBox">
         <property name="orientation">vertical</property>
         <child> 
-          <object class="AdwBanner">
+          <object class="AdwBanner" id="banner">
             <property name="css-classes">warning</property>
-            <property name= "title">Das soll ein Banner sein</property>
-            <property name= "button-label">Zurück</property>
+            <property name= "button-label">Ok</property>
           </object>
         </child>
         <child>

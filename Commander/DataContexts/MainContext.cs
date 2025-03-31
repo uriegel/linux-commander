@@ -88,6 +88,28 @@ class MainContext : INotifyPropertyChanged
         }
     }
 
+    public string? ErrorText
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(ErrorText));
+                if (value != null)
+                {
+                    Reset();
+                    async void Reset()
+                    {
+                        await Task.Delay(3000);
+                        ErrorText = null;
+                    }
+                }
+            }
+        }
+    }
+
     public StatusChoice StatusChoice
     {
         get => Restriction?.Trim()?.Length > 0

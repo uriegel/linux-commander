@@ -12,14 +12,15 @@ namespace Commander.Controllers;
 // TODO Menu actions like adapt view
 // TODO Backspace history
 
-// TODO overlay show errors in red
-
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
 // TODO Pdf viewer: PdViewer in Gtk4DotNet
 // TODO Pdf viewer
 // TODO Text viewer/editor
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
 
+// TODO overlay show errors in red: button Ok
+
+// TODO To Gtk4 AdwBanner with title, button-lable, revealed, signal: button-clicked;
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
 
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable

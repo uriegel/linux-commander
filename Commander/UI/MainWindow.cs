@@ -53,6 +53,10 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
             ?.Binding("label", nameof(MainContext.CurrentFiles), BindingFlags.Default);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("actionBar")
             ?.BindingToCss("info", nameof(MainContext.StatusChoice), s => (StatusChoice?)s == StatusChoice.BackgroundAction);
+        Handle.GetTemplateChild<WidgetHandle, ApplicationWindowHandle>("banner")
+            ?.Binding("revealed", nameof(MainContext.ErrorText), BindingFlags.Default, v => v != null)
+            ?.Binding("title", nameof(MainContext.ErrorText), BindingFlags.Default);
+
         Handle.AddActions(
             [
                 new("toggleViewMode", Viewer.ToggleView, "<Ctrl>F3"),
