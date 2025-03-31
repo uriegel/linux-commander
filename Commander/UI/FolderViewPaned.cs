@@ -52,9 +52,9 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
         await Task.Delay(1);
 
-        var window = Handle.GetAncestor<ApplicationWindowHandle>();
-        var cvhl = window.GetTemplateChild<CustomColumnViewHandle, ApplicationWindowHandle>("columnview-left");
-        var cvhr = window.GetTemplateChild<CustomColumnViewHandle, ApplicationWindowHandle>("columnview-right");
+        var window = Handle.GetAncestor<AdwApplicationWindowHandle>();
+        var cvhl = window.GetTemplateChild<CustomColumnViewHandle, AdwApplicationWindowHandle>("columnview-left");
+        var cvhr = window.GetTemplateChild<CustomColumnViewHandle, AdwApplicationWindowHandle>("columnview-right");
         if (cvhl != null && cvhr != null)
         {
             folderViewLeft = FolderView.GetInstance(cvhl);

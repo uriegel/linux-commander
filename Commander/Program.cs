@@ -25,10 +25,10 @@ using Commander.UI;
         .NewAdwaita(Globals.AppId)
             .OnActivate(app =>
                 app
-                .SubClass(ManagedApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
+                .SubClass(ManagedAdwApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
                 .SubClass(new FolderViewPanedClass(p => new FolderViewPaned(p)))
                 .SubClass(new FolderViewClass())
-                .ManagedApplicationWindow()
+                .ManagedAdwApplicationWindow()
                 .SaveBounds(600, 800)
                 .Show());
     app.Run(0, IntPtr.Zero);

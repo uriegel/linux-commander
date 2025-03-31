@@ -1,5 +1,6 @@
 using Commander.DataContexts;
 using Commander.Enums;
+using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -7,7 +8,7 @@ using GtkDotNet.SubClassing;
 
 namespace Commander.UI;
 
-class MainWindow(nint obj) : ManagedApplicationWindow(obj)
+class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
 {
     public static void Register(ApplicationHandle app)
         => app.SubClass(new MainWindowClass());
@@ -53,9 +54,10 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
             ?.Binding("label", nameof(MainContext.CurrentFiles), BindingFlags.Default);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("actionBar")
             ?.BindingToCss("info", nameof(MainContext.StatusChoice), s => (StatusChoice?)s == StatusChoice.BackgroundAction);
-        Handle.GetTemplateChild<WidgetHandle, ApplicationWindowHandle>("banner")
+        Handle.GetTemplateChild<BannerHandle, ApplicationWindowHandle>("banner")
             ?.Binding("revealed", nameof(MainContext.ErrorText), BindingFlags.Default, v => v != null)
-            ?.Binding("title", nameof(MainContext.ErrorText), BindingFlags.Default);
+            ?.Binding("title", nameof(MainContext.ErrorText), BindingFlags.Default)
+            ?.SideEffect(b => b.OnButtonClicked(() => b.SetRevealed(false)));
 
         Handle.AddActions(
             [
@@ -84,17 +86,10 @@ class MainWindow(nint obj) : ManagedApplicationWindow(obj)
     }
 
     public class MainWindowClass()
-        : SubClass<ApplicationWindowHandle>(GTypeEnum.ApplicationWindow, "MainWindow", p => new MainWindow(p))
-    {
-        protected override void ClassInit(nint cls, nint _)
-        {
-            base.ClassInit(cls, _);
-            InitTemplateFromResource(cls, "mainwindow");
-        }
-    }
+        : SubClass<AdwApplicationWindowHandle>(GTypeEnum.AdwApplicationWindow, "MainWindow", p => new MainWindow(p)) { }
 
     protected override void OnFinalize() => Console.WriteLine("Window finalized");
-    protected override ApplicationWindowHandle CreateHandle(nint obj) => new(obj);
+    protected override AdwApplicationWindowHandle CreateHandle(nint obj) => new(obj);
 
     string GetBackgroundAction(object? value)
     {
