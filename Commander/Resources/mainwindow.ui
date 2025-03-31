@@ -235,19 +235,13 @@
         <section>
           <item>
             <attribute name="label">Vorschaumodus _wechseln</attribute>
-            <attribute name="action">win.togglePreviewMode</attribute>
+            <attribute name="action">win.toggleViewMode</attribute>
           </item>
         </section>
         <section>
           <item>
             <attribute name="label">_Vollbild</attribute>
             <attribute name="action">win.fullscreen</attribute>
-          </item>
-        </section>
-        <section>
-          <item>
-            <attribute name="label">_Entwicklerwerkzeuge</attribute>
-            <attribute name="action">win.devtools</attribute>
           </item>
         </section>
       </submenu>
