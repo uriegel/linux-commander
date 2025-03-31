@@ -23,6 +23,13 @@
     <child>
       <object class="GtkBox">
         <property name="orientation">vertical</property>
+        <child> 
+          <object class="AdwBanner">
+            <property name="css-classes">warning</property>
+            <property name= "title">Das soll ein Banner sein</property>
+            <property name= "button-label">Zurück</property>
+          </object>
+        </child>
         <child>
           <object class="GtkPaned" id="viewerPaned">
             <property name="vexpand">True</property>
