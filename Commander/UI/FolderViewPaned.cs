@@ -24,6 +24,15 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
     public void SelectToStart() => folderViewActive?.OnSelectToStart();
     public void SelectToEnd() => folderViewActive?.OnSelectToEnd();
 
+    public void Refresh() => folderViewActive?.Refresh();
+
+    public void AdaptPath()
+    {
+        var path = folderViewActive?.Context.CurrentPath;
+        if (!string.IsNullOrEmpty(path))
+            GetInactiveFolderView()?.ChangePath(path);
+    } 
+
     protected override async void OnCreate()
     {
         Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m) =>

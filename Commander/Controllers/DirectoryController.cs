@@ -9,7 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Menu actions like adapt view
 // TODO Backspace history
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
@@ -18,6 +17,7 @@ namespace Commander.Controllers;
 // TODO Text viewer/editor
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
 
+// TODO Favorites
 // TODO overlay show errors in red: button Ok
 
 // TODO To Gtk4 AdwBanner with title, button-lable, revealed, signal: button-clicked;
@@ -149,7 +149,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             finally
             {
                 folderView.Context.BackgroundAction = BackgroundAction.None;
-                Gtk.Dispatch(() => folderView.Refresh());
+                Gtk.Dispatch(() => folderView.InvalidateView());
             }
         });
     }

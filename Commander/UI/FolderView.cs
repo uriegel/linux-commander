@@ -181,7 +181,9 @@ class FolderView : ColumnViewSubClassed
 
     public void GrabFocus() => columnView.GrabFocus();
 
-    public void Refresh()
+    public void Refresh() => controller.ChangePath(controller.CurrentPath);
+
+    public void InvalidateView()
     {
         var pos = controller.GetFocusedItemPos();
         var model = columnView.GetModel<SelectionHandle>();
