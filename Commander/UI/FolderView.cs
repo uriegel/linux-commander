@@ -5,7 +5,6 @@ using GtkDotNet.SafeHandles;
 using Commander.Controllers;
 using System.ComponentModel;
 using Commander.DataContexts;
-using Commander.EventArg;
 
 namespace Commander.UI;
 
@@ -14,6 +13,10 @@ class FolderView : ColumnViewSubClassed
     public int CurrentPos { get; private set; } = -1;
 
     public FolderContext Context { get; } = new();
+
+
+    [System.Runtime.InteropServices.DllImport("libgtk-4.so.1", EntryPoint = "gtk_editable_get_text", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
+    public extern static nint GetText(EditableLabelHandle editableLabel);
 
     public FolderView(nint obj)
         : base(obj)
@@ -33,14 +36,16 @@ class FolderView : ColumnViewSubClassed
             pathEditing.OnNotify("editing",
                     e =>
                     {
-                        if (e.IsEditing())
+                        if ((bool)e.GetProperty("editing", typeof(bool))! == false)
                         {
                             columnView.GrabFocus();
-                            if (!string.IsNullOrEmpty(Context.CurrentPath))
-                                controller.ChangePath(Context.CurrentPath);
+                            var affe = GetText(pathEditing);
+                            var val = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(affe);
+                            if (val != null)
+                                controller.ChangePath(val);
                         }
-                    }).Binding("text", nameof(FolderContext.CurrentPath), BindingFlags.Bidirectional);
-            _ = Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, k, m) =>
+                    }).Binding("text", nameof(FolderContext.CurrentPath), BindingFlags.Default);
+            Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, k, m) =>
             {
                 if (k == 9)
                     StopRestriction();

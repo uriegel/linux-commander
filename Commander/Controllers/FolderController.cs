@@ -48,9 +48,14 @@ class FolderController
             catch (Exception e)
             {
                 if (e is UnauthorizedAccessException)
-                    MainContext.Instance.ErrorText = "Ordner konnte nicht gewechselt werden: nicht erlaubt";
+                    MainContext.Instance.ErrorText = "Kein Zugriff";
+                else if (e is DirectoryNotFoundException)
+                    MainContext.Instance.ErrorText = "Pfad nicht gefunden";    
                 else
                     MainContext.Instance.ErrorText = "Ordner konnte nicht gewechselt werden";
+                var refreshPath = folderView.Context.CurrentPath;
+                folderView.Context.CurrentPath = "";
+                folderView.Context.CurrentPath = refreshPath;
                 ChangePath(folderView.Context.CurrentPath);
                 Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
             }
@@ -76,6 +81,7 @@ class FolderController
         switch (path)
         {
             case "root":
+            case "":
                 if (controller is not RootController)
                 {
                     controller.Dispose();

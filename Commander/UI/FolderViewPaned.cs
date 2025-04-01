@@ -31,7 +31,12 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         var path = folderViewActive?.Context.CurrentPath;
         if (!string.IsNullOrEmpty(path))
             GetInactiveFolderView()?.ChangePath(path);
-    } 
+    }
+
+    public void DeleteItems()
+    {
+        Console.WriteLine("DeleteItems");
+    }
 
     protected override async void OnCreate()
     {
@@ -39,7 +44,6 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         {
             if (k == 23)
             {
-
                 if (!m.HasFlag(KeyModifiers.Shift))
                     GetInactiveFolderView()?.GrabFocus();
                 else

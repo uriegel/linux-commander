@@ -59,30 +59,31 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
             ?.Binding("title", nameof(MainContext.ErrorText), BindingFlags.Default)
             ?.SideEffect(b => b.OnButtonClicked(() => b.SetRevealed(false)));
 
-        Handle.AddActions(
-            [
-                new("toggleViewMode", Viewer.ToggleView, "<Ctrl>F3"),
-                new("showpreview", false, show => Viewer.Show(Handle, viewer, show), "F3"),
-                // new("copy", Events.MenuAction.Apply("COPY"), "F5"),
-                // new("createfolder", Events.MenuAction.Apply("CREATE_FOLDER"), "F7"),
-                new("adaptpath", () => paned?.AdaptPath(), "F9"),
-                // new("delete", Events.MenuAction.Apply("DELETE")),
-                new("refresh", () => paned?.Refresh(), "<Ctrl>R"),
-                new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
-                new("diagnostics", Gtk.ShowDiagnostics, "<Ctrl><Shift>I"),
-                new("quit", Handle.CloseWindow, "<Ctrl>Q"),
-                new("down", () => paned?.OnDown(), "Down"),
-                new("up", () => paned?.OnUp(), "Up"),
-                new("pageDown", () => paned?.OnPageDown(Handle), "Page_Down"),
-                new("pageUp", () => paned?.OnPageUp(Handle), "Page_Up"),
-                new("home", () => paned?.OnHome(), "Home"),
-                new("end", () => paned?.OnEnd(), "End"),
-                new("selectall", () => paned?.SelectAll(), "KP_Add"),
-                new("selectnone", () => paned?.SelectNone(), "KP_Subtract"),
-                new("selectcurrent", () => paned?.SelectCurrent(), "Insert"),
-                new("selectToStart", () => paned?.SelectToStart(), "<Shift>Home"),
-                new("selectToEnd", () => paned?.SelectToEnd(), "<Shift>End"),
-            ]);
+        if (paned != null)
+            Handle.AddActions(
+                [
+                    new("toggleViewMode", Viewer.ToggleView, "<Ctrl>F3"),
+                    new("showpreview", false, show => Viewer.Show(Handle, viewer, show), "F3"),
+                    // new("copy", Events.MenuAction.Apply("COPY"), "F5"),
+                    // new("createfolder", Events.MenuAction.Apply("CREATE_FOLDER"), "F7"),
+                    new("adaptpath", paned.AdaptPath, "F9"),
+                    new("delete", paned.DeleteItems, "Delete"),
+                    new("refresh", paned.Refresh, "<Ctrl>R"),
+                    new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
+                    new("diagnostics", Gtk.ShowDiagnostics, "<Ctrl><Shift>I"),
+                    new("quit", Handle.CloseWindow, "<Ctrl>Q"),
+                    new("down", paned.OnDown, "Down"),
+                    new("up", paned.OnUp, "Up"),
+                    new("pageDown", () => paned.OnPageDown(Handle), "Page_Down"),
+                    new("pageUp", () => paned.OnPageUp(Handle), "Page_Up"),
+                    new("home", paned.OnHome, "Home"),
+                    new("end", paned.OnEnd, "End"),
+                    new("selectall", paned.SelectAll, "KP_Add"),
+                    new("selectnone", paned.SelectNone, "KP_Subtract"),
+                    new("selectcurrent", paned.SelectCurrent, "Insert"),
+                    new("selectToStart", paned.SelectToStart, "<Shift>Home"),
+                    new("selectToEnd", paned.SelectToEnd, "<Shift>End"),
+                ]);
     }
 
     public class MainWindowClass()

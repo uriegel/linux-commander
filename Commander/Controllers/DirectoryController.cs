@@ -9,6 +9,11 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO DeleteItems: action only active when paned is active (and not labels)
+// TODO Error description path not found
+
+// TODO To Gtk4: gtk_editable_get_text gtk_editable_set_text
+
 // TODO Backspace history
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
