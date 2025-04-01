@@ -14,10 +14,6 @@ class FolderView : ColumnViewSubClassed
 
     public FolderContext Context { get; } = new();
 
-
-    [System.Runtime.InteropServices.DllImport("libgtk-4.so.1", EntryPoint = "gtk_editable_get_text", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
-    public extern static nint GetText(EditableLabelHandle editableLabel);
-
     public FolderView(nint obj)
         : base(obj)
     {
@@ -34,18 +30,17 @@ class FolderView : ColumnViewSubClassed
                             .DataContext(Context)
                             .GetFirstChild<EditableLabelHandle>();
             pathEditing.OnNotify("editing",
-                    e =>
+                e =>
+                {
+                    Context.IsEditing = (bool)e.GetProperty("editing", typeof(bool))! == true;
+                    if (!Context.IsEditing)
                     {
-                        Context.IsEditing = (bool)e.GetProperty("editing", typeof(bool))! == true;
-                        if (!Context.IsEditing)
-                        {
-                            columnView.GrabFocus();
-                            var affe = GetText(pathEditing);
-                            var val = System.Runtime.InteropServices.Marshal.PtrToStringUTF8(affe);
-                            if (val != null)
-                                controller.ChangePath(val);
-                        }
-                    }).Binding("text", nameof(FolderContext.CurrentPath), BindingFlags.Default);
+                        columnView.GrabFocus();
+                        var val = EditableLabel.GetText(pathEditing);// TODO GTK4!
+                        if (val != null)
+                            controller.ChangePath(val);
+                    }
+                }).Binding("text", nameof(FolderContext.CurrentPath), BindingFlags.Default);
             Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, k, m) =>
             {
                 if (k == 9)
@@ -104,9 +99,9 @@ class FolderView : ColumnViewSubClassed
         CheckCurrentChanged(newPos);
     }
 
-    public void OnPageDown(WindowHandle window)
+    public void OnPageDown()
     {
-        var pageSize = GetNumberOfVisibleRows(window);
+        var pageSize = GetNumberOfVisibleRows(MainWindow.MainWindowHandle);
         var pos = controller.GetFocusedItemPos();
         var count = controller.ItemsCount();
         var newPos = Math.Min(pos + pageSize, count - 1);
@@ -114,9 +109,9 @@ class FolderView : ColumnViewSubClassed
         CheckCurrentChanged(newPos);
     }
 
-    public void OnPageUp(WindowHandle window)
+    public void OnPageUp()
     {
-        var pageSize = GetNumberOfVisibleRows(window);
+        var pageSize = GetNumberOfVisibleRows(MainWindow.MainWindowHandle);
         var pos = controller.GetFocusedItemPos();
         var newPos = Math.Max(pos - pageSize, 0);
         columnView.ScrollTo(newPos, ListScrollFlags.ScrollFocus);

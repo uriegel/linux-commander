@@ -13,8 +13,8 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
     public void OnDown() => folderViewActive?.OnDown();
     public void OnUp() => folderViewActive?.OnUp();
-    public void OnPageDown(WindowHandle window) => folderViewActive?.OnPageDown(window);
-    public void OnPageUp(WindowHandle window) => folderViewActive?.OnPageUp(window);
+    public void OnPageDown() => folderViewActive?.OnPageDown();
+    public void OnPageUp() => folderViewActive?.OnPageUp();
     public void OnHome() => folderViewActive?.OnHome();
     public void OnEnd() => folderViewActive?.OnEnd();
     

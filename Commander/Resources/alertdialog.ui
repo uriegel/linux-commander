@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <object class="AdwAlertDialog" id="dialog">
+        <property name="close-response">cancel</property>
+        <responses>
+            <response id="cancel" translatable="yes">_Abbrechen</response>
+            <response id="ok" translatable="yes" appearance="suggested" >_OK</response>
+        </responses>
+    </object>
+</interface>

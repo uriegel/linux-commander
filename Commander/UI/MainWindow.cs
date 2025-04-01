@@ -10,6 +10,7 @@ namespace Commander.UI;
 
 class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
 {
+    public static AdwApplicationWindowHandle MainWindowHandle { get; private set; } = new();
     public static void Register(ApplicationHandle app)
         => app.SubClass(new MainWindowClass());
 
@@ -18,6 +19,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
         var webkitType = GType.Get(GTypeEnum.WebKitWebView);
         GType.Ensure(webkitType);
 
+        MainWindowHandle = Handle;
         Handle.InitTemplate();
         StyleContext.AddProviderForDisplay(
             Display.GetDefault(),
@@ -74,8 +76,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                     new("quit", Handle.CloseWindow, "<Ctrl>Q"),
                     new("down", paned.OnDown, "Down"),
                     new("up", paned.OnUp, "Up"),
-                    new("pageDown", () => paned.OnPageDown(Handle), "Page_Down"),
-                    new("pageUp", () => paned.OnPageUp(Handle), "Page_Up"),
+                    new("pageDown", paned.OnPageDown, "Page_Down"),
+                    new("pageUp", paned.OnPageUp, "Page_Up"),
                     new("home", paned.OnHome, "Home"),
                     new("end", paned.OnEnd, "End"),
                     new("selectall", paned.SelectAll, "KP_Add"),

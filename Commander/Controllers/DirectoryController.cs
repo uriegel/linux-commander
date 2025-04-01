@@ -9,11 +9,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO DeleteItems: show dialog from template in ui
-// TODO DeleteItems: show text in dialog: detect text from selectedImets (folder, directories, both) from controller, so that content descriptions are folder dependant
-
-// TODO To Gtk4: gtk_editable_get_text gtk_editable_set_text
-
 // TODO Backspace history
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
@@ -65,7 +60,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public async void DeleteItems()
     {
-        var type = GetSelectedItemsType();
+        var type = GetSelectedItemsType(GetFocusedItemPos());
         if (type == SelectedItemsType.None)
             return;
         var text = type switch
@@ -74,13 +69,14 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             SelectedItemsType.Files => "Möchtest Du die markierten Dateien löschen?",
             SelectedItemsType.Folders => "Möchtest Du die markierten Verzeichnisse löschen?",
             SelectedItemsType.File => "Möchtest Du die markierte Datei löschen?",
-            SelectedItemsType.Folder => "Möchtest Du das markierten Verzeichnis löschen?",
+            SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis löschen?",
             _ => ""
         };
-        // TODO pos as parameeter if no items are selected  
-        // TODO access windowhandle from global singleton
-        // TODO do this in all previous cases
-        // TODO show dialog in ui
+        var dialog = Builder.FromDotNetResource("alertdialog").GetWidget<AdwAlertDialogHandle>("dialog");
+        dialog.Heading("Löschen");
+        dialog.Body(text);
+        var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
+        Console.WriteLine($"Response: {response}");
     }
 
     public string? OnActivate(int pos)
@@ -155,21 +151,30 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             }
         ];
 
-    public SelectedItemsType GetSelectedItemsType(int focusedItem)
+    public SelectedItemsType GetSelectedItemsType(int focusedItemPos)
     {
-        var dirs = GetSelectedItems().Count(n => n.IsDirectory);
-        var files = GetSelectedItems().Count(n => !n.IsDirectory); 
-        return dirs > 1 && files == 0
+        var dirs = GetSelectedItems().Count(n => n.Kind == ItemKind.Folder);
+        var files = GetSelectedItems().Count(n => n.Kind == ItemKind.Item);
+        var result = dirs > 1 && files == 0
             ? SelectedItemsType.Folders
             : dirs == 0 && files > 1
             ? SelectedItemsType.Files
             : dirs == 1 && files == 0
             ? SelectedItemsType.Folder
             : dirs == 0 && files == 1
-            ? SelectedItemsType.Both
+            ? SelectedItemsType.File
             : dirs + files > 0
             ? SelectedItemsType.Both
             : SelectedItemsType.None;
+        if (result != SelectedItemsType.None)
+            return result;
+        var focusedItem = Items().Skip(focusedItemPos).FirstOrDefault();
+        return focusedItem?.Kind switch
+        {
+            ItemKind.Folder => SelectedItemsType.Folder,
+            ItemKind.Item => SelectedItemsType.File,
+            _ => SelectedItemsType.None
+        };
     }
     
     void StartExifResolving(DirectoryItem[] items, FolderView folderView)
