@@ -9,7 +9,8 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO DeleteItems
+// TODO DeleteItems: show dialog from template in ui
+// TODO DeleteItems: show text in dialog: detect text from selectedImets (folder, directories, both) from controller, so that content descriptions are folder dependant
 
 // TODO To Gtk4: gtk_editable_get_text gtk_editable_set_text
 
