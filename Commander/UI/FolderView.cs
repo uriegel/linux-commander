@@ -5,6 +5,7 @@ using GtkDotNet.SafeHandles;
 using Commander.Controllers;
 using System.ComponentModel;
 using Commander.DataContexts;
+using GtkDotNet.Exceptions;
 
 namespace Commander.UI;
 
@@ -36,7 +37,7 @@ class FolderView : ColumnViewSubClassed
                     if (!Context.IsEditing)
                     {
                         columnView.GrabFocus();
-                        var val = EditableLabel.GetText(pathEditing);// TODO GTK4!
+                        var val = pathEditing.GetText();
                         if (val != null)
                             controller.ChangePath(val);
                     }
@@ -81,9 +82,9 @@ class FolderView : ColumnViewSubClassed
             await controller.DeleteItems();
             Refresh();
         }
-        catch
+        catch (GFileException e)
         {
-
+            MainContext.Instance.ErrorText = e.Message;
         }
     }
 

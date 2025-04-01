@@ -9,6 +9,8 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
+// TODO Gtk4 TrashAsync: GLib-GObject-CRITICAL **: 23:04:15.394: g_object_unref: assertion 'G_IS_OBJECT (object)' failed when deleting file without access rights
+
 // TODO Backspace history
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
@@ -80,10 +82,9 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             foreach (var item in GetSelectedItems(GetFocusedItemPos()))
             {
                 using var file = GFile.New(CurrentPath.AppendPath(item.Name));
-                // TODO GTK async and ResultThrow
-                file.Trash();
+                await file.TrashAsync();
             }
-        } 
+        }
     }
 
     public string? OnActivate(int pos)
@@ -183,7 +184,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             _ => SelectedItemsType.None
         };
     }
-    
+
     void StartExifResolving(DirectoryItem[] items, FolderView folderView)
     {
         var token = cancellation.Token;
