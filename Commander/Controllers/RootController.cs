@@ -8,6 +8,7 @@ using Commander.UI;
 
 using static GtkDotNet.Controls.ColumnViewSubClassed;
 using static CsTools.ProcessCmd;
+using CsTools;
 
 namespace Commander.Controllers;
 
@@ -118,7 +119,7 @@ class RootController : ControllerBase<RootItem>, IController
                 OnLabelBind = i => i.Size != 0 ? i.Size.ToString() : ""
             }];
 
-    public void DeleteItems() {}
+    public Task DeleteItems() => Unit.Value.ToAsync();
 
     RootItem CreateRootItem(string driveString, int[] columnPositions)
     {

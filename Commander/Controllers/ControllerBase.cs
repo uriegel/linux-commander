@@ -27,11 +27,19 @@ abstract class ControllerBase<T> : Controller<T>
         }
     }
 
-    protected IEnumerable<T> GetSelectedItems()
-        => selectionModel != null
+    protected IEnumerable<T> GetSelectedItems(int? focusedItemPos = null)
+    {
+        var items = selectionModel != null
             ? GetSelectedItemsIndices()
                 .SelectFilterNull(selectionModel.GetItem<T>)
             : [];
+        if (!items.Any() && focusedItemPos.HasValue)
+        {
+            var focusedItem = GetItem(focusedItemPos.Value);
+            if (focusedItem != null)
+                yield return focusedItem;   
+        }
+    }
 
     protected readonly SelectionHandle? selectionModel;
 }

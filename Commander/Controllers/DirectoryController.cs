@@ -18,7 +18,6 @@ namespace Commander.Controllers;
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
 
 // TODO Favorites
-// TODO overlay show errors in red: button Ok
 
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
 
@@ -58,7 +57,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 
-    public async void DeleteItems()
+    public async Task DeleteItems()
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());
         if (type == SelectedItemsType.None)
@@ -73,10 +72,18 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             _ => ""
         };
         var dialog = Builder.FromDotNetResource("alertdialog").GetWidget<AdwAlertDialogHandle>("dialog");
-        dialog.Heading("Löschen");
+        dialog.Heading("Löschen?");
         dialog.Body(text);
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
-        Console.WriteLine($"Response: {response}");
+        if (response == "ok")
+        {
+            foreach (var item in GetSelectedItems(GetFocusedItemPos()))
+            {
+                using var file = GFile.New(CurrentPath.AppendPath(item.Name));
+                // TODO GTK async and ResultThrow
+                file.Trash();
+            }
+        } 
     }
 
     public string? OnActivate(int pos)

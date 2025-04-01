@@ -23,7 +23,7 @@ class FolderController
     public string? GetItemPath(int pos) => controller.GetItemPath(pos);
     public ExifData? GetExifData(int pos) => controller.GetExifData(pos);
 
-    public void DeleteItems() => controller.DeleteItems();
+    public Task DeleteItems() => controller.DeleteItems();
 
     public void OnActivate(int pos)
     {
