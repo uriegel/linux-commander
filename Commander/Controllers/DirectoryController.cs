@@ -63,6 +63,26 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 
+    public async void DeleteItems()
+    {
+        var type = GetSelectedItemsType();
+        if (type == SelectedItemsType.None)
+            return;
+        var text = type switch
+        {
+            SelectedItemsType.Both => "Möchtest Du die markierten Einträge löschen?",
+            SelectedItemsType.Files => "Möchtest Du die markierten Dateien löschen?",
+            SelectedItemsType.Folders => "Möchtest Du die markierten Verzeichnisse löschen?",
+            SelectedItemsType.File => "Möchtest Du die markierte Datei löschen?",
+            SelectedItemsType.Folder => "Möchtest Du das markierten Verzeichnis löschen?",
+            _ => ""
+        };
+        // TODO pos as parameeter if no items are selected  
+        // TODO access windowhandle from global singleton
+        // TODO do this in all previous cases
+        // TODO show dialog in ui
+    }
+
     public string? OnActivate(int pos)
     {
         var item = GetItem(pos);
@@ -135,6 +155,23 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             }
         ];
 
+    public SelectedItemsType GetSelectedItemsType(int focusedItem)
+    {
+        var dirs = GetSelectedItems().Count(n => n.IsDirectory);
+        var files = GetSelectedItems().Count(n => !n.IsDirectory); 
+        return dirs > 1 && files == 0
+            ? SelectedItemsType.Folders
+            : dirs == 0 && files > 1
+            ? SelectedItemsType.Files
+            : dirs == 1 && files == 0
+            ? SelectedItemsType.Folder
+            : dirs == 0 && files == 1
+            ? SelectedItemsType.Both
+            : dirs + files > 0
+            ? SelectedItemsType.Both
+            : SelectedItemsType.None;
+    }
+    
     void StartExifResolving(DirectoryItem[] items, FolderView folderView)
     {
         var token = cancellation.Token;

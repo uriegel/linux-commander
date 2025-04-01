@@ -79,6 +79,8 @@ class FolderView : ColumnViewSubClassed
 
     public void OnPathChanged() => StopRestriction();
 
+    public void DeleteItems() => controller.DeleteItems();
+
     public void ScrollTo(int pos)
     {
         columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);

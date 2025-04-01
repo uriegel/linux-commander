@@ -33,10 +33,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
             GetInactiveFolderView()?.ChangePath(path);
     }
 
-    public void DeleteItems()
-    {
-        Console.WriteLine("DeleteItems");
-    }
+    public void DeleteItems() => folderViewActive?.DeleteItems();
 
     protected override async void OnCreate()
     {

@@ -118,6 +118,8 @@ class RootController : ControllerBase<RootItem>, IController
                 OnLabelBind = i => i.Size != 0 ? i.Size.ToString() : ""
             }];
 
+    public void DeleteItems() {}
+
     RootItem CreateRootItem(string driveString, int[] columnPositions)
     {
         var mountPoint = driveString != "home"

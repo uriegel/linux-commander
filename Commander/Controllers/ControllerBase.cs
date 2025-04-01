@@ -27,7 +27,7 @@ abstract class ControllerBase<T> : Controller<T>
         }
     }
 
-    IEnumerable<T> GetSelectedItems()
+    protected IEnumerable<T> GetSelectedItems()
         => selectionModel != null
             ? GetSelectedItemsIndices()
                 .SelectFilterNull(selectionModel.GetItem<T>)

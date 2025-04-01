@@ -17,6 +17,8 @@ interface IController : IDisposable
 
     Task<int> Fill(string path, FolderView folderView);
 
+    void DeleteItems();
+    
     string? OnActivate(int pos);
 
     int GetFocusedItemPos();
