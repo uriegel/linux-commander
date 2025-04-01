@@ -9,7 +9,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Gtk4 TrashAsync: GLib-GObject-CRITICAL **: 23:04:15.394: g_object_unref: assertion 'G_IS_OBJECT (object)' failed when deleting file without access rights
+// TODO Gtk4 TrashAsync: GLib-GObject-CRITICAL **: 23:04:15.394: g_object_unref: assertion 'G_IS_OBJECT (object)' failed when deleting file
 
 // TODO Backspace history
 
