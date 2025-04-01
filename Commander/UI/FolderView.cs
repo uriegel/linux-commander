@@ -36,7 +36,8 @@ class FolderView : ColumnViewSubClassed
             pathEditing.OnNotify("editing",
                     e =>
                     {
-                        if ((bool)e.GetProperty("editing", typeof(bool))! == false)
+                        Context.IsEditing = (bool)e.GetProperty("editing", typeof(bool))! == true;
+                        if (!Context.IsEditing)
                         {
                             columnView.GrabFocus();
                             var affe = GetText(pathEditing);

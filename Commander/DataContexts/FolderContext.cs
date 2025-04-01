@@ -102,6 +102,8 @@ class FolderContext : INotifyPropertyChanged
         }
     }
 
+    public bool IsEditing { get; set; }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));

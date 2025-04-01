@@ -9,8 +9,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO DeleteItems: action only active when paned is active (and not labels)
-// TODO Error description path not found
+// TODO DeleteItems
 
 // TODO To Gtk4: gtk_editable_get_text gtk_editable_set_text
 

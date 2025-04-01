@@ -73,8 +73,14 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                     folderViewActive = folderViewLeft;
                     MainContext.Instance.ChangeFolderContext(folderViewActive?.Context);
                     EnableKeyNavigation(true);
+                    if (folderViewActive?.Context.IsEditing != true)
+                        EnableFolderViewActions(true);
                 };
-                folderViewLeft.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
+                folderViewLeft.OnFocusLeave += (s, e) =>
+                {
+                    EnableKeyNavigation(false);
+                    EnableFolderViewActions(false);
+                };
             }
             folderViewRight = FolderView.GetInstance(cvhr);
             if (folderViewRight != null)
@@ -85,8 +91,14 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
                     folderViewActive = folderViewRight;
                     MainContext.Instance.ChangeFolderContext(folderViewActive?.Context);
                     EnableKeyNavigation(true);
+                    if (folderViewActive?.Context.IsEditing != true)
+                        EnableFolderViewActions(true);
                 };
-                folderViewRight.OnFocusLeave += (s, e) => EnableKeyNavigation(false);
+                folderViewRight.OnFocusLeave += (s, e) =>
+                {
+                    EnableKeyNavigation(false);
+                    EnableFolderViewActions(false);
+                };
             }
 
             await Task.Delay(100);
@@ -106,6 +118,12 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         IActionMap.GetAction("pageUp").SetEnabled(enable);
         IActionMap.GetAction("home").SetEnabled(enable);
         IActionMap.GetAction("end").SetEnabled(enable);
+    }
+
+    void EnableFolderViewActions(bool enable)
+    {
+        Console.WriteLine("EnableFolderViewActions: " + enable);
+        IActionMap.GetAction("delete").SetEnabled(enable);
     }
 
     FolderView? GetInactiveFolderView() => folderViewActive == folderViewLeft ? folderViewRight : folderViewLeft;
