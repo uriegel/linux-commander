@@ -24,6 +24,7 @@ class FolderController
     public ExifData? GetExifData(int pos) => controller.GetExifData(pos);
 
     public Task DeleteItems() => controller.DeleteItems();
+    public Task Rename() => controller.Rename();
 
     public void OnActivate(int pos)
     {

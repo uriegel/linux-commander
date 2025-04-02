@@ -64,6 +64,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
         if (paned != null)
             Handle.AddActions(
                 [
+                    new("rename", paned.Rename, "F2"),
                     new("toggleViewMode", Viewer.ToggleView, "<Ctrl>F3"),
                     new("showpreview", false, show => Viewer.Show(Handle, viewer, show), "F3"),
                     // new("copy", Events.MenuAction.Apply("COPY"), "F5"),

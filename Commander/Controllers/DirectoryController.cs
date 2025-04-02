@@ -87,6 +87,28 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         }
     }
 
+    public async Task Rename()
+    {
+        var type = GetSelectedItemsType(GetFocusedItemPos());
+        if (type == SelectedItemsType.None)
+            return;
+        var text = type switch
+        {
+            SelectedItemsType.File => "Möchtest Du die markierte Datei umbenennen?",
+            SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis umbenennen?",
+            _ => null
+        };
+        if (text == null)
+            return;
+        var dialog = Builder.FromDotNetResource("alertdialog").GetWidget<AdwAlertDialogHandle>("dialog");
+        dialog.Heading("Umbennen?");
+        dialog.Body(text);
+        var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
+        if (response == "ok")
+        {
+        }
+    }
+
     public string? OnActivate(int pos)
     {
         var item = GetItem(pos);
@@ -161,8 +183,9 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public SelectedItemsType GetSelectedItemsType(int focusedItemPos)
     {
-        var dirs = GetSelectedItems().Count(n => n.Kind == ItemKind.Folder);
-        var files = GetSelectedItems().Count(n => n.Kind == ItemKind.Item);
+        var selItems = GetSelectedItems();
+        var dirs = selItems.Count(n => n.Kind == ItemKind.Folder);
+        var files = selItems.Count(n => n.Kind == ItemKind.Item);
         var result = dirs > 1 && files == 0
             ? SelectedItemsType.Folders
             : dirs == 0 && files > 1

@@ -88,6 +88,19 @@ class FolderView : ColumnViewSubClassed
         }
     }
 
+    public async void Rename()
+    {
+        try
+        {
+            await controller.Rename();
+            Refresh();
+        }
+        catch (GFileException e)
+        {
+            MainContext.Instance.ErrorText = e.Message;
+        }
+    }
+    
     public void ScrollTo(int pos)
     {
         columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);

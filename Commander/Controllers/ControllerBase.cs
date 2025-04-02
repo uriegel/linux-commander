@@ -33,12 +33,17 @@ abstract class ControllerBase<T> : Controller<T>
             ? GetSelectedItemsIndices()
                 .SelectFilterNull(selectionModel.GetItem<T>)
             : [];
-        if (!items.Any() && focusedItemPos.HasValue)
+        if (items.Any())
+            return items;
+        if (focusedItemPos.HasValue)
         {
             var focusedItem = GetItem(focusedItemPos.Value);
-            if (focusedItem != null)
-                yield return focusedItem;   
+            return focusedItem != null
+                ? [focusedItem]
+                : [];
         }
+        else
+            return [];
     }
 
     protected readonly SelectionHandle? selectionModel;
