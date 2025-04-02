@@ -6,6 +6,7 @@ using Commander.Controllers;
 using System.ComponentModel;
 using Commander.DataContexts;
 using GtkDotNet.Exceptions;
+using Commander.Exceptions;
 
 namespace Commander.UI;
 
@@ -82,6 +83,7 @@ class FolderView : ColumnViewSubClassed
             await controller.DeleteItems();
             Refresh();
         }
+        catch (CancelledException) { }
         catch (GFileException e)
         {
             MainContext.Instance.ErrorText = e.Message;
@@ -95,6 +97,7 @@ class FolderView : ColumnViewSubClassed
             await controller.Rename();
             Refresh();
         }
+        catch (CancelledException) { }
         catch (GFileException e)
         {
             MainContext.Instance.ErrorText = e.Message;

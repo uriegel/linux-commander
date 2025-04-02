@@ -1,5 +1,6 @@
 using Commander.DataContexts;
 using Commander.Enums;
+using Commander.Exceptions;
 using Commander.UI;
 using CsTools.Extensions;
 using GtkDotNet;
@@ -63,7 +64,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());
         if (type == SelectedItemsType.None)
-            return;
+            throw new CancelledException();
         var text = type switch
         {
             SelectedItemsType.Both => "Möchtest Du die markierten Einträge löschen?",
@@ -85,13 +86,15 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 await file.TrashAsync();
             }
         }
+        else
+            throw new CancelledException();
     }
 
     public async Task Rename()
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());
         if (type == SelectedItemsType.None)
-            return;
+            throw new CancelledException();
         var text = type switch
         {
             SelectedItemsType.File => "Möchtest Du die markierte Datei umbenennen?",
@@ -99,7 +102,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             _ => null
         };
         if (text == null)
-            return;
+            throw new CancelledException();
         var dialog = Builder.FromDotNetResource("alertdialog").GetWidget<AdwAlertDialogHandle>("dialog");
         dialog.Heading("Umbennen?");
         dialog.Body(text);
@@ -107,6 +110,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         if (response == "ok")
         {
         }
+        else
+            throw new CancelledException();
     }
 
     public string? OnActivate(int pos)
