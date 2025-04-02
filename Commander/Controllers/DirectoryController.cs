@@ -9,7 +9,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Gtk4 TrashAsync: GLib-GObject-CRITICAL **: 23:04:15.394: g_object_unref: assertion 'G_IS_OBJECT (object)' failed when deleting file
+// TODO Gtk4 Initial fill: Gtk-CRITICAL **: 05:50:17.379: gtk_column_view_scroll_to: assertion 'pos < gtk_list_base_get_n_items (GTK_LIST_BASE (self->listview))' failed
 
 // TODO Backspace history
 
