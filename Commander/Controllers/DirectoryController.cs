@@ -100,15 +100,32 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             SelectedItemsType.File => "Möchtest Du die markierte Datei umbenennen?",
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis umbenennen?",
             _ => null
-        };
-        if (text == null)
-            throw new CancelledException();
-        var dialog = Builder.FromDotNetResource("alertdialog").GetWidget<AdwAlertDialogHandle>("dialog");
+        } ?? throw new CancelledException();
+        var builder = Builder.FromDotNetResource("textdialog");
+        var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
+        var textView = builder.GetWidget<EntryHandle>("text");
         dialog.Heading("Umbennen?");
         dialog.Body(text);
+        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();        
+        textView.Text(item?.Name ?? "");
+        dialog.OnMap(async () =>
+        {
+            textView.GrabFocus();
+            await Task.Delay(100);
+            textView.SelectRegion(0, item?.Name?.LastIndexOf('.') ?? 0);
+        });
+
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
+            var newFile = textView.GetText();
+            if (item != null && !string.IsNullOrWhiteSpace(text))
+            {
+                if (item.IsDirectory)
+                    Directory.Move(CurrentPath.AppendPath(item.Name), CurrentPath.AppendPath(newFile));
+                else
+                    File.Move(CurrentPath.AppendPath(item.Name), CurrentPath.AppendPath(newFile));
+            }
         }
         else
             throw new CancelledException();

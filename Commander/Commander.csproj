@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gtk4DotNet" Version="7.0.33-beta-33" />
+    <PackageReference Include="Gtk4DotNet" Version="7.0.36-beta-36" />
     <PackageReference Include="WebServerLight" Version="0.0.15-beta-15" />
   </ItemGroup>
 
@@ -22,6 +22,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="./Resources/alertdialog.ui">
       <LogicalName>alertdialog</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/textdialog.ui">
+      <LogicalName>textdialog</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="./Resources/style.css">
       <LogicalName>style</LogicalName>

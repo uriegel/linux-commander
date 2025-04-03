@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <object class="AdwAlertDialog" id="dialog">
+        <property name="close-response">cancel</property>
+        <property name="default-response">ok</property>
+        <property name="extra-child">
+            <object class="GtkBox" id="extra">
+                <property name="orientation">vertical</property>
+                <property name="spacing">12</property>
+                <child>
+                    <object class="GtkEntry" id="text">
+                        <property name="activates-default">true</property>
+                    </object>
+                </child>
+            </object>
+        </property>
+        <responses>
+            <response id="cancel" translatable="yes">_Abbrechen</response>
+            <response id="ok" translatable="yes" appearance="suggested" >_OK</response>
+        </responses>
+    </object>
+</interface>
+
+
+

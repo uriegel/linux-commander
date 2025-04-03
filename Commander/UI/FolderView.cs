@@ -98,6 +98,14 @@ class FolderView : ColumnViewSubClassed
             Refresh();
         }
         catch (CancelledException) { }
+        catch (IOException e) when (e.HResult == 13)
+        {
+            MainContext.Instance.ErrorText = "Kein Zugriff";
+        }
+        catch (IOException e2) when ((uint)e2.HResult == 0x80131620)
+        {
+            MainContext.Instance.ErrorText = "Ziel und Quelle sind identisch";
+        }
         catch (GFileException e)
         {
             MainContext.Instance.ErrorText = e.Message;
