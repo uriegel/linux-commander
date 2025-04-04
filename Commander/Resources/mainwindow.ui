@@ -19,6 +19,13 @@
               </object>
             </child>
             <child type="end">
+              <object class="GtkRevealer" id="progress-revealer">
+                <property name="transition-type">slide-left</property>
+                <child>
+                  <object class="GtkMenuButton">
+                  </object>
+                </child>
+              </object>
             </child>
           </object>
         </child>

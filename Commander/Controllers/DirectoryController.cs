@@ -183,11 +183,21 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             // TODO 2. copy directories
             // TODO 6. ConflictItems file Dialog
             // TODO 7. move files
+            // TODO 8. Cancellation
             var items = GetSelectedItems(GetFocusedItemPos());
-            foreach (var item in items)
+            try
             {
-                using var file = GFile.New(CurrentPath.AppendPath(item.Name));
-                await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false);
+                CopyProgressContext.Instance.Start(items.Sum(n => n.Size));
+                foreach (var item in items)
+                {
+                    CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size);
+                    using var file = GFile.New(CurrentPath.AppendPath(item.Name));
+                    await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false, (c, t) => CopyProgressContext.Instance.SetProgress(t));
+                }
+            }
+            finally
+            {
+                CopyProgressContext.Instance.Stop();
             }
         }
         else

@@ -60,6 +60,9 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
             ?.Binding("revealed", nameof(MainContext.ErrorText), BindingFlags.Default, v => v != null)
             ?.Binding("title", nameof(MainContext.ErrorText), BindingFlags.Default)
             ?.SideEffect(b => b.OnButtonClicked(() => b.SetRevealed(false)));
+        Handle.GetTemplateChild<RevealerHandle, ApplicationWindowHandle>("progress-revealer")
+            ?.DataContext(CopyProgressContext.Instance)
+            ?.Binding("reveal-child", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, p => p != null);
 
         if (paned != null)
             Handle.AddActions(
