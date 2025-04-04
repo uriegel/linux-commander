@@ -68,7 +68,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                     new("toggleViewMode", Viewer.ToggleView, "<Ctrl>F3"),
                     new("showpreview", false, show => Viewer.Show(Handle, viewer, show), "F3"),
                     // new("copy", Events.MenuAction.Apply("COPY"), "F5"),
-                    // new("createfolder", Events.MenuAction.Apply("CREATE_FOLDER"), "F7"),
+                    new("createfolder", paned.CreateFolder, "F7"),
                     new("adaptpath", paned.AdaptPath, "F9"),
                     new("delete", paned.DeleteItems, "Delete"),
                     new("refresh", paned.Refresh, "<Ctrl>R"),

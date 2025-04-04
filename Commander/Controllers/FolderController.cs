@@ -25,6 +25,7 @@ class FolderController
 
     public Task DeleteItems() => controller.DeleteItems();
     public Task Rename() => controller.Rename();
+    public Task CreateFolder() => controller.CreateFolder();
 
     public void OnActivate(int pos)
     {

@@ -19,6 +19,7 @@ interface IController : IDisposable
 
     Task DeleteItems();
     Task Rename();
+    Task CreateFolder();
     
     string? OnActivate(int pos);
 

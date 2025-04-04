@@ -131,6 +131,30 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             throw new CancelledException();
     }
 
+    public async Task CreateFolder()
+    {
+        var type = GetSelectedItemsType(GetFocusedItemPos());
+        var text = "Möchtest Du einen neuen Ordner anlegen?";
+        var builder = Builder.FromDotNetResource("textdialog");
+        var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
+        var textView = builder.GetWidget<EntryHandle>("text");
+        dialog.Heading("Ordner anlegen?");
+        dialog.Body(text);
+        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();        
+        textView.Text(item?.Kind == ItemKind.Folder ? item.Name : "");
+        dialog.OnMap(textView.GrabFocus);
+
+        var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
+        if (response == "ok")
+        {
+            var newFile = textView.GetText();
+            if (item != null && !string.IsNullOrWhiteSpace(text))
+                Directory.CreateDirectory(CurrentPath.AppendPath(newFile));
+        }
+        else
+            throw new CancelledException();
+    }
+
     public string? OnActivate(int pos)
     {
         var item = GetItem(pos);

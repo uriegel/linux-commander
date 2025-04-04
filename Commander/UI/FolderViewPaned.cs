@@ -35,6 +35,8 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 
     public void DeleteItems() => folderViewActive?.DeleteItems();
     public void Rename() => folderViewActive?.Rename();
+    public void CreateFolder() => folderViewActive?.CreateFolder();
+    
     
     protected override async void OnCreate()
     {
