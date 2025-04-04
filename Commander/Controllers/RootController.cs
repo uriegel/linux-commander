@@ -122,7 +122,8 @@ class RootController : ControllerBase<RootItem>, IController
     public Task DeleteItems() => Unit.Value.ToAsync();
     public Task Rename() => Unit.Value.ToAsync();
     public Task CreateFolder() => Unit.Value.ToAsync();
-
+    public Task CopyItems() => Unit.Value.ToAsync();
+    
     RootItem CreateRootItem(string driveString, int[] columnPositions)
     {
         var mountPoint = driveString != "home"

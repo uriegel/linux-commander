@@ -155,6 +155,31 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             throw new CancelledException();
     }
 
+    public async Task CopyItems()
+    {
+        var type = GetSelectedItemsType(GetFocusedItemPos());
+        var text = type switch
+        {
+            SelectedItemsType.Both => "Möchtest Du die markierten Einträge kopieren?",
+            SelectedItemsType.Files => "Möchtest Du die markierten Dateien kopieren?",
+            SelectedItemsType.Folders => "Möchtest Du die markierten Verzeichnisse kopieren?",
+            SelectedItemsType.File => "Möchtest Du die markierte Datei kopieren?",
+            SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis kopieren?",
+            _ => ""
+        };
+        var builder = Builder.FromDotNetResource("alertdialog");
+        var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
+        dialog.Heading("Kopieren?");
+        dialog.Body(text);
+        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();        
+        var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
+        if (response == "ok")
+        {
+        }
+        else
+            throw new CancelledException();
+    }
+
     public string? OnActivate(int pos)
     {
         var item = GetItem(pos);

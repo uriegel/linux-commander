@@ -125,6 +125,21 @@ class FolderView : ColumnViewSubClassed
             MainContext.Instance.ErrorText = "Ziel und Quelle sind identisch";
         }
     }
+
+    public async void CopyItems()
+    {
+        try
+        {
+            await controller.CopyItems();
+            Refresh();
+        }
+        catch (CancelledException) { }
+        catch (GFileException e)
+        {
+            MainContext.Instance.ErrorText = e.Message;
+        }
+    }
+
     public void ScrollTo(int pos)
     {
         columnView.ScrollTo(pos, ListScrollFlags.ScrollFocus);
