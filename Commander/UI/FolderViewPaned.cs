@@ -36,7 +36,11 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
     public void DeleteItems() => folderViewActive?.DeleteItems();
     public void Rename() => folderViewActive?.Rename();
     public void CreateFolder() => folderViewActive?.CreateFolder();
-    public void CopyItems() => folderViewActive?.CopyItems();
+    public async void CopyItems()
+    {
+        if (folderViewActive != null && await folderViewActive.CopyItems(GetInactiveFolderView()?.Context.CurrentPath))
+            GetInactiveFolderView()?.Refresh();
+    } 
         
     protected override async void OnCreate()
     {

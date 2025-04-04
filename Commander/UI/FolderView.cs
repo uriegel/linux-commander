@@ -126,17 +126,21 @@ class FolderView : ColumnViewSubClassed
         }
     }
 
-    public async void CopyItems()
+    public async Task<bool> CopyItems(string? targetPath)
     {
         try
         {
-            await controller.CopyItems();
-            Refresh();
+            await controller.CopyItems(targetPath);
+            return true;
         }
-        catch (CancelledException) { }
+        catch (CancelledException)
+        {
+            return false;
+        }
         catch (GFileException e)
         {
             MainContext.Instance.ErrorText = e.Message;
+            return false;
         }
     }
 

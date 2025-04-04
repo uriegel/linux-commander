@@ -106,7 +106,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var textView = builder.GetWidget<EntryHandle>("text");
         dialog.Heading("Umbennen?");
         dialog.Body(text);
-        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();        
+        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();
         textView.Text(item?.Name ?? "");
         dialog.OnMap(async () =>
         {
@@ -140,7 +140,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var textView = builder.GetWidget<EntryHandle>("text");
         dialog.Heading("Ordner anlegen?");
         dialog.Body(text);
-        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();        
+        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();
         textView.Text(item?.Kind == ItemKind.Folder ? item.Name : "");
         dialog.OnMap(textView.GrabFocus);
 
@@ -155,8 +155,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             throw new CancelledException();
     }
 
-    public async Task CopyItems()
+    public async Task CopyItems(string? targetPath)
     {
+        if (targetPath?.StartsWith('/') != true)
+            return;
         var type = GetSelectedItemsType(GetFocusedItemPos());
         var text = type switch
         {
@@ -171,17 +173,22 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
         dialog.Heading("Kopieren?");
         dialog.Body(text);
-        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();        
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO 1. copy file
-            // TODO 2. copy files
-            // TODO 3. copy big file with progress
+            // TODO 3. copy big file with progress (ProgressContext with controlling total progress)
             // TODO 4. copy many files with progress
             // TODO 5. copy many files with progress and details
-            // TODO 6. move files
-            // TODO 7. ConflictItems Dialog
+            // TODO 1. copy directory
+            // TODO 2. copy directories
+            // TODO 6. ConflictItems file Dialog
+            // TODO 7. move files
+            var items = GetSelectedItems(GetFocusedItemPos());
+            foreach (var item in items)
+            {
+                using var file = GFile.New(CurrentPath.AppendPath(item.Name));
+                await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false);
+            }
         }
         else
             throw new CancelledException();
