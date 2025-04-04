@@ -23,6 +23,9 @@
                 <property name="transition-type">slide-left</property>
                 <child>
                   <object class="GtkMenuButton">
+                    <child>
+                      <object class="ProgressDisplay" id="progress_area"/>
+                    </child>                  
                   </object>
                 </child>
               </object>

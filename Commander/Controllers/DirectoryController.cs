@@ -176,7 +176,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO 2. Subclass drawingArea as ProgressControl
+            // TODO 1. Subclass drawingArea as ProgressControl
+            // TODO 2. Subclass drawingArea: getInstance, bind to Context
             // TODO 3. copy big file with progress (ProgressContext with controlling total progress)
             // TODO 4. copy many files with progress
             // TODO 5. copy many files with progress and details

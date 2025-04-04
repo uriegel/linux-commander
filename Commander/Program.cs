@@ -5,6 +5,7 @@ using WebServerLight;
 using Commander;
 using Commander.Settings;
 using Commander.UI;
+using GtkDotNet.SubClassing;
 
 {
     Gtk.ShowDiagnostics();
@@ -28,6 +29,7 @@ using Commander.UI;
                 .SubClass(ManagedAdwApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
                 .SubClass(new FolderViewPanedClass(p => new FolderViewPaned(p)))
                 .SubClass(new FolderViewClass())
+                .SubClass(new ProgressDisplayClass(GTypeEnum.DrawingArea, "ProgressDisplay", p => new ProgressDisplay(p)))
                 .ManagedAdwApplicationWindow()
                 .SaveBounds(600, 800)
                 .Show());

@@ -8,7 +8,7 @@ using Commander.DataContexts;
 using GtkDotNet.Exceptions;
 using Commander.Exceptions;
 
-namespace Commander.UI;
+    namespace Commander.UI;
 
 class FolderView : ColumnViewSubClassed
 {
