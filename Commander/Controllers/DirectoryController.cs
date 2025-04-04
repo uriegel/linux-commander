@@ -175,6 +175,13 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
+            // TODO 1. copy file
+            // TODO 2. copy files
+            // TODO 3. copy big file with progress
+            // TODO 4. copy many files with progress
+            // TODO 5. copy many files with progress and details
+            // TODO 6. move files
+            // TODO 7. ConflictItems Dialog
         }
         else
             throw new CancelledException();
