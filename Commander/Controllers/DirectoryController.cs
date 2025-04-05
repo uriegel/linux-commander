@@ -12,8 +12,6 @@ namespace Commander.Controllers;
 
 // TODO Gtk4 Initial fill: Gtk-CRITICAL **: 05:50:17.379: gtk_column_view_scroll_to: assertion 'pos < gtk_list_base_get_n_items (GTK_LIST_BASE (self->listview))' failed
 
-// TODO Gtk4 and CsTools: Namesapce of WithProgress!!
-
 // TODO Backspace history
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
@@ -23,6 +21,8 @@ namespace Commander.Controllers;
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
 
 // TODO Favorites
+
+// TODO copy: copy to tmpfilename, then rename
 
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
 
@@ -178,13 +178,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO Gtk4: Make a Progress Spinner with arc
-            // TODO Gtk4: ProgressControl: style color with CSS
-            // TODO Gtk4: copy file attributes
-
-            // TODO 1. manual copy with progress
-            // TODO 3. copy big file with progress (ProgressContext with controlling total progress)
-            // TODO 4. copy many files with progress
             // TODO 5. copy many files with progress and details
             // TODO 1. copy directory
             // TODO 2. copy directories
@@ -212,6 +205,9 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                             target.Write(buffer, 0, Math.Min(read, buffer.Length));
                         }
                     });
+                    using var gsf = GFile.New(CurrentPath.AppendPath(item.Name));
+                    using var gtf = GFile.New(targetPath.AppendPath(item.Name));
+                    gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
 
                     // TODO Move
                     // using var file = GFile.New(CurrentPath.AppendPath(item.Name));

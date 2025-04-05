@@ -18,21 +18,25 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
 
     protected override void OnCreate()
     {
-        Handle.SetDrawFunction((_, cairo, w, h) =>
-            cairo
-                .AntiAlias(CairoAntialias.Best)
-                .LineJoin(LineJoin.Miter)
-                .LineCap(LineCap.Round)
-                .Translate(w / 2.0, h / 2.0)
-                .StrokePreserve()
-                .ArcNegative(0, 0, (w < h ? w : h) / 2.0, -Math.PI / 2.0, -Math.PI / 2.0 + progress * Math.PI * 2)
-                .LineTo(0, 0)
-                .SourceRgb(0.7, 0.7, 0.7)
-                .Fill()
-                .MoveTo(0, 0)
-                .Arc(0, 0, (w < h ? w : h) / 2.0, -Math.PI / 2.0, -Math.PI / 2.0 + progress * Math.PI * 2)
-                .SourceRgb(0.3, 0.3, 0.3)
-                .Fill());
+        Handle
+            .CssClass("custom-accent")
+            .SetDrawFunction((_, cairo, w, h) =>
+            {
+                var color = Handle.GetStyleContext().GetColor().ToSrgb();
+                cairo
+                    .AntiAlias(CairoAntialias.Best)
+                    .LineCap(LineCap.Round)
+                    .LineWidth(3.0)
+                    .SourceRgba(color.Red, color.Green, color.Blue, 0.2)
+                    .Arc(w / 2.0, h / 2.0, (w < h ? w : h) / 2.0 - 2.0, -Math.PI / 2.0, -Math.PI / 2.0 + Math.PI * 2)
+                    .Stroke()
+                    .AntiAlias(CairoAntialias.Best)
+                    .LineCap(LineCap.Round)
+                    .LineWidth(3.0)
+                    .SourceRgba(color.Red, color.Green, color.Blue, color.Alpha)
+                    .Arc(w / 2.0, h / 2.0, (w < h ? w : h) / 2.0 - 2.0, -Math.PI / 2.0, -Math.PI / 2.0 + progress * Math.PI * 2)
+                    .Stroke();
+            });
         CopyProgressContext.Instance.PropertyChanged += (s, e) => OnDraw();
     }
 
