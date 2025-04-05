@@ -189,6 +189,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             // TODO 6. ConflictItems file Dialog
             // TODO 7. move files
             // TODO 8. Cancellation
+            // TODO 9. Closing not possible with background action
             var items = GetSelectedItems(GetFocusedItemPos());
             try
             {
@@ -196,13 +197,29 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 foreach (var item in items)
                 {
                     CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size);
-                    using var file = GFile.New(CurrentPath.AppendPath(item.Name));
-                    await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false, (c, t) => CopyProgressContext.Instance.SetProgress(t));
+                    using var source = File.OpenRead(CurrentPath.AppendPath(item.Name));
+                    using var target = File.Create(targetPath.AppendPath(item.Name));
+                    await Task.Run(() =>
+                    {
+                        var buffer = new byte[15000];
+                        while (true)
+                        {
+                            var read = source.Read(buffer, 0, buffer.Length);
+                            if (read == 0)
+                                break;
+                            target.Write(buffer, 0, Math.Min(read, buffer.Length));
+                        }
+                    });
+
+                    // TODO Move
+                    // using var file = GFile.New(CurrentPath.AppendPath(item.Name));
+                    // await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false, (c, t) => CopyProgressContext.Instance.SetProgress(t));
                 }
             }
             finally
             {
                 CopyProgressContext.Instance.Stop();
+                Console.WriteLine("Bin fertig");
             }
         }
         else
