@@ -22,7 +22,7 @@ namespace Commander.Controllers;
 
 // TODO Favorites
 
-// TODO copy: copy to tmpfilename, then rename
+// TODO copy: copy to tmpfilename, then rename (.commander-tmp)
 
 // TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
 
@@ -188,7 +188,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             var items = GetSelectedItems(GetFocusedItemPos());
             try
             {
-                CopyProgressContext.Instance.Start(items.Sum(n => n.Size));
+                CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", items.Sum(n => n.Size));
                 foreach (var item in items)
                 {
                     CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size);

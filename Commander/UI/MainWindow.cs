@@ -63,6 +63,17 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
         Handle.GetTemplateChild<RevealerHandle, ApplicationWindowHandle>("progress-revealer")
             ?.DataContext(CopyProgressContext.Instance)
             ?.Binding("reveal-child", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, p => p != null);
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("progress-title-label")
+            ?.Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Title);
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("progress-size-label")
+            ?.Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"({((CopyProgress?)cpc)?.TotalMaxBytes.ByteCountToString(2)})");
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("progress-current-name-label")
+            ?.Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Name);
+        // Handle.GetTemplateChild<ProgressBarHandle, ApplicationWindowHandle>("progress-bar-total")
+        //     ?.Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetTotalFraction);
+        // Handle.GetTemplateChild<ProgressBarHandle, ApplicationWindowHandle>("progress-bar-current")
+        //     ?.Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetFraction);
+            
 
         if (paned != null)
             Handle.AddActions(

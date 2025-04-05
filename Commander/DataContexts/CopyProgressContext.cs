@@ -8,6 +8,22 @@ class CopyProgressContext : INotifyPropertyChanged
 {
     public static CopyProgressContext Instance = new();
 
+    public static object GetTotalFraction(object? copyProgress)
+    {
+        var cp = copyProgress as CopyProgress;
+        return cp != null
+            ? ((double)cp.TotalBytes + (double)cp.CurrentBytes) / (double)cp.TotalMaxBytes
+            : 0;
+    }
+
+    public static double GetFraction(object? copyProgress)
+    {
+        var cp = copyProgress as CopyProgress;
+        return cp != null
+            ? (double)cp.CurrentBytes / (double)cp.CurrentMaxBytes
+            : 0;
+    }
+
     public CopyProgress? CopyProgress
     {
         get => field;
@@ -21,11 +37,12 @@ class CopyProgressContext : INotifyPropertyChanged
         }
     }
 
-    public void Start(long totalSize)
+    public void Start(string title, long totalSize)
     {
         cts?.Cancel();
         cts = new CancellationTokenSource();
         CopyProgress = new CopyProgress(
+            title, 
             "",
             totalSize,
             0,
@@ -38,7 +55,7 @@ class CopyProgressContext : INotifyPropertyChanged
     public void SetNewFileProgress(string name, long size)
     {
         var currentSize = Instance.CopyProgress?.PreviousTotalBytes ?? 0;
-        Instance.CopyProgress = (Instance.CopyProgress ?? new("", 0, 0, 0, 0, 0)) with
+        Instance.CopyProgress = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0)) with
         {
             Name = name,
             TotalBytes = currentSize,
@@ -59,7 +76,7 @@ class CopyProgressContext : INotifyPropertyChanged
     }
 
     public void SetProgress(long size)
-        => progressSubject.OnNext((Instance.CopyProgress ?? new("", 0, 0, 0, 0, 0)) with
+        => progressSubject.OnNext((Instance.CopyProgress ?? new("","", 0, 0, 0, 0, 0)) with
         {
             CurrentBytes = size,
         });
@@ -82,6 +99,7 @@ class CopyProgressContext : INotifyPropertyChanged
 }
 
 record CopyProgress(
+    string Title,
     string Name,
     long TotalMaxBytes,
     long TotalBytes,

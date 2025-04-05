@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Commander.DataContexts;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
@@ -16,7 +17,7 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
 
     public ProgressSpinner(nint obj) : base(obj) { }
 
-    protected override void OnCreate()
+    protected override async void OnCreate()
     {
         Handle
             .CssClass("custom-accent")
@@ -38,6 +39,11 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
                     .Stroke();
             });
         CopyProgressContext.Instance.PropertyChanged += (s, e) => OnDraw();
+
+        await Task.Delay(1);
+        var window = Handle.GetAncestor<AdwApplicationWindowHandle>();
+        totalProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-total") ?? new(0);
+        currentProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-current") ?? new(0);
     }
 
     protected override void OnFinalize()
@@ -51,9 +57,16 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
         if (cpc != null)
         {
             progress = (cpc.TotalBytes + cpc.CurrentBytes) / (float)cpc.TotalMaxBytes;
-            Gtk.Dispatch(() => Handle.QueueDraw());
+            Gtk.Dispatch(() =>
+            {
+                Handle.QueueDraw();
+                totalProgress.Fraction(progress);
+                currentProgress.Fraction(CopyProgressContext.GetFraction(CopyProgressContext.Instance.CopyProgress));
+            });
         }
     }
 
     float progress;
+    ProgressBarHandle totalProgress = new(0);
+    ProgressBarHandle currentProgress = new(0);
 }
