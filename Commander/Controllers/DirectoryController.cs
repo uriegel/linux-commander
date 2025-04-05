@@ -176,8 +176,11 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO 1. Subclass drawingArea as ProgressControl
-            // TODO 2. Subclass drawingArea: getInstance, bind to Context
+            // TODO Gtk4: Make a Progress Spinner with arc
+            // TODO Gtk4: ProgressControl: style color with CSS
+            // TODO Gtk4: copy file attributes
+
+            // TODO 1. manual copy with progress
             // TODO 3. copy big file with progress (ProgressContext with controlling total progress)
             // TODO 4. copy many files with progress
             // TODO 5. copy many files with progress and details

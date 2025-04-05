@@ -60,10 +60,10 @@ class CopyProgressContext : INotifyPropertyChanged
 
     public void SetProgress(long size)
     {
-        var currentSize = Instance.CopyProgress?.CurrentBytes ?? 0;
+        Console.WriteLine($"AberHallo {size}");
         Instance.CopyProgress = (Instance.CopyProgress ?? new("", 0, 0, 0, 0, 0)) with
         {
-            CurrentBytes = currentSize + size,
+            CurrentBytes = size,
         };
     }
 
@@ -73,7 +73,7 @@ class CopyProgressContext : INotifyPropertyChanged
     {
         progressSubject = new();
         progressSubject
-            .Sample(TimeSpan.FromMilliseconds(400))
+            .Sample(TimeSpan.FromMilliseconds(40))
             .Subscribe(value => Instance.CopyProgress = value);
     }
 

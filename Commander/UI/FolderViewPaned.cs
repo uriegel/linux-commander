@@ -8,8 +8,8 @@ namespace Commander.UI;
 
 class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 {
-    public static FolderViewPaned? GetInstance(PanedHandle handle)
-        => GetInstance(handle.GetInternalHandle()) as FolderViewPaned;
+    public static FolderViewPaned? GetInstance(PanedHandle? handle)
+        => (handle != null ? GetInstance(handle.GetInternalHandle()) : null) as FolderViewPaned;
 
     public void OnDown() => folderViewActive?.OnDown();
     public void OnUp() => folderViewActive?.OnUp();

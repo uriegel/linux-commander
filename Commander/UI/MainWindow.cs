@@ -29,7 +29,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
     protected override void Initialize()
     {
         var panedHandle = Handle.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("paned");
-        var paned = panedHandle != null ? FolderViewPaned.GetInstance(panedHandle) : null;
+        var paned = FolderViewPaned.GetInstance(panedHandle);
         var viewer = Handle.GetTemplateChild<WidgetHandle, ApplicationWindowHandle>("viewer");
         Handle.OnRealize(w =>
             {
