@@ -12,6 +12,8 @@ namespace Commander.Controllers;
 
 // TODO Gtk4 Initial fill: Gtk-CRITICAL **: 05:50:17.379: gtk_column_view_scroll_to: assertion 'pos < gtk_list_base_get_n_items (GTK_LIST_BASE (self->listview))' failed
 
+// TODO Gtk4 and CsTools: Namesapce of WithProgress!!
+
 // TODO Backspace history
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
@@ -197,7 +199,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 foreach (var item in items)
                 {
                     CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size);
-                    using var source = File.OpenRead(CurrentPath.AppendPath(item.Name));
+                    using var source = File.OpenRead(CurrentPath.AppendPath(item.Name)).WithProgress((t, c) => CopyProgressContext.Instance.SetProgress(c));
                     using var target = File.Create(targetPath.AppendPath(item.Name));
                     await Task.Run(() =>
                     {
@@ -213,13 +215,12 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
                     // TODO Move
                     // using var file = GFile.New(CurrentPath.AppendPath(item.Name));
-                    // await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false, (c, t) => CopyProgressContext.Instance.SetProgress(t));
+                    // await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false, (c, t) => CopyProgressContext.Instance.SetProgress(c));
                 }
             }
             finally
             {
                 CopyProgressContext.Instance.Stop();
-                Console.WriteLine("Bin fertig");
             }
         }
         else

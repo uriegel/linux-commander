@@ -3,10 +3,19 @@ using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
 
-namespace Commander.UI;
+public class ProgressSpinnerClass(string name, Func<nint, ProgressSpinner> constructor)
+    : SubClass<DrawingAreaHandle>(GTypeEnum.DrawingArea, name, constructor)
+{ }
 
-class ProgressDisplay(nint obj) : SubClassInst<DrawingAreaHandle>(obj)
+public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
 {
+    public static SubClass<DrawingAreaHandle> Subclass()
+        => new ProgressSpinnerClass("ProgressSpinner", p => new ProgressSpinner(p));
+
+    protected override DrawingAreaHandle CreateHandle(nint obj) => new(obj);
+
+    public ProgressSpinner(nint obj) : base(obj) { }
+
     protected override void OnCreate()
     {
         Handle.SetDrawFunction((_, cairo, w, h) =>
@@ -27,8 +36,6 @@ class ProgressDisplay(nint obj) : SubClassInst<DrawingAreaHandle>(obj)
         CopyProgressContext.Instance.PropertyChanged += (s, e) => OnDraw();
     }
 
-    protected override DrawingAreaHandle CreateHandle(nint obj) => new(obj);
-
     protected override void OnFinalize()
     {
         Console.WriteLine("ProgressDisplay finalized");
@@ -40,15 +47,9 @@ class ProgressDisplay(nint obj) : SubClassInst<DrawingAreaHandle>(obj)
         if (cpc != null)
         {
             progress = (cpc.TotalBytes + cpc.CurrentBytes) / (float)cpc.TotalMaxBytes;
-            Console.WriteLine($"Wert: {cpc.CurrentBytes}, {progress}");
-            //Gtk.Dispatch(Handle.QueueDraw);
+            Gtk.Dispatch(() => Handle.QueueDraw());
         }
     }
 
     float progress;
 }
-
-class ProgressDisplayClass(GTypeEnum parent, string name, Func<nint, ProgressDisplay> constructor)
-    : SubClass<DrawingAreaHandle>(parent, name, constructor)
-{ }
-

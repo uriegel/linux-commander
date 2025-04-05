@@ -59,13 +59,10 @@ class CopyProgressContext : INotifyPropertyChanged
     }
 
     public void SetProgress(long size)
-    {
-        Console.WriteLine($"AberHallo {size}");
-        Instance.CopyProgress = (Instance.CopyProgress ?? new("", 0, 0, 0, 0, 0)) with
+        => progressSubject.OnNext((Instance.CopyProgress ?? new("", 0, 0, 0, 0, 0)) with
         {
             CurrentBytes = size,
-        };
-    }
+        });
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

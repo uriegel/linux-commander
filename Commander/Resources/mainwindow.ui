@@ -24,7 +24,7 @@
                 <child>
                   <object class="GtkMenuButton">
                     <child>
-                      <object class="ProgressDisplay" id="progress_area"/>
+                      <object class="ProgressSpinner" id="progress_spinner"/>
                     </child>                  
                   </object>
                 </child>
