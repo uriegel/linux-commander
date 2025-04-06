@@ -28,6 +28,7 @@ using Commander.UI;
                 .SubClass(ManagedAdwApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
                 .SubClass(new FolderViewPanedClass(p => new FolderViewPaned(p)))
                 .SubClass(new FolderViewClass())
+                .SubClass(ProgressControl.Subclass())
                 .SubClass(ProgressSpinner.Subclass())
                 .ManagedAdwApplicationWindow()
                 .SaveBounds(600, 800)

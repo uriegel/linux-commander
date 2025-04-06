@@ -27,6 +27,9 @@
     <EmbeddedResource Include="./Resources/textdialog.ui">
       <LogicalName>textdialog</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/progresscontrol.ui">
+      <LogicalName>progresscontrol</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="./Resources/style.css">
       <LogicalName>style</LogicalName>
     </EmbeddedResource>
