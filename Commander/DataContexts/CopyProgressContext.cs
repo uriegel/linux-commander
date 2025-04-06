@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using GtkDotNet;
 
 namespace Commander.DataContexts;
 
@@ -43,40 +42,44 @@ class CopyProgressContext : INotifyPropertyChanged
     public void Start(string title, long totalSize, int count)
     {
         cts?.Cancel();
+        startTime = DateTime.Now;
         cts = new CancellationTokenSource();
         CopyProgress = new CopyProgress(
-            title, 
+            title,
             "",
             count,
-            0, 
+            0,
             totalSize,
             0,
             0,
             0,
             0,
-            true
+            true,
+            TimeSpan.FromMilliseconds(0)
         );
     }
 
     public void SetNewFileProgress(string name, long size, int index)
     {
         var currentSize = Instance.CopyProgress?.PreviousTotalBytes ?? 0;
-        Instance.CopyProgress = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0, false)) with
+        Instance.CopyProgress = (Instance.CopyProgress ?? CopyProgress.Default()) with
         {
             Name = name,
             CurrentCount = index,
             TotalBytes = currentSize,
             CurrentMaxBytes = size,
             PreviousTotalBytes = currentSize + size,
-            CurrentBytes = 0
+            CurrentBytes = 0,
+            Duration = DateTime.Now - startTime
         };
     }
 
     public async void Stop()
     {
-        Instance.CopyProgress = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0, false)) with
+        Instance.CopyProgress = (Instance.CopyProgress ?? CopyProgress.Default()) with
         {
-            IsRunning = false
+            IsRunning = false,
+            Duration = DateTime.Now - startTime
         };
 
         try
@@ -89,9 +92,10 @@ class CopyProgressContext : INotifyPropertyChanged
 
     public void SetProgress(long totalSize, long size)
     {
-        var newVal = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0, false)) with
+        var newVal = (Instance.CopyProgress ?? CopyProgress.Default()) with
         {
             CurrentBytes = size,
+            Duration = DateTime.Now - startTime
         };
 
         if (size < totalSize)
@@ -114,11 +118,12 @@ class CopyProgressContext : INotifyPropertyChanged
             });
     }
 
+    static readonly Subject<CopyProgress> progressSubject;
+
     void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
 
     CancellationTokenSource? cts;
-
-    static readonly Subject<CopyProgress> progressSubject;
+    DateTime startTime = DateTime.Now;
 }
 
 record CopyProgress(
@@ -131,6 +136,9 @@ record CopyProgress(
     long PreviousTotalBytes,
     long CurrentMaxBytes,
     long CurrentBytes,
-    bool IsRunning
-
-);
+    bool IsRunning,
+    TimeSpan Duration
+)
+{
+    public static CopyProgress Default() => new("", "", 0, 0, 0, 0, 0, 0, 0, false, TimeSpan.FromMilliseconds(0));
+};

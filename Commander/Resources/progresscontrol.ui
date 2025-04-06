@@ -90,7 +90,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkLabel" id="duration_label">
+                    <object class="GtkLabel" id="duration-label">
                     <property name="halign">end</property>
                     <layout>
                         <property name="column">1</property>
@@ -101,7 +101,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkLabel" id="estimated_duration_label">
+                    <object class="GtkLabel" id="estimated-duration-label">
                     <property name="halign">end</property>
                     <layout>
                         <property name="column">1</property>

@@ -36,6 +36,10 @@ public class ProgressControl : SubClassInst<RevealerHandle>
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.TotalCount}");
         builder.GetWidget<MenuButtonHandle>("current-count-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.CurrentCount}");
+        builder.GetWidget<MenuButtonHandle>("duration-label")
+            .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.Duration:hh\\:mm\\:ss}");
+
+            
     }
 }
 public class ProgressControlClass(string name, Func<nint, ProgressControl> constructor)
