@@ -73,6 +73,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
             ?.Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetTotalFraction);
         Handle.GetTemplateChild<ProgressBarHandle, ApplicationWindowHandle>("progress-bar-current")
             ?.Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetFraction);
+        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("progress-total_count_label")
+            ?.Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.TotalCount}");
             
 
         if (paned != null)

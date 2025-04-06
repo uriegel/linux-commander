@@ -185,10 +185,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             // TODO 7. move files
             // TODO 8. Cancellation
             // TODO 9. Closing not possible with background action
-            var items = GetSelectedItems(GetFocusedItemPos());
+            var items = GetSelectedItems(GetFocusedItemPos()).ToList();
             try
             {
-                CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", items.Sum(n => n.Size));
+                CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", items.Sum(n => n.Size), items.Count);
                 foreach (var item in items)
                 {
                     CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size);

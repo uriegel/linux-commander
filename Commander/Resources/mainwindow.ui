@@ -40,11 +40,12 @@
                                 <property name="halign">start</property>
                                 <child>
                                   <object class="GtkLabel" id="progress-title-label">
-                                   <property name="css-classes">heading title-1</property>
+                                   <property name="css-classes">title-3</property>
                                   </object>
                                 </child>
                                 <child>
                                   <object class="GtkLabel" id="progress-size-label">
+                                    <property name="css-classes">title-3</property>
                                     <property name="margin-start">10</property>
                                   </object>
                                 </child>
@@ -63,7 +64,7 @@
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="count_label">
+                                  <object class="GtkLabel" id="progress-count_label">
                                     <property name="halign">end</property>
                                     <property name="hexpand">true</property>
                                     <layout>
@@ -73,7 +74,7 @@
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="total_count_label">
+                                  <object class="GtkLabel" id="progress-total_count_label">
                                     <property name="halign">end</property>
                                     <layout>
                                       <property name="column">2</property>
