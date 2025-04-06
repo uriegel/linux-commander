@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using GtkDotNet;
 
 namespace Commander.DataContexts;
 
@@ -16,11 +17,13 @@ class CopyProgressContext : INotifyPropertyChanged
             : 0;
     }
 
-    public static double GetFraction(object? copyProgress)
+    public static object GetFraction(object? copyProgress)
     {
         var cp = copyProgress as CopyProgress;
         return cp != null
+            ? cp.CurrentMaxBytes != 0
             ? (double)cp.CurrentBytes / (double)cp.CurrentMaxBytes
+            : 0
             : 0;
     }
 
@@ -87,8 +90,8 @@ class CopyProgressContext : INotifyPropertyChanged
     {
         progressSubject = new();
         progressSubject
-            .Sample(TimeSpan.FromMilliseconds(40))
-            .Subscribe(value => Instance.CopyProgress = value);
+            .Sample(TimeSpan.FromMilliseconds(80))
+            .Subscribe(value => Gtk.Dispatch(() => Instance.CopyProgress = value));
     }
 
     void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));

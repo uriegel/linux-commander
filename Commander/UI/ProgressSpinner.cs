@@ -57,12 +57,7 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
         if (cpc != null)
         {
             progress = (cpc.TotalBytes + cpc.CurrentBytes) / (float)cpc.TotalMaxBytes;
-            Gtk.Dispatch(() =>
-            {
-                Handle.QueueDraw();
-                totalProgress.Fraction(progress);
-                currentProgress.Fraction(CopyProgressContext.GetFraction(CopyProgressContext.Instance.CopyProgress));
-            });
+            Handle.QueueDraw();
         }
     }
 

@@ -192,10 +192,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 foreach (var item in items)
                 {
                     CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size);
-                    using var source = File.OpenRead(CurrentPath.AppendPath(item.Name)).WithProgress((t, c) => CopyProgressContext.Instance.SetProgress(c));
-                    using var target = File.Create(targetPath.AppendPath(item.Name));
                     await Task.Run(() =>
                     {
+                        using var source = File.OpenRead(CurrentPath.AppendPath(item.Name)).WithProgress((t, c) => CopyProgressContext.Instance.SetProgress(c));
+                        using var target = File.Create(targetPath.AppendPath(item.Name));
                         var buffer = new byte[15000];
                         while (true)
                         {
