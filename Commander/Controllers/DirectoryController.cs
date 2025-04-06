@@ -178,17 +178,16 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO copy Bildschirmfoto
-            // TODO Dauer und Restdauer
-            // TODO 8. Cancellation, Abbrechen
-            // TODO 9. Closing not possible with background action
+            // TODO 1. Dauer und Restdauer
+            // TODO 2. Cancellation, Abbrechen
+            // TODO 3. Closing not possible with background action
 
-            // TODO 7. move files with Gtk
+            // TODO 4. move files with Gtk
 
-            // TODO 6. ConflictItems file Dialog
+            // TODO 5. ConflictItems file Dialog
 
-            // TODO 1. copy directory
-            // TODO 2. copy directories
+            // TODO 6. copy directory
+            // TODO 7. copy directories
             var items = GetSelectedItems(GetFocusedItemPos()).ToList();
             try
             {
@@ -199,7 +198,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                     CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size, ++index);
                     await Task.Run(() =>
                     {
-                        using var source = File.OpenRead(CurrentPath.AppendPath(item.Name)).WithProgress((t, c) => CopyProgressContext.Instance.SetProgress(c));
+                        using var source = File.OpenRead(CurrentPath.AppendPath(item.Name)).WithProgress(CopyProgressContext.Instance.SetProgress);
                         using var target = File.Create(targetPath.AppendPath(item.Name));
                         var buffer = new byte[15000];
                         while (true)
@@ -345,7 +344,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             finally
             {
                 folderView.Context.BackgroundAction = BackgroundAction.None;
-                Gtk.Dispatch(() => folderView.InvalidateView());
+                folderView.InvalidateView();
             }
         });
     }

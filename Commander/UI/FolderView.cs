@@ -255,14 +255,16 @@ class FolderView : ColumnViewSubClassed
     public void Refresh() => controller.ChangePath(controller.CurrentPath);
 
     public void InvalidateView()
-    {
-        var pos = controller.GetFocusedItemPos();
-        var model = columnView.GetModel<SelectionHandle>();
-        var nil = new SelectionHandle();
-        columnView.SetModel(nil);
-        columnView.SetModel(model);
-        ScrollTo(pos);
-    }
+        => Gtk.BeginInvoke(200, () =>
+            {
+
+                var pos = controller.GetFocusedItemPos();
+                var model = columnView.GetModel<SelectionHandle>();
+                var nil = new SelectionHandle();
+                columnView.SetModel(nil);
+                columnView.SetModel(model);
+                ScrollTo(pos);
+            });
 
     protected override void OnCreate()
     {

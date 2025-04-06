@@ -74,10 +74,10 @@ class CopyProgressContext : INotifyPropertyChanged
 
     public async void Stop()
     {
-        progressSubject.OnNext((Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0, false)) with
+        Instance.CopyProgress = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0, false)) with
         {
             IsRunning = false
-        });
+        };
 
         try
         {
@@ -87,11 +87,18 @@ class CopyProgressContext : INotifyPropertyChanged
         catch (TaskCanceledException) { }
     }
 
-    public void SetProgress(long size)
-        => progressSubject.OnNext((Instance.CopyProgress ?? new("","", 0, 0, 0, 0, 0, 0, 0, false)) with
+    public void SetProgress(long totalSize, long size)
+    {
+        var newVal = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0, false)) with
         {
             CurrentBytes = size,
-        });
+        };
+
+        if (size < totalSize)
+            progressSubject.OnNext(newVal);
+        else
+            Instance.CopyProgress = newVal;
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -100,7 +107,11 @@ class CopyProgressContext : INotifyPropertyChanged
         progressSubject = new();
         progressSubject
             .Sample(TimeSpan.FromMilliseconds(80))
-            .Subscribe(value => Gtk.Dispatch(() => Instance.CopyProgress = value));
+            .Subscribe(value =>
+            {
+                if (value.CurrentCount == Instance.CopyProgress?.CurrentCount)
+                    Instance.CopyProgress = value;
+            });
     }
 
     void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
