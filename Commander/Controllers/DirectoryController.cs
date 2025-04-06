@@ -178,16 +178,14 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO 1. Dauer und Restdauer
-            // TODO 2. Cancellation, Abbrechen
-            // TODO 3. Closing not possible with background action
+            // TODO 1. Cancellation, Abbrechen
+            // TODO 2. Closing not possible with background action
 
-            // TODO 4. move files with Gtk
+            // TODO 3. move files with Gtk
 
-            // TODO 5. ConflictItems file Dialog
+            // TODO 4. ConflictItems file Dialog
 
-            // TODO 6. copy directory
-            // TODO 7. copy directories
+            // TODO 5. copy directories
             var items = GetSelectedItems(GetFocusedItemPos()).ToList();
             try
             {

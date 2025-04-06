@@ -16,6 +16,14 @@ class CopyProgressContext : INotifyPropertyChanged
             : 0;
     }
 
+    public static object GetEstimatedDuration(object? copyProgress)
+    {
+        var cp = copyProgress as CopyProgress;
+        return (cp != null && cp.Duration > ThreeSeconds)
+            ? cp.Duration / (double)GetTotalFraction(copyProgress)
+            : TimeSpan.FromMilliseconds(0);
+    }
+
     public static object GetFraction(object? copyProgress)
     {
         var cp = copyProgress as CopyProgress;
@@ -119,6 +127,8 @@ class CopyProgressContext : INotifyPropertyChanged
     }
 
     static readonly Subject<CopyProgress> progressSubject;
+
+    readonly static TimeSpan ThreeSeconds = TimeSpan.FromSeconds(3);
 
     void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
 
