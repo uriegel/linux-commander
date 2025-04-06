@@ -134,7 +134,7 @@ class FolderView : ColumnViewSubClassed
         }
         catch (TaskCanceledException)
         {
-            return false;
+            return true;
         }
         catch (GFileException e)
         {

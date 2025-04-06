@@ -9,6 +9,16 @@ public class ProgressControl : SubClassInst<RevealerHandle>
     public static SubClass<RevealerHandle> Subclass()
         => new ProgressControlClass("ProgressControl", p => new ProgressControl(p));
 
+    public static ProgressControl? GetInstance(RevealerHandle? handle)
+        => (handle != null ? GetInstance(handle.GetInternalHandle()) : null) as ProgressControl;
+
+    public void ShowPopover() => Popup(menuButton);
+
+    // TODO to Gtk4
+    [System.Runtime.InteropServices.DllImport("libgtk-4.so.1", EntryPoint = "gtk_menu_button_popup", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
+    extern static void Popup( MenuButtonHandle button);
+
+
     protected override RevealerHandle CreateHandle(nint obj) => new(obj);
 
     public ProgressControl(nint obj) : base(obj) { }
@@ -16,33 +26,35 @@ public class ProgressControl : SubClassInst<RevealerHandle>
     protected override void OnCreate()
     {
         var builder = Builder.FromDotNetResource("progresscontrol");
-        var button = builder.GetWidget<MenuButtonHandle>("progress-control");
-        Handle.Child(button);
+        menuButton = builder.GetWidget<MenuButtonHandle>("progress-control");
+        Handle.Child(menuButton);
 
         Handle
             .DataContext(CopyProgressContext.Instance)
             .Binding("reveal-child", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, p => p != null);
-        builder.GetWidget<MenuButtonHandle>("title-label")
+        builder.GetWidget<LabelHandle>("title-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Title);
-        builder.GetWidget<MenuButtonHandle>("size-label")
+        builder.GetWidget<LabelHandle>("size-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"({((CopyProgress?)cpc)?.TotalMaxBytes.ByteCountToString(2)})");
-        builder.GetWidget<MenuButtonHandle>("current-name-label")
+        builder.GetWidget<LabelHandle>("current-name-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Name);
-        builder.GetWidget<MenuButtonHandle>("progressbar-total")
+        builder.GetWidget<ProgressBarHandle>("progressbar-total")
             .Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetTotalFraction);
-        builder.GetWidget<MenuButtonHandle>("progressbar-current")
+        builder.GetWidget<ProgressBarHandle>("progressbar-current")
             .Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetFraction);
-        builder.GetWidget<MenuButtonHandle>("total-count-label")
+        builder.GetWidget<LabelHandle>("total-count-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.TotalCount}");
-        builder.GetWidget<MenuButtonHandle>("current-count-label")
+        builder.GetWidget<LabelHandle>("current-count-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.CurrentCount}");
-        builder.GetWidget<MenuButtonHandle>("duration-label")
+        builder.GetWidget<LabelHandle>("duration-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.Duration:hh\\:mm\\:ss}");
-        builder.GetWidget<MenuButtonHandle>("estimated-duration-label")
+        builder.GetWidget<LabelHandle>("estimated-duration-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{CopyProgressContext.GetEstimatedDuration(cpc):hh\\:mm\\:ss}");
         builder.GetWidget<MenuButtonHandle>("cancel-btn")
             .OnClicked(CopyProgressContext.Cancel);
     }
+
+    MenuButtonHandle menuButton = new(0);
 }
 
 public class ProgressControlClass(string name, Func<nint, ProgressControl> constructor)

@@ -177,7 +177,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO 2. Closing not possible with background action
+            // TODO 2. to Gtk4
+            // TODO 3. CanClose must wait till temp file is deleted
 
             // TODO 4. ConflictItems file Dialog
             // TODO 5. copy directories
@@ -201,8 +202,18 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                         while (true)
                         {
                             if (cancellation.IsCancellationRequested)
-                                // TOD CleanUp
+                            {
+                                try
+                                {
+                                    Console.WriteLine("0");
+                                    //target.Dispose();
+                                    Console.WriteLine("1");
+                                    File.Delete(tmpNewFileName);
+                                    Console.WriteLine("2");
+                                }
+                                catch { }
                                 throw new TaskCanceledException();
+                            }
 
                             var read = source.Read(buffer, 0, buffer.Length);
                             if (read == 0)
