@@ -10,6 +10,7 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 namespace Commander.Controllers;
 
 // TODO Gtk4 Initial fill: Gtk-CRITICAL **: 05:50:17.379: gtk_column_view_scroll_to: assertion 'pos < gtk_list_base_get_n_items (GTK_LIST_BASE (self->listview))' failed
+// TODO Gtk4 MenuButtonHandle OnClicked
 
 // TODO Backspace history
 
@@ -177,9 +178,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO 2. to Gtk4
-            // TODO 3. CanClose must wait till temp file is deleted
-
             // TODO 4. ConflictItems file Dialog
             // TODO 5. copy directories
             var items = GetSelectedItems(GetFocusedItemPos()).ToList();
@@ -205,11 +203,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                             {
                                 try
                                 {
-                                    Console.WriteLine("0");
-                                    //target.Dispose();
-                                    Console.WriteLine("1");
                                     File.Delete(tmpNewFileName);
-                                    Console.WriteLine("2");
                                 }
                                 catch { }
                                 throw new TaskCanceledException();

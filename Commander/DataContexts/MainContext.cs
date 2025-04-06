@@ -110,6 +110,19 @@ class MainContext : INotifyPropertyChanged
         }
     }
 
+    public string? InfoText
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(InfoText));
+            }
+        }
+    }
+    
     public StatusChoice StatusChoice
     {
         get => Restriction?.Trim()?.Length > 0

@@ -34,9 +34,15 @@ class CopyProgressContext : INotifyPropertyChanged
             : 0;
     }
 
+    public void SetRunning(bool running = true)
+    {
+        IsRunning = running;
+        MainContext.Instance.InfoText = null;  
+    } 
+
     public static bool CanClose()
     {
-        if (Instance.CopyProgress == null)
+        if (!Instance.IsRunning)
             return true;
         else
         {
@@ -56,6 +62,8 @@ class CopyProgressContext : INotifyPropertyChanged
             }
         }
     }
+
+    public bool IsRunning { get; private set; }
 
     public CancellationToken Start(string title, long totalSize, int count)
     {
@@ -113,6 +121,7 @@ class CopyProgressContext : INotifyPropertyChanged
 
     public static void Cancel()
     {
+        MainContext.Instance.InfoText = "Hintergrundaktion wird abgebrochen...";
         Instance.cts?.Cancel();
         Instance.CopyProgress = null;
     }

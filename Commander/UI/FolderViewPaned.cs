@@ -38,9 +38,22 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
     public void CreateFolder() => folderViewActive?.CreateFolder();
     public async void CopyItems()
     {
+        if (CopyProgressContext.Instance.IsRunning)
+        {
+            MainContext.Instance.ErrorText = "Es ist bereits eine Aktion am Laufen";
+            return;
+        }
         var inactive = GetInactiveFolderView();
-        if (folderViewActive != null && await folderViewActive.CopyItems(GetInactiveFolderView()?.Context.CurrentPath))
-            inactive?.Refresh();
+        try
+        {
+            CopyProgressContext.Instance.SetRunning();
+            if (folderViewActive != null && await folderViewActive.CopyItems(GetInactiveFolderView()?.Context.CurrentPath))
+                inactive?.Refresh();
+        }
+        finally
+        {
+            CopyProgressContext.Instance.SetRunning(false);
+        }
     } 
         
     protected override async void OnCreate()

@@ -61,6 +61,9 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
             ?.Binding("revealed", nameof(MainContext.ErrorText), BindingFlags.Default, v => v != null)
             ?.Binding("title", nameof(MainContext.ErrorText), BindingFlags.Default)
             ?.SideEffect(b => b.OnButtonClicked(() => b.SetRevealed(false)));
+        Handle.GetTemplateChild<BannerHandle, ApplicationWindowHandle>("info-banner")
+            ?.Binding("revealed", nameof(MainContext.InfoText), BindingFlags.Default, v => v != null)
+            ?.Binding("title", nameof(MainContext.InfoText), BindingFlags.Default);
 
         if (paned != null)
             Handle.AddActions(

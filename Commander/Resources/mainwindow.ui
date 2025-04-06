@@ -36,6 +36,10 @@
                 <property name= "button-label">Ok</property>
               </object>
             </child>
+            <child> 
+              <object class="AdwBanner" id="info-banner">
+              </object>
+            </child>
             <child>
               <object class="GtkPaned" id="viewerPaned">
                 <property name="vexpand">True</property>

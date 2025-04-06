@@ -12,12 +12,11 @@ public class ProgressControl : SubClassInst<RevealerHandle>
     public static ProgressControl? GetInstance(RevealerHandle? handle)
         => (handle != null ? GetInstance(handle.GetInternalHandle()) : null) as ProgressControl;
 
-    public void ShowPopover() => Popup(menuButton);
-
-    // TODO to Gtk4
-    [System.Runtime.InteropServices.DllImport("libgtk-4.so.1", EntryPoint = "gtk_menu_button_popup", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
-    extern static void Popup( MenuButtonHandle button);
-
+    public void ShowPopover()
+    {
+        if (CopyProgressContext.Instance.CopyProgress != null)
+            menuButton.Popup();
+    } 
 
     protected override RevealerHandle CreateHandle(nint obj) => new(obj);
 
@@ -50,7 +49,7 @@ public class ProgressControl : SubClassInst<RevealerHandle>
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.Duration:hh\\:mm\\:ss}");
         builder.GetWidget<LabelHandle>("estimated-duration-label")
             .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{CopyProgressContext.GetEstimatedDuration(cpc):hh\\:mm\\:ss}");
-        builder.GetWidget<MenuButtonHandle>("cancel-btn")
+        builder.GetWidget<ButtonHandle>("cancel-btn")
             .OnClicked(CopyProgressContext.Cancel);
     }
 
