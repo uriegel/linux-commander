@@ -178,20 +178,25 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO 5. copy many files with progress and details
+            // TODO copy Bildschirmfoto
+            // TODO Dauer und Restdauer
+            // TODO 8. Cancellation, Abbrechen
+            // TODO 9. Closing not possible with background action
+
+            // TODO 7. move files with Gtk
+
+            // TODO 6. ConflictItems file Dialog
+
             // TODO 1. copy directory
             // TODO 2. copy directories
-            // TODO 6. ConflictItems file Dialog
-            // TODO 7. move files
-            // TODO 8. Cancellation
-            // TODO 9. Closing not possible with background action
             var items = GetSelectedItems(GetFocusedItemPos()).ToList();
             try
             {
+                var index = 0;
                 CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", items.Sum(n => n.Size), items.Count);
                 foreach (var item in items)
                 {
-                    CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size);
+                    CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size, ++index);
                     await Task.Run(() =>
                     {
                         using var source = File.OpenRead(CurrentPath.AppendPath(item.Name)).WithProgress((t, c) => CopyProgressContext.Instance.SetProgress(c));

@@ -16,12 +16,12 @@
                 <object class="GtkBox">
                 <property name="halign">start</property>
                 <child>
-                    <object class="GtkLabel" id="progress-title-label">
+                    <object class="GtkLabel" id="title-label">
                     <property name="css-classes">title-3</property>
                     </object>
                 </child>
                 <child>
-                    <object class="GtkLabel" id="progress-size-label">
+                    <object class="GtkLabel" id="size-label">
                     <property name="css-classes">title-3</property>
                     <property name="margin-start">10</property>
                     </object>
@@ -32,7 +32,7 @@
                 <object class="GtkGrid">
                 <property name="halign">fill</property>
                 <child>
-                    <object class="GtkLabel" id="progress-current-name-label">
+                    <object class="GtkLabel" id="current-name-label">
                     <property name="halign">start</property>
                     <layout>
                         <property name="column">0</property>
@@ -41,7 +41,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkLabel" id="progress-count_label">
+                    <object class="GtkLabel" id="current-count-label">
                     <property name="halign">end</property>
                     <property name="hexpand">true</property>
                     <layout>
@@ -51,10 +51,20 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkLabel" id="progress-total_count_label">
+                    <object class="GtkLabel">
                     <property name="halign">end</property>
+                    <property name="label">/</property>
                     <layout>
                         <property name="column">2</property>
+                        <property name="row">0</property>
+                    </layout>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkLabel" id="total-count-label">
+                    <property name="halign">end</property>
+                    <layout>
+                        <property name="column">3</property>
                         <property name="row">0</property>
                     </layout>
                     </object>
@@ -84,7 +94,7 @@
                     <property name="halign">end</property>
                     <layout>
                         <property name="column">1</property>
-                        <property name="column-span">2</property>
+                        <property name="column-span">3</property>
                         <property name="row">1</property>
                         <property name="row-span">1</property>
                     </layout>
@@ -95,7 +105,7 @@
                     <property name="halign">end</property>
                     <layout>
                         <property name="column">1</property>
-                        <property name="column-span">2</property>
+                        <property name="column-span">3</property>
                         <property name="row">2</property>
                         <property name="row-span">1</property>
                     </layout>
@@ -104,7 +114,7 @@
                 </object>
             </child>
             <child>
-                <object class="GtkProgressBar" id="progress-bar-current">
+                <object class="GtkProgressBar" id="progressbar-current">
                 <property name="show-text">True</property>
                 </object>
             </child>
@@ -118,7 +128,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkProgressBar" id="progress-bar-total">
+                    <object class="GtkProgressBar" id="progressbar-total">
                     <property name="show-text">True</property>
                     </object>
                 </child>

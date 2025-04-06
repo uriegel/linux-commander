@@ -60,22 +60,6 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
             ?.Binding("revealed", nameof(MainContext.ErrorText), BindingFlags.Default, v => v != null)
             ?.Binding("title", nameof(MainContext.ErrorText), BindingFlags.Default)
             ?.SideEffect(b => b.OnButtonClicked(() => b.SetRevealed(false)));
-        Handle.GetTemplateChild<RevealerHandle, ApplicationWindowHandle>("progress-revealer")
-            ?.DataContext(CopyProgressContext.Instance)
-            ?.Binding("reveal-child", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, p => p != null);
-        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("progress-title-label")
-            ?.Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Title);
-        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("progress-size-label")
-            ?.Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"({((CopyProgress?)cpc)?.TotalMaxBytes.ByteCountToString(2)})");
-        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("progress-current-name-label")
-            ?.Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Name);
-        Handle.GetTemplateChild<ProgressBarHandle, ApplicationWindowHandle>("progress-bar-total")
-            ?.Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetTotalFraction);
-        Handle.GetTemplateChild<ProgressBarHandle, ApplicationWindowHandle>("progress-bar-current")
-            ?.Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetFraction);
-        Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("progress-total_count_label")
-            ?.Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.TotalCount}");
-            
 
         if (paned != null)
             Handle.AddActions(

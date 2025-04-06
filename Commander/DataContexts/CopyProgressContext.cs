@@ -48,6 +48,7 @@ class CopyProgressContext : INotifyPropertyChanged
             title, 
             "",
             count,
+            0, 
             totalSize,
             0,
             0,
@@ -56,12 +57,13 @@ class CopyProgressContext : INotifyPropertyChanged
         );
     }
 
-    public void SetNewFileProgress(string name, long size)
+    public void SetNewFileProgress(string name, long size, int index)
     {
         var currentSize = Instance.CopyProgress?.PreviousTotalBytes ?? 0;
-        Instance.CopyProgress = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0)) with
+        Instance.CopyProgress = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0)) with
         {
             Name = name,
+            CurrentCount = index,
             TotalBytes = currentSize,
             CurrentMaxBytes = size,
             PreviousTotalBytes = currentSize + size,
@@ -80,7 +82,7 @@ class CopyProgressContext : INotifyPropertyChanged
     }
 
     public void SetProgress(long size)
-        => progressSubject.OnNext((Instance.CopyProgress ?? new("","", 0, 0, 0, 0, 0, 0)) with
+        => progressSubject.OnNext((Instance.CopyProgress ?? new("","", 0, 0, 0, 0, 0, 0, 0)) with
         {
             CurrentBytes = size,
         });
@@ -106,6 +108,7 @@ record CopyProgress(
     string Title,
     string Name,
     int TotalCount,
+    int CurrentCount,
     long TotalMaxBytes,
     long TotalBytes,
     long PreviousTotalBytes,

@@ -1,3 +1,5 @@
+using Commander.DataContexts;
+using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
@@ -16,6 +18,24 @@ public class ProgressControl : SubClassInst<RevealerHandle>
         var builder = Builder.FromDotNetResource("progresscontrol");
         var button = builder.GetWidget<MenuButtonHandle>("progress-control");
         Handle.Child(button);
+
+        Handle
+            .DataContext(CopyProgressContext.Instance)
+            .Binding("reveal-child", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, p => p != null);
+        builder.GetWidget<MenuButtonHandle>("title-label")
+            .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Title);
+        builder.GetWidget<MenuButtonHandle>("size-label")
+            .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"({((CopyProgress?)cpc)?.TotalMaxBytes.ByteCountToString(2)})");
+        builder.GetWidget<MenuButtonHandle>("current-name-label")
+            .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Name);
+        builder.GetWidget<MenuButtonHandle>("progressbar-total")
+            .Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetTotalFraction);
+        builder.GetWidget<MenuButtonHandle>("progressbar-current")
+            .Binding("fraction", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, CopyProgressContext.GetFraction);
+        builder.GetWidget<MenuButtonHandle>("total-count-label")
+            .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.TotalCount}");
+        builder.GetWidget<MenuButtonHandle>("current-count-label")
+            .Binding("label", nameof(CopyProgressContext.CopyProgress), BindingFlags.Default, cpc => $"{((CopyProgress?)cpc)?.CurrentCount}");
     }
 }
 public class ProgressControlClass(string name, Func<nint, ProgressControl> constructor)
