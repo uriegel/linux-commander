@@ -135,8 +135,11 @@
                 </object>
             </child>
             <child>
-                <object class="GtkButton" id="cancel_btn">
-                <property name="label">Abbrechen</property>
+                <object class="GtkButton" id="cancel-btn">
+                    <property name="label">Abbrechen</property>
+                    <style>
+                        <class name="destructive-action"/>
+                    </style>                    
                 </object>
             </child>
             </object>

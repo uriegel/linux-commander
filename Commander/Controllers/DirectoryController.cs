@@ -1,6 +1,5 @@
 using Commander.DataContexts;
 using Commander.Enums;
-using Commander.Exceptions;
 using Commander.UI;
 using CsTools.Extensions;
 using GtkDotNet;
@@ -66,7 +65,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());
         if (type == SelectedItemsType.None)
-            throw new CancelledException();
+            throw new TaskCanceledException();
         var text = type switch
         {
             SelectedItemsType.Both => "Möchtest Du die markierten Einträge löschen?",
@@ -89,20 +88,20 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             }
         }
         else
-            throw new CancelledException();
+            throw new TaskCanceledException();
     }
 
     public async Task Rename()
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());
         if (type == SelectedItemsType.None)
-            throw new CancelledException();
+            throw new TaskCanceledException();
         var text = type switch
         {
             SelectedItemsType.File => "Möchtest Du die markierte Datei umbenennen?",
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis umbenennen?",
             _ => null
-        } ?? throw new CancelledException();
+        } ?? throw new TaskCanceledException();
         var builder = Builder.FromDotNetResource("textdialog");
         var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
         var textView = builder.GetWidget<EntryHandle>("text");
@@ -130,7 +129,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             }
         }
         else
-            throw new CancelledException();
+            throw new TaskCanceledException();
     }
 
     public async Task CreateFolder()
@@ -154,7 +153,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 Directory.CreateDirectory(CurrentPath.AppendPath(newFile));
         }
         else
-            throw new CancelledException();
+            throw new TaskCanceledException();
     }
 
     public async Task CopyItems(string? targetPath)
@@ -178,29 +177,33 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
         if (response == "ok")
         {
-            // TODO 1. Cancellation, Abbrechen
             // TODO 2. Closing not possible with background action
 
-            // TODO 3. move files with Gtk
-
             // TODO 4. ConflictItems file Dialog
-
             // TODO 5. copy directories
             var items = GetSelectedItems(GetFocusedItemPos()).ToList();
             try
             {
                 var index = 0;
-                CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", items.Sum(n => n.Size), items.Count);
+                var cancellation = CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", items.Sum(n => n.Size), items.Count);
+                var buffer = new byte[15000];
                 foreach (var item in items)
                 {
+                    if (cancellation.IsCancellationRequested)
+                        throw new TaskCanceledException();
                     CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size, ++index);
+                    var newFileName = targetPath.AppendPath(item.Name);
+                    var tmpNewFileName = targetPath.AppendPath(TMP_PREFIX + item.Name);
                     await Task.Run(() =>
                     {
                         using var source = File.OpenRead(CurrentPath.AppendPath(item.Name)).WithProgress(CopyProgressContext.Instance.SetProgress);
-                        using var target = File.Create(targetPath.AppendPath(item.Name));
-                        var buffer = new byte[15000];
+                        using var target = File.Create(tmpNewFileName);
                         while (true)
                         {
+                            if (cancellation.IsCancellationRequested)
+                                // TOD CleanUp
+                                throw new TaskCanceledException();
+
                             var read = source.Read(buffer, 0, buffer.Length);
                             if (read == 0)
                                 break;
@@ -210,6 +213,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                     using var gsf = GFile.New(CurrentPath.AppendPath(item.Name));
                     using var gtf = GFile.New(targetPath.AppendPath(item.Name));
                     gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
+                    File.Move(tmpNewFileName, newFileName, true);
 
                     // TODO Move
                     // using var file = GFile.New(CurrentPath.AppendPath(item.Name));
@@ -222,7 +226,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             }
         }
         else
-            throw new CancelledException();
+            throw new TaskCanceledException();
     }
 
     public string? OnActivate(int pos)
@@ -481,7 +485,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //     Dispose(disposing: false);
     // }
-
+    const string TMP_PREFIX = "tmp-commander-";
     bool disposedValue;
 
     #endregion

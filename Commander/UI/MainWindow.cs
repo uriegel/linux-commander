@@ -37,6 +37,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 panedHandle?.SetPosition(width / 2);
             });
         Handle.OnSizeChanged((w, _) => panedHandle?.SetPosition(w / 2));
+        //Handle.OnClose(CanClose);
+        Handle.OnClose(_ => false);
         Handle.DataContext(MainContext.Instance);
         Handle.GetTemplateChild<LabelHandle, ApplicationWindowHandle>("statusText")
             ?.Binding("label", nameof(MainContext.SelectedPath), BindingFlags.Default)
@@ -94,6 +96,9 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
 
     protected override void OnFinalize() => Console.WriteLine("Window finalized");
     protected override AdwApplicationWindowHandle CreateHandle(nint obj) => new(obj);
+
+    bool CanClose(WindowHandle _)
+        => CopyProgressContext.CanClose();
 
     string GetBackgroundAction(object? value)
     {

@@ -6,9 +6,8 @@ using Commander.Controllers;
 using System.ComponentModel;
 using Commander.DataContexts;
 using GtkDotNet.Exceptions;
-using Commander.Exceptions;
 
-    namespace Commander.UI;
+namespace Commander.UI;
 
 class FolderView : ColumnViewSubClassed
 {
@@ -83,7 +82,7 @@ class FolderView : ColumnViewSubClassed
             await controller.DeleteItems();
             Refresh();
         }
-        catch (CancelledException) { }
+        catch (TaskCanceledException) { }
         catch (GFileException e)
         {
             MainContext.Instance.ErrorText = e.Message;
@@ -97,7 +96,7 @@ class FolderView : ColumnViewSubClassed
             await controller.Rename();
             Refresh();
         }
-        catch (CancelledException) { }
+        catch (TaskCanceledException) { }
         catch (IOException e) when (e.HResult == 13)
         {
             MainContext.Instance.ErrorText = "Kein Zugriff";
@@ -115,7 +114,7 @@ class FolderView : ColumnViewSubClassed
             await controller.CreateFolder();
             Refresh();
         }
-        catch (CancelledException) { }
+        catch (TaskCanceledException) { }
         catch (UnauthorizedAccessException)
         {
             MainContext.Instance.ErrorText = "Kein Zugriff";
@@ -133,7 +132,7 @@ class FolderView : ColumnViewSubClassed
             await controller.CopyItems(targetPath);
             return true;
         }
-        catch (CancelledException)
+        catch (TaskCanceledException)
         {
             return false;
         }

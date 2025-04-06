@@ -34,6 +34,16 @@ class CopyProgressContext : INotifyPropertyChanged
             : 0;
     }
 
+    public static bool CanClose()
+    {
+        if (Instance.CopyProgress == null)
+            return true;
+        else
+        {
+            return false;
+        }
+    }
+
     public CopyProgress? CopyProgress
     {
         get => field;
@@ -47,7 +57,7 @@ class CopyProgressContext : INotifyPropertyChanged
         }
     }
 
-    public void Start(string title, long totalSize, int count)
+    public CancellationToken Start(string title, long totalSize, int count)
     {
         cts?.Cancel();
         startTime = DateTime.Now;
@@ -65,30 +75,33 @@ class CopyProgressContext : INotifyPropertyChanged
             true,
             TimeSpan.FromMilliseconds(0)
         );
+        return cts.Token;
     }
 
     public void SetNewFileProgress(string name, long size, int index)
     {
         var currentSize = Instance.CopyProgress?.PreviousTotalBytes ?? 0;
-        Instance.CopyProgress = (Instance.CopyProgress ?? CopyProgress.Default()) with
-        {
-            Name = name,
-            CurrentCount = index,
-            TotalBytes = currentSize,
-            CurrentMaxBytes = size,
-            PreviousTotalBytes = currentSize + size,
-            CurrentBytes = 0,
-            Duration = DateTime.Now - startTime
-        };
+        if (Instance.CopyProgress != null)
+            Instance.CopyProgress = Instance.CopyProgress with
+            {
+                Name = name,
+                CurrentCount = index,
+                TotalBytes = currentSize,
+                CurrentMaxBytes = size,
+                PreviousTotalBytes = currentSize + size,
+                CurrentBytes = 0,
+                Duration = DateTime.Now - startTime
+            };
     }
 
     public async void Stop()
     {
-        Instance.CopyProgress = (Instance.CopyProgress ?? CopyProgress.Default()) with
-        {
-            IsRunning = false,
-            Duration = DateTime.Now - startTime
-        };
+        if (Instance.CopyProgress != null)
+            Instance.CopyProgress = Instance.CopyProgress with
+            {
+                IsRunning = false,
+                Duration = DateTime.Now - startTime
+            };
 
         try
         {
@@ -98,18 +111,27 @@ class CopyProgressContext : INotifyPropertyChanged
         catch (TaskCanceledException) { }
     }
 
+    public static void Cancel()
+    {
+        Instance.cts?.Cancel();
+        Instance.CopyProgress = null;
+    }
+
     public void SetProgress(long totalSize, long size)
     {
-        var newVal = (Instance.CopyProgress ?? CopyProgress.Default()) with
+        if (Instance.CopyProgress != null)
         {
-            CurrentBytes = size,
-            Duration = DateTime.Now - startTime
-        };
+            var newVal = Instance.CopyProgress with
+            {
+                CurrentBytes = size,
+                Duration = DateTime.Now - startTime
+            };
 
-        if (size < totalSize)
-            progressSubject.OnNext(newVal);
-        else
-            Instance.CopyProgress = newVal;
+            if (size < totalSize)
+                progressSubject.OnNext(newVal);
+            else
+                Instance.CopyProgress = newVal;
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -148,7 +170,4 @@ record CopyProgress(
     long CurrentBytes,
     bool IsRunning,
     TimeSpan Duration
-)
-{
-    public static CopyProgress Default() => new("", "", 0, 0, 0, 0, 0, 0, 0, false, TimeSpan.FromMilliseconds(0));
-};
+);
