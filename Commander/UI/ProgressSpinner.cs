@@ -23,7 +23,9 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
             .CssClass("custom-accent")
             .SetDrawFunction((_, cairo, w, h) =>
             {
-                var color = Handle.GetStyleContext().GetColor().ToSrgb();
+                var color = CopyProgressContext.Instance.CopyProgress?.IsRunning == true
+                    ? Handle.GetStyleContext().GetColor().ToSrgb() 
+                    : new GtkRgba() { Red = 0, Green = 0, Blue = 0, Alpha = 0 };
                 cairo
                     .AntiAlias(CairoAntialias.Best)
                     .LineCap(LineCap.Round)

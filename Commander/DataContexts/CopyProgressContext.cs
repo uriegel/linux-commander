@@ -53,14 +53,15 @@ class CopyProgressContext : INotifyPropertyChanged
             0,
             0,
             0,
-            0
+            0,
+            true
         );
     }
 
     public void SetNewFileProgress(string name, long size, int index)
     {
         var currentSize = Instance.CopyProgress?.PreviousTotalBytes ?? 0;
-        Instance.CopyProgress = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0)) with
+        Instance.CopyProgress = (Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0, false)) with
         {
             Name = name,
             CurrentCount = index,
@@ -73,6 +74,11 @@ class CopyProgressContext : INotifyPropertyChanged
 
     public async void Stop()
     {
+        progressSubject.OnNext((Instance.CopyProgress ?? new("", "", 0, 0, 0, 0, 0, 0, 0, false)) with
+        {
+            IsRunning = false
+        });
+
         try
         {
             await Task.Delay(5000, cts?.Token ?? default);
@@ -82,7 +88,7 @@ class CopyProgressContext : INotifyPropertyChanged
     }
 
     public void SetProgress(long size)
-        => progressSubject.OnNext((Instance.CopyProgress ?? new("","", 0, 0, 0, 0, 0, 0, 0)) with
+        => progressSubject.OnNext((Instance.CopyProgress ?? new("","", 0, 0, 0, 0, 0, 0, 0, false)) with
         {
             CurrentBytes = size,
         });
@@ -113,5 +119,7 @@ record CopyProgress(
     long TotalBytes,
     long PreviousTotalBytes,
     long CurrentMaxBytes,
-    long CurrentBytes
+    long CurrentBytes,
+    bool IsRunning
+
 );
