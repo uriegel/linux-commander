@@ -159,6 +159,17 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public async Task CopyItems(string? targetPath)
     {
+
+
+        // TODO Test
+        var dialog1 = new ConflictDialog();
+        dialog1.Show();
+        
+        return;
+
+
+
+
         if (targetPath?.StartsWith('/') != true)
             return;
         var type = GetSelectedItemsType(GetFocusedItemPos());

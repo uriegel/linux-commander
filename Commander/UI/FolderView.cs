@@ -17,7 +17,7 @@ class FolderView : ColumnViewSubClassed
 
     public FolderView(nint obj)
         : base(obj)
-    {
+    {   
         MultiSelection = true;
         OnSelectionChanged = SelectionChanged;
         controller = new(this);

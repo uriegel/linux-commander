@@ -1,12 +1,9 @@
-using System.Threading.Tasks;
 using Commander.DataContexts;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
 
-public class ProgressSpinnerClass(string name, Func<nint, ProgressSpinner> constructor)
-    : SubClass<DrawingAreaHandle>(GTypeEnum.DrawingArea, name, constructor)
-{ }
+namespace Commander.UI;
 
 public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
 {
@@ -24,7 +21,7 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
             .SetDrawFunction((_, cairo, w, h) =>
             {
                 var color = CopyProgressContext.Instance.CopyProgress?.IsRunning == true
-                    ? Handle.GetStyleContext().GetColor().ToSrgb() 
+                    ? Handle.GetStyleContext().GetColor().ToSrgb()
                     : new GtkRgba() { Red = 0, Green = 0, Blue = 0, Alpha = 0 };
                 cairo
                     .AntiAlias(CairoAntialias.Best)
@@ -67,3 +64,7 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
     ProgressBarHandle totalProgress = new(0);
     ProgressBarHandle currentProgress = new(0);
 }
+
+public class ProgressSpinnerClass(string name, Func<nint, ProgressSpinner> constructor)
+    : SubClass<DrawingAreaHandle>(GTypeEnum.DrawingArea, name, constructor)
+{ }

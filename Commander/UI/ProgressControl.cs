@@ -4,6 +4,8 @@ using GtkDotNet;
 using GtkDotNet.SafeHandles;
 using GtkDotNet.SubClassing;
 
+namespace Commander.UI;
+
 public class ProgressControl : SubClassInst<RevealerHandle>
 {
     public static SubClass<RevealerHandle> Subclass()
@@ -16,7 +18,7 @@ public class ProgressControl : SubClassInst<RevealerHandle>
     {
         if (CopyProgressContext.Instance.CopyProgress != null)
             menuButton.Popup();
-    } 
+    }
 
     protected override RevealerHandle CreateHandle(nint obj) => new(obj);
 

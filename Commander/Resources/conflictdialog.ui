@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <object class="AdwDialog" id="dialog">
+        <property name="presentation-mode">bottom-sheet</property>
+        <property name="title">Dateien überschreiben beim Kopieren?</property>
+        <property name="content-width">1900</property>
+        <property name="content-height">1000</property>
+        <property name="child">
+            <object class="AdwToolbarView">
+                <child type="top">
+                    <object class="AdwHeaderBar">
+                        <property name="show-end-title-buttons">false</property>
+                    </object>
+                </child>
+                <child>
+                    <object class="ColumnView" id="columnview">
+                        <property name="vexpand">True</property>
+                    </object>
+                </child>
+            </object>
+        </property>
+    </object>
+</interface>
