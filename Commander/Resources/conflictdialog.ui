@@ -1,23 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-    <object class="AdwDialog" id="dialog">
-        <property name="presentation-mode">bottom-sheet</property>
-        <property name="title">Dateien überschreiben beim Kopieren?</property>
-        <property name="content-width">1900</property>
-        <property name="content-height">1000</property>
-        <property name="child">
-            <object class="AdwToolbarView">
-                <child type="top">
-                    <object class="AdwHeaderBar">
-                        <property name="show-end-title-buttons">false</property>
-                    </object>
-                </child>
-                <child>
-                    <object class="ColumnView" id="columnview">
-                        <property name="vexpand">True</property>
-                    </object>
-                </child>
-            </object>
-        </property>
-    </object>
+<object class="AdwDialog" id="dialog">
+	<property name="presentation-mode">bottom-sheet</property>
+	<property name="title">Dateien überschreiben beim Kopieren?</property>
+	<property name="content-width">1900</property>
+	<property name="content-height">1000</property>
+	<property name="child">
+		<object class="AdwToolbarView">
+			<child type="top">
+				<object class="AdwHeaderBar">
+				</object>
+			</child>
+			<child>
+				<object class="GtkBox">
+					<property name="orientation">vertical</property>
+					<child>
+						<object class="ColumnView" id="columnview">
+							<property name="vexpand">True</property>
+						</object>
+					</child>
+					<child>
+						<object class="GtkCenterBox">
+							<property name="margin-bottom">20</property>
+							<property name="margin-end">20</property>
+							<property name="margin-start">20</property>
+							<property name="margin-top">20</property>
+							<child type="start"> 
+								<object class="GtkButton">
+									<property name="width-request">150</property>
+									<property name="label">Ja</property>
+									<style>
+										<class name="suggested-action" />
+									</style>
+								</object>
+							</child>
+							<child type="end"> 
+								<object class="GtkButton">
+									<property name="width-request">150</property>
+									<property name="label">Nein</property>
+									<style>
+										<class name="destructive-action" />
+									</style>
+								</object>
+							</child>
+						</object>
+					</child>
+				</object>
+			</child>
+		</object>
+	</property>
+</object>
 </interface>
