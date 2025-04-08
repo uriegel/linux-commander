@@ -15,7 +15,7 @@
 				<object class="GtkBox">
 					<property name="orientation">vertical</property>
 					<child>
-						<object class="ColumnView" id="columnview">
+						<object class="ConflictView" id="conflictview">
 							<property name="vexpand">True</property>
 							<property name="tab-behavior">2</property>
 						</object>
