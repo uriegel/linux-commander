@@ -12,10 +12,11 @@ public class ConflictDialog
         var columnViewHandle = builder.GetWidget<CustomColumnViewHandle>("columnview");
         var columnView = FolderView.GetInstance(columnViewHandle);
         columnView?.ChangePath("root");
+        columnView?.SetTabBehavior(ListTabBehavior.Item);
     }
 
     public void Show() => dialog.Present(MainWindow.MainWindowHandle);
 
-    AdwDialogHandle dialog = new(0);
+    readonly AdwDialogHandle dialog = new(0);
 }
 
