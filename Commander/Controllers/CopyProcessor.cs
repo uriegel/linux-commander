@@ -14,6 +14,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
     {
         // TODO 4. ConflictItems file Dialog
         // TODO 5. copy directories
+        // TODO 6. Move
         if (targetPath?.StartsWith('/') != true)
             return;
         var text = selectedItemsType switch
