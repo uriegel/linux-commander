@@ -17,7 +17,7 @@
 					<child>
 						<object class="ConflictView" id="conflictview">
 							<property name="vexpand">True</property>
-							<property name="tab-behavior">2</property>
+							<property name="tab-behavior">1</property>
 						</object>
 					</child>
 					<child>

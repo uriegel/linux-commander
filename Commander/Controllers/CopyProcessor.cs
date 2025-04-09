@@ -13,6 +13,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
     public async Task CopyItems()
     {
         // TODO 4. ConflictItems file Dialog
+        // TODO 4. ConflictItems file Dialog NoSelection
         // TODO 5. copy directories
         // TODO 6. Move
         if (targetPath?.StartsWith('/') != true)
@@ -31,8 +32,9 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         if (conflicts.Length > 0)
         {
-            var dialog1 = new ConflictDialog();
-            dialog1.Show();
+            var dialog = new ConflictDialog(conflicts);
+            dialog.Show();
+            throw new TaskCanceledException();
         }
         else
         {
@@ -41,7 +43,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
             dialog.Heading("Kopieren?");
             dialog.Body(text);
             var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
-            if (response != "ok")            
+            if (response != "ok")
                 throw new TaskCanceledException();
         }
         try

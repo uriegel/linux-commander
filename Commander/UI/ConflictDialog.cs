@@ -5,15 +5,16 @@ using GtkDotNet.SafeHandles;
 
 namespace Commander.UI;
 
-public class ConflictDialog
+class ConflictDialog
 {
-    public ConflictDialog()
+    public ConflictDialog(IEnumerable<CopyItem> conflicts)
     {
         var builder = Builder.FromDotNetResource("conflictdialog");
         dialog = builder.GetWidget<AdwDialogHandle>("dialog");
         var columnViewHandle = builder.GetWidget<CustomColumnViewHandle>("conflictview");
         var columnView = ConflictView.GetInstance(columnViewHandle);
         columnView?.SetTabBehavior(ListTabBehavior.Item);
+        columnView?.Fill(conflicts);
     }
 
     public void Show() => dialog.Present(MainWindow.MainWindowHandle);
@@ -26,8 +27,11 @@ class ConflictView : ColumnViewSubClassed
     public ConflictView(nint obj)
         : base(obj)
     {
+        SingleSelection = true;
         controller = new(this);
     }
+
+    public void Fill(IEnumerable<CopyItem> conflicts) => controller.Fill(conflicts);
 
     public static ConflictView? GetInstance(CustomColumnViewHandle handle)
         => GetInstance(handle.GetInternalHandle()) as ConflictView;

@@ -261,6 +261,22 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         };
     }
 
+    public static string GetIconName(string fileName)
+    {
+        var ct = ContentType.Guess(fileName);
+        if (ct != null)
+        {
+            using var icon = ContentType.GetIcon(ct);
+            return icon
+                    .ThemedNames()
+                    .Where(Display.GetDefault().GetIconTheme().HasIcon) // TODO Skip(1), symbolic icons
+                    .FirstOrDefault()
+                 ?? "text-x-generic-template";
+        }
+        else
+            return "text-x-generic-template";
+    }
+
     void StartExifResolving(DirectoryItem[] items, FolderView folderView)
     {
         var token = cancellation.Token;
@@ -306,23 +322,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         label?.Set(item.ExifData?.DateTime.ToString() ?? item.Time.ToString() ?? "");
         label?.AddCssClass("exif", item.ExifData?.DateTime != null);
     }
-
-    static string GetIconName(string fileName)
-    {
-        var ct = ContentType.Guess(fileName);
-        if (ct != null)
-        {
-            using var icon = ContentType.GetIcon(ct);
-            return icon
-                    .ThemedNames()
-                    .Where(Display.GetDefault().GetIconTheme().HasIcon) // TODO Skip(1), symbolic icons
-                    .FirstOrDefault()
-                 ?? "text-x-generic-template";
-        }
-        else
-            return "text-x-generic-template";
-    }
-
 
     static int? OnFolderOrParentSort(DirectoryItem a, DirectoryItem b, bool desc)
     {
