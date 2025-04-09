@@ -12,14 +12,8 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task CopyItems()
     {
-
-
-        // TODO Test
-        // var dialog1 = new ConflictDialog();
-        // dialog1.Show();
-
-        // return;
-
+        // TODO 4. ConflictItems file Dialog
+        // TODO 5. copy directories
         if (targetPath?.StartsWith('/') != true)
             return;
         var text = selectedItemsType switch
@@ -32,77 +26,92 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
             _ => ""
         };
 
-        var copyItems = MakeCopyItems(selectedItems.Select(n => n.Name));
-
-        var builder = Builder.FromDotNetResource("alertdialog");
-        var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
-        dialog.Heading("Kopieren?");
-        dialog.Body(text);
-        var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
-        if (response == "ok")
+        var copyItems = MakeCopyItems(selectedItems);
+        var conflicts = copyItems.Where(n => n.Target != null).ToArray();
+        if (conflicts.Length > 0)
         {
-            // TODO 4. ConflictItems file Dialog
-            // TODO 5. copy directories
-            try
-            {
-                var index = 0;
-                var cancellation = CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", selectedItems.Sum(n => n.Size), selectedItems.Length);
-                var buffer = new byte[15000];
-                foreach (var item in selectedItems)
-                {
-                    if (cancellation.IsCancellationRequested)
-                        throw new TaskCanceledException();
-                    CopyProgressContext.Instance.SetNewFileProgress(item.Name, item.Size, ++index);
-                    var newFileName = targetPath.AppendPath(item.Name);
-                    var tmpNewFileName = targetPath.AppendPath(TMP_PREFIX + item.Name);
-                    await Task.Run(() =>
-                    {
-                        using var source = File.OpenRead(sourcePath.AppendPath(item.Name)).WithProgress(CopyProgressContext.Instance.SetProgress);
-                        using var target = File.Create(tmpNewFileName);
-                        while (true)
-                        {
-                            if (cancellation.IsCancellationRequested)
-                            {
-                                try
-                                {
-                                    File.Delete(tmpNewFileName);
-                                }
-                                catch { }
-                                throw new TaskCanceledException();
-                            }
-
-                            var read = source.Read(buffer, 0, buffer.Length);
-                            if (read == 0)
-                                break;
-                            target.Write(buffer, 0, Math.Min(read, buffer.Length));
-                        }
-                    });
-                    using var gsf = GFile.New(sourcePath.AppendPath(item.Name));
-                    using var gtf = GFile.New(targetPath.AppendPath(item.Name));
-                    gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
-                    File.Move(tmpNewFileName, newFileName, true);
-
-                    // TODO Move
-                    // using var file = GFile.New(CurrentPath.AppendPath(item.Name));
-                    // await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false, (c, t) => CopyProgressContext.Instance.SetProgress(c));
-                }
-            }
-            finally
-            {
-                CopyProgressContext.Instance.Stop();
-            }
+            var dialog1 = new ConflictDialog();
+            dialog1.Show();
         }
         else
-            throw new TaskCanceledException();
+        {
+            var builder = Builder.FromDotNetResource("alertdialog");
+            var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
+            dialog.Heading("Kopieren?");
+            dialog.Body(text);
+            var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
+            if (response != "ok")            
+                throw new TaskCanceledException();
+        }
+        try
+        {
+            var index = 0;
+            var cancellation = CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", copyItems.Sum(n => n.Source.Size), copyItems.Length);
+            var buffer = new byte[15000];
+            foreach (var item in copyItems)
+            {
+                if (cancellation.IsCancellationRequested)
+                    throw new TaskCanceledException();
+                CopyProgressContext.Instance.SetNewFileProgress(item.Source.Name, item.Source.Size, ++index);
+                var newFileName = targetPath.AppendPath(item.Source.Name);
+                var tmpNewFileName = targetPath.AppendPath(TMP_PREFIX + item.Source.Name);
+                await Task.Run(() =>
+                {
+                    using var source = File.OpenRead(sourcePath.AppendPath(item.Source.Name)).WithProgress(CopyProgressContext.Instance.SetProgress);
+                    using var target = File.Create(tmpNewFileName);
+                    while (true)
+                    {
+                        if (cancellation.IsCancellationRequested)
+                        {
+                            try
+                            {
+                                File.Delete(tmpNewFileName);
+                            }
+                            catch { }
+                            throw new TaskCanceledException();
+                        }
+
+                        var read = source.Read(buffer, 0, buffer.Length);
+                        if (read == 0)
+                            break;
+                        target.Write(buffer, 0, Math.Min(read, buffer.Length));
+                    }
+                });
+                using var gsf = GFile.New(sourcePath.AppendPath(item.Source.Name));
+                using var gtf = GFile.New(tmpNewFileName);
+                gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
+                File.Move(tmpNewFileName, newFileName, true);
+
+                // TODO Move
+                // using var file = GFile.New(CurrentPath.AppendPath(item.Name));
+                // await file.CopyAsync(targetPath.AppendPath(item.Name), FileCopyFlags.Overwrite, false, (c, t) => CopyProgressContext.Instance.SetProgress(c));
+            }
+        }
+        finally
+        {
+            CopyProgressContext.Instance.Stop();
+        }
     }
 
-    CopyItem[] MakeCopyItems(IEnumerable<string> fileNames)
+    CopyItem[] MakeCopyItems(IEnumerable<DirectoryItem> fileNames)
+        => fileNames
+            .Where(n => !n.IsDirectory)
+            .SelectFilterNull(CreateCopyItem)
+            .ToArray();
+
+    CopyItem? CreateCopyItem(DirectoryItem item)
     {
-        return [];
+        var info = new FileInfo(sourcePath.AppendPath(item.Name));
+        if (!info.Exists)
+            return null;
+        var source = new Item(info.Name, info.Length, info.LastWriteTime);
+        info = new FileInfo(targetPath.AppendPath(item.Name));
+        var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
+        return new(source, target);
     }
 
     const string TMP_PREFIX = "tmp-commander-";
 }
 
 record Item(string Name, long Size, DateTime DateTime);
-record CopyItem(Item Source, Item ? Target);
+record CopyItem(Item Source, Item? Target);
