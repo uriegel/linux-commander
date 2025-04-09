@@ -158,7 +158,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     public Task CopyItems(string? targetPath)
     {
         var copyProcessor = new CopyProcessor(CurrentPath, targetPath,
-            GetSelectedItemsType(GetFocusedItemPos()), () => [.. GetSelectedItems(GetFocusedItemPos())]);
+            GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);
         return copyProcessor.CopyItems();
     }
 

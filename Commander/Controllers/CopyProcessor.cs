@@ -8,7 +8,7 @@ using CsTools.Extensions;
 
 namespace Commander.Controllers;
 
-class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType selectedItemsType, Func<DirectoryItem[]> getSelectedItems)
+class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType selectedItemsType, DirectoryItem[] selectedItems)
 {
     public async Task CopyItems()
     {
@@ -31,6 +31,9 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis kopieren?",
             _ => ""
         };
+
+        var copyItems = MakeCopyItems(selectedItems.Select(n => n.Name));
+
         var builder = Builder.FromDotNetResource("alertdialog");
         var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
         dialog.Heading("Kopieren?");
@@ -40,13 +43,12 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         {
             // TODO 4. ConflictItems file Dialog
             // TODO 5. copy directories
-            var items = getSelectedItems();
             try
             {
                 var index = 0;
-                var cancellation = CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", items.Sum(n => n.Size), items.Length);
+                var cancellation = CopyProgressContext.Instance.Start("Fortschritt beim Kopieren", selectedItems.Sum(n => n.Size), selectedItems.Length);
                 var buffer = new byte[15000];
-                foreach (var item in items)
+                foreach (var item in selectedItems)
                 {
                     if (cancellation.IsCancellationRequested)
                         throw new TaskCanceledException();
@@ -94,5 +96,13 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
             throw new TaskCanceledException();
     }
 
+    CopyItem[] MakeCopyItems(IEnumerable<string> fileNames)
+    {
+        return [];
+    }
+
     const string TMP_PREFIX = "tmp-commander-";
 }
+
+record Item(string Name, long Size, DateTime DateTime);
+record CopyItem(Item Source, Item ? Target);
