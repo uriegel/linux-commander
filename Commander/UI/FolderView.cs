@@ -68,8 +68,8 @@ class FolderView : ColumnViewSubClassed
         }
     }
 
-    public static FolderView? GetInstance(CustomColumnViewHandle handle)
-        => GetInstance(handle.GetInternalHandle()) as FolderView;
+    public static FolderView GetInstance(CustomColumnViewHandle handle)
+        => (GetInstance(handle.GetInternalHandle()) as FolderView)!;
 
     public void StartPathEditing() => pathEditing.StartEditing();
 

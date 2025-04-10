@@ -8,8 +8,8 @@ namespace Commander.UI;
 
 class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
 {
-    public static FolderViewPaned? GetInstance(PanedHandle? handle)
-        => (handle != null ? GetInstance(handle.GetInternalHandle()) : null) as FolderViewPaned;
+    public static FolderViewPaned GetInstance(PanedHandle handle)
+        => (GetInstance(handle.GetInternalHandle()) as FolderViewPaned)!;
 
     public void OnDown() => folderViewActive?.OnDown();
     public void OnUp() => folderViewActive?.OnUp();
@@ -77,52 +77,43 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         var window = Handle.GetAncestor<AdwApplicationWindowHandle>();
         var cvhl = window.GetTemplateChild<CustomColumnViewHandle, AdwApplicationWindowHandle>("columnview-left");
         var cvhr = window.GetTemplateChild<CustomColumnViewHandle, AdwApplicationWindowHandle>("columnview-right");
-        if (cvhl != null && cvhr != null)
+        folderViewLeft = FolderView.GetInstance(cvhl);
+        folderViewActive = folderViewLeft;
+        MainContext.Instance.ChangeFolderContext(folderViewLeft.Context);
+        folderViewLeft.Context.IsLeft = true;
+        folderViewLeft.ChangePath(Storage.Retrieve().LeftPath);
+        folderViewLeft.OnFocusEnter += (s, e) =>
         {
-            folderViewLeft = FolderView.GetInstance(cvhl);
             folderViewActive = folderViewLeft;
-            MainContext.Instance.ChangeFolderContext(folderViewLeft?.Context);
-            if (folderViewLeft != null)
-            {
-                folderViewLeft.Context.IsLeft = true;
-                folderViewLeft.ChangePath(Storage.Retrieve().LeftPath);
-                folderViewLeft.OnFocusEnter += (s, e) =>
-                {
-                    folderViewActive = folderViewLeft;
-                    MainContext.Instance.ChangeFolderContext(folderViewActive?.Context);
-                    EnableKeyNavigation(true);
-                    if (folderViewActive?.Context.IsEditing != true)
-                        EnableFolderViewActions(true);
-                };
-                folderViewLeft.OnFocusLeave += (s, e) =>
-                {
-                    EnableKeyNavigation(false);
-                    EnableFolderViewActions(false);
-                };
-            }
-            folderViewRight = FolderView.GetInstance(cvhr);
-            if (folderViewRight != null)
-            {
-                folderViewRight.ChangePath(Storage.Retrieve().RightPath);
-                folderViewRight.OnFocusEnter += (s, e) =>
-                {
-                    folderViewActive = folderViewRight;
-                    MainContext.Instance.ChangeFolderContext(folderViewActive?.Context);
-                    EnableKeyNavigation(true);
-                    if (folderViewActive?.Context.IsEditing != true)
-                        EnableFolderViewActions(true);
-                };
-                folderViewRight.OnFocusLeave += (s, e) =>
-                {
-                    EnableKeyNavigation(false);
-                    EnableFolderViewActions(false);
-                };
-            }
+            MainContext.Instance.ChangeFolderContext(folderViewActive.Context);
+            EnableKeyNavigation(true);
+            if (folderViewActive?.Context.IsEditing != true)
+                EnableFolderViewActions(true);
+        };
+        folderViewLeft.OnFocusLeave += (s, e) =>
+        {
+            EnableKeyNavigation(false);
+            EnableFolderViewActions(false);
+        };
+        folderViewRight = FolderView.GetInstance(cvhr);
+        folderViewRight.ChangePath(Storage.Retrieve().RightPath);
+        folderViewRight.OnFocusEnter += (s, e) =>
+        {
+            folderViewActive = folderViewRight;
+            MainContext.Instance.ChangeFolderContext(folderViewActive?.Context);
+            EnableKeyNavigation(true);
+            if (folderViewActive?.Context.IsEditing != true)
+                EnableFolderViewActions(true);
+        };
+        folderViewRight.OnFocusLeave += (s, e) =>
+        {
+            EnableKeyNavigation(false);
+            EnableFolderViewActions(false);
+        };
 
-            await Task.Delay(100);
-            folderViewActive?.GrabFocus();
-            IActionMap.GetAction("down").SetEnabled(true);
-        }
+        await Task.Delay(100);
+        folderViewActive?.GrabFocus();
+        IActionMap.GetAction("down").SetEnabled(true);
     }
 
     protected override PanedHandle CreateHandle(nint obj) => new(obj);

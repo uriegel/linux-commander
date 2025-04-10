@@ -11,8 +11,8 @@ public class ProgressControl : SubClassInst<RevealerHandle>
     public static SubClass<RevealerHandle> Subclass()
         => new ProgressControlClass("ProgressControl", p => new ProgressControl(p));
 
-    public static ProgressControl? GetInstance(RevealerHandle? handle)
-        => (handle != null ? GetInstance(handle.GetInternalHandle()) : null) as ProgressControl;
+    public static ProgressControl GetInstance(RevealerHandle handle)
+        => (GetInstance(handle.GetInternalHandle()) as ProgressControl)!;
 
     public void ShowPopover()
     {

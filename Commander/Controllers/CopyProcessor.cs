@@ -1,7 +1,6 @@
 using GtkDotNet;
 
 using Commander.Enums;
-using GtkDotNet.SafeHandles;
 using Commander.UI;
 using Commander.DataContexts;
 using CsTools.Extensions;
@@ -12,7 +11,6 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task CopyItems()
     {
-        // TODO 2. dialog closed >= conflict view is not finalized
         // TODO 3. suggested button is the default button
         // TODO 4. make present async method returning the same respone like AdwAlertDialog
         // TODO 5. copy directories
@@ -33,19 +31,12 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         if (conflicts.Length > 0)
         {
-            var dialog = new ConflictDialog(conflicts);
-            var res = await dialog.ShowAsync();
-
-
+            var res = await ConflictDialog.PresentAsync(conflicts);
             throw new TaskCanceledException();
         }
         else
         {
-            var builder = Builder.FromDotNetResource("alertdialog");
-            var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
-            dialog.Heading("Kopieren?");
-            dialog.Body(text);
-            var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
+            var response = await AlertDialog.PresentAsync("Kopieren?", text);
             if (response != "ok")
                 throw new TaskCanceledException();
         }

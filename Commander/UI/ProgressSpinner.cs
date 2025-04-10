@@ -41,8 +41,8 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
 
         await Task.Delay(1);
         var window = Handle.GetAncestor<AdwApplicationWindowHandle>();
-        totalProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-total") ?? new(0);
-        currentProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-current") ?? new(0);
+        totalProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-total");
+        currentProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-current");
     }
 
     protected override void OnFinalize()

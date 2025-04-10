@@ -17,9 +17,9 @@ static class Viewer
             // TODO Maximize window 
             initial = false;
             var viewerPaned = window.GetTemplateChild<PanedHandle, ApplicationWindowHandle>("viewerPaned");
-            viewerPaned?.SetPosition(window.GetHeight() / 2);
+            viewerPaned.SetPosition(window.GetHeight() / 2);
             webView = window.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("viewer");
-            webView?.LoadUri("http://localhost:20000");
+            webView.LoadUri("http://localhost:20000");
             await Task.Delay(400);
             SetValues();
         }
