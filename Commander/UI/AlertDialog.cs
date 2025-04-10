@@ -10,8 +10,7 @@ class AlertDialog(nint obj) : GtkDotNet.SubClassing.AlertDialog(obj)
         var handle = GObject.New<AdwAlertDialogHandle>("AlertDialog".TypeFromName());
         handle.Heading(heading);
         handle.Body(text);
-        var dialog = GetInstance(handle.GetInternalHandle()) as AlertDialog;
-        return dialog!.Handle.PresentAsync(MainWindow.MainWindowHandle);
+        return handle.PresentAsync(MainWindow.MainWindowHandle);
     }
 
     protected override void OnFinalize() => Console.WriteLine("AlertDialog finalized");

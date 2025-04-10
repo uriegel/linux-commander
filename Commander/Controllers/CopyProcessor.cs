@@ -12,8 +12,8 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
     public async Task CopyItems()
     {
         // TODO 3. suggested button is the default button
-        // TODO 4. make present async method returning the same respone like AdwAlertDialog
-        // TODO 5. copy directories
+        // TODO 4. when necessary filter copyItems 
+        // TODO 5. copy directories: flatten directory trees
         // TODO 6. Move
         if (targetPath?.StartsWith('/') != true)
             return;

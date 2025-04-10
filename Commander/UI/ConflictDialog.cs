@@ -6,79 +6,51 @@ using GtkDotNet.SubClassing;
 
 namespace Commander.UI;
 
-// TODO 1. Gtk4DotNet All from the above
-// TODO 1. Gtk4DotNet AdwDialog Object from Template with PresentAsync
-
-class ConflictDialog(nint obj) : SubClassInst<AdwDialogHandle>(obj)
+class ConflictDialog(nint obj) : Dialog<bool>(obj)
 {
     /// <summary>
     /// Presents the conflict dialog
     /// </summary>
     /// <param name="conflicts"></param>
     /// <returns>true: overwrite conflicts, false: don't overwerite conflicts</returns>
-    // TODO zusammenfassen
     public static Task<bool> PresentAsync(IEnumerable<CopyItem> conflicts)
     {
-        var dialogHandle = GObject.New<AdwDialogHandle>("ConflictDialog".TypeFromName());
-        dialogHandle.Present(MainWindow.MainWindowHandle);
-        var dialog = GetInstance(dialogHandle);
-        dialog!.conflicts = conflicts;
-        return dialog!.completionSource.Task;
+        var handle = GObject.New<AdwDialogHandle>("ConflictDialog".TypeFromName());
+        var dialog = (GetInstance(handle.GetInternalHandle()) as ConflictDialog)!;
+        dialog.Initialize(conflicts);
+        return dialog.PresentAsync(MainWindow.MainWindowHandle);
     }
 
-    protected override async void OnCreate()
+    protected override void OnInitialize()
     {
-        // TODO zusammenfassen
-        Handle.InitTemplate();
-        await Task.Delay(1);
-        var columnViewHandle = Handle.GetTemplateChild<CustomColumnViewHandle, AdwDialogHandle>("conflictview")!;
+        base.OnInitialize();
+        var columnViewHandle = Handle.GetTemplateChild<CustomColumnViewHandle, AdwDialogHandle>("conflictview");
         var columnView = ConflictView.GetInstance(columnViewHandle);
         columnView.SetTabBehavior(ListTabBehavior.Item);
         columnView.Fill(conflicts);
         var yesButton = Handle.GetTemplateChild<ButtonHandle, AdwDialogHandle>("yes-button");
-        yesButton.OnClicked(() =>
-        {
-            Handle.CloseDialog();
-            completionSource.TrySetResult(true);
-        });
+        yesButton.OnClicked(() => Close(true));
         var noButton = Handle.GetTemplateChild<ButtonHandle, AdwDialogHandle>("no-button");
-        noButton.OnClicked(() =>
-        {
-            Handle.CloseDialog();
-            completionSource.TrySetResult(false);
-        });
+        noButton.OnClicked(() => Close(false));
         Handle.SetDefaultWidget(yesButton);
-        overwriteCritical = conflicts.Any(n => n.Target != null && n.Target.DateTime > n.Source.DateTime);
+        var overwriteCritical = conflicts.Any(n => n.Target != null && n.Target.DateTime > n.Source.DateTime);
+        columnView.OnEnter += (s, e) => Close(overwriteCritical);
         yesButton.AddCssClass("destructive-action", overwriteCritical);
         noButton.AddCssClass("suggested-action", overwriteCritical);
         yesButton.AddCssClass("suggested-action", !overwriteCritical);
         noButton.AddCssClass("destructive-action", !overwriteCritical);
-        Handle.OnClosed(() => completionSource.TrySetException(new TaskCanceledException()));
     }
-
-    protected override AdwDialogHandle CreateHandle(nint obj) => new(obj);
 
     protected override void OnFinalize() => Console.WriteLine("ConflictDialog finalized");
 
-    static ConflictDialog? GetInstance(AdwDialogHandle? handle)
-        => (handle != null ? GetInstance(handle.GetInternalHandle()) : null) as ConflictDialog;
+    void Initialize(IEnumerable<CopyItem> conflicts) => this.conflicts = conflicts;
 
     IEnumerable<CopyItem> conflicts = [];
-    readonly TaskCompletionSource<bool> completionSource = new();
-
-    bool overwriteCritical;
 }
 
-class ConflictDialogClass()
-    : SubClass<AdwDialogHandle>(GTypeEnum.AdwDialog, "ConflictDialog", p => new ConflictDialog(p))
-{
-    // TODO to base class, extended constructor with template
-    protected override void ClassInit(nint cls, nint _)
-    {
-        base.ClassInit(cls, _);
-        InitTemplateFromResource(cls, "conflictdialog");
-    }  
-}
+class ConflictDialogClass() 
+    : DialogClass<bool>("ConflictDialog", "conflictdialog", p => new ConflictDialog(p))
+{ }
 
 class ConflictView : ColumnViewSubClassed
 {
@@ -90,13 +62,10 @@ class ConflictView : ColumnViewSubClassed
         controller = new(this);
     }
 
+    public event EventHandler? OnEnter;
+
     protected override void OnCreate()
-    {
-        OnActivate(_ =>
-        {
-            //overwriteCritical
-        });
-    }
+        => OnActivate(_ => OnEnter?.Invoke(this, EventArgs.Empty));
 
     public void Fill(IEnumerable<CopyItem> conflicts) => controller.Fill(conflicts);
 
