@@ -15,6 +15,11 @@ class ConflictDialog
         var columnView = ConflictView.GetInstance(columnViewHandle);
         columnView?.SetTabBehavior(ListTabBehavior.Item);
         columnView?.Fill(conflicts);
+        var yesButton = builder.GetWidget<ButtonHandle>("yes-button");
+        yesButton.OnClicked(() => Console.WriteLine("Ja"));
+        var noButton = builder.GetWidget<ButtonHandle>("no-button");
+        noButton.OnClicked(() => Console.WriteLine("Nein"));
+        dialog.SetDefaultWidget(yesButton);
     }
 
     public void Show() => dialog.Present(MainWindow.MainWindowHandle);
@@ -27,8 +32,14 @@ class ConflictView : ColumnViewSubClassed
     public ConflictView(nint obj)
         : base(obj)
     {
-        SingleSelection = true;
+        MultiSelection = true;
+        OnSelectionChanged = (model, pos, count) => model.UnselectRange(pos, count);
         controller = new(this);
+    }
+
+    protected override void OnCreate()
+    {
+        OnActivate(_ => Console.WriteLine("aktiviziert"));
     }
 
     public void Fill(IEnumerable<CopyItem> conflicts) => controller.Fill(conflicts);

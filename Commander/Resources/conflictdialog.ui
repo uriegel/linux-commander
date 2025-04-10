@@ -27,7 +27,7 @@
 							<property name="margin-start">20</property>
 							<property name="margin-top">20</property>
 							<child type="start"> 
-								<object class="GtkButton">
+								<object class="GtkButton" id="yes-button">
 									<property name="width-request">150</property>
 									<property name="label">Ja</property>
 									<style>
@@ -36,7 +36,7 @@
 								</object>
 							</child>
 							<child type="end"> 
-								<object class="GtkButton">
+								<object class="GtkButton" id="no-button">
 									<property name="width-request">150</property>
 									<property name="label">Nein</property>
 									<style>

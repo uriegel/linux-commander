@@ -12,8 +12,10 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task CopyItems()
     {
-        // TODO 4. ConflictItems file Dialog
-        // TODO 4. ConflictItems file Dialog NoSelection
+        // TODO 1. Copy some txt file, change it on one side
+        // TODO 2. Either suggested-action or destructive-action is set on yes or no depending on overwrite behavior
+        // TODO 3. suggested button is the default button
+        // TODO 4. make present async method returning the same respone like AdwAlertDialog
         // TODO 5. copy directories
         // TODO 6. Move
         if (targetPath?.StartsWith('/') != true)
