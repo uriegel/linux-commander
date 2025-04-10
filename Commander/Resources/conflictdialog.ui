@@ -2,6 +2,7 @@
 <interface>
 <object class="AdwDialog" id="dialog">
 	<property name="presentation-mode">bottom-sheet</property>
+	<property name="can-close">true</property>
 	<property name="title">Dateien überschreiben beim Kopieren?</property>
 	<property name="content-width">1900</property>
 	<property name="content-height">1000</property>

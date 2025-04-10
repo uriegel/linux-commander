@@ -12,6 +12,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task CopyItems()
     {
+        // TODO 2. dialog closed >= conflict view is not finalized
         // TODO 3. suggested button is the default button
         // TODO 4. make present async method returning the same respone like AdwAlertDialog
         // TODO 5. copy directories
@@ -33,7 +34,9 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         if (conflicts.Length > 0)
         {
             var dialog = new ConflictDialog(conflicts);
-            dialog.Show();
+            var res = await dialog.ShowAsync();
+
+
             throw new TaskCanceledException();
         }
         else

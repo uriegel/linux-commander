@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using Commander.Controllers;
 using GtkDotNet;
 using GtkDotNet.Controls;
@@ -17,20 +16,42 @@ class ConflictDialog
         columnView?.SetTabBehavior(ListTabBehavior.Item);
         columnView?.Fill(conflicts);
         var yesButton = builder.GetWidget<ButtonHandle>("yes-button");
-        yesButton.OnClicked(() => Console.WriteLine("Ja"));
+        yesButton.OnClicked(async () =>
+        {
+            AdwDialog.Close(dialog);
+            await Task.Delay(1);
+            completionSource.TrySetResult(true);
+        });
         var noButton = builder.GetWidget<ButtonHandle>("no-button");
-        noButton.OnClicked(() => Console.WriteLine("Nein"));
+        noButton.OnClicked(async () =>
+        {
+            AdwDialog.Close(dialog);
+            await Task.Delay(1);
+            completionSource.TrySetResult(false);
+        });
         dialog.SetDefaultWidget(yesButton);
-        var overwriteCritical = conflicts.Any(n => n.Target != null && n.Target.DateTime > n.Source.DateTime);
+        overwriteCritical = conflicts.Any(n => n.Target != null && n.Target.DateTime > n.Source.DateTime);
         yesButton.AddCssClass("destructive-action", overwriteCritical);
         noButton.AddCssClass("suggested-action", overwriteCritical);
         yesButton.AddCssClass("suggested-action", !overwriteCritical);
         noButton.AddCssClass("destructive-action", !overwriteCritical);
+        dialog.OnClosed(() => completionSource.TrySetException(new TaskCanceledException()));
     }
 
-    public void Show() => dialog.Present(MainWindow.MainWindowHandle);
+    /// <summary>
+    /// Presents the conflict dialog
+    /// </summary>
+    /// <returns>true: overwrite conflicts, false: don't overwerite conflicts</returns>
+    public Task<bool> ShowAsync()
+    {
+        dialog.Present(MainWindow.MainWindowHandle);
+        return completionSource.Task;
+    }
 
+    readonly TaskCompletionSource<bool> completionSource = new();
     readonly AdwDialogHandle dialog = new(0);
+
+    bool overwriteCritical;
 }
 
 class ConflictView : ColumnViewSubClassed
@@ -45,7 +66,10 @@ class ConflictView : ColumnViewSubClassed
 
     protected override void OnCreate()
     {
-        OnActivate(_ => Console.WriteLine("aktiviziert"));
+        OnActivate(_ =>
+        {
+            //overwriteCritical
+        });
     }
 
     public void Fill(IEnumerable<CopyItem> conflicts) => controller.Fill(conflicts);
