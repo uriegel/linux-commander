@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using Commander.Controllers;
 using GtkDotNet;
 using GtkDotNet.Controls;
@@ -20,6 +21,11 @@ class ConflictDialog
         var noButton = builder.GetWidget<ButtonHandle>("no-button");
         noButton.OnClicked(() => Console.WriteLine("Nein"));
         dialog.SetDefaultWidget(yesButton);
+        var overwriteCritical = conflicts.Any(n => n.Target != null && n.Target.DateTime > n.Source.DateTime);
+        yesButton.AddCssClass("destructive-action", overwriteCritical);
+        noButton.AddCssClass("suggested-action", overwriteCritical);
+        yesButton.AddCssClass("suggested-action", !overwriteCritical);
+        noButton.AddCssClass("destructive-action", !overwriteCritical);
     }
 
     public void Show() => dialog.Present(MainWindow.MainWindowHandle);

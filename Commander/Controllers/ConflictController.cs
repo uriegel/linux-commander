@@ -62,12 +62,13 @@ class ConflichtController : Controller<CopyItem>
         var icon = DirectoryController.GetIconName(item.Source.Name);
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Source.Name);
-        //        box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem", item.IsHidden);
     }
 
     static void OnTimeBind(ListItemHandle listItem, CopyItem item)
     {
         var box = listItem.GetChild<BoxHandle>();
+        box.AddCssClass("validated", item.Source.DateTime > item.Target?.DateTime);
+        box.AddCssClass("not-validated", item.Source.DateTime < item.Target?.DateTime);
         var first = box.GetFirstChild<LabelHandle>();
         first.Set(item.Source.DateTime.ToString());
         var last = first.GetNextSibling<LabelHandle>();
@@ -77,6 +78,7 @@ class ConflichtController : Controller<CopyItem>
     static void OnSizeBind(ListItemHandle listItem, CopyItem item)
     {
         var box = listItem.GetChild<BoxHandle>();
+        box.AddCssClass("different", item.Source.Size != item.Target?.Size);
         var first = box.GetFirstChild<LabelHandle>();
         first.Set(item.Source.Size.ToString());
         var last = first.GetNextSibling<LabelHandle>();

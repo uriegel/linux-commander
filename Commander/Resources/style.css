@@ -47,3 +47,17 @@ actionbar.info>revealer>box{
 .custom-accent { 
     color: @accent_color; 
 }
+
+box.different {
+    background-color: color-mix(in srgb, green 10%, transparent);
+}
+
+box.validated {
+    background-color: color-mix(in srgb, green 25%, transparent);
+}
+
+box.not-validated {
+    background-color: red;
+    color: white;
+    font-weight: bold;
+}
