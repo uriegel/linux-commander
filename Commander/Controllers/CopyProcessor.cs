@@ -4,6 +4,8 @@ using Commander.Enums;
 using Commander.UI;
 using Commander.DataContexts;
 using CsTools.Extensions;
+using System.Security.AccessControl;
+using CsTools.Functional;
 
 namespace Commander.Controllers;
 
@@ -11,8 +13,27 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task CopyItems()
     {
-        // TODO 5. copy directories: flatten directory trees
-        // TODO 6. Move
+
+
+
+
+
+
+// TODO path editables without function!!!!
+// TODO Esc in AlertDialog crashes
+
+
+
+
+
+
+
+        // TODO 1. copy directories: flatten directory trees
+        // TODO 2. DirectoryItems => flatten DirectoryItems only files with names containig subpathes
+        // TODO 3. CreateCopyItems => select CopyItem with Targets
+
+        // TODO 6. copy from path a to a: prevent
+        // TODO 7. Move
         if (targetPath?.StartsWith('/') != true)
             return;
         var text = selectedItemsType switch
@@ -25,7 +46,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
             _ => ""
         };
 
-        var copyItems = MakeCopyItems(selectedItems);
+        var copyItems = selectedItems.Flatten(sourcePath).MakeCopyItems(targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         if (conflicts.Length > 0)
         {
@@ -89,25 +110,57 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         }
     }
 
-    CopyItem[] MakeCopyItems(IEnumerable<DirectoryItem> fileNames)
-        => fileNames
-            .Where(n => !n.IsDirectory)
-            .SelectFilterNull(CreateCopyItem)
-            .ToArray();
-
-    CopyItem? CreateCopyItem(DirectoryItem item)
-    {
-        var info = new FileInfo(sourcePath.AppendPath(item.Name));
-        if (!info.Exists)
-            return null;
-        var source = new Item(info.Name, info.Length, info.LastWriteTime);
-        info = new FileInfo(targetPath.AppendPath(item.Name));
-        var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
-        return new(source, target);
-    }
-
     const string TMP_PREFIX = "tmp-commander-";
 }
 
 record Item(string Name, long Size, DateTime DateTime);
 record CopyItem(Item Source, Item? Target);
+
+static partial class Extensions
+{
+    public static IEnumerable<Item> Flatten(this IEnumerable<DirectoryItem> items, string sourcePath)
+    {
+        var dirs = items
+                        .Where(n => n.IsDirectory)
+                        .SelectMany(n => Flatten(n.Name, sourcePath));
+        var files = items
+                        .Where(n => !n.IsDirectory)
+                        .SelectFilterNull(n => ValidateFile(n.Name, sourcePath));
+        return dirs.Concat(files);
+    }
+
+    public static IEnumerable<Item> Flatten(string item, string sourcePath)
+    {
+        var info = new DirectoryInfo(sourcePath.AppendPath(item));
+
+        var dirs = info
+            .GetDirectories()
+            .OrderBy(n => n.Name)
+            .Select(n => item.AppendPath(n.Name))
+            .SelectMany(n => Flatten(n, sourcePath));
+
+        var files = info
+            .GetFiles()
+            .OrderBy(n => n.Name)
+            .Select(n => new Item(item.AppendPath(n.Name), n.Length, n.LastWriteTime));
+        return dirs.Concat(files);
+    }
+
+    public static Item? ValidateFile(string subPath, string path)
+    {
+        var info = new FileInfo(path.AppendPath(subPath));
+        if (!info.Exists)
+            return null;
+        return new Item(info.Name, info.Length, info.LastWriteTime);
+    }
+
+    public static CopyItem[] MakeCopyItems(this IEnumerable<Item> items, string targetPath)
+        => [.. items.Select(n => n.CreateCopyItem(targetPath))];
+
+    public static CopyItem CreateCopyItem(this Item source, string targetPath)
+    {
+        var info = new FileInfo(targetPath.AppendPath(source.Name));
+        var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
+        return new(source, target);
+    }
+}

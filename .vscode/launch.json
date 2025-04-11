@@ -10,7 +10,7 @@
             "request": "launch",
             "requireExactSource": true, 
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Commander/bin/Debug/net8.0/linux-x64/Commander.dll",
+            "program": "${workspaceFolder}/Commander/bin/Debug/net9.0/linux-x64/Commander.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

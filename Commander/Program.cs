@@ -5,7 +5,6 @@ using WebServerLight;
 using Commander;
 using Commander.Settings;
 using Commander.UI;
-using GtkDotNet.SubClassing;
 
 {
     Gtk.ShowDiagnostics();

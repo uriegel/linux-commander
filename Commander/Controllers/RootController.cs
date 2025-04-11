@@ -179,7 +179,7 @@ class RootController : ControllerBase<RootItem>, IController
     }
 }
 
-static class Extensions
+static partial class Extensions
 {
     public static string TrimName(this string name)
         => name.Length > 2 && name[1] == '─'
