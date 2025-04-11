@@ -5,11 +5,12 @@ namespace Commander.UI;
 
 class AlertDialog(nint obj) : GtkDotNet.SubClassing.AlertDialog(obj)
 {
-    public static Task<string> PresentAsync(string heading, string text)
+    public static Task<string> PresentAsync(string heading, string text, Action<AdwAlertDialogHandle>? onCreate = null)
     {
         var handle = GObject.New<AdwAlertDialogHandle>("AlertDialog".TypeFromName());
         handle.Heading(heading);
         handle.Body(text);
+        onCreate?.Invoke(handle);
         return handle.PresentAsync(MainWindow.MainWindowHandle);
     }
 

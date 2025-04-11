@@ -11,8 +11,6 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task CopyItems()
     {
-        // TODO 3. suggested button is the default button
-        // TODO 4. when necessary filter copyItems 
         // TODO 5. copy directories: flatten directory trees
         // TODO 6. Move
         if (targetPath?.StartsWith('/') != true)
@@ -31,8 +29,9 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         if (conflicts.Length > 0)
         {
-            var res = await ConflictDialog.PresentAsync(conflicts);
-            throw new TaskCanceledException();
+            var overwrite = await ConflictDialog.PresentAsync(conflicts);
+            if (!overwrite)
+                copyItems = [.. copyItems.Where(n => n.Target == null)];
         }
         else
         {

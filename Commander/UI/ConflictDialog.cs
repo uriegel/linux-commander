@@ -34,7 +34,7 @@ class ConflictDialog(nint obj) : Dialog<bool>(obj)
         noButton.OnClicked(() => Close(false));
         Handle.SetDefaultWidget(yesButton);
         var overwriteCritical = conflicts.Any(n => n.Target != null && n.Target.DateTime > n.Source.DateTime);
-        columnView.OnEnter += (s, e) => Close(overwriteCritical);
+        columnView.OnEnter += (s, e) => Close(!overwriteCritical);
         yesButton.AddCssClass("destructive-action", overwriteCritical);
         noButton.AddCssClass("suggested-action", overwriteCritical);
         yesButton.AddCssClass("suggested-action", !overwriteCritical);
@@ -77,7 +77,7 @@ class ConflictView : ColumnViewSubClassed
 
     protected override CustomColumnViewHandle CreateHandle(nint obj) => new(obj);
 
-    ConflichtController controller;
+    readonly ConflichtController controller;
 }
 
 class ConflictViewClass() : ColumnViewSubClassedClass("ConflictView", p => new ConflictView(p)) { }

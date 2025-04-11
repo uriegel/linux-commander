@@ -74,10 +74,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis löschen?",
             _ => ""
         };
-        var dialog = Builder.FromDotNetResource("alertdialog").GetWidget<AdwAlertDialogHandle>("dialog");
-        dialog.Heading("Löschen?");
-        dialog.Body(text);
-        var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
+        var response = await AlertDialog.PresentAsync("Löschen?", text);
         if (response == "ok")
         {
             foreach (var item in GetSelectedItems(GetFocusedItemPos()))
@@ -101,6 +98,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis umbenennen?",
             _ => null
         } ?? throw new TaskCanceledException();
+        // TODO custom control?
         var builder = Builder.FromDotNetResource("textdialog");
         var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
         var textView = builder.GetWidget<EntryHandle>("text");
