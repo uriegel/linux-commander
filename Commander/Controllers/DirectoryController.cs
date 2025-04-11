@@ -10,7 +10,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 namespace Commander.Controllers;
 
 // TODO Gtk4 Initial fill: Gtk-CRITICAL **: 05:50:17.379: gtk_column_view_scroll_to: assertion 'pos < gtk_list_base_get_n_items (GTK_LIST_BASE (self->listview))' failed
-// TODO Gtk4 MenuButtonHandle OnClicked
 
 // TODO Backspace history
 
@@ -21,8 +20,6 @@ namespace Commander.Controllers;
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
 
 // TODO Favorites
-
-// TODO To Gtk4 await Task.Delay(1) to get a chance that datacontext is set on binding source;
 
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
@@ -415,7 +412,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //     Dispose(disposing: false);
     // }
-    
+
     bool disposedValue;
 
     #endregion

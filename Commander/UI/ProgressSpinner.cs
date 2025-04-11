@@ -5,7 +5,7 @@ using GtkDotNet.SubClassing;
 
 namespace Commander.UI;
 
-public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
+public class ProgressSpinner : SubClassWidgetInst<DrawingAreaHandle>
 {
     public static SubClass<DrawingAreaHandle> Subclass()
         => new ProgressSpinnerClass("ProgressSpinner", p => new ProgressSpinner(p));
@@ -14,7 +14,7 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
 
     public ProgressSpinner(nint obj) : base(obj) { }
 
-    protected override async void OnCreate()
+    protected override void OnInitialize()
     {
         Handle
             .CssClass("custom-accent")
@@ -39,16 +39,12 @@ public class ProgressSpinner : SubClassInst<DrawingAreaHandle>
             });
         CopyProgressContext.Instance.PropertyChanged += (s, e) => OnDraw();
 
-        await Task.Delay(1);
         var window = Handle.GetAncestor<AdwApplicationWindowHandle>();
         totalProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-total");
         currentProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-current");
     }
 
-    protected override void OnFinalize()
-    {
-        Console.WriteLine("ProgressDisplay finalized");
-    }
+    protected override void OnFinalize() => Console.WriteLine("ProgressDisplay finalized");
 
     void OnDraw()
     {

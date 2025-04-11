@@ -6,7 +6,7 @@ using GtkDotNet.SubClassing;
 
 namespace Commander.UI;
 
-class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
+class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
 {
     public static FolderViewPaned GetInstance(PanedHandle handle)
         => (GetInstance(handle.GetInternalHandle()) as FolderViewPaned)!;
@@ -56,7 +56,7 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
         }
     } 
         
-    protected override async void OnCreate()
+    protected override async void OnInitialize()
     {
         Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m) =>
         {
@@ -71,8 +71,6 @@ class FolderViewPaned(nint obj) : SubClassInst<PanedHandle>(obj)
             else
                 return false;
         }));
-
-        await Task.Delay(1);
 
         var window = Handle.GetAncestor<AdwApplicationWindowHandle>();
         var cvhl = window.GetTemplateChild<CustomColumnViewHandle, AdwApplicationWindowHandle>("columnview-left");

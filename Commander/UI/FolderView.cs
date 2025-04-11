@@ -17,55 +17,55 @@ class FolderView : ColumnViewSubClassed
 
     public FolderView(nint obj)
         : base(obj)
-    {   
+    {
         MultiSelection = true;
         OnSelectionChanged = SelectionChanged;
         controller = new(this);
-        OnCreated();
 
-        async void OnCreated()
+        Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, k, m) =>
         {
-            await Task.Delay(1);
-            pathEditing = Handle
-                            .GetParent()
-                            .DataContext(Context)
-                            .GetFirstChild<EditableLabelHandle>();
-            pathEditing.OnNotify("editing",
-                e =>
-                {
-                    Context.IsEditing = (bool)e.GetProperty("editing", typeof(bool))! == true;
-                    if (!Context.IsEditing)
-                    {
-                        columnView.GrabFocus();
-                        var val = pathEditing.GetText();
-                        if (val != null)
-                            controller.ChangePath(val);
-                    }
-                }).Binding("text", nameof(FolderContext.CurrentPath), BindingFlags.Default);
-            Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, k, m) =>
+            if (k == 9)
+                StopRestriction();
+            else if (k == 22)
             {
-                if (k == 9)
-                    StopRestriction();
-                else if (k == 22)
+                MainContext.Instance.Restriction = MainContext.Instance.Restriction?[..^1];
+                FilterChanged(FilterChange.LessStrict);
+            }
+            else
+            {
+                if (chr != '\0')
                 {
-                    MainContext.Instance.Restriction = MainContext.Instance.Restriction?[..^1];
-                    FilterChanged(FilterChange.LessStrict);
-                }
-                else
-                {
-                    if (chr != '\0')
+                    var searchKey = MainContext.Instance.Restriction + chr;
+                    if (controller.CheckRestriction(searchKey))
                     {
-                        var searchKey = MainContext.Instance.Restriction + chr;
-                        if (controller.CheckRestriction(searchKey))
-                        {
-                            MainContext.Instance.Restriction = searchKey;
-                            FilterChanged(FilterChange.MoreStrict);
-                        }
+                        MainContext.Instance.Restriction = searchKey;
+                        FilterChanged(FilterChange.MoreStrict);
                     }
                 }
-                return false;
-            }));
-        }
+            }
+            return false;
+        }));
+    }
+
+    protected override void OnInitialize()
+    {
+        base.OnInitialize();
+        pathEditing = Handle
+                        .GetParent()
+                        .DataContext(Context)
+                        .GetFirstChild<EditableLabelHandle>();
+        pathEditing.OnNotify("editing",
+            e =>
+            {
+                Context.IsEditing = (bool)e.GetProperty("editing", typeof(bool))! == true;
+                if (!Context.IsEditing)
+                {
+                    columnView.GrabFocus();
+                    var val = pathEditing.GetText();
+                    if (val != null)
+                        controller.ChangePath(val);
+                }
+            }).Binding("text", nameof(FolderContext.CurrentPath), BindingFlags.Default);
     }
 
     public static FolderView GetInstance(CustomColumnViewHandle handle)
