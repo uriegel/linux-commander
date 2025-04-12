@@ -16,7 +16,7 @@
             "stopAtEntry": false,
             "console": "internalConsole",
             "env": {
-                "DOTNET_EnableDiagnostics": "0" 
+     //           "DOTNET_EnableDiagnostics": "0" 
             }
         }, {
             "name": ".NET Core Attach",

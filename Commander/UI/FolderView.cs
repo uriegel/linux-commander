@@ -256,8 +256,9 @@ class FolderView : ColumnViewSubClassed
     public void InvalidateView()
         => Gtk.BeginInvoke(200, () =>
             {
-
                 var pos = controller.GetFocusedItemPos();
+                if (pos == -1)
+                    pos = 0;
                 var model = columnView.GetModel<SelectionHandle>();
                 var nil = new SelectionHandle();
                 columnView.SetModel(nil);
