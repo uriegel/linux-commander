@@ -4,8 +4,8 @@ using Commander.Enums;
 using Commander.UI;
 using Commander.DataContexts;
 using CsTools.Extensions;
-using System.Security.AccessControl;
 using CsTools.Functional;
+using CsTools;
 
 namespace Commander.Controllers;
 
@@ -13,13 +13,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task CopyItems()
     {
-        // TODO 1. copy directories: flatten directory trees
-        // TODO 2. DirectoryItems => flatten DirectoryItems only files with names containig subpathes
-        // TODO 3. CreateCopyItems => select CopyItem with Targets
-
-        // TODO 6. copy from path a to a: prevent
-        // TODO 7. Move
-        if (targetPath?.StartsWith('/') != true)
+        if (targetPath?.StartsWith('/') != true || string.Compare(sourcePath, targetPath, StringComparison.CurrentCultureIgnoreCase) == 0)
             return;
         var text = selectedItemsType switch
         {
@@ -56,11 +50,11 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
                     throw new TaskCanceledException();
                 CopyProgressContext.Instance.SetNewFileProgress(item.Source.Name, item.Source.Size, ++index);
                 var newFileName = targetPath.AppendPath(item.Source.Name);
-                var tmpNewFileName = targetPath.AppendPath(TMP_PREFIX + item.Source.Name);
+                var tmpNewFileName = targetPath.AppendPath(item.Source.Name + TMP_POSTFIX);
                 await Task.Run(() =>
                 {
                     using var source = File.OpenRead(sourcePath.AppendPath(item.Source.Name)).WithProgress(CopyProgressContext.Instance.SetProgress);
-                    using var target = File.Create(tmpNewFileName);
+                    using var target = File.Create(tmpNewFileName.EnsureFileDirectoryExists());
                     while (true)
                     {
                         if (cancellation.IsCancellationRequested)
@@ -95,7 +89,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         }
     }
 
-    const string TMP_PREFIX = "tmp-commander-";
+    const string TMP_POSTFIX = "-tmp-commander";
 }
 
 record Item(string Name, long Size, DateTime DateTime);

@@ -10,16 +10,17 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 namespace Commander.Controllers;
 
 // TODO Gtk4 Initial fill: Gtk-CRITICAL **: 05:50:17.379: gtk_column_view_scroll_to: assertion 'pos < gtk_list_base_get_n_items (GTK_LIST_BASE (self->listview))' failed
+// TODO MoveItems
 
 // TODO Backspace history
+// TODO Favorites
+// TODO Remotes
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
 // TODO Pdf viewer: PdViewer in Gtk4DotNet
 // TODO Pdf viewer
 // TODO Text viewer/editor
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
-
-// TODO Favorites
 
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
