@@ -64,13 +64,6 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         }
     }
 
-    async Task MoveItem(CopyItem item, CancellationToken cancellation)
-    {
-        using var file = GFile.New(sourcePath.AppendPath(item.Source.Name));
-        await file.MoveAsync(targetPath.AppendPath(item.Source.Name).EnsureFileDirectoryExists(),
-                                FileCopyFlags.Overwrite, true, (c, t) => CopyProgressContext.Instance.SetProgress(t, c), cancellation);
-    }
-
     async Task CopyItem(CopyItem item, byte[] buffer, CancellationToken cancellation)
     {
         var newFileName = targetPath.AppendPath(item.Source.Name);
@@ -101,6 +94,13 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         using var gtf = GFile.New(tmpNewFileName);
         gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
         File.Move(tmpNewFileName, newFileName, true);
+    }
+
+    async Task MoveItem(CopyItem item, CancellationToken cancellation)
+    {
+        using var file = GFile.New(sourcePath.AppendPath(item.Source.Name));
+        await file.MoveAsync(targetPath.AppendPath(item.Source.Name).EnsureFileDirectoryExists(),
+                                FileCopyFlags.Overwrite, true, (c, t) => CopyProgressContext.Instance.SetProgress(t, c), cancellation);
     }
 
     const string TMP_POSTFIX = "-tmp-commander";
