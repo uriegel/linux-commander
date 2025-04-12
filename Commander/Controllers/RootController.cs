@@ -122,7 +122,7 @@ class RootController : ControllerBase<RootItem>, IController
     public Task DeleteItems() => Unit.Value.ToAsync();
     public Task Rename() => Unit.Value.ToAsync();
     public Task CreateFolder() => Unit.Value.ToAsync();
-    public Task CopyItems(string? _) => Unit.Value.ToAsync();
+    public Task CopyItems(string? _, bool __) => Unit.Value.ToAsync();
     
     RootItem CreateRootItem(string driveString, int[] columnPositions)
     {

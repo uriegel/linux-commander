@@ -36,7 +36,7 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
     public void DeleteItems() => folderViewActive?.DeleteItems();
     public void Rename() => folderViewActive?.Rename();
     public void CreateFolder() => folderViewActive?.CreateFolder();
-    public async void CopyItems()
+    public async void CopyItems(bool move)
     {
         if (CopyProgressContext.Instance.IsRunning)
         {
@@ -47,8 +47,12 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
         try
         {
             CopyProgressContext.Instance.SetRunning();
-            if (folderViewActive != null && await folderViewActive.CopyItems(GetInactiveFolderView()?.Context.CurrentPath))
+            if (folderViewActive != null && await folderViewActive.CopyItems(GetInactiveFolderView()?.Context.CurrentPath, move))
+            {
                 inactive?.Refresh();
+                if (move)
+                    folderViewActive.Refresh();
+            }
         }
         finally
         {

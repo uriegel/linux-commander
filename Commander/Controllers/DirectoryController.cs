@@ -9,7 +9,30 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO MoveItems
+// TODO MoveItems: delete empty source directories
+// TODO MoveItems: 2nd time:
+// Object name: 'GtkDotNet.SafeHandles.CancellableHandle'.)
+//  ---> System.ObjectDisposedException: Cannot access a disposed object.
+// Object name: 'GtkDotNet.SafeHandles.CancellableHandle'.
+//    at System.Runtime.InteropServices.SafeHandle.DangerousAddRef(Boolean& success)
+//    at GtkDotNet.Cancellable.Cancel()
+//    at System.Threading.CancellationTokenSource.Invoke(Delegate d, Object state, CancellationTokenSource source)
+//    at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+// --- End of stack trace from previous location ---
+//    at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+//    at System.Threading.CancellationTokenSource.ExecuteCallbackHandlers(Boolean throwOnFirstException)
+//    --- End of inner exception stack trace ---
+//    at System.Threading.CancellationTokenSource.ExecuteCallbackHandlers(Boolean throwOnFirstException)
+//    at Commander.DataContexts.CopyProgressContext.Start(String title, Int64 totalSize, Int32 count) in /speicher/Projekte/linux-commander/Commander/DataContexts/CopyProgressContext.cs:line 70
+//    at Commander.Controllers.CopyProcessor.CopyItems(Boolean move) in /speicher/Projekte/linux-commander/Commander/Controllers/CopyProcessor.cs:line 48
+//    at Commander.UI.FolderView.CopyItems(String targetPath, Boolean move) in /speicher/Projekte/linux-commander/Commander/UI/FolderView.cs:line 132
+//    at Commander.UI.FolderViewPaned.CopyItems(Boolean move) in /speicher/Projekte/linux-commander/Commander/UI/FolderViewPaned.cs:line 51
+//    at System.Threading.Tasks.Task.<>c.<ThrowAsync>b__128_0(Object state)
+//    at GtkDotNet.Gtk.BeginInvoke(Int32 priority, Action action)
+//    at System.Threading.Tasks.Task.ThrowAsync(Exception exception, SynchronizationContext targetContext)
+//  ---> (Inner Exception #1) System.ObjectDisposedException: Cannot access a disposed object.
+// Object name: 'GtkDotNet.SafeHandles.CancellableHandle'.
+
 // TODO Start file item
 // TODO Backspace history
 // TODO Favorites
@@ -150,11 +173,11 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             throw new TaskCanceledException();
     }
 
-    public Task CopyItems(string? targetPath)
+    public Task CopyItems(string? targetPath, bool move)
     {
         var copyProcessor = new CopyProcessor(CurrentPath, targetPath,
             GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);
-        return copyProcessor.CopyItems();
+        return copyProcessor.CopyItems(move);
     }
 
     public string? OnActivate(int pos)
