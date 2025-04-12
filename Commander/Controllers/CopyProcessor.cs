@@ -13,21 +13,6 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task CopyItems()
     {
-
-
-
-
-
-
-// TODO path editables without function!!!!
-// TODO Esc in AlertDialog crashes
-
-
-
-
-
-
-
         // TODO 1. copy directories: flatten directory trees
         // TODO 2. DirectoryItems => flatten DirectoryItems only files with names containig subpathes
         // TODO 3. CreateCopyItems => select CopyItem with Targets

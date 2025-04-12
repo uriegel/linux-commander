@@ -6,7 +6,6 @@ using Commander.Controllers;
 using System.ComponentModel;
 using Commander.DataContexts;
 using GtkDotNet.Exceptions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Commander.UI;
 
@@ -46,20 +45,8 @@ class FolderView : ColumnViewSubClassed
             }
             return false;
         }));
-
-        now();
-
-        async void now()
-        {
-            await Task.Delay(1);
-            OnInitialize();
-        }
     }
 
-    
-
-
-    // TODO not working!!!
     protected override void OnInitialize()
     {
         base.OnInitialize();
@@ -280,6 +267,7 @@ class FolderView : ColumnViewSubClassed
 
     protected override void OnCreate()
     {
+        base.OnCreate();
         Actions.Instance.PropertyChanged += OnActionChanged;
         OnActivate(OnActivate);
         Handle.AddController(EventControllerFocus
