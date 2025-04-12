@@ -28,6 +28,8 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
             _ => ""
         };
 
+        var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
+
         var copyItems = selectedItems.Flatten(sourcePath).MakeCopyItems(targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         if (conflicts.Length > 0)
@@ -57,6 +59,9 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
                 else
                     await CopyItem(item, buffer, cancellation);
             }
+
+            if (move)
+                dirs.DeleteEmptyDirectories(sourcePath);
         }
         finally
         {
@@ -155,5 +160,41 @@ static partial class Extensions
         var info = new FileInfo(targetPath.AppendPath(source.Name));
         var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
         return new(source, target);
+    }
+
+    public static void DeleteEmptyDirectories(this IEnumerable<string> dirs, string path)
+    {
+        foreach (var dir in dirs)
+        {
+            var dirToCheck = path.AppendPath(dir);
+            if (dirToCheck.IsDirectoryEmpty())
+            {
+                try
+                {
+                    System.IO.Directory.Delete(dirToCheck, true);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Konnte Ausgangsverzeicnis nicht löschen: {e}");
+                }
+            }
+        }
+    }
+
+    static bool IsDirectoryEmpty(this string dir)
+    {
+        var info = new DirectoryInfo(dir);
+        if (info.GetFiles().Length != 0)
+            return false;
+
+        var dirs = info
+            .GetDirectories()
+            .Select(n => n.FullName);
+        foreach (var subDir in dirs)
+        {
+            if (!subDir.IsDirectoryEmpty())
+                return false;
+        }
+        return true;
     }
 }

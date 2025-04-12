@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Commander.DataContexts;
 using Commander.Enums;
 using Commander.UI;
@@ -9,12 +10,10 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO MoveItems: delete empty source directories
-
-// TODO Start file item
 // TODO Backspace history
 // TODO Favorites
 // TODO Remotes
+// TODO extended rename
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
 // TODO Pdf viewer: PdViewer in Gtk4DotNet
@@ -166,6 +165,11 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 return Path.Combine(CurrentPath, item.Name);
             else
                 return "root";
+        else if (item != null && item.Kind == ItemKind.Item)
+        {
+            StartItem(item.Name);
+            return null;
+        }
         else
             return null;
     }
@@ -377,6 +381,19 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             }
             i++;
         }
+    }
+
+    void StartItem(string name)
+    {
+        using var proc = new Process()
+        {
+            StartInfo = new ProcessStartInfo()
+            {
+                FileName = "xdg-open",
+                Arguments = $"\"{CurrentPath.AppendPath(name)}\"",
+            },
+        };
+        proc.Start();
     }
 
     CancellationTokenSource cancellation = new();
