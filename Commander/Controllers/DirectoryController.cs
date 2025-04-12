@@ -12,6 +12,8 @@ namespace Commander.Controllers;
 // TODO Gtk4 Initial fill: Gtk-CRITICAL **: 05:50:17.379: gtk_column_view_scroll_to: assertion 'pos < gtk_list_base_get_n_items (GTK_LIST_BASE (self->listview))' failed
 // TODO MoveItems
 
+// TODO remove CsTools
+
 // TODO Backspace history
 // TODO Favorites
 // TODO Remotes
