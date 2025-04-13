@@ -22,11 +22,11 @@ class FolderView : ColumnViewSubClassed
         OnSelectionChanged = SelectionChanged;
         controller = new(this);
 
-        Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, k, m) =>
+        Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, m) =>
         {
-            if (k == 9)
+            if (chr == (char)ConsoleKey.Escape)
                 StopRestriction();
-            else if (k == 22)
+            else if (chr == (char)ConsoleKey.Backspace)
             {
                 MainContext.Instance.Restriction = MainContext.Instance.Restriction?[..^1];
                 FilterChanged(FilterChange.LessStrict);

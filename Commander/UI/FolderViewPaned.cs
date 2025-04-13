@@ -62,9 +62,9 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
         
     protected override async void OnInitialize()
     {
-        Handle.AddController(EventControllerKey.New().OnKeyPressed((_, k, m) =>
+        Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, m) =>
         {
-            if (k == 23)
+            if (chr == (char)ConsoleKey.Tab)
             {
                 if (!m.HasFlag(KeyModifiers.Shift))
                     GetInactiveFolderView()?.GrabFocus();
