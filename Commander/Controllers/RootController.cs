@@ -10,6 +10,9 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 using static CsTools.ProcessCmd;
 using CsTools;
 
+using static CsTools.Extensions.Core;
+using System.Data;
+
 namespace Commander.Controllers;
 
 class RootController : ControllerBase<RootItem>, IController
@@ -28,31 +31,29 @@ class RootController : ControllerBase<RootItem>, IController
 
     public async Task<int> Fill(string path, FolderView folderView)
     {
-        // TODO Fill sda when there is no sda1 (daten)
-        var rootItems = (await
-        (from n in RunAsync("lsblk", "--bytes --output SIZE,NAME,LABEL,MOUNTPOINT,FSTYPE")
-         let driveLines = n.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-         let titles = driveLines[0]
-         let columnPositions = new[]
-         {
-                0,
-                titles.IndexOf("NAME"),
-                titles.IndexOf("LABEL"),
-                titles.IndexOf("MOUNT"),
-                titles.IndexOf("FSTYPE")
-            }
-         select
-             (from n in driveLines
-                 .Skip(1)
-                 .Append("home")
-              where FilterDrives(n, columnPositions)
-              let item = CreateRootItem(n, columnPositions)
-              orderby item.IsMounted descending, item.Name
-              select item)))
-            .ToArray();
+        var rootItems = await GetRootItems();
+        var mounted = rootItems.Where(n => n.IsMounted);
+        var unmounted = rootItems.Where(n => !n.IsMounted);
 
-        Insert(rootItems);
-        Directories = rootItems.Length;
+        var home = new RootItem(
+            "~",
+            "home",
+            0,
+            CsTools.Directory.GetHomeDir(),
+            true,
+            DriveKind.Home);
+        var fav = new RootItem(
+            "fav",
+            "Favoriten",
+            0,
+            "fav",            
+            true,
+            DriveKind.Unknown);
+        
+        var items = ConcatEnumerables([home], mounted, [fav], unmounted).ToArray();
+
+        Insert(items);
+        Directories = items.Length;
         return -1;
     }
 
@@ -72,10 +73,10 @@ class RootController : ControllerBase<RootItem>, IController
     }
 
     public void SelectAll(FolderView folderView) { }
-    public void SelectNone(FolderView folderView) {}
-    public void SelectCurrent(FolderView folderView) {}
-    public void SelectToStart(FolderView folderView) {}
-    public void SelectToEnd(FolderView folderView) {}
+    public void SelectNone(FolderView folderView) { }
+    public void SelectCurrent(FolderView folderView) { }
+    public void SelectToStart(FolderView folderView) { }
+    public void SelectToEnd(FolderView folderView) { }
 
     #endregion
 
@@ -109,7 +110,7 @@ class RootController : ControllerBase<RootItem>, IController
                 Title = "Mountpoint",
                 Expanded = true,
                 Resizeable = true,
-                OnLabelBind = i => i.MountPoint
+                OnLabelBind = i => i.DriveKind == DriveKind.Unknown ? "" : i.MountPoint ?? "" 
             },
             new()
             {
@@ -123,22 +124,43 @@ class RootController : ControllerBase<RootItem>, IController
     public Task Rename() => Unit.Value.ToAsync();
     public Task CreateFolder() => Unit.Value.ToAsync();
     public Task CopyItems(string? _, bool __) => Unit.Value.ToAsync();
-    
-    RootItem CreateRootItem(string driveString, int[] columnPositions)
-    {
-        var mountPoint = driveString != "home"
-            ? GetString(3, 4)
-            : "";
 
-        return driveString == "home"
-            ? new(
-                "~",
-                "home",
-                0,
-                CsTools.Directory.GetHomeDir(),
-                true,
-                DriveKind.Home)
-            : new(
+    async Task<RootItem[]> GetRootItems()
+    {
+        var lsblkResult = await RunAsync("lsblk", "--bytes --output SIZE,NAME,LABEL,MOUNTPOINT,FSTYPE");
+        var driveLines = lsblkResult.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var titles = driveLines[0];
+        var columnPositions = new[]
+        {
+            0,
+            titles.IndexOf("NAME"),
+            titles.IndexOf("LABEL"),
+            titles.IndexOf("MOUNT"),
+            titles.IndexOf("FSTYPE")
+        };
+
+        var rootItemsOffers =
+            driveLines
+                .Skip(1)
+                .Select(n => CreateRootItem(n, columnPositions))
+                .ToArray();
+
+        return rootItemsOffers
+            .Where(FilterDrives)
+            .Select(n => n.RootItem)
+            .OrderBy(n => n.Name)
+            .ToArray();
+
+        bool FilterDrives(RootItemOffer rio)
+            => !rio.IsRoot
+                || (!rootItemsOffers.Any(rio => rio.RootItem.Name != rio.RootItem.Name && rio.RootItem.Name.StartsWith(rio.RootItem.Name))
+                    && rio.RootItem.MountPoint != "[SWAP]");
+    }
+
+    static RootItemOffer CreateRootItem(string driveString, int[] columnPositions)
+    {
+        var mountPoint = GetString(3, 4);
+        return new(new(
                 GetString(1, 2).TrimName(),
                 GetString(2, 3),
                 GetString(0, 1)
@@ -153,14 +175,11 @@ class RootController : ControllerBase<RootItem>, IController
                     "vfat" => DriveKind.Vfat,
                     _ => DriveKind.Unknown
                 }
-            );
+            ), driveString[columnPositions[1]] < '~');
+
         string GetString(int pos1, int pos2)
             => driveString[columnPositions[pos1]..columnPositions[pos2]].Trim();
     }
-
-    static bool FilterDrives(string driveString, int[] columnPositions) =>
-        driveString == "home"
-        || driveString[columnPositions[1]] > '~';
 
     void OnIconNameBind(ListItemHandle listItem, RootItem item)
     {
@@ -171,11 +190,12 @@ class RootController : ControllerBase<RootItem>, IController
         {
             DriveKind.Home => "user-home",
             //_ => "drive-removable-media-symbolic"
+            DriveKind.Unknown when item.Name == "fav"=> "starred",
             _ => "drive-removable-media"
         };
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
-        box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem", string.IsNullOrEmpty(item.MountPoint));
+        box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem", !item.IsMounted);
     }
 }
 
@@ -191,7 +211,8 @@ record RootItem(
     string Name,
     string Description,
     long Size,
-    string MountPoint,
+    string? MountPoint,
     bool IsMounted,
     DriveKind DriveKind);
 
+record RootItemOffer(RootItem RootItem, bool IsRoot);

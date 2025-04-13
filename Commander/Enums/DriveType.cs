@@ -6,5 +6,5 @@ enum DriveKind
     Ext4,
     Ntfs,
     Vfat,
-    Home
+    Home,
 }
