@@ -156,21 +156,21 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         return copyProcessor.CopyItems(move);
     }
 
-    public string? OnActivate(int pos)
+    public Task<string?> OnActivate(int pos)
     {
         var item = GetItem(pos);
         if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
             if (CurrentPath != "/" || item.Kind != ItemKind.Parent)
-                return Path.Combine(CurrentPath, item.Name);
+                return ((string?)Path.Combine(CurrentPath, item.Name)).ToAsync();
             else
-                return "root";
+                return ((string?)"root").ToAsync();
         else if (item != null && item.Kind == ItemKind.Item)
         {
             StartItem(item.Name);
-            return null;
+            return ((string?)null).ToAsync();
         }
         else
-            return null;
+            return ((string?)null).ToAsync();
     }
 
     public bool CheckRestriction(string searchKey)

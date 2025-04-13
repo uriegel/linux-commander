@@ -50,7 +50,7 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposa
         throw new NotImplementedException();
     }
 
-    public string? OnActivate(int pos)
+    public Task<string?> OnActivate(int pos)
     {
         // TODO
         throw new NotImplementedException();

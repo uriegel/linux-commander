@@ -22,7 +22,7 @@ interface IController : IDisposable
     Task CreateFolder();
     Task CopyItems(string? targetPath, bool move);
     
-    string? OnActivate(int pos);
+    Task<string?> OnActivate(int pos);
 
     int GetFocusedItemPos();
     int ItemsCount();

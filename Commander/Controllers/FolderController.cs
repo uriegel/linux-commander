@@ -27,12 +27,19 @@ class FolderController
     public Task Rename() => controller.Rename();
     public Task CreateFolder() => controller.CreateFolder();
     public Task CopyItems(string? targetPath, bool move) => controller.CopyItems(targetPath, move);
-    
-    public void OnActivate(int pos)
+
+    public async void OnActivate(int pos)
     {
-        var newPath = controller.OnActivate(pos);
-        if (!string.IsNullOrEmpty(newPath))
-            ChangePath(newPath, true);
+        try
+        {
+            var newPath = await controller.OnActivate(pos);
+            if (!string.IsNullOrEmpty(newPath))
+                ChangePath(newPath, true);
+        }
+        catch (Exception e)
+        {
+            Error.WriteLine($"Fehler bei OnActivate: {e}");
+        }
     }
 
     public async void ChangePath(string path, bool saveHistory)

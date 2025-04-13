@@ -15,6 +15,9 @@ using System.Data;
 
 namespace Commander.Controllers;
 
+// TODO ejectable device with another device icon
+// TODO eject ejectable devices
+
 class RootController : ControllerBase<RootItem>, IController
 {
     #region IController
@@ -46,10 +49,10 @@ class RootController : ControllerBase<RootItem>, IController
             "fav",
             "Favoriten",
             0,
-            "fav",            
+            "fav",
             true,
             DriveKind.Unknown);
-        
+
         var items = ConcatEnumerables([home], mounted, [fav], unmounted).ToArray();
 
         Insert(items);
@@ -57,11 +60,13 @@ class RootController : ControllerBase<RootItem>, IController
         return -1;
     }
 
-    public string? OnActivate(int pos)
+    public async Task<string?> OnActivate(int pos)
     {
-        // TODO when not mounted, mount
         var item = GetItem(pos);
-        return item?.MountPoint;
+        if (item != null && string.IsNullOrWhiteSpace(item.MountPoint))
+            return await MountAsync(item.Name);
+        else
+            return item?.MountPoint;
     }
 
     public bool CheckRestriction(string searchKey) => false;
@@ -110,7 +115,7 @@ class RootController : ControllerBase<RootItem>, IController
                 Title = "Mountpoint",
                 Expanded = true,
                 Resizeable = true,
-                OnLabelBind = i => i.DriveKind == DriveKind.Unknown ? "" : i.MountPoint ?? "" 
+                OnLabelBind = i => i.DriveKind == DriveKind.Unknown ? "" : i.MountPoint ?? ""
             },
             new()
             {
@@ -153,7 +158,7 @@ class RootController : ControllerBase<RootItem>, IController
 
         bool FilterDrives(RootItemOffer rio)
             => !rio.IsRoot
-                || (!rootItemsOffers.Any(rio => rio.RootItem.Name != rio.RootItem.Name && rio.RootItem.Name.StartsWith(rio.RootItem.Name))
+                || (!rootItemsOffers.Any(n => n.RootItem.Name != rio.RootItem.Name && n.RootItem.Name.StartsWith(rio.RootItem.Name))
                     && rio.RootItem.MountPoint != "[SWAP]");
     }
 
@@ -181,6 +186,12 @@ class RootController : ControllerBase<RootItem>, IController
             => driveString[columnPositions[pos1]..columnPositions[pos2]].Trim();
     }
 
+    static async Task<string> MountAsync(string path)
+    {
+        var result = await RunAsync("udisksctl", $"mount -b /dev/{path}");
+        return result?.SubstringAfter(" at ").Trim() ?? path;
+    }
+
     void OnIconNameBind(ListItemHandle listItem, RootItem item)
     {
         var box = listItem.GetChild<BoxHandle>();
@@ -190,7 +201,7 @@ class RootController : ControllerBase<RootItem>, IController
         {
             DriveKind.Home => "user-home",
             //_ => "drive-removable-media-symbolic"
-            DriveKind.Unknown when item.Name == "fav"=> "starred",
+            DriveKind.Unknown when item.Name == "fav" => "starred",
             _ => "drive-removable-media"
         };
         image?.SetFromIconName(icon, IconSize.Menu);
