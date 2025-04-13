@@ -32,10 +32,10 @@ class FolderController
     {
         var newPath = controller.OnActivate(pos);
         if (!string.IsNullOrEmpty(newPath))
-            ChangePath(newPath);
+            ChangePath(newPath, true);
     }
 
-    public async void ChangePath(string path)
+    public async void ChangePath(string path, bool saveHistory)
     {
         DetectController(path);
         if (controller != null)
@@ -48,7 +48,7 @@ class FolderController
                 folderView.Context.CurrentDirectories = Actions.Instance.ShowHidden ? controller.Directories + controller.HiddenDirectories : controller.Directories;
                 folderView.Context.CurrentFiles = Actions.Instance.ShowHidden ? controller.Files + controller.Files : controller.Files;
                 folderView.Context.CurrentPath = controller.CurrentPath;
-                folderView.OnPathChanged();
+                folderView.OnPathChanged(saveHistory ? CurrentPath : null);
             }
             catch (Exception e)
             {
@@ -61,7 +61,7 @@ class FolderController
                 var refreshPath = folderView.Context.CurrentPath;
                 folderView.Context.CurrentPath = "";
                 folderView.Context.CurrentPath = refreshPath;
-                ChangePath(folderView.Context.CurrentPath);
+                ChangePath(folderView.Context.CurrentPath, false);
                 Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
             }
         }

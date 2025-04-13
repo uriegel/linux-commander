@@ -30,7 +30,7 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
     {
         var path = folderViewActive?.Context.CurrentPath;
         if (!string.IsNullOrEmpty(path))
-            GetInactiveFolderView()?.ChangePath(path);
+            GetInactiveFolderView()?.ChangePath(path, true);
     }
 
     public void DeleteItems() => folderViewActive?.DeleteItems();
@@ -83,7 +83,7 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
         folderViewActive = folderViewLeft;
         MainContext.Instance.ChangeFolderContext(folderViewLeft.Context);
         folderViewLeft.Context.IsLeft = true;
-        folderViewLeft.ChangePath(Storage.Retrieve().LeftPath);
+        folderViewLeft.ChangePath(Storage.Retrieve().LeftPath, true);
         folderViewLeft.OnFocusEnter += (s, e) =>
         {
             folderViewActive = folderViewLeft;
@@ -98,7 +98,7 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
             EnableFolderViewActions(false);
         };
         folderViewRight = FolderView.GetInstance(cvhr);
-        folderViewRight.ChangePath(Storage.Retrieve().RightPath);
+        folderViewRight.ChangePath(Storage.Retrieve().RightPath, true);
         folderViewRight.OnFocusEnter += (s, e) =>
         {
             folderViewActive = folderViewRight;

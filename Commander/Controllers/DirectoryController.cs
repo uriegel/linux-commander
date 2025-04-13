@@ -10,7 +10,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Backspace history
 // TODO Favorites
 // TODO Remotes
 // TODO extended rename

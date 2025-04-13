@@ -22,14 +22,25 @@ class FolderView : ColumnViewSubClassed
         OnSelectionChanged = SelectionChanged;
         controller = new(this);
 
-        Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, m) =>
+        Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, modifiers) =>
         {
             if (chr == (char)ConsoleKey.Escape)
                 StopRestriction();
             else if (chr == (char)ConsoleKey.Backspace)
             {
-                MainContext.Instance.Restriction = MainContext.Instance.Restriction?[..^1];
-                FilterChanged(FilterChange.LessStrict);
+                if (MainContext.Instance.Restriction == null)
+                {
+                    var path = history.Get(modifiers.HasFlag(KeyModifiers.Shift));
+                    if (path != null)
+                        ChangePath(path, false);
+                }
+                else
+                {
+                    MainContext.Instance.Restriction = MainContext.Instance.Restriction?[..^1];
+                    if (MainContext.Instance.Restriction?.Length == 0)
+                        MainContext.Instance.Restriction = null;
+                    FilterChanged(FilterChange.LessStrict);
+                }
             }
             else
             {
@@ -63,7 +74,7 @@ class FolderView : ColumnViewSubClassed
                     columnView.GrabFocus();
                     var val = pathEditing.GetText();
                     if (val != null)
-                        controller.ChangePath(val);
+                        controller.ChangePath(val, true);
                 }
             }).Binding("text", nameof(FolderContext.CurrentPath), BindingFlags.Default);
     }
@@ -73,7 +84,12 @@ class FolderView : ColumnViewSubClassed
 
     public void StartPathEditing() => pathEditing.StartEditing();
 
-    public void OnPathChanged() => StopRestriction();
+    public void OnPathChanged(string? pathToSave)
+    {
+        StopRestriction();
+        if (pathToSave != null)
+            history.Set(pathToSave);
+    } 
 
     public async void DeleteItems()
     {
@@ -247,11 +263,11 @@ class FolderView : ColumnViewSubClassed
     public event EventHandler? OnFocusEnter;
     public event EventHandler? OnFocusLeave;
 
-    public void ChangePath(string path) => controller.ChangePath(path);
+    public void ChangePath(string path, bool saveHistory) => controller.ChangePath(path, saveHistory);
 
     public void GrabFocus() => columnView.GrabFocus();
 
-    public void Refresh() => controller.ChangePath(controller.CurrentPath);
+    public void Refresh() => controller.ChangePath(controller.CurrentPath, false);
 
     public void InvalidateView()
         => Gtk.BeginInvoke(200, () =>
@@ -340,6 +356,7 @@ class FolderView : ColumnViewSubClassed
     void OnActivate(int pos) => controller.OnActivate(pos);
 
     readonly FolderController controller;
+    readonly History history = new();
     EditableLabelHandle pathEditing = new(0);
     bool mouseButton;
     bool mouseButtonCtrl;
