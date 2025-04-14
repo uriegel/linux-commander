@@ -10,7 +10,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Dialog before ejectable is being ejected
 // TODO error when ejecting: Error banner
 
 // TODO Favorites

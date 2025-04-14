@@ -132,7 +132,7 @@ class RootController : ControllerBase<RootItem>, IController
         {
             var volumes = VolumeMonitor.Get().GetVolumes();
             var device = volumes.FirstOrDefault(n => n.GetUnixDevice()?.EndsWith(focusedItem?.Name ?? "---") == true);
-            if (device != null)
+            if (device != null && await AlertDialog.PresentAsync("Auswerfen?", "Möchtest du das Laufwerk auswerfen?") == "ok")
             {
                 try
                 {
