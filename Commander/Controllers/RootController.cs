@@ -15,9 +15,6 @@ using System.Data;
 
 namespace Commander.Controllers;
 
-// TODO ejectable device with another device icon
-// TODO eject ejectable devices
-
 class RootController : ControllerBase<RootItem>, IController
 {
     #region IController
@@ -44,6 +41,7 @@ class RootController : ControllerBase<RootItem>, IController
             0,
             CsTools.Directory.GetHomeDir(),
             true,
+            false,
             DriveKind.Home);
         var fav = new RootItem(
             "fav",
@@ -51,6 +49,7 @@ class RootController : ControllerBase<RootItem>, IController
             0,
             "fav",
             true,
+            false,
             DriveKind.Unknown);
 
         var items = ConcatEnumerables([home], mounted, [fav], unmounted).ToArray();
@@ -125,7 +124,29 @@ class RootController : ControllerBase<RootItem>, IController
                 OnLabelBind = i => i.Size != 0 ? i.Size.ToString() : ""
             }];
 
-    public Task DeleteItems() => Unit.Value.ToAsync();
+    public async Task DeleteItems()
+    {
+        var pos = GetFocusedItemPos();
+        var focusedItem = Items().Skip(pos).FirstOrDefault();
+        if (focusedItem?.IsEjectable == true)
+        {
+            var volumes = VolumeMonitor.Get().GetVolumes();
+            var device = volumes.FirstOrDefault(n => n.GetUnixDevice()?.EndsWith(focusedItem?.Name ?? "---") == true);
+            if (device != null)
+            {
+                try
+                {
+                    using var mo = MountOperation.New();
+                    await device.EjectAsync(UnmountFlags.Force, mo);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Konnte {focusedItem?.Name} nicht auswerfen: {e}");
+                }
+            }
+        }
+    }
+
     public Task Rename() => Unit.Value.ToAsync();
     public Task CreateFolder() => Unit.Value.ToAsync();
     public Task CopyItems(string? _, bool __) => Unit.Value.ToAsync();
@@ -164,15 +185,18 @@ class RootController : ControllerBase<RootItem>, IController
 
     static RootItemOffer CreateRootItem(string driveString, int[] columnPositions)
     {
+        var volumes = VolumeMonitor.Get().GetVolumes();
+        var name = GetString(1, 2).TrimName();
         var mountPoint = GetString(3, 4);
         return new(new(
-                GetString(1, 2).TrimName(),
+                name,
                 GetString(2, 3),
                 GetString(0, 1)
                     .ParseLong()
                     ?? 0,
                 mountPoint,
                 mountPoint.Length > 0,
+                volumes.FirstOrDefault(n => n.GetUnixDevice()?.EndsWith(name) == true)?.CanEject() == true, 
                 driveString[columnPositions[4]..].Trim() switch
                 {
                     "ext4" => DriveKind.Ext4,
@@ -202,7 +226,7 @@ class RootController : ControllerBase<RootItem>, IController
             DriveKind.Home => "user-home",
             //_ => "drive-removable-media-symbolic"
             DriveKind.Unknown when item.Name == "fav" => "starred",
-            _ => "drive-removable-media"
+            _ => item.IsEjectable ? "media-removable" : "drive-removable-media"
         };
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
@@ -224,6 +248,7 @@ record RootItem(
     long Size,
     string? MountPoint,
     bool IsMounted,
+    bool IsEjectable,
     DriveKind DriveKind);
 
 record RootItemOffer(RootItem RootItem, bool IsRoot);
