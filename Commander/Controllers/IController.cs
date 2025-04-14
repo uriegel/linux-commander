@@ -15,6 +15,8 @@ interface IController : IDisposable
 
     ExifData? GetExifData(int pos);
 
+    void RemoveAll();
+
     Task<int> Fill(string path, FolderView folderView);
 
     Task DeleteItems();

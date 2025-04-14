@@ -49,6 +49,7 @@ class FolderController
         {
             try
             {
+                controller.RemoveAll();
                 var lastPos = await controller.Fill(path, folderView);
                 if (lastPos != -1)
                     folderView.ScrollTo(lastPos);

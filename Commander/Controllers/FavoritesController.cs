@@ -7,7 +7,6 @@ using GtkDotNet.SafeHandles;
 
 namespace Commander.Controllers;
 
-// TODO 1. remove all times before filling new
 // TODO 2. fill parent item
 // TODO 3. append add favorite
 class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposable
