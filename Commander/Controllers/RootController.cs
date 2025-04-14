@@ -63,7 +63,9 @@ class RootController : ControllerBase<RootItem>, IController
     public async Task<string?> OnActivate(int pos)
     {
         var item = GetItem(pos);
-        if (item != null && string.IsNullOrWhiteSpace(item.MountPoint))
+        if (item != null && item.Name == "fav")
+            return item.Name;
+        else if (item != null && string.IsNullOrWhiteSpace(item.MountPoint))
             return await MountAsync(item.Name);
         else
             return item?.MountPoint;

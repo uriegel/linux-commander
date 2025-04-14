@@ -92,6 +92,14 @@ class FolderController
     {
         switch (path)
         {
+            case "fav":
+                if (controller is not FavoritesController)
+                {
+                    controller.Dispose();
+                    controller = new FavoritesController(folderView);
+                    return true;
+                }
+                break;
             case "root":
             case "":
                 if (controller is not RootController)

@@ -7,6 +7,9 @@ using GtkDotNet.SafeHandles;
 
 namespace Commander.Controllers;
 
+// TODO 1. remove all times before filling new
+// TODO 2. fill parent item
+// TODO 3. append add favorite
 class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposable
 {
     #region IController
@@ -39,7 +42,7 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposa
 
     public async Task<int> Fill(string path, FolderView folderView)
     {
-        return 0;
+        return -1; // !!! 0
     }
 
     public ExifData? GetExifData(int pos) => null;
@@ -76,6 +79,9 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposa
 
     #endregion
 
+    public FavoritesController(FolderView folderView) : base()
+        => folderView.SetController(this);
+
     public override ColumnViewSubClassed.Column<FavoritesItem>[] GetColumns()
         => [
             new()
@@ -93,7 +99,6 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposa
             new()
             {
                 Title = "Pfad",
-                Expanded = true,
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End),
                 OnLabelBind = i => i.Path
