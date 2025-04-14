@@ -12,6 +12,7 @@ using CsTools;
 
 using static CsTools.Extensions.Core;
 using System.Data;
+using Commander.DataContexts;
 
 namespace Commander.Controllers;
 
@@ -141,6 +142,7 @@ class RootController : ControllerBase<RootItem>, IController
                 }
                 catch (Exception e)
                 {
+                    MainContext.Instance.ErrorText = "Das Laufwerk konnte nicht ausgeworfen werden";
                     Console.WriteLine($"Konnte {focusedItem?.Name} nicht auswerfen: {e}");
                 }
             }

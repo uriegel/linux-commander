@@ -10,8 +10,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO error when ejecting: Error banner
-
 // TODO Favorites
 // TODO Remotes
 // TODO extended rename
