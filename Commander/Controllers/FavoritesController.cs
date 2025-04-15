@@ -9,7 +9,7 @@ namespace Commander.Controllers;
 
 // TODO 2. fill parent item
 // TODO 3. append add favorite
-class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposable
+class FavoritesController : ControllerBase<FavoritesItem>, IController
 {
     #region IController
 
@@ -23,12 +23,8 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposa
 
     public int HiddenFiles => 0;
 
-    public bool CheckRestriction(string searchKey)
-    {
-        // TODO
-        throw new NotImplementedException();
-    }
-
+    public bool CheckRestriction(string searchKey) => false;
+    
     public Task CopyItems(string? targetPath, bool move) => Unit.Value.ToAsync();
 
     public Task CreateFolder() => Unit.Value.ToAsync();
@@ -48,8 +44,8 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController, IDisposa
 
     public string? GetItemPath(int pos)
     {
-        // TODO
-        throw new NotImplementedException();
+        return null;
+            
     }
 
     public Task<string?> OnActivate(int pos)
