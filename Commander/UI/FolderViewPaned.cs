@@ -8,6 +8,7 @@ namespace Commander.UI;
 
 class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
 {
+    public static FolderViewPaned Instance { get; private set; } = new(0);
     public static FolderViewPaned GetInstance(PanedHandle handle)
         => (GetInstance(handle.GetInternalHandle()) as FolderViewPaned)!;
 
@@ -26,6 +27,8 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
 
     public void Refresh() => folderViewActive?.Refresh();
 
+    public FolderView? GetInactiveFolderView() => folderViewActive == folderViewLeft ? folderViewRight : folderViewLeft;
+    
     public void AdaptPath()
     {
         var path = folderViewActive?.Context.CurrentPath;
@@ -62,6 +65,7 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
         
     protected override async void OnInitialize()
     {
+        Instance = this;
         Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, m) =>
         {
             if (chr == (char)ConsoleKey.Tab)
@@ -136,8 +140,6 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
         Console.WriteLine("EnableFolderViewActions: " + enable);
         IActionMap.GetAction("delete").SetEnabled(enable);
     }
-
-    FolderView? GetInactiveFolderView() => folderViewActive == folderViewLeft ? folderViewRight : folderViewLeft;
 
     FolderView? folderViewLeft;
     FolderView? folderViewRight;

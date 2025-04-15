@@ -58,16 +58,19 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
 
     }
 
-    public Task<string?> OnActivate(int pos)
+    public async Task<string?> OnActivate(int pos)
     {
         var item = GetItem(pos);
         if (item != null && item.Name == "..")
-            return ((string?)"root").ToAsync();
+            return "root";
         // else if (item != null && string.IsNullOrWhiteSpace(item.MountPoint))
         //     return await MountAsync(item.Name);
         else
         {
-            return ((string?)null).ToAsync();
+            await AlertDialog.PresentAsync(
+                "Als Favoriten übernehmen?",
+                $"Möchtest Du {FolderViewPaned.Instance.GetInactiveFolderView()?.Context.CurrentPath} als Favoriten übernehmen?");
+            return null;
         }
     }
 
