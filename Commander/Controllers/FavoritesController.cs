@@ -5,10 +5,10 @@ using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 
+using static CsTools.Extensions.Core;
+
 namespace Commander.Controllers;
 
-// TODO 2. fill parent item
-// TODO 3. append add favorite
 class FavoritesController : ControllerBase<FavoritesItem>, IController
 {
     #region IController
@@ -24,7 +24,7 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
     public int HiddenFiles => 0;
 
     public bool CheckRestriction(string searchKey) => false;
-    
+
     public Task CopyItems(string? targetPath, bool move) => Unit.Value.ToAsync();
 
     public Task CreateFolder() => Unit.Value.ToAsync();
@@ -34,10 +34,20 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
         // TODO
         throw new NotImplementedException();
     }
-
-    public async Task<int> Fill(string path, FolderView folderView)
+    public Task<int> Fill(string path, FolderView folderView)
     {
-        return -1; // !!! 0
+        var home = new FavoritesItem(
+            "..",
+            "");
+        var newFav = new FavoritesItem(
+            "Favoriten hinzufügen...",
+            "");
+
+        var items = ConcatEnumerables([home], [newFav]).ToArray();
+
+        Insert(items);
+        Directories = items.Length;
+        return (-1).ToAsync();
     }
 
     public ExifData? GetExifData(int pos) => null;
@@ -45,13 +55,20 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
     public string? GetItemPath(int pos)
     {
         return null;
-            
+
     }
 
     public Task<string?> OnActivate(int pos)
     {
-        // TODO
-        throw new NotImplementedException();
+        var item = GetItem(pos);
+        if (item != null && item.Name == "..")
+            return ((string?)"root").ToAsync();
+        // else if (item != null && string.IsNullOrWhiteSpace(item.MountPoint))
+        //     return await MountAsync(item.Name);
+        else
+        {
+            return ((string?)null).ToAsync();
+        }
     }
 
     public int OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
@@ -105,7 +122,7 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
         var label = image?.GetNextSibling<LabelHandle>();
-        var icon = "user-home";
+        var icon = item.Name == ".." ? "go-up" : "list-add";
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
     }
