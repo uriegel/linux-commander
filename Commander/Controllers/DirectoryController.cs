@@ -96,25 +96,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis umbenennen?",
             _ => null
         } ?? throw new TaskCanceledException();
-        // TODO custom control?
-        var builder = Builder.FromDotNetResource("textdialog");
-        var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
-        var textView = builder.GetWidget<EntryHandle>("text");
-        dialog.Heading("Umbennen?");
-        dialog.Body(text);
         var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();
-        textView.Text(item?.Name ?? "");
-        dialog.OnMap(async () =>
+        var newFile = await TextDialog.ShowAsync("Umbennen?", text, item?.Name, () => (0, item?.Name?.LastIndexOf('.') ?? 0));
+        if  (newFile != null)
         {
-            textView.GrabFocus();
-            await Task.Delay(100);
-            textView.SelectRegion(0, item?.Name?.LastIndexOf('.') ?? 0);
-        });
-
-        var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
-        if (response == "ok")
-        {
-            var newFile = textView.GetText();
             if (item != null && !string.IsNullOrWhiteSpace(text))
             {
                 if (item.IsDirectory)

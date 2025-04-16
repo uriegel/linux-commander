@@ -13,12 +13,19 @@ static class Storage
             .AppendPath("settings.json")
             .ReadAllTextFromFilePath()
             ?.Deserialize<Value>(Json.Defaults)
-            ?? new("root", "root");
+            ?? new("root", "root", []);
 
     public static void SaveLeftPath(string path)
         => Save(Retrieve() with { LeftPath = path });
     public static void SaveRightPath(string path)
         => Save(Retrieve() with { RightPath = path });
+
+    public static void SaveFavorite(Favorite favorites)
+    {
+        var val = Retrieve();
+        Save(val with { Favorites = [.. val.Favorites, favorites] });    
+    }
+    
 
     static void Save(Value value)
         => Environment
@@ -29,4 +36,8 @@ static class Storage
             .WriteAllTextToFilePath(value.Serialize(Json.Defaults));
 }
 
-record Value(string LeftPath, string RightPath);
+record Favorite(string Name, string Path);
+record Value(
+    string LeftPath,
+    string RightPath,
+    Favorite[] Favorites);
