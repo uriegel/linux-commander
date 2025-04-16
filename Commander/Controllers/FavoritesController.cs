@@ -11,7 +11,7 @@ using static CsTools.Extensions.Core;
 namespace Commander.Controllers;
 
 // TODO 1. Delete favorite
-// TODO 2. ChangePath
+// TODO 2. Rename favorite
 
 class FavoritesController : ControllerBase<FavoritesItem>, IController
 {
@@ -56,11 +56,7 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
 
     public ExifData? GetExifData(int pos) => null;
 
-    public string? GetItemPath(int pos)
-    {
-        return null;
-
-    }
+    public string? GetItemPath(int pos) => null;
 
     public async Task<string?> OnActivate(int pos)
     {
@@ -68,9 +64,7 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
         if (item != null && item.Name == "..")
             return "root";
         else if (item != null && item.Path != "")
-        {
-            return null;
-        }
+            return item.Path;
         else
         {
             var inactive = FolderViewPaned.Instance.GetInactiveFolderView();
