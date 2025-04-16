@@ -21,12 +21,28 @@ static class Storage
     public static void SaveRightPath(string path)
         => Save(Retrieve() with { RightPath = path });
 
-    public static void SaveFavorite(FavoritesItem favorites)
+    public static void SaveFavorite(FavoritesItem favorite)
     {
         var val = Retrieve();
-        Save(val with { Favorites = val.Favorites != null ? [.. val.Favorites, favorites] : [ favorites ]});    
+        Save(val with { Favorites = val.Favorites != null ? [.. val.Favorites, favorite] : [ favorite ]});    
     }
     
+    public static void DeleteFavorite(FavoritesItem favorite)
+    {
+        var val = Retrieve();
+        Save(val with { Favorites = val.Favorites?.Where(n => n != favorite).ToArray() });    
+    }
+
+    public static void ChangeFavorite(FavoritesItem favorite, string newName)
+    {
+        var val = Retrieve();
+        if (val.Favorites != null)
+        {
+            var pos = Array.IndexOf(val.Favorites, favorite);
+            val.Favorites[pos] = val.Favorites[pos] with { Name = newName };
+            Save(val with { Favorites = val.Favorites });    
+        }
+    }
 
     static void Save(Value value)
         => Environment

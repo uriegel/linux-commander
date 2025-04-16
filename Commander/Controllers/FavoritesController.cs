@@ -10,9 +10,6 @@ using static CsTools.Extensions.Core;
 
 namespace Commander.Controllers;
 
-// TODO 1. Delete favorite
-// TODO 2. Rename favorite
-
 class FavoritesController : ControllerBase<FavoritesItem>, IController
 {
     #region IController
@@ -33,11 +30,17 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
 
     public Task CreateFolder() => Unit.Value.ToAsync();
 
-    public Task DeleteItems()
+    public async Task DeleteItems()
     {
-        // TODO
-        throw new NotImplementedException();
+        var item = GetItem(GetFocusedItemPos());
+        if (item != null && item.Path != "")
+        {
+            var response = await AlertDialog.PresentAsync("Löschen?", "Möchtest du den Favoriten löschen?");
+            if (response == "ok")
+                Storage.DeleteFavorite(item);
+        }
     }
+
     public Task<int> Fill(string path, FolderView folderView)
     {
         var home = new FavoritesItem(
@@ -88,10 +91,15 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
         return 0;
     }
 
-    public Task Rename()
+    public async Task Rename()
     {
-        // TODO
-        throw new NotImplementedException();
+        var item = GetItem(GetFocusedItemPos());
+        if (item != null && item.Path != "")
+        {
+            var newName = await TextDialog.ShowAsync("Umbennen?", "Möchtest du den Favoriten umbenennen?", item.Name);
+            if (newName != null)
+                Storage.ChangeFavorite(item, newName);
+        }
     }
 
     public void SelectAll(FolderView folderView) { }
