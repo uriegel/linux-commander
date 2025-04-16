@@ -10,6 +10,9 @@ using static CsTools.Extensions.Core;
 
 namespace Commander.Controllers;
 
+// TODO 1. Delete favorite
+// TODO 2. ChangePath
+
 class FavoritesController : ControllerBase<FavoritesItem>, IController
 {
     #region IController
@@ -44,7 +47,7 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
             "Favoriten hinzufügen...",
             "");
 
-        var items = ConcatEnumerables([home], [newFav]).ToArray();
+        var items = ConcatEnumerables([home], Storage.Retrieve().Favorites ?? [], [newFav]).ToArray();
 
         Insert(items);
         Directories = items.Length;
@@ -64,8 +67,10 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
         var item = GetItem(pos);
         if (item != null && item.Name == "..")
             return "root";
-        // else if (item != null && string.IsNullOrWhiteSpace(item.MountPoint))
-        //     return await MountAsync(item.Name);
+        else if (item != null && item.Path != "")
+        {
+            return null;
+        }
         else
         {
             var inactive = FolderViewPaned.Instance.GetInactiveFolderView();
@@ -76,7 +81,8 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
                     $"Möchtest Du {inactive.Context.CurrentPath} als Favoriten übernehmen?",
                     inactive.Context.CurrentPath.SubstringAfterLast('/'));
                 if (newName != null)
-                    Storage.SaveFavorite(new(inactive.Context.CurrentPath, ""));
+                    Storage.SaveFavorite(new(newName, inactive.Context.CurrentPath));
+                FolderViewPaned.Instance.GetActiveFolderView()?.Refresh();
             }
             return null;
         }
@@ -133,7 +139,11 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
         var label = image?.GetNextSibling<LabelHandle>();
-        var icon = item.Name == ".." ? "go-up" : "list-add";
+        var icon = item.Name == ".."
+            ? "go-up"
+            : item.Path == ""
+            ? "list-add"
+            : "starred";
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
     }

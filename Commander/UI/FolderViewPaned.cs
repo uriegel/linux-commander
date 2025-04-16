@@ -28,6 +28,7 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
     public void Refresh() => folderViewActive?.Refresh();
 
     public FolderView? GetInactiveFolderView() => folderViewActive == folderViewLeft ? folderViewRight : folderViewLeft;
+    public FolderView? GetActiveFolderView() => folderViewActive;
     
     public void AdaptPath()
     {

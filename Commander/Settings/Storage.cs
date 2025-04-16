@@ -1,3 +1,4 @@
+using Commander.Controllers;
 using CsTools;
 using CsTools.Extensions;
 
@@ -20,10 +21,10 @@ static class Storage
     public static void SaveRightPath(string path)
         => Save(Retrieve() with { RightPath = path });
 
-    public static void SaveFavorite(Favorite favorites)
+    public static void SaveFavorite(FavoritesItem favorites)
     {
         var val = Retrieve();
-        Save(val with { Favorites = [.. val.Favorites, favorites] });    
+        Save(val with { Favorites = val.Favorites != null ? [.. val.Favorites, favorites] : [ favorites ]});    
     }
     
 
@@ -36,8 +37,7 @@ static class Storage
             .WriteAllTextToFilePath(value.Serialize(Json.Defaults));
 }
 
-record Favorite(string Name, string Path);
 record Value(
     string LeftPath,
     string RightPath,
-    Favorite[] Favorites);
+    FavoritesItem[]? Favorites);
