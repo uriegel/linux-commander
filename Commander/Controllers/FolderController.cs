@@ -101,6 +101,14 @@ class FolderController
                     return true;
                 }
                 break;
+            case "remotes":
+                if (controller is not RemotesController)
+                {
+                    controller.Dispose();
+                    controller = new RemotesController(folderView);
+                    return true;
+                }
+                break;
             case "root":
             case "":
                 if (controller is not RootController)

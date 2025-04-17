@@ -16,6 +16,11 @@ using Commander.DataContexts;
 
 namespace Commander.Controllers;
 
+// TODO Add Remote dialog with name, ip, isAndroid
+// TODO use gtk icon for mobile and remote
+// TODO RemoteController
+
+
 class RootController : ControllerBase<RootItem>, IController
 {
     #region IController
@@ -71,7 +76,7 @@ class RootController : ControllerBase<RootItem>, IController
     public async Task<string?> OnActivate(int pos)
     {
         var item = GetItem(pos);
-        if (item != null && item.Name == "fav")
+        if (item != null && (item.Name == "fav" || item.Name == "remotes"))
             return item.Name;
         else if (item != null && string.IsNullOrWhiteSpace(item.MountPoint))
             return await MountAsync(item.Name);
@@ -208,7 +213,7 @@ class RootController : ControllerBase<RootItem>, IController
                     ?? 0,
                 mountPoint,
                 mountPoint.Length > 0,
-                volumes.FirstOrDefault(n => n.GetUnixDevice()?.EndsWith(name) == true)?.CanEject() == true, 
+                volumes.FirstOrDefault(n => n.GetUnixDevice()?.EndsWith(name) == true)?.CanEject() == true,
                 driveString[columnPositions[4]..].Trim() switch
                 {
                     "ext4" => DriveKind.Ext4,
