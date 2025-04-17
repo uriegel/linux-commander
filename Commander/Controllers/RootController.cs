@@ -52,8 +52,16 @@ class RootController : ControllerBase<RootItem>, IController
             true,
             false,
             DriveKind.Unknown);
+        var remotes = new RootItem(
+            "remotes",
+            "Zugriff auf entfernte Geräte",
+            0,
+            "remotes",
+            true,
+            false,
+            DriveKind.Unknown);
 
-        var items = ConcatEnumerables([home], mounted, [fav], unmounted).ToArray();
+        var items = ConcatEnumerables([home], mounted, [fav, remotes], unmounted).ToArray();
 
         Insert(items);
         Directories = items.Length;
@@ -230,6 +238,7 @@ class RootController : ControllerBase<RootItem>, IController
             DriveKind.Home => "user-home",
             //_ => "drive-removable-media-symbolic"
             DriveKind.Unknown when item.Name == "fav" => "starred",
+            DriveKind.Unknown when item.Name == "remotes" => "network-server",
             _ => item.IsEjectable ? "media-removable" : "drive-removable-media"
         };
         image?.SetFromIconName(icon, IconSize.Menu);
