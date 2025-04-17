@@ -27,7 +27,7 @@ static class Storage
         Save(val with { Favorites = val.Favorites != null ? [.. val.Favorites, favorite] : [ favorite ]});    
     }
     
-    public static void SaveRemote(RemoteItem remote)
+    public static void SaveRemote(RemotesItem remote)
     {
         var val = Retrieve();
         Save(val with { Remotes = val.Remotes != null ? [.. val.Remotes, remote] : [ remote ]});    
@@ -50,7 +50,7 @@ static class Storage
         }
     }
 
-    public static void ChangeRemote(RemoteItem remote, string newName)
+    public static void ChangeRemote(RemotesItem remote, string newName)
     {
         var val = Retrieve();
         if (val.Remotes != null)
@@ -61,7 +61,7 @@ static class Storage
         }
     }
 
-    public static void DeleteRemote(RemoteItem remote)
+    public static void DeleteRemote(RemotesItem remote)
     {
         var val = Retrieve();
         Save(val with { Remotes = val.Remotes?.Where(n => n != remote).ToArray() });
@@ -80,4 +80,4 @@ record Value(
     string LeftPath,
     string RightPath,
     FavoritesItem[]? Favorites,
-    RemoteItem[]? Remotes);
+    RemotesItem[]? Remotes);

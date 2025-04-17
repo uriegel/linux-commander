@@ -10,7 +10,7 @@ using static CsTools.Extensions.Core;
 
 namespace Commander.Controllers;
 
-class RemotesController : ControllerBase<RemoteItem>, IController
+class RemotesController : ControllerBase<RemotesItem>, IController
 {
     #region IController
 
@@ -43,11 +43,11 @@ class RemotesController : ControllerBase<RemoteItem>, IController
 
     public Task<int> Fill(string path, FolderView folderView)
     {
-        var home = new RemoteItem(
+        var home = new RemotesItem(
             "..",
             "",
             false);
-        var newRemote = new RemoteItem(
+        var newRemote = new RemotesItem(
             "Entferntes Gerät hinzufügen...",
             "",
             false);
@@ -112,7 +112,7 @@ class RemotesController : ControllerBase<RemoteItem>, IController
     public RemotesController(FolderView folderView) : base()
         => folderView.SetController(this);
 
-    public override ColumnViewSubClassed.Column<RemoteItem>[] GetColumns()
+    public override ColumnViewSubClassed.Column<RemotesItem>[] GetColumns()
         => [
             new()
             {
@@ -135,7 +135,7 @@ class RemotesController : ControllerBase<RemoteItem>, IController
             }
         ];
 
-    void OnIconNameBind(ListItemHandle listItem, RemoteItem item)
+    void OnIconNameBind(ListItemHandle listItem, RemotesItem item)
     {
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
@@ -152,5 +152,5 @@ class RemotesController : ControllerBase<RemoteItem>, IController
     }
 }
 
-
+record RemotesItem(string Name, string IP, bool IsAndroid);
     

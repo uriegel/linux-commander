@@ -97,6 +97,7 @@ class FolderController
             "remotes" => SetController(() => new RemotesController(folderView)),
             "root" => SetController(() => new RootController(folderView)),
             "" => SetController(() => new RootController(folderView)),
+            _ when path.StartsWith("remote") => SetController(() => new RemoteController(folderView)),
             _ => SetController(() => new DirectoryController(folderView))
         };
 

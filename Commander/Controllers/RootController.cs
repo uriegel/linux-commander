@@ -71,7 +71,7 @@ class RootController : ControllerBase<RootItem>, IController
 
         Insert(items);
         Directories = items.Length;
-        return -1;
+        return 0;
     }
 
     public async Task<string?> OnActivate(int pos)

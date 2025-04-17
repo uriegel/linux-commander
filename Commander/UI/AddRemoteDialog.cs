@@ -6,7 +6,7 @@ namespace Commander.UI;
 
 static class AddRemoteDialog
 {
-    public static async Task<RemoteItem?> ShowAsync()
+    public static async Task<RemotesItem?> ShowAsync()
     {
         var builder = Builder.FromDotNetResource("addremote");
         var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");

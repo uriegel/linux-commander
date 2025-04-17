@@ -1,14 +1,15 @@
 using Commander.Enums;
-using Commander.Settings;
 using Commander.UI;
 using CsTools;
 using CsTools.Extensions;
+using CsTools.Functional;
+using CsTools.HttpRequest;
 using GtkDotNet;
-using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
 
-using static CsTools.Extensions.Core;
 using static GtkDotNet.Controls.ColumnViewSubClassed;
+using static CsTools.Extensions.Core;
+using Commander.DataContexts;
 
 namespace Commander.Controllers;
 
@@ -20,7 +21,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
     public int Directories { get; private set; }
 
-    public int Files { get; }
+    public int Files { get; private set; }
 
     public int HiddenDirectories => 0;
 
@@ -36,18 +37,52 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
     {
     }
 
-    public Task<int> Fill(string path, FolderView folderView)
+    public async Task<int> Fill(string path, FolderView folderView)
     {
-        return (-1).ToAsync();
+        var result = await path
+            .GetIpAndPath()
+            .Pipe(ipPath =>
+                ipPath
+                    .GetRequest()
+                    .Get<RemoteItem[]>($"getfiles{ipPath.Path}", true)
+                    .Select(n => n.Select(n => new DirectoryItem(
+                        n.IsDirectory ? ItemKind.Folder : ItemKind.Item,
+                        n.Name,
+                        n.Size,
+                        n.IsDirectory,
+                        n.IsHidden,
+                        n.Time.FromUnixTime()))))
+            .SelectError(e => new RequestException(e))
+            .GetOrThrowAsync();
+        var oldPath = CurrentPath;
+        CurrentPath = path;
+        Insert(ConcatEnumerables([new DirectoryItem(ItemKind.Parent, "..", 0, true, false, null)], result));
+        Directories = result.Where(n => n.IsDirectory).Count();
+        Files = result.Where(n => !n.IsDirectory).Count();
+        return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'))
+            .Minus1To0();
     }
 
     public ExifData? GetExifData(int pos) => null;
 
     public string? GetItemPath(int pos) => null;
 
-    public async Task<string?> OnActivate(int pos)
+    public Task<string?> OnActivate(int pos)
     {
-        return null;
+        var item = GetItem(pos);
+        if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
+            if (item.Kind != ItemKind.Parent)
+                return ((string?)CurrentPath.CombineRemotePath(item.Name)).ToAsync();
+            else
+                return ((string?)CurrentPath.UpOne()).ToAsync();
+        //return ((string?)"root").ToAsync();
+        // else if (item != null && item.Kind == ItemKind.Item)
+        // {
+        //     StartItem(item.Name);
+        //     return ((string?)null).ToAsync();
+        // }
+        else
+            return ((string?)null).ToAsync();
     }
 
     public int OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
@@ -69,7 +104,11 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
     #endregion
 
     public RemoteController(FolderView folderView) : base()
-        => folderView.SetController(this);
+    {
+        EnableRubberband = true;
+        folderView.SetController(this);
+        OnFilter = Filter;
+    }
 
     public override Column<DirectoryItem>[] GetColumns() =>
         [
@@ -104,6 +143,11 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
             }
         ];
 
+    bool Filter(DirectoryItem item)
+        => (!item.IsHidden || Actions.Instance.ShowHidden)
+            && (MainContext.Instance.Restriction == null
+                || item.Name.StartsWith(MainContext.Instance.Restriction, StringComparison.CurrentCultureIgnoreCase));
+
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
     {
         var box = listItem.GetChild<BoxHandle>();
@@ -123,11 +167,64 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
     static void OnTimeBind(ListItemHandle listItem, DirectoryItem item)
     {
         var label = listItem.GetChild<LabelHandle>();
-        label?.Set(item.ExifData?.DateTime.ToString() ?? item.Time.ToString() ?? "");
-        label?.AddCssClass("exif", item.ExifData?.DateTime != null);
+        label?.Set(item.Time.ToString() ?? "");
     }
 
+    int FindPos(Func<DirectoryItem, bool> predicate)
+    {
+        var i = 0;
+        while (true)
+        {
+            var item = GetItem(i);
+            if (item == null)
+                return -1;
+            else
+            {
+                if (predicate(item))
+                    return (int)i;
+            }
+            i++;
+        }
+    }
 }
 
-record RemoteItem(string Name, string IP, bool IsAndroid);
-    
+static partial class Extensions
+{
+    public static IpAndPath GetIpAndPath(this string url)
+        => new(url.StringBetween('/', '/'),
+            url[7..].Contains('/')
+            ? "/" + url.SubstringAfter('/').SubstringAfter('/')
+            : "");
+
+    public static JsonRequest GetRequest(this IpAndPath ipAndPath)
+        => new($"http://{ipAndPath.Ip}:8080");
+
+    public static string CombineRemotePath(this string path, string subPath)
+        => path.EndsWith('/')
+            ? subPath.StartsWith('/')
+                ? path + subPath[1..]
+                : path + subPath
+            : subPath.StartsWith('/')
+                ? path + subPath
+                : path + '/' + subPath;
+
+    public static string UpOne(this string path)
+        => path[7..].Contains('/')
+            ? path.SubstringUntilLast('/')
+            : "remotes";
+
+    public static int Minus1To0(this int pos)
+        => pos == -1
+            ? 0
+            : pos;
+}
+
+record RemoteItem(
+    string Name,
+    long Size,
+    bool IsDirectory,
+    bool IsHidden,
+    long Time
+);
+
+record IpAndPath(string Ip, string Path);    
