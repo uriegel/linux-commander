@@ -27,6 +27,9 @@
     <EmbeddedResource Include="./Resources/textdialog.ui">
       <LogicalName>textdialog</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/addremote.ui">
+      <LogicalName>addremote</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="./Resources/conflictdialog.ui">
       <LogicalName>conflictdialog</LogicalName>
     </EmbeddedResource>

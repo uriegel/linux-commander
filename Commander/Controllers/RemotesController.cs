@@ -1,4 +1,3 @@
-using Commander.Settings;
 using Commander.UI;
 using CsTools;
 using CsTools.Extensions;
@@ -14,7 +13,7 @@ class RemotesController : ControllerBase<RemotesItem>, IController
 {
     #region IController
 
-    public string CurrentPath { get; private set; } = "fav";
+    public string CurrentPath { get; private set; } = "remotes";
 
     public int Directories { get; private set; }
 
@@ -74,12 +73,9 @@ class RemotesController : ControllerBase<RemotesItem>, IController
             var inactive = FolderViewPaned.Instance.GetInactiveFolderView();
             if (inactive != null)
             {
-                var newName = await TextDialog.ShowAsync(
-                    "Als Favoriten übernehmen?",
-                    $"Möchtest Du {inactive.Context.CurrentPath} als Favoriten übernehmen?",
-                    inactive.Context.CurrentPath.SubstringAfterLast('/'));
-                if (newName != null)
-                    Storage.SaveFavorite(new(newName, inactive.Context.CurrentPath));
+                var newName = await AddRemote.ShowAsync();
+                // if (newName != null)
+                //     Storage.SaveFavorite(new(newName, inactive.Context.CurrentPath));
                 FolderViewPaned.Instance.GetActiveFolderView()?.Refresh();
             }
             return null;
