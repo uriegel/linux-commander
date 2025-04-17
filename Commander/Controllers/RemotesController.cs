@@ -1,3 +1,4 @@
+using Commander.Settings;
 using Commander.UI;
 using CsTools;
 using CsTools.Extensions;
@@ -9,7 +10,7 @@ using static CsTools.Extensions.Core;
 
 namespace Commander.Controllers;
 
-class RemotesController : ControllerBase<RemotesItem>, IController
+class RemotesController : ControllerBase<RemoteItem>, IController
 {
     #region IController
 
@@ -31,27 +32,28 @@ class RemotesController : ControllerBase<RemotesItem>, IController
 
     public async Task DeleteItems()
     {
-        // var item = GetItem(GetFocusedItemPos());
-        // if (item != null && item.Path != "")
-        // {
-        //     var response = await AlertDialog.PresentAsync("Löschen?", "Möchtest du den Favoriten löschen?");
-        //     if (response == "ok")
-        //         Storage.DeleteFavorite(item);
-        // }
+        var item = GetItem(GetFocusedItemPos());
+        if (item != null && item.IP != "")
+        {
+            var response = await AlertDialog.PresentAsync("Entfernen?", "Möchtest du das entfernte Gerät entfernen?");
+            if (response == "ok")
+                Storage.DeleteRemote(item);
+        }
     }
 
     public Task<int> Fill(string path, FolderView folderView)
     {
-        var home = new RemotesItem(
+        var home = new RemoteItem(
             "..",
-            "");
-        var newRemote = new RemotesItem(
+            "",
+            false);
+        var newRemote = new RemoteItem(
             "Entferntes Gerät hinzufügen...",
-            "");
+            "",
+            false);
 
-        //var items = ConcatEnumerables([home], Storage.Retrieve().Favorites ?? [], [newRemote]).ToArray();
-        var items = ConcatEnumerables([home], [newRemote]).ToArray();        
-
+        var items = ConcatEnumerables([home], Storage.Retrieve().Remotes ?? [], [newRemote]).ToArray();
+        
         Insert(items);
         Directories = items.Length;
         return (-1).ToAsync();
@@ -66,16 +68,16 @@ class RemotesController : ControllerBase<RemotesItem>, IController
         var item = GetItem(pos);
         if (item != null && item.Name == "..")
             return "root";
-        else if (item != null && item.Path != "")
-            return item.Path;
+        else if (item != null && item.IP != "")
+            return item.IP;
         else
         {
             var inactive = FolderViewPaned.Instance.GetInactiveFolderView();
             if (inactive != null)
             {
-                var newName = await AddRemote.ShowAsync();
-                // if (newName != null)
-                //     Storage.SaveFavorite(new(newName, inactive.Context.CurrentPath));
+                var newItem = await AddRemoteDialog.ShowAsync();
+                if (newItem != null)
+                    Storage.SaveRemote(newItem);
                 FolderViewPaned.Instance.GetActiveFolderView()?.Refresh();
             }
             return null;
@@ -90,13 +92,13 @@ class RemotesController : ControllerBase<RemotesItem>, IController
 
     public async Task Rename()
     {
-        // var item = GetItem(GetFocusedItemPos());
-        // if (item != null && item.Path != "")
-        // {
-        //     var newName = await TextDialog.ShowAsync("Umbennen?", "Möchtest du den Favoriten umbenennen?", item.Name);
-        //     if (newName != null)
-        //         Storage.ChangeFavorite(item, newName);
-        // }
+        var item = GetItem(GetFocusedItemPos());
+        if (item != null && item.IP != "")
+        {
+            var newName = await TextDialog.ShowAsync("Umbennen?", "Möchtest du das entfernte Gerät umbenennen?", item.Name);
+            if (newName != null)
+                Storage.ChangeRemote(item, newName);
+        }
     }
 
     public void SelectAll(FolderView folderView) { }
@@ -110,7 +112,7 @@ class RemotesController : ControllerBase<RemotesItem>, IController
     public RemotesController(FolderView folderView) : base()
         => folderView.SetController(this);
 
-    public override ColumnViewSubClassed.Column<RemotesItem>[] GetColumns()
+    public override ColumnViewSubClassed.Column<RemoteItem>[] GetColumns()
         => [
             new()
             {
@@ -126,27 +128,29 @@ class RemotesController : ControllerBase<RemotesItem>, IController
             },
             new()
             {
-                Title = "Pfad",
+                Title = "IP-Adresse",
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End),
-                OnLabelBind = i => i.Path
+                OnLabelBind = i => i.IP
             }
         ];
 
-    void OnIconNameBind(ListItemHandle listItem, RemotesItem item)
+    void OnIconNameBind(ListItemHandle listItem, RemoteItem item)
     {
         var box = listItem.GetChild<BoxHandle>();
         var image = box?.GetFirstChild<ImageHandle>();
         var label = image?.GetNextSibling<LabelHandle>();
         var icon = item.Name == ".."
             ? "go-up"
-            : item.Path == ""
+            : item.IP == ""
             ? "list-add"
-            : "starred";
+            : item.IsAndroid
+            ? "phone"
+            : "network-server";
         image?.SetFromIconName(icon, IconSize.Menu);
         label?.Set(item.Name);
     }
 }
 
-record RemotesItem(string Name, string Path);
+record RemoteItem(string Name, string IP, bool IsAndroid);
     

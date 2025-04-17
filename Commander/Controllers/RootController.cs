@@ -16,11 +16,6 @@ using Commander.DataContexts;
 
 namespace Commander.Controllers;
 
-// TODO Add Remote dialog with name, ip, isAndroid
-// TODO use gtk icon for mobile and remote
-// TODO RemoteController
-
-
 class RootController : ControllerBase<RootItem>, IController
 {
     #region IController

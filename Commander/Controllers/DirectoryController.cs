@@ -10,7 +10,8 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Remotes
+// TODO RemoteController
+
 // TODO extended rename
 
 // TODO parent to root: no selection

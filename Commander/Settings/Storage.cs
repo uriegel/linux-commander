@@ -14,7 +14,7 @@ static class Storage
             .AppendPath("settings.json")
             .ReadAllTextFromFilePath()
             ?.Deserialize<Value>(Json.Defaults)
-            ?? new("root", "root", []);
+            ?? new("root", "root", [], []);
 
     public static void SaveLeftPath(string path)
         => Save(Retrieve() with { LeftPath = path });
@@ -27,10 +27,16 @@ static class Storage
         Save(val with { Favorites = val.Favorites != null ? [.. val.Favorites, favorite] : [ favorite ]});    
     }
     
+    public static void SaveRemote(RemoteItem remote)
+    {
+        var val = Retrieve();
+        Save(val with { Remotes = val.Remotes != null ? [.. val.Remotes, remote] : [ remote ]});    
+    }
+
     public static void DeleteFavorite(FavoritesItem favorite)
     {
         var val = Retrieve();
-        Save(val with { Favorites = val.Favorites?.Where(n => n != favorite).ToArray() });    
+        Save(val with { Favorites = val.Favorites?.Where(n => n != favorite).ToArray() });
     }
 
     public static void ChangeFavorite(FavoritesItem favorite, string newName)
@@ -42,6 +48,23 @@ static class Storage
             val.Favorites[pos] = val.Favorites[pos] with { Name = newName };
             Save(val with { Favorites = val.Favorites });    
         }
+    }
+
+    public static void ChangeRemote(RemoteItem remote, string newName)
+    {
+        var val = Retrieve();
+        if (val.Remotes != null)
+        {
+            var pos = Array.IndexOf(val.Remotes, remote);
+            val.Remotes[pos] = val.Remotes[pos] with { Name = newName };
+            Save(val with { Remotes = val.Remotes });    
+        }
+    }
+
+    public static void DeleteRemote(RemoteItem remote)
+    {
+        var val = Retrieve();
+        Save(val with { Remotes = val.Remotes?.Where(n => n != remote).ToArray() });
     }
 
     static void Save(Value value)
@@ -56,4 +79,5 @@ static class Storage
 record Value(
     string LeftPath,
     string RightPath,
-    FavoritesItem[]? Favorites);
+    FavoritesItem[]? Favorites,
+    RemoteItem[]? Remotes);
