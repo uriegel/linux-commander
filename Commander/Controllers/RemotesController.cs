@@ -61,7 +61,7 @@ class RemotesController : ControllerBase<RemoteItem>, IController
 
     public ExifData? GetExifData(int pos) => null;
 
-    public string? GetItemPath(int pos) => null;
+    public string? GetItemPath(int pos) => GetItem(pos)?.Name ?? "";
 
     public async Task<string?> OnActivate(int pos)
     {
@@ -69,7 +69,7 @@ class RemotesController : ControllerBase<RemoteItem>, IController
         if (item != null && item.Name == "..")
             return "root";
         else if (item != null && item.IP != "")
-            return item.IP;
+            return $"remote/{item.IP}";
         else
         {
             var inactive = FolderViewPaned.Instance.GetInactiveFolderView();
@@ -152,5 +152,5 @@ class RemotesController : ControllerBase<RemoteItem>, IController
     }
 }
 
-record RemoteItem(string Name, string IP, bool IsAndroid);
+
     

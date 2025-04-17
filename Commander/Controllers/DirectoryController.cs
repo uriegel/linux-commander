@@ -263,6 +263,27 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             return "text-x-generic-template";
     }
 
+    public static int OnNameSort(DirectoryItem a, DirectoryItem b, bool desc)
+        => OnFolderOrParentSort(a, b, desc) ?? string.Compare(a.Name, b.Name);
+
+    public static int OnTimeSort(DirectoryItem a, DirectoryItem b, bool desc)
+        => OnFolderOrParentSort(a, b, desc)
+            ?? (a.GetDateTime().HasValue && b.GetDateTime().HasValue
+            ? (a.GetDateTime()!.Value - b.GetDateTime()!.Value).TotalMilliseconds > 0
+            ? 1
+            : (a.GetDateTime()!.Value - b.GetDateTime()!.Value).TotalMilliseconds < 0
+            ? -1
+            : 0
+            : 0);
+
+    public static int OnSizeSort(DirectoryItem a, DirectoryItem b, bool desc)
+        => OnFolderOrParentSort(a, b, desc)
+            ?? (a.Size > b.Size
+            ? 1
+            : a.Size < b.Size
+            ? -1
+            : 0);
+
     void StartExifResolving(DirectoryItem[] items, FolderView folderView)
     {
         var token = cancellation.Token;
@@ -331,26 +352,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         => (!item.IsHidden || Actions.Instance.ShowHidden)
             && (MainContext.Instance.Restriction == null
                 || item.Name.StartsWith(MainContext.Instance.Restriction, StringComparison.CurrentCultureIgnoreCase));
-
-    int OnNameSort(DirectoryItem a, DirectoryItem b, bool desc)
-        => OnFolderOrParentSort(a, b, desc) ?? string.Compare(a.Name, b.Name);
-    int OnTimeSort(DirectoryItem a, DirectoryItem b, bool desc)
-        => OnFolderOrParentSort(a, b, desc)
-            ?? (a.GetDateTime().HasValue && b.GetDateTime().HasValue
-            ? (a.GetDateTime()!.Value - b.GetDateTime()!.Value).TotalMilliseconds > 0
-            ? 1
-            : (a.GetDateTime()!.Value - b.GetDateTime()!.Value).TotalMilliseconds < 0
-            ? -1
-            : 0
-            : 0);
-
-    int OnSizeSort(DirectoryItem a, DirectoryItem b, bool desc)
-        => OnFolderOrParentSort(a, b, desc)
-            ?? (a.Size > b.Size
-            ? 1
-            : a.Size < b.Size
-            ? -1
-            : 0);
 
     int FindPos(Func<DirectoryItem, bool> predicate)
     {

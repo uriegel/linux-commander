@@ -91,43 +91,27 @@ class FolderController
 
     bool DetectController(string path)
     {
-        switch (path)
+        return path switch
         {
-            case "fav":
-                if (controller is not FavoritesController)
-                {
-                    controller.Dispose();
-                    controller = new FavoritesController(folderView);
-                    return true;
-                }
-                break;
-            case "remotes":
-                if (controller is not RemotesController)
-                {
-                    controller.Dispose();
-                    controller = new RemotesController(folderView);
-                    return true;
-                }
-                break;
-            case "root":
-            case "":
-                if (controller is not RootController)
-                {
-                    controller.Dispose();
-                    controller = new RootController(folderView);
-                    return true;
-                }
-                break;
-            default:
-                if (controller is not DirectoryController)
-                {
-                    controller.Dispose();
-                    controller = new DirectoryController(folderView);
-                    return true;
-                }
-                break;
+            "fav" => SetController(() => new FavoritesController(folderView)),
+            "remotes" => SetController(() => new RemotesController(folderView)),
+            "root" => SetController(() => new RootController(folderView)),
+            "" => SetController(() => new RootController(folderView)),
+            _ => SetController(() => new DirectoryController(folderView))
+        };
+
+        bool SetController<T>(Func<T> controller)
+            where T : IController
+        {
+            if (this.controller is not T)
+            {
+                this.controller.Dispose();
+                this.controller = controller();
+                return true;
+            }            
+            else
+                return false;
         }
-        return false;
     }
 
     IController controller;

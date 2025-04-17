@@ -27,7 +27,13 @@ class RootController : ControllerBase<RootItem>, IController
 
     public int HiddenDirectories { get; } = 0;
     public int HiddenFiles { get; } = 0;
-    public string? GetItemPath(int pos) => GetItem(pos)?.MountPoint;
+
+    public string? GetItemPath(int pos)
+    {
+        var item = GetItem(pos);
+        return !string.IsNullOrEmpty(item?.Description) ? item?.Description : item?.Name;
+    }
+     
     public ExifData? GetExifData(int pos) => null;
 
     public async Task<int> Fill(string path, FolderView folderView)
