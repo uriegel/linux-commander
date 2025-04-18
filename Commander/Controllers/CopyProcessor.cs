@@ -13,7 +13,9 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 {
     public async Task<bool> CopyItems(bool move)
     {
-        if (targetPath?.StartsWith('/') != true || string.Compare(sourcePath, targetPath, StringComparison.CurrentCultureIgnoreCase) == 0)
+        if (targetPath?.StartsWith('/') != true
+                || string.Compare(sourcePath, targetPath, StringComparison.CurrentCultureIgnoreCase) == 0
+                || selectedItemsType == SelectedItemsType.None)
             return false;
 
         var copyText = move ? "verschieben" : "kopieren";
@@ -29,8 +31,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         };
 
         var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
-
-        var copyItems = selectedItems.Flatten(sourcePath).MakeCopyItems(targetPath);
+        var copyItems = MakeCopyItems(selectedItems.Flatten(sourcePath), targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         if (conflicts.Length > 0)
         {
@@ -68,6 +69,18 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         {
             CopyProgressContext.Instance.Stop();
         }
+    }
+
+    // TODO overwrite in CoopyFromRemote
+    protected virtual CopyItem[] MakeCopyItems(IEnumerable<Item> items, string targetPath)
+        => [.. items.Select(n => CreateCopyItem(n, targetPath))];
+
+    // TODO Check source Items
+    protected virtual CopyItem CreateCopyItem(Item source, string targetPath)
+    {
+        var info = new FileInfo(targetPath.AppendPath(source.Name));
+        var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
+        return new(source, target);
     }
 
     async Task CopyItem(CopyItem item, byte[] buffer, CancellationToken cancellation)
@@ -151,16 +164,6 @@ static partial class Extensions
         if (!info.Exists)
             return null;
         return new Item(info.Name, info.Length, info.LastWriteTime);
-    }
-
-    public static CopyItem[] MakeCopyItems(this IEnumerable<Item> items, string targetPath)
-        => [.. items.Select(n => n.CreateCopyItem(targetPath))];
-
-    public static CopyItem CreateCopyItem(this Item source, string targetPath)
-    {
-        var info = new FileInfo(targetPath.AppendPath(source.Name));
-        var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
-        return new(source, target);
     }
 
     public static void DeleteEmptyDirectories(this IEnumerable<string> dirs, string path)

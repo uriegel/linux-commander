@@ -17,8 +17,6 @@ namespace Commander.Controllers;
 
 // TODO extended rename
 
-// TODO parent to root: no selection
-
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
 // TODO Pdf viewer: PdViewer in Gtk4DotNet
 // TODO Pdf viewer

@@ -27,9 +27,15 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
     public int HiddenFiles => 0;
 
-    public bool CheckRestriction(string searchKey) => false;
+    public bool CheckRestriction(string searchKey)
+        => Items().Any(n => n.Name.StartsWith(searchKey, StringComparison.CurrentCultureIgnoreCase));
 
-    public Task<bool> CopyItems(string? targetPath, bool move) => false.ToAsync();
+    public Task<bool> CopyItems(string? targetPath, bool move) 
+    {
+        var copyProcessor = new CopyFromRemoteProcessor(CurrentPath, targetPath,
+            GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);
+        return copyProcessor.CopyItems(move);
+    }
 
     public Task CreateFolder() => Unit.Value.ToAsync();
 
@@ -45,13 +51,16 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
                 ipPath
                     .GetRequest()
                     .Get<RemoteItem[]>($"getfiles{ipPath.Path}", true)
-                    .Select(n => n.Select(n => new DirectoryItem(
-                        n.IsDirectory ? ItemKind.Folder : ItemKind.Item,
-                        n.Name,
-                        n.Size,
-                        n.IsDirectory,
-                        n.IsHidden,
-                        n.Time.FromUnixTime()))))
+                    .Select(n => n
+                        .OrderByDescending(n => n.IsDirectory)
+                        .ThenBy(n => n.Name)
+                        .Select(n => new DirectoryItem(
+                            n.IsDirectory ? ItemKind.Folder : ItemKind.Item,
+                            n.Name,
+                            n.Size,
+                            n.IsDirectory,
+                            n.IsHidden,
+                            n.Time.FromUnixTime()))))
             .SelectError(e => new RequestException(e))
             .GetOrThrowAsync();
         var oldPath = CurrentPath;
@@ -87,23 +96,30 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
     public int OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
     {
-        model.UnselectRange(pos, count);
-        return 0;
+        if (mouseButton && !mouseButtonCtrl && count == 1)
+            model.UnselectRange(pos, 1);
+
+        if (selectionModel != null)
+        {
+            var dirs = selectionModel.GetItems<DirectoryItem>().Where(n => n.IsDirectory).Count();
+            model.UnselectRange(0, dirs);
+        }
+        return GetSelectedItemsIndices().Count();
     }
 
     public async Task Rename()
     {
     }
 
-    public void SelectAll(FolderView folderView) { }
-    public void SelectCurrent(FolderView folderView) { }
-    public void SelectNone(FolderView folderView) { }
-    public void SelectToEnd(FolderView folderView) { }
-    public void SelectToStart(FolderView folderView) { }
+    public void SelectAll(FolderView folderView) => folderView.SelectAll();
+    public void SelectNone(FolderView folderView) => folderView.UnselectAll();
+    public void SelectCurrent(FolderView folderView) => folderView.SelectCurrent();
+    public void SelectToStart(FolderView folderView) => folderView.SelectToStart();
+    public void SelectToEnd(FolderView folderView) => folderView.SelectToEnd();
 
     #endregion
 
-    public RemoteController(FolderView folderView) : base()
+    public RemoteController(FolderView folderView) : base(folderView.GetSelectionModel())
     {
         EnableRubberband = true;
         folderView.SetController(this);
@@ -168,6 +184,25 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
     {
         var label = listItem.GetChild<LabelHandle>();
         label?.Set(item.Time.ToString() ?? "");
+    }
+
+    SelectedItemsType GetSelectedItemsType(int focusedItemPos)
+    {
+        var selItems = GetSelectedItems();
+        var files = selItems.Count(n => n.Kind == ItemKind.Item);
+        var result = files > 1
+            ? SelectedItemsType.Files
+            : files == 1
+            ? SelectedItemsType.File
+            : SelectedItemsType.None;
+        if (result != SelectedItemsType.None)
+            return result;
+        var focusedItem = Items().Skip(focusedItemPos).FirstOrDefault();
+        return focusedItem?.Kind switch
+        {
+            ItemKind.Item => SelectedItemsType.File,
+            _ => SelectedItemsType.None
+        };
     }
 
     int FindPos(Func<DirectoryItem, bool> predicate)
