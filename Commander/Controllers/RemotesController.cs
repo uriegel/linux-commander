@@ -1,6 +1,5 @@
 using Commander.Settings;
 using Commander.UI;
-using CsTools;
 using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.Controls;

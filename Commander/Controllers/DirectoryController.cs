@@ -26,6 +26,8 @@ namespace Commander.Controllers;
 
 // TODO When item is opened wait till process stops and refresh item
 
+// TODO Rename remote
+
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
     #region IController

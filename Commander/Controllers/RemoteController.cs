@@ -13,6 +13,10 @@ using Commander.DataContexts;
 
 namespace Commander.Controllers;
 
+// TODO Delete
+// TODO createFolder
+// TODO Switch phone off (text)
+
 class RemoteController : ControllerBase<DirectoryItem>, IController
 {
     #region IController
