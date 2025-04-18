@@ -30,11 +30,16 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
     public bool CheckRestriction(string searchKey)
         => Items().Any(n => n.Name.StartsWith(searchKey, StringComparison.CurrentCultureIgnoreCase));
 
-    public Task<bool> CopyItems(string? targetPath, bool move) 
+    public Task<bool> CopyItems(string? targetPath, bool move)
     {
-        var copyProcessor = new CopyFromRemoteProcessor(CurrentPath, targetPath,
-            GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);
-        return copyProcessor.CopyItems(move);
+        if (!move)
+        {
+            var copyProcessor = new CopyFromRemoteProcessor(CurrentPath, targetPath,
+                GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);
+            return copyProcessor.CopyItems(move);
+        }
+        else
+            return false.ToAsync();
     }
 
     public Task CreateFolder() => Unit.Value.ToAsync();

@@ -71,7 +71,6 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         }
     }
 
-    // TODO overwrite in CoopyFromRemote
     protected virtual CopyItem[] MakeCopyItems(IEnumerable<Item> items, string sourcePath, string targetPath)
         => [.. items.SelectFilterNull(n => CreateCopyItem(n, sourcePath, targetPath))];
 
