@@ -31,7 +31,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         };
 
         var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
-        var copyItems = MakeCopyItems(selectedItems.Flatten(sourcePath), sourcePath, targetPath);
+        var copyItems = MakeCopyItems(MakeSourceCopyItems(selectedItems, sourcePath), targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         if (conflicts.Length > 0)
         {
@@ -71,24 +71,29 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         }
     }
 
-    protected virtual CopyItem[] MakeCopyItems(IEnumerable<Item> items, string sourcePath, string targetPath)
-        => [.. items.SelectFilterNull(n => CreateCopyItem(n, sourcePath, targetPath))];
-
-    protected virtual CopyItem? CreateCopyItem(Item source, string sourcePath, string targetPath)
+    protected virtual IEnumerable<Item> MakeSourceCopyItems(IEnumerable<DirectoryItem> items, string sourcePath)
     {
-        var info = new FileInfo(sourcePath.AppendPath(source.Name));
-        var sourceOption = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
-        if (sourceOption != null)
-        {
-            info = new FileInfo(targetPath.AppendPath(source.Name));
-            var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
-            return new(sourceOption, target);
-        }
-        else
-            return null;
+        var dirs = items
+                        .Where(n => n.IsDirectory)
+                        .SelectMany(n => Flatten(n.Name, sourcePath));
+        var files = items
+                        .Where(n => !n.IsDirectory)
+                        .SelectFilterNull(n => ValidateFile(n.Name, sourcePath));
+        return dirs.Concat(files);
     }
 
-    async Task CopyItem(CopyItem item, byte[] buffer, CancellationToken cancellation)
+    protected virtual CopyItem[] MakeCopyItems(IEnumerable<Item> items, string targetPath)
+        => [.. items.Select(n => CreateCopyItem(n, targetPath))];
+
+    // TODO Check source Items
+    protected virtual CopyItem CreateCopyItem(Item source, string targetPath)
+    {
+        var info = new FileInfo(targetPath.AppendPath(source.Name));
+        var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
+        return new(source, target);
+    }
+
+    protected virtual async Task CopyItem(CopyItem item, byte[] buffer, CancellationToken cancellation)
     {
         var newFileName = targetPath.AppendPath(item.Source.Name);
         var tmpNewFileName = targetPath.AppendPath(item.Source.Name + TMP_POSTFIX);
@@ -113,40 +118,14 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
                     break;
                 target.Write(buffer, 0, Math.Min(read, buffer.Length));
             }
-        });
+        }, CancellationToken.None);
         using var gsf = GFile.New(sourcePath.AppendPath(item.Source.Name));
         using var gtf = GFile.New(tmpNewFileName);
         gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
         File.Move(tmpNewFileName, newFileName, true);
     }
 
-    async Task MoveItem(CopyItem item, CancellationToken cancellation)
-    {
-        using var file = GFile.New(sourcePath.AppendPath(item.Source.Name));
-        await file.MoveAsync(targetPath.AppendPath(item.Source.Name).EnsureFileDirectoryExists(),
-                                FileCopyFlags.Overwrite, true, (c, t) => CopyProgressContext.Instance.SetProgress(t, c), cancellation);
-    }
-
-    const string TMP_POSTFIX = "-tmp-commander";
-}
-
-record Item(string Name, long Size, DateTime DateTime);
-record CopyItem(Item Source, Item? Target);
-
-static partial class Extensions
-{
-    public static IEnumerable<Item> Flatten(this IEnumerable<DirectoryItem> items, string sourcePath)
-    {
-        var dirs = items
-                        .Where(n => n.IsDirectory)
-                        .SelectMany(n => Flatten(n.Name, sourcePath));
-        var files = items
-                        .Where(n => !n.IsDirectory)
-                        .SelectFilterNull(n => ValidateFile(n.Name, sourcePath));
-        return dirs.Concat(files);
-    }
-
-    public static IEnumerable<Item> Flatten(string item, string sourcePath)
+    static IEnumerable<Item> Flatten(string item, string sourcePath)
     {
         var info = new DirectoryInfo(sourcePath.AppendPath(item));
 
@@ -161,6 +140,7 @@ static partial class Extensions
             .OrderBy(n => n.Name)
             .Select(n => new Item(item.AppendPath(n.Name), n.Length, n.LastWriteTime));
         return dirs.Concat(files);
+
     }
 
     public static Item? ValidateFile(string subPath, string path)
@@ -171,6 +151,21 @@ static partial class Extensions
         return new Item(info.Name, info.Length, info.LastWriteTime);
     }
 
+    async Task MoveItem(CopyItem item, CancellationToken cancellation)
+    {
+        using var file = GFile.New(sourcePath.AppendPath(item.Source.Name));
+        await file.MoveAsync(targetPath.AppendPath(item.Source.Name).EnsureFileDirectoryExists(),
+                                FileCopyFlags.Overwrite, true, (c, t) => CopyProgressContext.Instance.SetProgress(t, c), cancellation);
+    }
+
+    public const string TMP_POSTFIX = "-tmp-commander";
+}
+
+record Item(string Name, long Size, DateTime DateTime);
+record CopyItem(Item Source, Item? Target);
+
+static partial class Extensions
+{
     public static void DeleteEmptyDirectories(this IEnumerable<string> dirs, string path)
     {
         foreach (var dir in dirs)
