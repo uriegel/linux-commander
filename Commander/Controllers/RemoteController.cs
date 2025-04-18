@@ -29,7 +29,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
     public bool CheckRestriction(string searchKey) => false;
 
-    public Task CopyItems(string? targetPath, bool move) => Unit.Value.ToAsync();
+    public Task<bool> CopyItems(string? targetPath, bool move) => false.ToAsync();
 
     public Task CreateFolder() => Unit.Value.ToAsync();
 

@@ -1,6 +1,6 @@
 using Commander.DataContexts;
 using Commander.UI;
-
+using CsTools.HttpRequest;
 using static System.Console;
 
 namespace Commander.Controllers;
@@ -26,7 +26,7 @@ class FolderController
     public Task DeleteItems() => controller.DeleteItems();
     public Task Rename() => controller.Rename();
     public Task CreateFolder() => controller.CreateFolder();
-    public Task CopyItems(string? targetPath, bool move) => controller.CopyItems(targetPath, move);
+    public Task<bool> CopyItems(string? targetPath, bool move) => controller.CopyItems(targetPath, move);
 
     public async void OnActivate(int pos)
     {
@@ -58,20 +58,41 @@ class FolderController
                 folderView.Context.CurrentPath = controller.CurrentPath;
                 folderView.OnPathChanged(saveHistory ? CurrentPath : null);
             }
+            catch (UnauthorizedAccessException uae)
+            {
+                OnError(uae);
+                MainContext.Instance.ErrorText = "Kein Zugriff";
+            }
+            catch (DirectoryNotFoundException dnfe)
+            {
+                OnError(dnfe);
+                MainContext.Instance.ErrorText = "Pfad nicht gefunden";
+            }
+            catch (RequestException re) when (re.CustomRequestError == CustomRequestError.ConnectionError)
+            {
+                OnError(re);
+                MainContext.Instance.ErrorText = "Die Verbindung zum Gerät konnte nicht aufgebaut werden";
+            }
+            catch (RequestException re) when (re.CustomRequestError == CustomRequestError.NameResolutionError)
+            {
+                OnError(re);
+                MainContext.Instance.ErrorText = "Der Netzwerkname des Gerätes konnte nicht ermittelt werden";
+            }
             catch (Exception e)
             {
-                if (e is UnauthorizedAccessException)
-                    MainContext.Instance.ErrorText = "Kein Zugriff";
-                else if (e is DirectoryNotFoundException)
-                    MainContext.Instance.ErrorText = "Pfad nicht gefunden";    
-                else
-                    MainContext.Instance.ErrorText = "Ordner konnte nicht gewechselt werden";
-                var refreshPath = folderView.Context.CurrentPath;
-                folderView.Context.CurrentPath = "";
-                folderView.Context.CurrentPath = refreshPath;
-                ChangePath(folderView.Context.CurrentPath, false);
-                Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
+                OnError(e);
+                MainContext.Instance.ErrorText = "Ordner konnte nicht gewechselt werden";
             }
+        }
+
+        void OnError(Exception e)
+        {
+            var refreshPath = folderView.Context.CurrentPath;
+            folderView.Context.CurrentPath = "";
+            folderView.Context.CurrentPath = refreshPath;
+            ChangePath(folderView.Context.CurrentPath, false);
+            folderView.GrabFocus();
+            Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
         }
     }
 

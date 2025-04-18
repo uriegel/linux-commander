@@ -11,10 +11,10 @@ namespace Commander.Controllers;
 
 class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType selectedItemsType, DirectoryItem[] selectedItems)
 {
-    public async Task CopyItems(bool move)
+    public async Task<bool> CopyItems(bool move)
     {
         if (targetPath?.StartsWith('/') != true || string.Compare(sourcePath, targetPath, StringComparison.CurrentCultureIgnoreCase) == 0)
-            return;
+            return false;
 
         var copyText = move ? "verschieben" : "kopieren";
         var copyTextCapitel = move ? "Verschieben" : "Kopieren";
@@ -62,6 +62,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
 
             if (move)
                 dirs.DeleteEmptyDirectories(sourcePath);
+            return true;
         }
         finally
         {

@@ -12,6 +12,9 @@ namespace Commander.Controllers;
 
 // TODO RemoteController
 
+// TODO Padding in columns
+// TODO Size column with dots
+
 // TODO extended rename
 
 // TODO parent to root: no selection
@@ -98,7 +101,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         } ?? throw new TaskCanceledException();
         var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();
         var newFile = await TextDialog.ShowAsync("Umbennen?", text, item?.Name, () => (0, item?.Name?.LastIndexOf('.') ?? 0));
-        if  (newFile != null)
+        if (newFile != null)
         {
             if (item != null && !string.IsNullOrWhiteSpace(text))
             {
@@ -136,7 +139,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             throw new TaskCanceledException();
     }
 
-    public Task CopyItems(string? targetPath, bool move)
+    public Task<bool> CopyItems(string? targetPath, bool move)
     {
         var copyProcessor = new CopyProcessor(CurrentPath, targetPath,
             GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);

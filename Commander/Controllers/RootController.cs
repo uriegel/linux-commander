@@ -131,6 +131,7 @@ class RootController : ControllerBase<RootItem>, IController
                 Title = "Mountpoint",
                 Expanded = true,
                 Resizeable = true,
+                OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End),
                 OnLabelBind = i => i.DriveKind == DriveKind.Unknown ? "" : i.MountPoint ?? ""
             },
             new()
@@ -167,7 +168,7 @@ class RootController : ControllerBase<RootItem>, IController
 
     public Task Rename() => Unit.Value.ToAsync();
     public Task CreateFolder() => Unit.Value.ToAsync();
-    public Task CopyItems(string? _, bool __) => Unit.Value.ToAsync();
+    public Task<bool> CopyItems(string? targetPath, bool move) => false.ToAsync();
 
     async Task<RootItem[]> GetRootItems()
     {

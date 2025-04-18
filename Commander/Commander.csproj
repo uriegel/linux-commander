@@ -15,6 +15,15 @@
     <PackageReference Include="Gtk4DotNet" Version="7.0.57-beta-57" />
     <PackageReference Include="WebServerLight" Version="0.0.15-beta-15" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
+
+
+
+
+
+<PackageReference Include="CsTools" Version="7.25.3" />
+
+
+
   </ItemGroup>
 
   <ItemGroup>

@@ -145,8 +145,7 @@ class FolderView : ColumnViewSubClassed
     {
         try
         {
-            await controller.CopyItems(targetPath, move);
-            return true;
+            return await controller.CopyItems(targetPath, move);
         }
         catch (TaskCanceledException)
         {
