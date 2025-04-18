@@ -151,9 +151,13 @@ class FolderView : ColumnViewSubClassed
         {
             return true;
         }
-        catch (GFileException e)
+        catch (GFileException gfe)
         {
-            MainContext.Instance.ErrorText = e.Message;
+            MainContext.Instance.ErrorText = gfe.Message;
+            return false;
+        }
+        catch (RequestException e)
+        {
             return false;
         }
     }

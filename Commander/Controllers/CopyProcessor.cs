@@ -9,8 +9,16 @@ using CsTools;
 
 namespace Commander.Controllers;
 
-class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType selectedItemsType, DirectoryItem[] selectedItems)
+class CopyProcessor
 {
+    public CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType selectedItemsType, DirectoryItem[] selectedItems)
+    {
+        this.sourcePath = sourcePath;
+        this.targetPath = targetPath;
+        this.selectedItemsType = selectedItemsType;
+        this.selectedItems = selectedItems;
+    }
+
     public async Task<bool> CopyItems(bool move)
     {
         if (targetPath?.StartsWith('/') != true
@@ -23,8 +31,8 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         var text = selectedItemsType switch
         {
             SelectedItemsType.Both => "Möchtest Du die markierten Einträge " + copyText + "?",
-            SelectedItemsType.Files => "Möchtest Du die markierten Dateien " + copyText + "?", 
-            SelectedItemsType.Folders => "Möchtest Du die markierten Verzeichnisse " + copyText + "?", 
+            SelectedItemsType.Files => "Möchtest Du die markierten Dateien " + copyText + "?",
+            SelectedItemsType.Folders => "Möchtest Du die markierten Verzeichnisse " + copyText + "?",
             SelectedItemsType.File => "Möchtest Du die markierte Datei " + copyText + "?",
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis " + copyText + "?",
             _ => ""
@@ -159,7 +167,11 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
     }
 
     public const string TMP_POSTFIX = "-tmp-commander";
-}
+
+    protected string sourcePath;
+    protected string? targetPath;
+    SelectedItemsType selectedItemsType;
+    DirectoryItem[] selectedItems;}
 
 record Item(string Name, long Size, DateTime DateTime);
 record CopyItem(Item Source, Item? Target);
