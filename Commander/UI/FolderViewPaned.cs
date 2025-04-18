@@ -51,7 +51,7 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
         try
         {
             CopyProgressContext.Instance.SetRunning();
-            if (folderViewActive != null && await folderViewActive.CopyItems(GetInactiveFolderView()?.Context.CurrentPath, move))
+            if (folderViewActive != null && await folderViewActive.CopyItems(GetInactiveFolderView()?.Context.CurrentPath, move) == true)
             {
                 inactive?.Refresh();
                 if (move)

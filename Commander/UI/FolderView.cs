@@ -95,10 +95,9 @@ class FolderView : ColumnViewSubClassed
     {
         try
         {
-            await controller.DeleteItems();
-            Refresh();
+            if (await controller.DeleteItems())
+                Refresh();
         }
-        catch (TaskCanceledException) { }
         catch (GFileException e)
         {
             MainContext.Instance.ErrorText = e.Message;
@@ -109,10 +108,9 @@ class FolderView : ColumnViewSubClassed
     {
         try
         {
-            await controller.Rename();
-            Refresh();
+            if (await controller.Rename())
+                Refresh();
         }
-        catch (TaskCanceledException) { }
         catch (IOException e) when (e.HResult == 13)
         {
             MainContext.Instance.ErrorText = "Kein Zugriff";
@@ -127,10 +125,9 @@ class FolderView : ColumnViewSubClassed
     {
         try
         {
-            await controller.CreateFolder();
-            Refresh();
+            if (await controller.CreateFolder())
+                Refresh();
         }
-        catch (TaskCanceledException) { }
         catch (UnauthorizedAccessException)
         {
             MainContext.Instance.ErrorText = "Kein Zugriff";

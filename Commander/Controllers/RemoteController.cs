@@ -42,10 +42,11 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
             return false.ToAsync();
     }
 
-    public Task CreateFolder() => Unit.Value.ToAsync();
+    public Task<bool> CreateFolder() => false.ToAsync();
 
-    public async Task DeleteItems()
+    public async Task<bool> DeleteItems()
     {
+        return false;
     }
 
     public async Task<int> Fill(string path, FolderView folderView)
@@ -111,8 +112,9 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
         return GetSelectedItemsIndices().Count();
     }
 
-    public async Task Rename()
+    public async Task<bool> Rename()
     {
+        return false;
     }
 
     public void SelectAll(FolderView folderView) => folderView.SelectAll();

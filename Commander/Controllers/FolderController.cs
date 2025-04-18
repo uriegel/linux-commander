@@ -23,9 +23,9 @@ class FolderController
     public string? GetItemPath(int pos) => controller.GetItemPath(pos);
     public ExifData? GetExifData(int pos) => controller.GetExifData(pos);
 
-    public Task DeleteItems() => controller.DeleteItems();
-    public Task Rename() => controller.Rename();
-    public Task CreateFolder() => controller.CreateFolder();
+    public Task<bool> DeleteItems() => controller.DeleteItems();
+    public Task<bool> Rename() => controller.Rename();
+    public Task<bool> CreateFolder() => controller.CreateFolder();
     public Task<bool> CopyItems(string? targetPath, bool move) => controller.CopyItems(targetPath, move);
 
     public async void OnActivate(int pos)

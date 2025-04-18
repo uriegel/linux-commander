@@ -13,8 +13,6 @@ namespace Commander.Controllers;
 // TODO RemoteController
 // TODO CopyToRemoteController
 
-// TODO Cancel on  dialogs? return null, not TaskCanceledException!!! No banner
-
 // TODO Padding in columns
 // TODO Size column with dots
 
@@ -64,11 +62,11 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         return FindPos(n => n.Name == oldPath.SubstringAfterLast('/'));
     }
 
-    public async Task DeleteItems()
+    public async Task<bool> DeleteItems()
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());
         if (type == SelectedItemsType.None)
-            throw new TaskCanceledException();
+            return false;
         var text = type switch
         {
             SelectedItemsType.Both => "Möchtest Du die markierten Einträge löschen?",
@@ -86,39 +84,39 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 using var file = GFile.New(CurrentPath.AppendPath(item.Name));
                 await file.TrashAsync();
             }
+            return true;
         }
         else
-            throw new TaskCanceledException();
+            return false;
     }
 
-    public async Task Rename()
+    public async Task<bool> Rename()
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());
         if (type == SelectedItemsType.None)
-            throw new TaskCanceledException();
+            return false;
         var text = type switch
         {
             SelectedItemsType.File => "Möchtest Du die markierte Datei umbenennen?",
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis umbenennen?",
             _ => null
-        } ?? throw new TaskCanceledException();
+        };
+        if (text == null)
+            return false;
         var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();
         var newFile = await TextDialog.ShowAsync("Umbennen?", text, item?.Name, () => (0, item?.Name?.LastIndexOf('.') ?? 0));
-        if (newFile != null)
+        if (newFile != null && item != null && !string.IsNullOrWhiteSpace(text))
         {
-            if (item != null && !string.IsNullOrWhiteSpace(text))
-            {
-                if (item.IsDirectory)
-                    Directory.Move(CurrentPath.AppendPath(item.Name), CurrentPath.AppendPath(newFile));
-                else
-                    File.Move(CurrentPath.AppendPath(item.Name), CurrentPath.AppendPath(newFile));
-            }
+            if (item.IsDirectory)
+                Directory.Move(CurrentPath.AppendPath(item.Name), CurrentPath.AppendPath(newFile));
+            else
+                File.Move(CurrentPath.AppendPath(item.Name), CurrentPath.AppendPath(newFile));
+            return true;
         }
-        else
-            throw new TaskCanceledException();
+        return false;
     }
 
-    public async Task CreateFolder()
+    public async Task<bool> CreateFolder()
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());
         var text = "Möchtest Du einen neuen Ordner anlegen?";
@@ -136,10 +134,12 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         {
             var newFile = textView.GetText();
             if (item != null && !string.IsNullOrWhiteSpace(text))
+            {
                 Directory.CreateDirectory(CurrentPath.AppendPath(newFile));
+                return true;
+            }
         }
-        else
-            throw new TaskCanceledException();
+        return false;
     }
 
     public Task<bool> CopyItems(string? targetPath, bool move)

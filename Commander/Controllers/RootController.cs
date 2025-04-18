@@ -142,7 +142,7 @@ class RootController : ControllerBase<RootItem>, IController
                 OnLabelBind = i => i.Size != 0 ? i.Size.ToString() : ""
             }];
 
-    public async Task DeleteItems()
+    public async Task<bool> DeleteItems()
     {
         var pos = GetFocusedItemPos();
         var focusedItem = Items().Skip(pos).FirstOrDefault();
@@ -156,6 +156,7 @@ class RootController : ControllerBase<RootItem>, IController
                 {
                     using var mo = MountOperation.New();
                     await device.EjectAsync(UnmountFlags.Force, mo);
+                    return true;
                 }
                 catch (Exception e)
                 {
@@ -164,10 +165,11 @@ class RootController : ControllerBase<RootItem>, IController
                 }
             }
         }
+        return false;
     }
 
-    public Task Rename() => Unit.Value.ToAsync();
-    public Task CreateFolder() => Unit.Value.ToAsync();
+    public Task<bool> Rename() => false.ToAsync();
+    public Task<bool> CreateFolder() => false.ToAsync();
     public Task<bool> CopyItems(string? targetPath, bool move) => false.ToAsync();
 
     async Task<RootItem[]> GetRootItems()

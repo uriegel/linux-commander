@@ -51,7 +51,7 @@ class CopyProcessor
         {
             var response = await AlertDialog.PresentAsync(copyTextCapitel + "?", text);
             if (response != "ok")
-                throw new TaskCanceledException();
+                return false;
         }
         try
         {

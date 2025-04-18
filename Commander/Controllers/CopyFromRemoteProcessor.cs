@@ -12,7 +12,7 @@ namespace Commander.Controllers;
 
 // TODO Rename
 // TODO Delete
-// TODO Switch phne off (text)
+// TODO Switch phone off (text)
 
 class CopyFromRemoteProcessor : CopyProcessor
 {

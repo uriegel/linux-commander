@@ -28,17 +28,21 @@ class RemotesController : ControllerBase<RemotesItem>, IController
 
     public Task<bool> CopyItems(string? targetPath, bool move) => false.ToAsync();
 
-    public Task CreateFolder() => Unit.Value.ToAsync();
+    public Task<bool> CreateFolder() => false.ToAsync();
 
-    public async Task DeleteItems()
+    public async Task<bool> DeleteItems()
     {
         var item = GetItem(GetFocusedItemPos());
         if (item != null && item.IP != "")
         {
             var response = await AlertDialog.PresentAsync("Entfernen?", "Möchtest du das entfernte Gerät entfernen?");
             if (response == "ok")
+            {
                 Storage.DeleteRemote(item);
+                return true;
+            }
         }
+        return false;
     }
 
     public Task<int> Fill(string path, FolderView folderView)
@@ -90,15 +94,19 @@ class RemotesController : ControllerBase<RemotesItem>, IController
         return 0;
     }
 
-    public async Task Rename()
+    public async Task<bool> Rename()
     {
         var item = GetItem(GetFocusedItemPos());
         if (item != null && item.IP != "")
         {
             var newName = await TextDialog.ShowAsync("Umbennen?", "Möchtest du das entfernte Gerät umbenennen?", item.Name);
             if (newName != null)
+            {
                 Storage.ChangeRemote(item, newName);
+                return true;
+            }
         }
+        return false;
     }
 
     public void SelectAll(FolderView folderView) { }

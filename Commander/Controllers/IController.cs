@@ -19,9 +19,9 @@ interface IController : IDisposable
 
     Task<int> Fill(string path, FolderView folderView);
 
-    Task DeleteItems();
-    Task Rename();
-    Task CreateFolder();
+    Task<bool> DeleteItems();
+    Task<bool> Rename();
+    Task<bool> CreateFolder();
     Task<bool> CopyItems(string? targetPath, bool move);
     
     Task<string?> OnActivate(int pos);

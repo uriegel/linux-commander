@@ -1,6 +1,5 @@
 using Commander.Settings;
 using Commander.UI;
-using CsTools;
 using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.Controls;
@@ -28,17 +27,21 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
 
     public Task<bool> CopyItems(string? targetPath, bool move) => false.ToAsync();
 
-    public Task CreateFolder() => Unit.Value.ToAsync();
+    public Task<bool> CreateFolder() => false.ToAsync();
 
-    public async Task DeleteItems()
+    public async Task<bool> DeleteItems()
     {
         var item = GetItem(GetFocusedItemPos());
         if (item != null && item.Path != "")
         {
             var response = await AlertDialog.PresentAsync("Löschen?", "Möchtest du den Favoriten löschen?");
             if (response == "ok")
+            {
                 Storage.DeleteFavorite(item);
+                return true;
+            }
         }
+        return false;
     }
 
     public Task<int> Fill(string path, FolderView folderView)
@@ -91,15 +94,19 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
         return 0;
     }
 
-    public async Task Rename()
+    public async Task<bool> Rename()
     {
         var item = GetItem(GetFocusedItemPos());
         if (item != null && item.Path != "")
         {
             var newName = await TextDialog.ShowAsync("Umbennen?", "Möchtest du den Favoriten umbenennen?", item.Name);
             if (newName != null)
+            {
                 Storage.ChangeFavorite(item, newName);
+                return true;
+            }
         }
+        return false;
     }
 
     public void SelectAll(FolderView folderView) { }
