@@ -23,6 +23,8 @@ namespace Commander.Controllers;
 // TODO Text viewer/editor
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
 
+// TODO When item is opened wait till process stops and refresh item
+
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
     #region IController

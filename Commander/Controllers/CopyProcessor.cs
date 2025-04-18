@@ -31,7 +31,7 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
         };
 
         var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
-        var copyItems = MakeCopyItems(selectedItems.Flatten(sourcePath), targetPath);
+        var copyItems = MakeCopyItems(selectedItems.Flatten(sourcePath), sourcePath, targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         if (conflicts.Length > 0)
         {
@@ -72,15 +72,21 @@ class CopyProcessor(string sourcePath, string? targetPath, SelectedItemsType sel
     }
 
     // TODO overwrite in CoopyFromRemote
-    protected virtual CopyItem[] MakeCopyItems(IEnumerable<Item> items, string targetPath)
-        => [.. items.Select(n => CreateCopyItem(n, targetPath))];
+    protected virtual CopyItem[] MakeCopyItems(IEnumerable<Item> items, string sourcePath, string targetPath)
+        => [.. items.SelectFilterNull(n => CreateCopyItem(n, sourcePath, targetPath))];
 
-    // TODO Check source Items
-    protected virtual CopyItem CreateCopyItem(Item source, string targetPath)
+    protected virtual CopyItem? CreateCopyItem(Item source, string sourcePath, string targetPath)
     {
-        var info = new FileInfo(targetPath.AppendPath(source.Name));
-        var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
-        return new(source, target);
+        var info = new FileInfo(sourcePath.AppendPath(source.Name));
+        var sourceOption = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
+        if (sourceOption != null)
+        {
+            info = new FileInfo(targetPath.AppendPath(source.Name));
+            var target = info.Exists ? new Item(info.Name, info.Length, info.LastWriteTime) : null;
+            return new(sourceOption, target);
+        }
+        else
+            return null;
     }
 
     async Task CopyItem(CopyItem item, byte[] buffer, CancellationToken cancellation)
