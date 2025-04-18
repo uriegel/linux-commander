@@ -66,8 +66,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
                             n.IsDirectory,
                             n.IsHidden,
                             n.Time.FromUnixTime()))))
-            .SelectError(e => new RequestException(e))
-            .GetOrThrowAsync();
+            .HttpGetOrThrowAsync();
         var oldPath = CurrentPath;
         CurrentPath = path;
         Insert(ConcatEnumerables([new DirectoryItem(ItemKind.Parent, "..", 0, true, false, null)], result));

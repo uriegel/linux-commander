@@ -20,7 +20,7 @@
 
 
 
-<PackageReference Include="CsTools" Version="7.25.3" />
+<PackageReference Include="CsTools" Version="7.25.5" />
 
 
 

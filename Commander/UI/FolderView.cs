@@ -149,6 +149,7 @@ class FolderView : ColumnViewSubClassed
         }
         catch (TaskCanceledException)
         {
+            MainContext.Instance.ErrorText = "Kopiervorgang abgebrochen...";
             return true;
         }
         catch (GFileException gfe)
@@ -156,8 +157,14 @@ class FolderView : ColumnViewSubClassed
             MainContext.Instance.ErrorText = gfe.Message;
             return false;
         }
-        catch (RequestException e)
+        catch (RequestException re)
         {
+            MainContext.Instance.ErrorText = re.Message;
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Affe {e}");
             return false;
         }
     }

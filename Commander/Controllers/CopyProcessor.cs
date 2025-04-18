@@ -93,7 +93,6 @@ class CopyProcessor
     protected virtual CopyItem[] MakeCopyItems(IEnumerable<Item> items, string targetPath)
         => [.. items.Select(n => CreateCopyItem(n, targetPath))];
 
-    // TODO Check source Items
     protected virtual CopyItem CreateCopyItem(Item source, string targetPath)
     {
         var info = new FileInfo(targetPath.AppendPath(source.Name));

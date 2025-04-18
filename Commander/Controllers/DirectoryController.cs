@@ -11,6 +11,9 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 namespace Commander.Controllers;
 
 // TODO RemoteController
+// TODO CopyToRemoteController
+
+// TODO Cancel on  dialogs? return null, not TaskCanceledException!!! No banner
 
 // TODO Padding in columns
 // TODO Size column with dots

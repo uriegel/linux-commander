@@ -20,7 +20,7 @@ class CopyProgressContext : INotifyPropertyChanged
     {
         var cp = copyProgress as CopyProgress;
         return (cp != null && cp.Duration > ThreeSeconds)
-            ? cp.Duration / (double)GetTotalFraction(copyProgress)
+            ? (cp.Duration / (double)GetTotalFraction(copyProgress)) - cp.Duration
             : TimeSpan.FromMilliseconds(0);
     }
 
