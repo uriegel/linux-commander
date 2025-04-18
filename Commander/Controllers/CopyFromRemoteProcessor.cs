@@ -12,6 +12,7 @@ namespace Commander.Controllers;
 
 // TODO Rename
 // TODO Delete
+// TODO createFolder
 // TODO Switch phone off (text)
 
 class CopyFromRemoteProcessor : CopyProcessor
