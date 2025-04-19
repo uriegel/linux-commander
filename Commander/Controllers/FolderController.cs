@@ -87,10 +87,13 @@ class FolderController
 
         void OnError(Exception e)
         {
-            var refreshPath = folderView.Context.CurrentPath;
-            folderView.Context.CurrentPath = "";
-            folderView.Context.CurrentPath = refreshPath;
-            ChangePath(folderView.Context.CurrentPath, false);
+            if (!folderView.Context.CurrentPath.StartsWith("remote/"))
+            {
+                var refreshPath = folderView.Context.CurrentPath;
+                folderView.Context.CurrentPath = "";
+                folderView.Context.CurrentPath = refreshPath;
+                ChangePath(folderView.Context.CurrentPath, false);
+            }
             folderView.GrabFocus();
             Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
         }

@@ -38,6 +38,8 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
     }
 
     public void DeleteItems() => folderViewActive?.DeleteItems();
+
+    public void ShowFavorites() => folderViewActive?.ShowFavorites();
     public void Rename() => folderViewActive?.Rename();
     public void CreateFolder() => folderViewActive?.CreateFolder();
     public async void CopyItems(bool move)

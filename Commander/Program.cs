@@ -6,10 +6,9 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
-// TODO Copy cancel: 2 cancel actions! check remote copy too (when phone is switched off)
-// TODO Remote Delete, delete folder with Progress
-// TODO Remote  Switch phone off (text)
 // TODO Viewer show pictures and media from remote
+
+// TODO Remote Delete, delete folder with Progress
 // TODO Padding in columns
 // TODO Size column with dots
 // TODO 0 Size in root

@@ -104,6 +104,8 @@ class FolderView : ColumnViewSubClassed
         }
     }
 
+    public void ShowFavorites() => ChangePath("fav", true);
+
     public async void Rename()
     {
         try
@@ -146,7 +148,8 @@ class FolderView : ColumnViewSubClassed
         }
         catch (TaskCanceledException)
         {
-            MainContext.Instance.ErrorText = "Kopiervorgang abgebrochen...";
+            if (CopyProgressContext.Instance.CopyProgress != null)
+                MainContext.Instance.ErrorText = "Kopiervorgang ist unterbrochen worden...";
             return true;
         }
         catch (GFileException gfe)
@@ -161,7 +164,7 @@ class FolderView : ColumnViewSubClassed
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Affe {e}");
+            Console.WriteLine(e);
             return false;
         }
     }

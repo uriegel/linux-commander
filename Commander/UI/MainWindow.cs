@@ -67,6 +67,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
 
         Handle.AddActions(
             [
+                new("favorites", paned.ShowFavorites, "F1"),
                 new("rename", paned.Rename, "F2"),
                 new("toggleViewMode", Viewer.ToggleView, "<Ctrl>F3"),
                 new("showpreview", false, show => Viewer.Show(Handle, viewer, show), "F3"),

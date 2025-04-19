@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Commander.UI;
 
 namespace Commander.DataContexts;
 
@@ -121,9 +122,10 @@ class CopyProgressContext : INotifyPropertyChanged
 
     public static void Cancel()
     {
-        MainContext.Instance.InfoText = "Hintergrundaktion wird abgebrochen...";
+        MainContext.Instance.InfoText = "Kopiervorgang wird abgebrochen...";
         Instance.cts?.Cancel();
         Instance.CopyProgress = null;
+        FolderViewPaned.Instance.GetActiveFolderView()?.GrabFocus();
     }
 
     public void SetProgress(long totalSize, long size)
