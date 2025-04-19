@@ -20,7 +20,7 @@ function setPath(path: string, latitude?: number, longitude?: number) {
         trackViewer.classList.add("hidden")
         viewer.classList.remove("hidden")
         
-        viewer.path = `/getfile?path=${path}`
+        viewer.path = path.startsWith("http") ? path :  `/getfile?path=${path}`
         viewer.location = latitude && longitude ? { latitude, longitude } : null
     }
     else if (isMedia(path)) {
@@ -28,7 +28,7 @@ function setPath(path: string, latitude?: number, longitude?: number) {
         trackViewer.classList.add("hidden")
         mediaPlayer.classList.remove("hidden")
         
-        mediaPlayer.src = `/getfile?path=${path}`
+        mediaPlayer.src = path.startsWith("http") ? path :  `/getfile?path=${path}`
     }
     else if (isTrack(path)) {
         viewer.classList.add("hidden")

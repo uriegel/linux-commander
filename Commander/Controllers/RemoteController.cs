@@ -17,7 +17,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 {
     #region IController
 
-    public string CurrentPath { get; private set; } = "remote";
+    public string CurrentPath { get; private set; } = "";
 
     public int Directories { get; private set; }
 
@@ -106,7 +106,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
     public ExifData? GetExifData(int pos) => null;
 
-    public string? GetItemPath(int pos) => null;
+    public string? GetItemPath(int pos) => CurrentPath.GetIpAndPath().Pipe(ipPath => $"http://{ipPath.Ip}:8080/getfile{ipPath.Path.CombineRemotePath(GetItem(pos)?.Name ?? "")}");
 
     public Task<string?> OnActivate(int pos)
     {

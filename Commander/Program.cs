@@ -6,14 +6,12 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
-// TODO Viewer show pictures and media from remote
-//? `http://${path.stringBetween("/", "/")}/getfile/${path.substringAfter("/").substringAfter("/")}`
-//: `http://localhost:${getPort()}/getfile?path=${path}`
-        
 // TODO Remote Delete, delete folder with Progress
 // TODO Padding in columns
 // TODO Size column with dots
 // TODO 0 Size in root
+
+// TODO Viewer: Press F3 and the image has to be shown
 
 // TODO extended rename
 
@@ -27,6 +25,8 @@ using Commander.UI;
 
 // TODO Rename remote
 // TODO remote copy to with directories
+
+// TODO Android range
 
 {
     Gtk.ShowDiagnostics();
