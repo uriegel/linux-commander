@@ -13,9 +13,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO Delete, delete folder
-// TODO Switch phone off (text)
-
 class RemoteController : ControllerBase<DirectoryItem>, IController
 {
     #region IController

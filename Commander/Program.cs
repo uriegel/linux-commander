@@ -6,6 +6,9 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
+// TODO Copy cancel: 2 cancel actions! check remote copy too (when phone is switched off)
+// TODO Remote Delete, delete folder with Progress
+// TODO Remote  Switch phone off (text)
 // TODO Viewer show pictures and media from remote
 // TODO Padding in columns
 // TODO Size column with dots
@@ -22,7 +25,7 @@ using Commander.UI;
 // TODO When item is opened wait till process stops and refresh item
 
 // TODO Rename remote
-// TODO remote copy from and to
+// TODO remote copy to with directories
 
 {
     Gtk.ShowDiagnostics();
