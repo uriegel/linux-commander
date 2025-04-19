@@ -6,6 +6,24 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
+// TODO Viewer show pictures and media from remote
+// TODO Padding in columns
+// TODO Size column with dots
+// TODO 0 Size in root
+
+// TODO extended rename
+
+// TODO Pdf viewer: PdViewer in WebWindowNetCore
+// TODO Pdf viewer: PdViewer in Gtk4DotNet
+// TODO Pdf viewer
+// TODO Text viewer/editor
+// TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
+
+// TODO When item is opened wait till process stops and refresh item
+
+// TODO Rename remote
+// TODO remote copy from and to
+
 {
     Gtk.ShowDiagnostics();
 

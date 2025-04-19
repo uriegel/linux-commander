@@ -10,24 +10,6 @@ using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
-// TODO RemoteController
-// TODO CopyToRemoteController
-
-// TODO Padding in columns
-// TODO Size column with dots
-
-// TODO extended rename
-
-// TODO Pdf viewer: PdViewer in WebWindowNetCore
-// TODO Pdf viewer: PdViewer in Gtk4DotNet
-// TODO Pdf viewer
-// TODO Text viewer/editor
-// TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
-
-// TODO When item is opened wait till process stops and refresh item
-
-// TODO Rename remote
-
 class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposable
 {
     #region IController
@@ -146,9 +128,20 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public Task<bool> CopyItems(string? targetPath, bool move)
     {
-        var copyProcessor = new CopyProcessor(CurrentPath, targetPath,
-            GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);
-        return copyProcessor.CopyItems(move);
+        if (targetPath?.StartsWith("remote/") != true)
+        {
+            var copyProcessor = new CopyProcessor(CurrentPath, targetPath,
+                GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);
+            return copyProcessor.CopyItems(move);
+        }
+        else if (!move)
+        {
+            var copyProcessor = new CopyToRemoteProcessor(CurrentPath, targetPath,
+                GetSelectedItemsType(GetFocusedItemPos()), [.. GetSelectedItems(GetFocusedItemPos())]);
+            return copyProcessor.CopyItems(false);
+        }
+        else
+            return false.ToAsync();
     }
 
     public Task<string?> OnActivate(int pos)

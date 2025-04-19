@@ -21,7 +21,7 @@ class CopyProcessor
 
     public async Task<bool> CopyItems(bool move)
     {
-        if (targetPath?.StartsWith('/') != true
+        if ((targetPath?.StartsWith('/') != true && targetPath?.StartsWith("remote/") != true)
                 || string.Compare(sourcePath, targetPath, StringComparison.CurrentCultureIgnoreCase) == 0
                 || selectedItemsType == SelectedItemsType.None)
             return false;
