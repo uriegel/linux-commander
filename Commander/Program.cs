@@ -7,7 +7,9 @@ using Commander.Settings;
 using Commander.UI;
 
 // TODO Viewer show pictures and media from remote
-
+//? `http://${path.stringBetween("/", "/")}/getfile/${path.substringAfter("/").substringAfter("/")}`
+//: `http://localhost:${getPort()}/getfile?path=${path}`
+        
 // TODO Remote Delete, delete folder with Progress
 // TODO Padding in columns
 // TODO Size column with dots
