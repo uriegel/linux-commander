@@ -1,20 +1,19 @@
 using Commander.Enums;
 using Commander.UI;
-using CsTools;
 using CsTools.Extensions;
 using CsTools.Functional;
 using CsTools.HttpRequest;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
-
-using static GtkDotNet.Controls.ColumnViewSubClassed;
-using static CsTools.Extensions.Core;
 using Commander.DataContexts;
+
+using static CsTools.HttpRequest.Core;
+using static CsTools.Extensions.Core;
+using static GtkDotNet.Controls.ColumnViewSubClassed;
 
 namespace Commander.Controllers;
 
 // TODO Delete
-// TODO createFolder
 // TODO Switch phone off (text)
 
 class RemoteController : ControllerBase<DirectoryItem>, IController
@@ -46,7 +45,34 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
             return false.ToAsync();
     }
 
-    public Task<bool> CreateFolder() => false.ToAsync();
+    public async Task<bool> CreateFolder()
+    {
+        var type = GetSelectedItemsType(GetFocusedItemPos());
+        var text = "Möchtest Du einen neuen Ordner anlegen?";
+        var builder = Builder.FromDotNetResource("textdialog");
+        var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
+        var textView = builder.GetWidget<EntryHandle>("text");
+        dialog.Heading("Ordner anlegen?");
+        dialog.Body(text);
+        var item = GetSelectedItems(GetFocusedItemPos()).FirstOrDefault();
+        textView.Text(item?.Kind == ItemKind.Folder ? item.Name : "");
+        dialog.OnMap(textView.GrabFocus);
+
+        var response = await dialog.PresentAsync(MainWindow.MainWindowHandle);
+        if (response == "ok")
+        {
+            var newFile = textView.GetText();
+            if (newFile != null && item != null && !string.IsNullOrWhiteSpace(text))
+            {
+                await Request
+                    .Run(CurrentPath.CombineRemotePath(newFile).GetIpAndPath().PostCreateDirectory(), true)
+                    .HttpGetOrThrowAsync();
+
+                return true;
+            }
+        }
+        return false;
+    }
 
     public async Task<bool> DeleteItems()
     {
@@ -252,6 +278,14 @@ static partial class Extensions
             : subPath.StartsWith('/')
                 ? path + subPath
                 : path + '/' + subPath;
+
+    public static CsTools.HttpRequest.Settings PostCreateDirectory(this IpAndPath ipAndPath) 
+        => DefaultSettings with
+        {
+            Method = HttpMethod.Post,
+            BaseUrl = $"http://{ipAndPath.Ip}:8080",
+            Url = $"/createdirectory/{ipAndPath.Path}",
+        };    
 
     public static string UpOne(this string path)
         => path[7..].Contains('/')
