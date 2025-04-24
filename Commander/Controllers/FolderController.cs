@@ -45,44 +45,41 @@ class FolderController
     public async void ChangePath(string path, bool saveHistory)
     {
         DetectController(path);
-        if (controller != null)
+        try
         {
-            try
-            {
-                controller.RemoveAll();
-                var lastPos = await controller.Fill(path, folderView);
-                if (lastPos != -1)
-                    folderView.ScrollTo(lastPos);
-                folderView.Context.CurrentDirectories = Actions.Instance.ShowHidden ? controller.Directories + controller.HiddenDirectories : controller.Directories;
-                folderView.Context.CurrentFiles = Actions.Instance.ShowHidden ? controller.Files + controller.Files : controller.Files;
-                folderView.Context.CurrentPath = controller.CurrentPath;
-                folderView.OnPathChanged(saveHistory ? CurrentPath : null);
-            }
-            catch (UnauthorizedAccessException uae)
-            {
-                OnError(uae);
-                MainContext.Instance.ErrorText = "Kein Zugriff";
-            }
-            catch (DirectoryNotFoundException dnfe)
-            {
-                OnError(dnfe);
-                MainContext.Instance.ErrorText = "Pfad nicht gefunden";
-            }
-            catch (RequestException re) when (re.CustomRequestError == CustomRequestError.ConnectionError)
-            {
-                OnError(re);
-                MainContext.Instance.ErrorText = "Die Verbindung zum Gerät konnte nicht aufgebaut werden";
-            }
-            catch (RequestException re) when (re.CustomRequestError == CustomRequestError.NameResolutionError)
-            {
-                OnError(re);
-                MainContext.Instance.ErrorText = "Der Netzwerkname des Gerätes konnte nicht ermittelt werden";
-            }
-            catch (Exception e)
-            {
-                OnError(e);
-                MainContext.Instance.ErrorText = "Ordner konnte nicht gewechselt werden";
-            }
+            controller.RemoveAll();
+            var lastPos = await controller.Fill(path, folderView);
+            if (lastPos != -1)
+                folderView.ScrollTo(lastPos);
+            folderView.Context.CurrentDirectories = Actions.Instance.ShowHidden ? controller.Directories + controller.HiddenDirectories : controller.Directories;
+            folderView.Context.CurrentFiles = Actions.Instance.ShowHidden ? controller.Files + controller.Files : controller.Files;
+            folderView.Context.CurrentPath = controller.CurrentPath;
+            folderView.OnPathChanged(saveHistory ? CurrentPath : null);
+        }
+        catch (UnauthorizedAccessException uae)
+        {
+            OnError(uae);
+            MainContext.Instance.ErrorText = "Kein Zugriff";
+        }
+        catch (DirectoryNotFoundException dnfe)
+        {
+            OnError(dnfe);
+            MainContext.Instance.ErrorText = "Pfad nicht gefunden";
+        }
+        catch (RequestException re) when (re.CustomRequestError == CustomRequestError.ConnectionError)
+        {
+            OnError(re);
+            MainContext.Instance.ErrorText = "Die Verbindung zum Gerät konnte nicht aufgebaut werden";
+        }
+        catch (RequestException re) when (re.CustomRequestError == CustomRequestError.NameResolutionError)
+        {
+            OnError(re);
+            MainContext.Instance.ErrorText = "Der Netzwerkname des Gerätes konnte nicht ermittelt werden";
+        }
+        catch (Exception e)
+        {
+            OnError(e);
+            MainContext.Instance.ErrorText = "Ordner konnte nicht gewechselt werden";
         }
 
         void OnError(Exception e)
