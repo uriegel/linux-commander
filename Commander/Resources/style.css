@@ -1,14 +1,14 @@
 listview row {
-    font-size: smaller;
-    font-family: "Noto Sans";
+    font-size: small;
+    /* font-family: "Noto Sans"; */
     border-width: 1px;
     border-style: solid;
     border-color: transparent;
 }
 
 editablelabel {
-    font-size: smaller;
-    font-family: "Noto Sans";
+    font-size: small;
+    /* font-family: "Noto Sans"; */
 }
 
 listview row:selected {
@@ -32,8 +32,8 @@ listview row.hiddenItem {
 }
 
 actionbar {
-    font-size: smaller;
-    font-family: "Noto Sans";
+    font-size: small;
+    /* font-family: "Noto Sans"; */
 }
 
 actionbar>revealer>box {    

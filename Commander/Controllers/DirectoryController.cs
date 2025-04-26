@@ -208,7 +208,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 Title = "Datum",
                 Resizeable = true,
                 OnSort = OnTimeSort,
-                OnItemSetup = () => Label.New(),
+                OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End),
                 OnItemBind = OnTimeBind
             },
             new()
