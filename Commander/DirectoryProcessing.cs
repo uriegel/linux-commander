@@ -37,7 +37,7 @@ record DirectoryItem(
     bool IsDirectory,
     bool IsHidden,
     DateTime? Time
-)
+) : MemoryTestItem(Name)
 {
     public ExifData? ExifData { get; set; }
 

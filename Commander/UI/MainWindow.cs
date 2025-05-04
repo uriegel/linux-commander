@@ -78,7 +78,12 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("delete", paned.DeleteItems, "Delete"),
                 new("refresh", paned.Refresh, "<Ctrl>R"),
                 new("showhidden", false, show => Actions.Instance.ShowHidden = show, "<Ctrl>H"),
-                new("diagnostics", Gtk.ShowDiagnostics, "<Ctrl><Shift>I"),
+                new("diagnostics", () => {
+                    MemoryTestItem.Snapshot();
+
+                    Gtk.ShowDiagnostics();
+
+                } , "<Ctrl><Shift>I"),
                 new("quit", Handle.CloseWindow, "<Ctrl>Q"),
                 new("down", paned.OnDown, "Down"),
                 new("up", paned.OnUp, "Up"),
