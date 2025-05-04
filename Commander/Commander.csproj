@@ -12,7 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gtk4DotNet" Version="7.0.58-beta-58" />
     <PackageReference Include="WebServerLight" Version="0.0.15-beta-15" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
   </ItemGroup>
@@ -63,6 +62,10 @@
     <EmbeddedResource Include="../website/script/trackviewer.js">
       <LogicalName>/script/trackviewer.js</LogicalName>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gtk4DotNet\Gtk4DotNet.csproj" />
   </ItemGroup>
 
 </Project>

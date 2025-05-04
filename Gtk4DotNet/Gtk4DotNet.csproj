@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<Version>7.0.58-beta-58</Version>
+	<FileVersion>7.0.58.0</FileVersion>
+	<AssemblyVersion>7.0.58.0</AssemblyVersion>
+	<AssemblyName>Gtk4DotNet</AssemblyName>
+	<Authors>Uwe Riegel</Authors>
+	<Company>Uwe Riegel</Company>		
+	<Description>.NET 8 Bindings for GTK 4, functional declarative similar to REACT or Kotlin Compose</Description>
+	<PackageLicenseUrl></PackageLicenseUrl>
+	<PackageProjectUrl>https://github.com/uriegel/Gtk4DotNet</PackageProjectUrl>
+	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	<PackageTags>DotNet;.NET;C#;CSharp;Gtk4;Gtk;Linux;P/Invoke</PackageTags>
+	<PackageReleaseNotes>ListView, ColumnView</PackageReleaseNotes>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<NoWarn>1591</NoWarn>
+	<LangVersion>Latest</LangVersion>
+  </PropertyGroup>
+
+<PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+</PropertyGroup>
+
+<ItemGroup>
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+</ItemGroup>
+
+<ItemGroup>
+  <PackageReference Include="CsTools" Version="7.25.5" />
+</ItemGroup>  
+
+</Project>
