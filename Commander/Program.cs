@@ -63,4 +63,4 @@ using Commander.UI;
 
 Gtk.ShowDiagnostics();
 
-
+MemoryTestItem.Snapshot();

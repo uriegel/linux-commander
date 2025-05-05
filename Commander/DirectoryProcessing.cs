@@ -41,6 +41,11 @@ record DirectoryItem(
 {
     public ExifData? ExifData { get; set; }
 
+    public DirectoryItem Kopie()
+    => new(Kind, Name, Size, IsDirectory, IsHidden, Time);
+
+    public string? tesz;
+
     public static DirectoryItem CreateParentItem()
         => new(
             ItemKind.Parent,

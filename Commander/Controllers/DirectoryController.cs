@@ -37,8 +37,9 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var result = await Task.Factory.StartNew(() => DirectoryProcessing.GetFiles(path));
         var oldPath = CurrentPath;
         CurrentPath = result.Path;
-        StartExifResolving(result.Items, folderView);
-        Insert(result.Items);
+        var items = result.Items.Select(n => n.Kopie()).ToArray(); 
+        StartExifResolving(items, folderView);
+        Insert(items);
         Directories = result.DirCount;
         Files = result.FileCount;
         HiddenDirectories = result.HiddenDirCount;

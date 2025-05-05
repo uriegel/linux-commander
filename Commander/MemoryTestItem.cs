@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 
+using static System.Console;
+
 record MemoryTestItem : IDisposable
 {
     public string Display { get; }
@@ -9,7 +11,14 @@ record MemoryTestItem : IDisposable
         items = items.Add(this, Display);
     }
 
-    public static void Snapshot() => Console.WriteLine($"Anzahl aller TestItems: {items.Count}");
+    public static void Snapshot()
+    {
+        WriteLine("===================================================================");
+        WriteLine($"Anzahl aller TestItems: {items.Count}");
+        foreach (var item in items.Values.Order())
+            WriteLine(item);
+        WriteLine("===================================================================");
+    }
 
     public static ImmutableDictionary<MemoryTestItem, string> items = ImmutableDictionary<MemoryTestItem, string>.Empty;
 
@@ -29,10 +38,10 @@ record MemoryTestItem : IDisposable
         }
     }
 
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     ~MemoryTestItem()
     {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: false);
     }
 
