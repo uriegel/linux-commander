@@ -85,16 +85,38 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis löschen?",
             _ => ""
         };
+
+
+
+        //TODO CopyProgressContext => ProgressContext
+        //TODO ProgressContext: without Size
+        //TODO Stack overflow
+
+
         var response = await AlertDialog.PresentAsync("Löschen?", text);
         if (response == "ok")
         {
-            foreach (var item in GetSelectedItems(GetFocusedItemPos()))
+            var items = GetSelectedItems(GetFocusedItemPos()).ToArray();
+            try
             {
-                await Request
-                    .Run(CurrentPath
-                    .CombineRemotePath(item.Name).GetIpAndPath()
-                    .DeleteItem())
-                    .HttpGetOrThrowAsync();
+                var cancellation = CopyProgressContext.Instance.Start("copyTextCapitel", 1, items.Length);
+                var index = 0;
+                foreach (var item in items)
+                {
+                    if (cancellation.IsCancellationRequested)
+                        throw new TaskCanceledException();
+                    CopyProgressContext.Instance.SetNewFileProgress(item.Name, 0, ++index);
+                    await Request
+                            .Run(CurrentPath
+                            .CombineRemotePath(item.Name).GetIpAndPath()
+                            .DeleteItem())
+                            .HttpGetOrThrowAsync();
+                    await Task.Delay(2000);
+                }
+            }
+            finally
+            {
+                CopyProgressContext.Instance.Stop();
             }
             return true;
         }
