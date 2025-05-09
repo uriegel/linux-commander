@@ -8,7 +8,7 @@ namespace Commander.DataContexts;
 class CopyProgressContext : INotifyPropertyChanged
 {
     public static CopyProgressContext Instance = new();
-
+    
     public static object GetTotalFraction(object? copyProgress)
     {
         var cp = copyProgress as CopyProgress;
@@ -91,7 +91,8 @@ class CopyProgressContext : INotifyPropertyChanged
     {
         var currentSize = Instance.CopyProgress?.PreviousTotalBytes ?? 0;
         if (Instance.CopyProgress != null)
-            Instance.CopyProgress = Instance.CopyProgress with
+        {
+            var affe = Instance.CopyProgress with
             {
                 Name = name,
                 CurrentCount = index,
@@ -101,6 +102,18 @@ class CopyProgressContext : INotifyPropertyChanged
                 CurrentBytes = 0,
                 Duration = DateTime.Now - startTime
             };
+            Instance.CopyProgress = affe;
+            // Instance.CopyProgress = Instance.CopyProgress with
+            // {
+            //     Name = name,
+            //     CurrentCount = index,
+            //     TotalBytes = currentSize,
+            //     CurrentMaxBytes = size,
+            //     PreviousTotalBytes = currentSize + size,
+            //     CurrentBytes = 0,
+            //     Duration = DateTime.Now - startTime
+            // };
+        }
     }
 
     public async void Stop()

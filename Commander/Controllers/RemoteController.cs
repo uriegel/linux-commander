@@ -89,8 +89,9 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
 
         //TODO CopyProgressContext => ProgressContext
-        //TODO ProgressContext: without Size
+        //TODO ProgressContext: without Size and without duration!!!
         //TODO Stack overflow
+        //TODO Remote delete GetEstimatedDuration is the cause
 
 
         var response = await AlertDialog.PresentAsync("Löschen?", text);
