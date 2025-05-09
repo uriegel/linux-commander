@@ -73,7 +73,33 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
     public async Task<bool> DeleteItems()
     {
-        return false;
+        var type = GetSelectedItemsType(GetFocusedItemPos());
+        if (type == SelectedItemsType.None)
+            return false;
+        var text = type switch
+        {
+            SelectedItemsType.Both => "Möchtest Du die markierten Einträge löschen?",
+            SelectedItemsType.Files => "Möchtest Du die markierten Dateien löschen?",
+            SelectedItemsType.Folders => "Möchtest Du die markierten Verzeichnisse löschen?",
+            SelectedItemsType.File => "Möchtest Du die markierte Datei löschen?",
+            SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis löschen?",
+            _ => ""
+        };
+        var response = await AlertDialog.PresentAsync("Löschen?", text);
+        if (response == "ok")
+        {
+            foreach (var item in GetSelectedItems(GetFocusedItemPos()))
+            {
+                await Request
+                    .Run(CurrentPath
+                    .CombineRemotePath(item.Name).GetIpAndPath()
+                    .DeleteItem())
+                    .HttpGetOrThrowAsync();
+            }
+            return true;
+        }
+        else
+            return false;
     }
 
     public async Task<int> Fill(string path, FolderView folderView)
@@ -133,7 +159,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
         if (selectionModel != null)
         {
-            var dirs = selectionModel.GetItems<DirectoryItem>().Where(n => n.IsDirectory).Count();
+            var dirs = selectionModel.GetItems<DirectoryItem>().Where(n => n.Name == "..").Count();
             model.UnselectRange(0, dirs);
         }
         return GetSelectedItemsIndices().Count();
@@ -219,24 +245,51 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
         label?.Set(item.Time.ToString() ?? "");
     }
 
-    SelectedItemsType GetSelectedItemsType(int focusedItemPos)
+    public SelectedItemsType GetSelectedItemsType(int focusedItemPos)
     {
         var selItems = GetSelectedItems();
+        var dirs = selItems.Count(n => n.Kind == ItemKind.Folder);
         var files = selItems.Count(n => n.Kind == ItemKind.Item);
-        var result = files > 1
+        var result = dirs > 1 && files == 0
+            ? SelectedItemsType.Folders
+            : dirs == 0 && files > 1
             ? SelectedItemsType.Files
-            : files == 1
+            : dirs == 1 && files == 0
+            ? SelectedItemsType.Folder
+            : dirs == 0 && files == 1
             ? SelectedItemsType.File
+            : dirs + files > 0
+            ? SelectedItemsType.Both
             : SelectedItemsType.None;
         if (result != SelectedItemsType.None)
             return result;
         var focusedItem = Items().Skip(focusedItemPos).FirstOrDefault();
         return focusedItem?.Kind switch
         {
+            ItemKind.Folder => SelectedItemsType.Folder,
             ItemKind.Item => SelectedItemsType.File,
             _ => SelectedItemsType.None
         };
     }
+
+    // SelectedItemsType GetSelectedItemsType(int focusedItemPos)
+    // {
+    //     var selItems = GetSelectedItems();
+    //     var files = selItems.Count(n => n.Kind == ItemKind.Item);
+    //     var result = files > 1
+    //         ? SelectedItemsType.Files
+    //         : files == 1
+    //         ? SelectedItemsType.File
+    //         : SelectedItemsType.None;
+    //     if (result != SelectedItemsType.None)
+    //         return result;
+    //     var focusedItem = Items().Skip(focusedItemPos).FirstOrDefault();
+    //     return focusedItem?.Kind switch
+    //     {
+    //         ItemKind.Item => SelectedItemsType.File,
+    //         _ => SelectedItemsType.None
+    //     };
+    // }
 
     int FindPos(Func<DirectoryItem, bool> predicate)
     {
@@ -282,6 +335,14 @@ static partial class Extensions
             Method = HttpMethod.Post,
             BaseUrl = $"http://{ipAndPath.Ip}:8080",
             Url = $"/createdirectory/{ipAndPath.Path}",
+        };    
+
+    public static CsTools.HttpRequest.Settings DeleteItem(this IpAndPath ipAndPath) 
+        => DefaultSettings with
+        {
+            Method = HttpMethod.Delete,
+            BaseUrl = $"http://{ipAndPath.Ip}:8080",
+            Url = $"/deletefile/{ipAndPath.Path}",
         };    
 
     public static string UpOne(this string path)

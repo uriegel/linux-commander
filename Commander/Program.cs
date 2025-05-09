@@ -6,7 +6,7 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
-// TODO Remote Delete, delete folder with Progress
+// TODO Remote delete with Progress
 // TODO Padding in columns
 // TODO Size column with dots
 // TODO 0 Size in root
@@ -28,6 +28,7 @@ using Commander.UI;
 
 // TODO Android range
 
+// TODO Dont copy directory from remote
 {
     Gtk.ShowDiagnostics();
 
