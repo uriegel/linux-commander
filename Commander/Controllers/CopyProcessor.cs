@@ -56,13 +56,13 @@ class CopyProcessor
         try
         {
             var index = 0;
-            var cancellation = CopyProgressContext.Instance.Start(copyTextCapitel, copyItems.Sum(n => n.Source.Size), copyItems.Length);
+            var cancellation = ProgressContext.Instance.Start(copyTextCapitel, copyItems.Sum(n => n.Source.Size), copyItems.Length);
             var buffer = new byte[15000];
             foreach (var item in copyItems)
             {
                 if (cancellation.IsCancellationRequested)
                     throw new TaskCanceledException();
-                CopyProgressContext.Instance.SetNewFileProgress(item.Source.Name, item.Source.Size, ++index);
+                ProgressContext.Instance.SetNewFileProgress(item.Source.Name, item.Source.Size, ++index);
                 if (move)
                     await MoveItem(item, cancellation);
                 else
@@ -75,7 +75,7 @@ class CopyProcessor
         }
         finally
         {
-            CopyProgressContext.Instance.Stop();
+            ProgressContext.Instance.Stop();
         }
     }
 
@@ -106,7 +106,7 @@ class CopyProcessor
         var tmpNewFileName = targetPath.AppendPath(item.Source.Name + TMP_POSTFIX);
         await Task.Run(() =>
         {
-            using var source = File.OpenRead(sourcePath.AppendPath(item.Source.Name)).WithProgress(CopyProgressContext.Instance.SetProgress);
+            using var source = File.OpenRead(sourcePath.AppendPath(item.Source.Name)).WithProgress(ProgressContext.Instance.SetProgress);
             using var target = File.Create(tmpNewFileName.EnsureFileDirectoryExists());
             while (true)
             {
@@ -162,7 +162,7 @@ class CopyProcessor
     {
         using var file = GFile.New(sourcePath.AppendPath(item.Source.Name));
         await file.MoveAsync(targetPath.AppendPath(item.Source.Name).EnsureFileDirectoryExists(),
-                                FileCopyFlags.Overwrite, true, (c, t) => CopyProgressContext.Instance.SetProgress(t, c), cancellation);
+                                FileCopyFlags.Overwrite, true, (c, t) => ProgressContext.Instance.SetProgress(t, c), cancellation);
     }
 
     public const string TMP_POSTFIX = "-tmp-commander";

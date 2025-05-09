@@ -102,7 +102,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
 
     bool OnClose(WindowHandle _)
     {
-        if (!CopyProgressContext.CanClose())
+        if (!ProgressContext.CanClose())
         {
             var wh = Handle.GetTemplateChild<RevealerHandle, ApplicationWindowHandle>("progress-revealer");
             var progressControl = ProgressControl.GetInstance(wh);

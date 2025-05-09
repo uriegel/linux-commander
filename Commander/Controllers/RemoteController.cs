@@ -88,7 +88,6 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
 
 
-        //TODO CopyProgressContext => ProgressContext
         //TODO ProgressContext: without Size and without duration!!!
         //TODO Stack overflow
         //TODO Remote delete GetEstimatedDuration is the cause
@@ -100,13 +99,13 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
             var items = GetSelectedItems(GetFocusedItemPos()).ToArray();
             try
             {
-                var cancellation = CopyProgressContext.Instance.Start("copyTextCapitel", 1, items.Length);
+                var cancellation = ProgressContext.Instance.Start("Löschen", 0, items.Length);
                 var index = 0;
                 foreach (var item in items)
                 {
                     if (cancellation.IsCancellationRequested)
                         throw new TaskCanceledException();
-                    CopyProgressContext.Instance.SetNewFileProgress(item.Name, 0, ++index);
+                    ProgressContext.Instance.SetNewFileProgress(item.Name, 0, ++index);
                     await Request
                             .Run(CurrentPath
                             .CombineRemotePath(item.Name).GetIpAndPath()
@@ -117,7 +116,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
             }
             finally
             {
-                CopyProgressContext.Instance.Stop();
+                ProgressContext.Instance.Stop();
             }
             return true;
         }

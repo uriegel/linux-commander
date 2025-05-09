@@ -20,7 +20,7 @@ public class ProgressSpinner : SubClassWidgetInst<DrawingAreaHandle>
             .CssClass("custom-accent")
             .SetDrawFunction((_, cairo, w, h) =>
             {
-                var color = CopyProgressContext.Instance.CopyProgress?.IsRunning == true
+                var color = ProgressContext.Instance.CopyProgress?.IsRunning == true
                     ? Handle.GetStyleContext().GetColor().ToSrgb()
                     : new GtkRgba() { Red = 0, Green = 0, Blue = 0, Alpha = 0 };
                 cairo
@@ -37,7 +37,7 @@ public class ProgressSpinner : SubClassWidgetInst<DrawingAreaHandle>
                     .Arc(w / 2.0, h / 2.0, (w < h ? w : h) / 2.0 - 2.0, -Math.PI / 2.0, -Math.PI / 2.0 + progress * Math.PI * 2)
                     .Stroke();
             });
-        CopyProgressContext.Instance.PropertyChanged += (s, e) => OnDraw();
+        ProgressContext.Instance.PropertyChanged += (s, e) => OnDraw();
 
         var window = Handle.GetAncestor<AdwApplicationWindowHandle>();
         totalProgress = window.GetTemplateChild<ProgressBarHandle, AdwApplicationWindowHandle>("progress-bar-total");
@@ -48,7 +48,7 @@ public class ProgressSpinner : SubClassWidgetInst<DrawingAreaHandle>
 
     void OnDraw()
     {
-        var cpc = CopyProgressContext.Instance.CopyProgress;
+        var cpc = ProgressContext.Instance.CopyProgress;
         if (cpc != null)
         {
             progress = (cpc.TotalBytes + cpc.CurrentBytes) / (float)cpc.TotalMaxBytes;

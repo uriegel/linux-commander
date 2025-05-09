@@ -35,7 +35,7 @@ class CopyToRemoteProcessor : CopyProcessor
             using var source =
                 File
                     .OpenRead(sourcePath.AppendPath(item.Source.Name))
-                    .WithProgress(CopyProgressContext.Instance.SetProgress);
+                    .WithProgress(ProgressContext.Instance.SetProgress);
             await Request
                 .Run(source.PutFile(ipAndPath, item.Source.Name, item.Source.DateTime), true)
                 .HttpGetOrThrowAsync();

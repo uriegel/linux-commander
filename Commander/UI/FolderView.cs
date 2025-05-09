@@ -148,7 +148,7 @@ class FolderView : ColumnViewSubClassed
         }
         catch (TaskCanceledException)
         {
-            if (CopyProgressContext.Instance.CopyProgress != null)
+            if (ProgressContext.Instance.CopyProgress != null)
                 MainContext.Instance.ErrorText = "Kopiervorgang ist unterbrochen worden...";
             return true;
         }

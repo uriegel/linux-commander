@@ -36,7 +36,7 @@ class CopyFromRemoteProcessor : CopyProcessor
                 using var target =
                     File
                         .Create(tmpNewFileName.EnsureFileDirectoryExists())
-                        .WithProgress((t, c) => CopyProgressContext.Instance.SetProgress(len ?? t, c));
+                        .WithProgress((t, c) => ProgressContext.Instance.SetProgress(len ?? t, c));
                 await msg
                     .CopyToStream(target, cancellation)
                     .HttpGetOrThrowAsync();

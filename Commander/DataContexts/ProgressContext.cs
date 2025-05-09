@@ -5,14 +5,14 @@ using Commander.UI;
 
 namespace Commander.DataContexts;
 
-class CopyProgressContext : INotifyPropertyChanged
+class ProgressContext : INotifyPropertyChanged
 {
-    public static CopyProgressContext Instance = new();
+    public static ProgressContext Instance = new();
     
-    public static object GetTotalFraction(object? copyProgress)
+    public static object GetTotalFraction(object? progress)
     {
-        var cp = copyProgress as CopyProgress;
-        return cp != null
+        var cp = progress as CopyProgress;
+        return cp != null && cp.TotalMaxBytes != 0
             ? ((double)cp.TotalBytes + (double)cp.CurrentBytes) / (double)cp.TotalMaxBytes
             : 0;
     }
@@ -20,7 +20,7 @@ class CopyProgressContext : INotifyPropertyChanged
     public static object GetEstimatedDuration(object? copyProgress)
     {
         var cp = copyProgress as CopyProgress;
-        return (cp != null && cp.Duration > ThreeSeconds)
+        return cp != null && cp.Duration > ThreeSeconds && cp.CurrentMaxBytes != 0
             ? (cp.Duration / (double)GetTotalFraction(copyProgress)) - cp.Duration
             : TimeSpan.FromMilliseconds(0);
     }
@@ -28,7 +28,7 @@ class CopyProgressContext : INotifyPropertyChanged
     public static object GetFraction(object? copyProgress)
     {
         var cp = copyProgress as CopyProgress;
-        return cp != null
+        return cp != null && cp.CurrentMaxBytes != 0
             ? cp.CurrentMaxBytes != 0
             ? (double)cp.CurrentBytes / (double)cp.CurrentMaxBytes
             : 0
@@ -92,7 +92,7 @@ class CopyProgressContext : INotifyPropertyChanged
         var currentSize = Instance.CopyProgress?.PreviousTotalBytes ?? 0;
         if (Instance.CopyProgress != null)
         {
-            var affe = Instance.CopyProgress with
+            Instance.CopyProgress = Instance.CopyProgress with
             {
                 Name = name,
                 CurrentCount = index,
@@ -102,17 +102,6 @@ class CopyProgressContext : INotifyPropertyChanged
                 CurrentBytes = 0,
                 Duration = DateTime.Now - startTime
             };
-            Instance.CopyProgress = affe;
-            // Instance.CopyProgress = Instance.CopyProgress with
-            // {
-            //     Name = name,
-            //     CurrentCount = index,
-            //     TotalBytes = currentSize,
-            //     CurrentMaxBytes = size,
-            //     PreviousTotalBytes = currentSize + size,
-            //     CurrentBytes = 0,
-            //     Duration = DateTime.Now - startTime
-            // };
         }
     }
 
@@ -160,7 +149,7 @@ class CopyProgressContext : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    static CopyProgressContext()
+    static ProgressContext()
     {
         progressSubject = new();
         progressSubject
