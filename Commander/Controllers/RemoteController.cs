@@ -85,33 +85,27 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
             SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis löschen?",
             _ => ""
         };
-
-
-
-        //TODO ProgressContext: without Size and without duration!!!
-        //TODO Stack overflow
-        //TODO Remote delete GetEstimatedDuration is the cause
-
-
         var response = await AlertDialog.PresentAsync("Löschen?", text);
         if (response == "ok")
         {
             var items = GetSelectedItems(GetFocusedItemPos()).ToArray();
             try
             {
-                var cancellation = ProgressContext.Instance.Start("Löschen", 0, items.Length);
+                var cancellation = ProgressContext.Instance.Start("Löschen", items.Length, items.Length, true);
                 var index = 0;
                 foreach (var item in items)
                 {
                     if (cancellation.IsCancellationRequested)
                         throw new TaskCanceledException();
-                    ProgressContext.Instance.SetNewFileProgress(item.Name, 0, ++index);
+                    ProgressContext.Instance.SetNewFileProgress(item.Name, 1, ++index);
+                    ProgressContext.Instance.SetProgress(1, 0);
                     await Request
                             .Run(CurrentPath
                             .CombineRemotePath(item.Name).GetIpAndPath()
                             .DeleteItem())
                             .HttpGetOrThrowAsync();
                     await Task.Delay(2000);
+                    ProgressContext.Instance.SetProgress(1, 1);
                 }
             }
             finally

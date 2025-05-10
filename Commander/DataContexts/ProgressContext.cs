@@ -12,7 +12,7 @@ class ProgressContext : INotifyPropertyChanged
     public static object GetTotalFraction(object? progress)
     {
         var cp = progress as CopyProgress;
-        return cp != null && cp.TotalMaxBytes != 0
+        return cp != null
             ? ((double)cp.TotalBytes + (double)cp.CurrentBytes) / (double)cp.TotalMaxBytes
             : 0;
     }
@@ -20,7 +20,7 @@ class ProgressContext : INotifyPropertyChanged
     public static object GetEstimatedDuration(object? copyProgress)
     {
         var cp = copyProgress as CopyProgress;
-        return cp != null && cp.Duration > ThreeSeconds && cp.CurrentMaxBytes != 0
+        return cp != null && cp.Duration > ThreeSeconds
             ? (cp.Duration / (double)GetTotalFraction(copyProgress)) - cp.Duration
             : TimeSpan.FromMilliseconds(0);
     }
@@ -28,7 +28,7 @@ class ProgressContext : INotifyPropertyChanged
     public static object GetFraction(object? copyProgress)
     {
         var cp = copyProgress as CopyProgress;
-        return cp != null && cp.CurrentMaxBytes != 0
+        return cp != null
             ? cp.CurrentMaxBytes != 0
             ? (double)cp.CurrentBytes / (double)cp.CurrentMaxBytes
             : 0
@@ -64,11 +64,25 @@ class ProgressContext : INotifyPropertyChanged
         }
     }
 
+    public bool HideSize
+    {
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                OnChanged(nameof(HideSize));
+            }
+        }
+    }
+
     public bool IsRunning { get; private set; }
 
-    public CancellationToken Start(string title, long totalSize, int count)
+    public CancellationToken Start(string title, long totalSize, int count, bool hideSize = false)
     {
         cts?.Cancel();
+        HideSize = hideSize;
         startTime = DateTime.Now;
         cts = new CancellationTokenSource();
         CopyProgress = new CopyProgress(

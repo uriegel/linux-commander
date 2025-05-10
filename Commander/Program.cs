@@ -6,7 +6,6 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
-// TODO Remote delete with Progress
 // TODO replace TaskCanceledException with OperationCanceledException
 // TODO Padding in columns
 // TODO Size column with dots
