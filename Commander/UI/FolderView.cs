@@ -146,7 +146,7 @@ class FolderView : ColumnViewSubClassed
         {
             return await controller.CopyItems(targetPath, move);
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
             if (ProgressContext.Instance.CopyProgress != null)
                 MainContext.Instance.ErrorText = "Kopiervorgang ist unterbrochen worden...";

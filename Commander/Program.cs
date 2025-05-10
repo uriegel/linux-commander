@@ -6,7 +6,6 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
-// TODO replace TaskCanceledException with OperationCanceledException
 // TODO Padding in columns
 // TODO Size column with dots
 // TODO 0 Size in root

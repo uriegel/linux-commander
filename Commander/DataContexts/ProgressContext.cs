@@ -133,7 +133,7 @@ class ProgressContext : INotifyPropertyChanged
             await Task.Delay(5000, cts?.Token ?? default);
             CopyProgress = null;
         }
-        catch (TaskCanceledException) { }
+        catch (OperationCanceledException) { }
     }
 
     public static void Cancel()
