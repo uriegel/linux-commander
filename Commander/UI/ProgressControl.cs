@@ -37,7 +37,7 @@ public class ProgressControl : SubClassInst<RevealerHandle>
             .Binding("label", nameof(ProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Title);
         builder.GetWidget<LabelHandle>("size-label")
             .Binding("label", nameof(ProgressContext.CopyProgress), BindingFlags.Default, cpc => $"({((CopyProgress?)cpc)?.TotalMaxBytes.ByteCountToString(2)})")
-            .Binding("opacity", nameof(ProgressContext.HideSize), BindingFlags.Default, hide => (bool?)hide == true ? 0.0 : 1.0);
+            .Binding("opacity", nameof(ProgressContext.DeleteAction), BindingFlags.Default, hide => (bool?)hide == true ? 0.0 : 1.0);
         builder.GetWidget<LabelHandle>("current-name-label")
             .Binding("label", nameof(ProgressContext.CopyProgress), BindingFlags.Default, cpc => ((CopyProgress?)cpc)?.Name);
         builder.GetWidget<ProgressBarHandle>("progressbar-total")

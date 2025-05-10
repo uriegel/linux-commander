@@ -6,11 +6,11 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
-// TODO Padding in columns
+
 // TODO Size column with dots
-// TODO 0 Size in root
 
 // TODO Viewer: Press F3 and the image has to be shown
+// TODO Viewer: stop mp4 player when not active
 
 // TODO extended rename
 
@@ -23,7 +23,6 @@ using Commander.UI;
 // TODO When item is opened wait till process stops and refresh item
 
 // TODO Rename remote
-// TODO remote copy to with directories
 
 // TODO Android range
 

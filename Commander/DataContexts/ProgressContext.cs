@@ -64,7 +64,7 @@ class ProgressContext : INotifyPropertyChanged
         }
     }
 
-    public bool HideSize
+    public bool DeleteAction
     {
         get => field;
         set
@@ -72,17 +72,17 @@ class ProgressContext : INotifyPropertyChanged
             if (field != value)
             {
                 field = value;
-                OnChanged(nameof(HideSize));
+                OnChanged(nameof(DeleteAction));
             }
         }
     }
 
     public bool IsRunning { get; private set; }
 
-    public CancellationToken Start(string title, long totalSize, int count, bool hideSize = false)
+    public CancellationToken Start(string title, long totalSize, int count, bool deleteAction = false)
     {
         cts?.Cancel();
-        HideSize = hideSize;
+        DeleteAction = deleteAction;
         startTime = DateTime.Now;
         cts = new CancellationTokenSource();
         CopyProgress = new CopyProgress(
@@ -138,7 +138,7 @@ class ProgressContext : INotifyPropertyChanged
 
     public static void Cancel()
     {
-        MainContext.Instance.InfoText = "Kopiervorgang wird abgebrochen...";
+        MainContext.Instance.InfoText = Instance.DeleteAction ? "Löschvorgang wird abgebrochen..." : "Kopiervorgang wird abgebrochen...";
         Instance.cts?.Cancel();
         Instance.CopyProgress = null;
         FolderViewPaned.Instance.GetActiveFolderView()?.GrabFocus();

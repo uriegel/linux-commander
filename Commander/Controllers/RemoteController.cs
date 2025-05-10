@@ -73,49 +73,55 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
 
     public async Task<bool> DeleteItems()
     {
-        var type = GetSelectedItemsType(GetFocusedItemPos());
-        if (type == SelectedItemsType.None)
-            return false;
-        var text = type switch
+        try
         {
-            SelectedItemsType.Both => "Möchtest Du die markierten Einträge löschen?",
-            SelectedItemsType.Files => "Möchtest Du die markierten Dateien löschen?",
-            SelectedItemsType.Folders => "Möchtest Du die markierten Verzeichnisse löschen?",
-            SelectedItemsType.File => "Möchtest Du die markierte Datei löschen?",
-            SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis löschen?",
-            _ => ""
-        };
-        var response = await AlertDialog.PresentAsync("Löschen?", text);
-        if (response == "ok")
-        {
-            var items = GetSelectedItems(GetFocusedItemPos()).ToArray();
-            try
+            ProgressContext.Instance.SetRunning();
+            var type = GetSelectedItemsType(GetFocusedItemPos());
+            if (type == SelectedItemsType.None)
+                return false;
+            var text = type switch
             {
-                var cancellation = ProgressContext.Instance.Start("Löschen", items.Length, items.Length, true);
-                var index = 0;
-                foreach (var item in items)
+                SelectedItemsType.Both => "Möchtest Du die markierten Einträge löschen?",
+                SelectedItemsType.Files => "Möchtest Du die markierten Dateien löschen?",
+                SelectedItemsType.Folders => "Möchtest Du die markierten Verzeichnisse löschen?",
+                SelectedItemsType.File => "Möchtest Du die markierte Datei löschen?",
+                SelectedItemsType.Folder => "Möchtest Du das markierte Verzeichnis löschen?",
+                _ => ""
+            };
+            var response = await AlertDialog.PresentAsync("Löschen?", text);
+            if (response == "ok")
+            {
+                var items = GetSelectedItems(GetFocusedItemPos()).ToArray();
+                try
                 {
-                    if (cancellation.IsCancellationRequested)
-                        throw new TaskCanceledException();
-                    ProgressContext.Instance.SetNewFileProgress(item.Name, 1, ++index);
-                    ProgressContext.Instance.SetProgress(1, 0);
-                    await Request
-                            .Run(CurrentPath
-                            .CombineRemotePath(item.Name).GetIpAndPath()
-                            .DeleteItem())
-                            .HttpGetOrThrowAsync();
-                    await Task.Delay(2000);
-                    ProgressContext.Instance.SetProgress(1, 1);
+                    var cancellation = ProgressContext.Instance.Start("Löschen", items.Length, items.Length, true);
+                    var index = 0;
+                    foreach (var item in items)
+                    {
+                        if (cancellation.IsCancellationRequested)
+                            throw new TaskCanceledException();
+                        ProgressContext.Instance.SetNewFileProgress(item.Name, 1, ++index);
+                        await Request
+                                .Run(CurrentPath
+                                .CombineRemotePath(item.Name).GetIpAndPath()
+                                .DeleteItem())
+                                .HttpGetOrThrowAsync();
+                        ProgressContext.Instance.SetProgress(1, 1);
+                    }
                 }
+                finally
+                {
+                    ProgressContext.Instance.Stop();
+                }
+                return true;
             }
-            finally
-            {
-                ProgressContext.Instance.Stop();
-            }
-            return true;
+            else
+                return false;
         }
-        else
-            return false;
+        finally
+        {
+            ProgressContext.Instance.SetRunning(false);
+        }
     }
 
     public async Task<int> Fill(string path, FolderView folderView)
@@ -230,7 +236,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
                 OnSort = DirectoryController.OnSizeSort,
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
-                OnLabelBind = i => i.Size != -1 ? i.Size.ToString() : ""
+                OnLabelBind = i => i.Size != 0 ? i.Size.ToString() : ""
             }
         ];
 

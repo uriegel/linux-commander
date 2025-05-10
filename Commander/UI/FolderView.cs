@@ -98,6 +98,12 @@ class FolderView : ColumnViewSubClassed
             if (await controller.DeleteItems())
                 Refresh();
         }
+        catch (OperationCanceledException)
+        {
+            if (ProgressContext.Instance.CopyProgress != null)
+                MainContext.Instance.ErrorText = "Löschvorgang ist unterbrochen worden...";
+            Refresh();                
+        }
         catch (GFileException e)
         {
             MainContext.Instance.ErrorText = e.Message;
