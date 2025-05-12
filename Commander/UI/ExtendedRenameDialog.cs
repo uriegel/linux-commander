@@ -1,3 +1,4 @@
+using Commander.Settings;
 using GtkDotNet;
 using GtkDotNet.SafeHandles;
 
@@ -9,13 +10,17 @@ public static class ExtendedRenameDialog
     {
         var builder = Builder.FromDotNetResource("extendedrenamedialog");
         var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
-        var textView = builder.GetWidget<EntryHandle>("text");
+        var prefixText = builder.GetWidget<EntryHandle>("prefix");
+        var start = builder.GetWidget<WidgetHandle>("start");
         // dialog.Heading(heading);
         // dialog.Body(text);
-        // textView.Text(preset ?? "");
+
+        var data = Storage.Retrieve().ExtendedRenameData ?? new("Bild", 3, 1);
+
+        prefixText.Text(data.Prefix);
         dialog.OnMap(async () =>
         {
-            textView.GrabFocus();
+            start.GrabFocus();
             await Task.Delay(100);
             // if (onSelect != null)
             // {
@@ -24,8 +29,18 @@ public static class ExtendedRenameDialog
             // }
         });
 
-        return await dialog.PresentAsync(MainWindow.MainWindowHandle) == "ok"
-            ? textView.GetText()
-            : null;
+        if (await dialog.PresentAsync(MainWindow.MainWindowHandle) == "ok")
+        {
+            var prefix = prefixText.GetText() ?? data.Prefix;
+            data = data with { Prefix = prefix };
+            Storage.SaveExtendedRename(data);
+        }
+        return "";
     }
 }
+
+record ExtendedRenameData(
+    string Prefix,
+    int Digits,
+    int StartIndex
+);

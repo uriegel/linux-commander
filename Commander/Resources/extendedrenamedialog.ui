@@ -14,7 +14,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkEntry" id="text">
+                    <object class="GtkEntry" id="prefix">
                         <property name="halign">fill</property>
                         <property name="activates-default">true</property>
                         <property name="margin-bottom">5</property>
@@ -65,7 +65,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkSpinButton">
+                    <object class="GtkSpinButton" id="start">
                         <property name="adjustment">
                             <object class="GtkAdjustment">
                                 <property name="lower">0</property>

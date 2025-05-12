@@ -1,4 +1,5 @@
 using Commander.Controllers;
+using Commander.UI;
 using CsTools;
 using CsTools.Extensions;
 
@@ -14,7 +15,7 @@ static class Storage
             .AppendPath("settings.json")
             .ReadAllTextFromFilePath()
             ?.Deserialize<Value>(Json.Defaults)
-            ?? new("root", "root", [], []);
+            ?? new("root", "root", [], [], null);
 
     public static void SaveLeftPath(string path)
         => Save(Retrieve() with { LeftPath = path });
@@ -31,6 +32,12 @@ static class Storage
     {
         var val = Retrieve();
         Save(val with { Remotes = val.Remotes != null ? [.. val.Remotes, remote] : [ remote ]});    
+    }
+
+    public static void SaveExtendedRename(ExtendedRenameData data)
+    {
+        var val = Retrieve();
+        Save(val with { ExtendedRenameData = data });    
     }
 
     public static void DeleteFavorite(FavoritesItem favorite)
@@ -80,4 +87,5 @@ record Value(
     string LeftPath,
     string RightPath,
     FavoritesItem[]? Favorites,
-    RemotesItem[]? Remotes);
+    RemotesItem[]? Remotes,
+    ExtendedRenameData? ExtendedRenameData);
