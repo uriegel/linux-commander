@@ -7,9 +7,6 @@ using Commander.Settings;
 using Commander.UI;
 
 
-// TODO Viewer: Press F3 and the image has to be shown
-// TODO Viewer: stop mp4 player when not active
-
 // TODO extended rename
 
 // TODO pathEdit: when path is too long, it is not ellipsized: Custom Control containing entry and label

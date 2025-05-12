@@ -30,8 +30,10 @@ static class Viewer
             SetValues();
         }
         else
+        {
             MainContext.Instance.PropertyChanged -= PropertyChanged;
-
+            webView?.RunJavascript($"setPath('')"); 
+        }
     }
 
     public static void ToggleView()
