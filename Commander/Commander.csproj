@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gtk4DotNet" Version="7.0.58-beta-58" />
+    <PackageReference Include="Gtk4DotNet" Version="7.0.59-beta-59" />
     <PackageReference Include="WebServerLight" Version="0.0.15-beta-15" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
   </ItemGroup>
@@ -26,6 +26,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="./Resources/textdialog.ui">
       <LogicalName>textdialog</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/extendedrenamedialog.ui">
+      <LogicalName>extendedrenamedialog</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="./Resources/addremote.ui">
       <LogicalName>addremote</LogicalName>

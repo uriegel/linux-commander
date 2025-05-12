@@ -128,7 +128,12 @@ class FolderView : ColumnViewSubClassed
             MainContext.Instance.ErrorText = "Ziel und Quelle sind identisch";
         }
     }
-    
+
+    public async void ExtendedRename()
+    {
+        await ExtendedRenameDialog.ShowAsync();
+    }
+
     public async void CreateFolder()
     {
         try
