@@ -327,7 +327,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     static void OnTimeBind(ListItemHandle listItem, DirectoryItem item)
     {
         var label = listItem.GetChild<LabelHandle>();
-        label?.Set(item.ExifData?.DateTime.ToString() ?? item.Time.ToString() ?? "");
+        label?.Set(
+            item.ExifData?.DateTime.HasValue == true
+            ? item.ExifData.DateTime.Value.ToString()?[..^3] 
+            : (item.Time.HasValue ? item.Time.Value.ToString()?[..^3] : ""));
         label?.AddCssClass("exif", item.ExifData?.DateTime != null);
     }
 

@@ -14,6 +14,8 @@ using Commander.UI;
 
 // TODO extended rename
 
+// TODO pathEdit: when path is too long, it is not ellipsized: Custom Control containing entry and label
+
 // TODO Pdf viewer: PdViewer in WebWindowNetCore
 // TODO Pdf viewer: PdViewer in Gtk4DotNet
 // TODO Pdf viewer

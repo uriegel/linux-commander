@@ -264,7 +264,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
     static void OnTimeBind(ListItemHandle listItem, DirectoryItem item)
     {
         var label = listItem.GetChild<LabelHandle>();
-        label?.Set(item.Time.ToString() ?? "");
+        label?.Set(item.Time.HasValue ? item.Time.Value.ToString()?[..^3] : "");
     }
 
     public SelectedItemsType GetSelectedItemsType(int focusedItemPos)
