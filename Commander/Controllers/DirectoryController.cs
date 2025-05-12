@@ -217,7 +217,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 OnSort = OnSizeSort,
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.End).MarginEnd(3),
-                OnLabelBind = i => i.Size != -1 ? i.Size.ToString() : ""
+                OnLabelBind = i => i.Size != -1 ? i.Size.ToString("N0") : ""
             }
         ];
 
