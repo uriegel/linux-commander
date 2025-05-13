@@ -100,6 +100,12 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         return false;
     }
 
+    public async Task<bool> ExtendedRename()
+    {
+        await ExtendedRenameDialog.ShowAsync();
+        return false;
+    }
+
     public async Task<bool> CreateFolder()
     {
         var type = GetSelectedItemsType(GetFocusedItemPos());

@@ -131,7 +131,8 @@ class FolderView : ColumnViewSubClassed
 
     public async void ExtendedRename()
     {
-        await ExtendedRenameDialog.ShowAsync();
+        if (await controller.ExtendedRename())
+            Refresh();
     }
 
     public async void CreateFolder()

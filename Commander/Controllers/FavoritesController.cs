@@ -109,6 +109,7 @@ class FavoritesController : ControllerBase<FavoritesItem>, IController
         return false;
     }
 
+    public Task<bool> ExtendedRename() => false.ToAsync();
     public void SelectAll(FolderView folderView) { }
     public void SelectCurrent(FolderView folderView) { }
     public void SelectNone(FolderView folderView) { }

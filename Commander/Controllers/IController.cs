@@ -21,6 +21,7 @@ interface IController : IDisposable
 
     Task<bool> DeleteItems();
     Task<bool> Rename();
+    Task<bool> ExtendedRename();
     Task<bool> CreateFolder();
     Task<bool> CopyItems(string? targetPath, bool move);
     
