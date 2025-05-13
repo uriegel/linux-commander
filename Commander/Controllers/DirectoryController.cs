@@ -102,6 +102,9 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public async Task<bool> ExtendedRename()
     {
+        // TODO to FolderController
+        // TODO DetectController switches DirectoryController to ExtendedRenameController : DirectoryController
+        // TODO switches back and forth without deleting items, only Controller with one column more or less
         await ExtendedRenameDialog.ShowAsync();
         return false;
     }
