@@ -12,6 +12,13 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
     public static FolderViewPaned GetInstance(PanedHandle handle)
         => (GetInstance(handle.GetInternalHandle()) as FolderViewPaned)!;
 
+    public FolderView? GetFolderView(int id)
+        => id == 1
+            ? folderViewLeft
+            : id == 2
+            ? folderViewRight
+            : null;
+
     public void OnDown() => folderViewActive?.OnDown();
     public void OnUp() => folderViewActive?.OnUp();
     public void OnPageDown() => folderViewActive?.OnPageDown();
@@ -120,6 +127,9 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
             EnableKeyNavigation(false);
             EnableFolderViewActions(false);
         };
+
+        folderViewLeft.ID = 1;
+        folderViewRight.ID = 2;
 
         await Task.Delay(100);
         folderViewActive?.GrabFocus();

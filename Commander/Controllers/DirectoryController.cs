@@ -102,6 +102,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public async Task<bool> ExtendedRename(FolderView folderView)
     {
+        id = folderView.ID;
         var res = await ExtendedRenameDialog.ShowAsync();
         if (res != null && extendedRename == null)
         {
@@ -116,7 +117,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         if (res == null && extendedRename != null)
             folderView.RemoveCol(1);
         extendedRename = res;
-        SetExtendedRenameNames(folderView);
+        SetExtendedRenameNames();
         return false;
     }
 
@@ -193,11 +194,32 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         return GetSelectedItemsIndices().Count();
     }
 
-    public void SelectAll(FolderView folderView) => folderView.SelectAll();
-    public void SelectNone(FolderView folderView) => folderView.UnselectAll();
-    public void SelectCurrent(FolderView folderView) => folderView.SelectCurrent();
-    public void SelectToStart(FolderView folderView) => folderView.SelectToStart();
-    public void SelectToEnd(FolderView folderView) => folderView.SelectToEnd();
+    public void SelectAll(FolderView folderView)
+    {
+        folderView.SelectAll();
+        SetExtendedRenameNames();
+    }
+    public void SelectNone(FolderView folderView)
+    {
+        folderView.UnselectAll();
+        SetExtendedRenameNames();
+    }
+    public void SelectCurrent(FolderView folderView)
+    {
+        folderView.SelectCurrent();
+        SetExtendedRenameNames();
+    }
+    public void SelectToStart(FolderView folderView)
+    {
+        folderView.SelectToStart();
+        SetExtendedRenameNames();
+    }
+    public void SelectToEnd(FolderView folderView)
+    {
+        folderView.SelectToEnd();
+        SetExtendedRenameNames();
+    }
+
 
     #endregion
 
@@ -206,6 +228,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         EnableRubberband = true;
         folderView.SetController(this);
         OnFilter = Filter;
+        id = folderView.ID;
     }
 
     public override Column<DirectoryItem>[] GetColumns() =>
@@ -407,10 +430,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         proc.Start();
     }
 
-    void SetExtendedRenameNames(FolderView folderView)
+    void SetExtendedRenameNames()
     {
+        // TODO FolderView ID on creation!!!!!!!!!!
         // TODO only fileitems!
-        // TODO signal folderView to invalidate
         // TODO on selection changed
         // TODO on sort changed
 
@@ -421,13 +444,15 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             var index = extendedRename.StartIndex;
             foreach (var selItem in GetSelectedItems())
                 selItem.RenameName = $"{extendedRename.Prefix}{index++}";
-            folderView.InvalidateView();
+            FolderViewPaned.Instance.GetFolderView(id)?.InvalidateView();
         }
     }
 
     CancellationTokenSource cancellation = new();
 
     ExtendedRenameData? extendedRename;
+
+    int id;
 
     #region IDisposable
 
