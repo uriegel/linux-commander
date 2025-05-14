@@ -17,6 +17,8 @@ using Commander.UI;
 // TODO Text viewer/editor
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
 
+// TODO Drag n drop
+
 // TODO When item is opened wait till process stops and refresh item
 
 // TODO Rename remote
