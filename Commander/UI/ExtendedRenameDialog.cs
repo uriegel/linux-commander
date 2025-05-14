@@ -4,9 +4,9 @@ using GtkDotNet.SafeHandles;
 
 namespace Commander.UI;
 
-public static class ExtendedRenameDialog
+static class ExtendedRenameDialog
 {
-    public static async Task<string?> ShowAsync()
+    public static async Task<ExtendedRenameData?> ShowAsync()
     {
         var builder = Builder.FromDotNetResource("extendedrenamedialog");
         var dialog = builder.GetWidget<AdwAlertDialogHandle>("dialog");
@@ -32,7 +32,7 @@ public static class ExtendedRenameDialog
             var startVal = start.GetValue();
             data = data with { Prefix = prefix, Digits = d, StartIndex = (int)startVal };
             Storage.SaveExtendedRename(data);
-            return "";
+            return new(prefix, d, (int)startVal);
         }
         else
             return null;
