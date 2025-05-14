@@ -40,6 +40,7 @@ record DirectoryItem(
 )
 {
     public ExifData? ExifData { get; set; }
+    public string? RenameName { get; set; }
 
     public static DirectoryItem CreateParentItem()
         => new(

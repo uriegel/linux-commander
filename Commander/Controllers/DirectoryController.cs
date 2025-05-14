@@ -110,12 +110,13 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 Title = "Neuer Name",
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End).MarginEnd(3),
-                OnLabelBind = i => i.Name + "-new"
+                OnLabelBind = i => i.RenameName ?? ""
             });
         }
         if (res == null && extendedRename != null)
             folderView.RemoveCol(1);
         extendedRename = res;
+        SetExtendedRenameNames(folderView);
         return false;
     }
 
@@ -404,6 +405,24 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             },
         };
         proc.Start();
+    }
+
+    void SetExtendedRenameNames(FolderView folderView)
+    {
+        // TODO only fileitems!
+        // TODO signal folderView to invalidate
+        // TODO on selection changed
+        // TODO on sort changed
+
+        if (extendedRename != null)
+        {
+            foreach (var item in Items())
+                item.RenameName = null;
+            var index = extendedRename.StartIndex;
+            foreach (var selItem in GetSelectedItems())
+                selItem.RenameName = $"{extendedRename.Prefix}{index++}";
+            folderView.InvalidateView();
+        }
     }
 
     CancellationTokenSource cancellation = new();

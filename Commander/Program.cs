@@ -50,7 +50,7 @@ using Commander.UI;
                 .SubClass(new FolderViewClass())
                 .SubClass(new ConflictViewClass())
                 .SubClass(new ConflictDialogClass())
-                .SubClass(new Commander.UI.AlertDialogClass())
+                .SubClass(new AlertDialogClass())
                 .SubClass(ProgressControl.Subclass())
                 .SubClass(ProgressSpinner.Subclass())
                 .ManagedAdwApplicationWindow()
