@@ -25,7 +25,7 @@ class RemotesController : ControllerBase<RemotesItem>, IController
 
     public bool CheckRestriction(string searchKey) => false;
 
-    public Task<bool> ExtendedRename() => false.ToAsync();
+    public Task<bool> ExtendedRename(FolderView _) => false.ToAsync();
 
     public Task<bool> CopyItems(string? targetPath, bool move) => false.ToAsync();
 

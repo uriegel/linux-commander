@@ -26,7 +26,8 @@ class FolderController
     public Task<bool> DeleteItems() => controller.DeleteItems();
     public Task<bool> Rename() => controller.Rename();
 
-    public Task<bool> ExtendedRename() => controller.ExtendedRename();
+    public Task<bool> ExtendedRename() => controller.ExtendedRename(folderView);
+
     public Task<bool> CreateFolder() => controller.CreateFolder();
     public Task<bool> CopyItems(string? targetPath, bool move) => controller.CopyItems(targetPath, move);
 

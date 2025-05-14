@@ -13,7 +13,7 @@ public static class ExtendedRenameDialog
         var prefixText = builder.GetWidget<EntryHandle>("prefix");
         var digits = builder.GetWidget<DropDownHandle>("digits");
         var start = builder.GetWidget<SpinButtonHandle>("start");
- 
+
         var data = Storage.Retrieve().ExtendedRenameData ?? new("Bild", 2, 1);
         prefixText.Text(data.Prefix);
         digits.SetSelected(data.Digits - 1);
@@ -32,9 +32,10 @@ public static class ExtendedRenameDialog
             var startVal = start.GetValue();
             data = data with { Prefix = prefix, Digits = d, StartIndex = (int)startVal };
             Storage.SaveExtendedRename(data);
-            
+            return "";
         }
-        return "";
+        else
+            return null;
     }
 }
 

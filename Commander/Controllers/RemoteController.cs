@@ -30,7 +30,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
     public bool CheckRestriction(string searchKey)
         => Items().Any(n => n.Name.StartsWith(searchKey, StringComparison.CurrentCultureIgnoreCase));
 
-    public Task<bool> ExtendedRename() => false.ToAsync();
+    public Task<bool> ExtendedRename(FolderView _) => false.ToAsync();
 
     public Task<bool> CopyItems(string? targetPath, bool move)
     {

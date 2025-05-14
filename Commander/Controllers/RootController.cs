@@ -169,7 +169,7 @@ class RootController : ControllerBase<RootItem>, IController
     }
 
     public Task<bool> Rename() => false.ToAsync();
-    public Task<bool> ExtendedRename() => false.ToAsync();
+    public Task<bool> ExtendedRename(FolderView _) => false.ToAsync();
     public Task<bool> CreateFolder() => false.ToAsync();
     public Task<bool> CopyItems(string? targetPath, bool move) => false.ToAsync();
 

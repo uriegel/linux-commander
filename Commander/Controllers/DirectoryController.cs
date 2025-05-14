@@ -100,12 +100,25 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         return false;
     }
 
-    public async Task<bool> ExtendedRename()
+    public async Task<bool> ExtendedRename(FolderView folderView)
     {
-        // TODO to FolderController
-        // TODO DetectController switches DirectoryController to ExtendedRenameController : DirectoryController
-        // TODO switches back and forth without deleting items, only Controller with one column more or less
-        await ExtendedRenameDialog.ShowAsync();
+        var res = await ExtendedRenameDialog.ShowAsync();
+        if (res != null && !extendedRenameMode)
+        {
+            folderView.InsertColumn<DirectoryItem>(1, new()
+            {
+                Title = "Neuer Name",
+                Resizeable = true,
+                OnItemSetup = () => Label.New().HAlign(Align.Start).MarginEnd(3),
+                OnLabelBind = i => i.Name + "-new"
+            });
+            extendedRenameMode = true;
+        }
+        if (res == null && extendedRenameMode)
+        {
+            folderView.RemoveCol(1);
+            extendedRenameMode = false;
+        }
         return false;
     }
 
@@ -397,6 +410,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     }
 
     CancellationTokenSource cancellation = new();
+
+    bool extendedRenameMode;
 
     #region IDisposable
 
