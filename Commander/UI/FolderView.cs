@@ -11,7 +11,6 @@ namespace Commander.UI;
 
 class FolderView : ColumnViewSubClassed
 {
-    public int ID { get; set; }
     public int CurrentPos { get; private set; } = -1;
 
     public FolderContext Context { get; } = new();

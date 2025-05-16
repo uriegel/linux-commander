@@ -128,9 +128,6 @@ class FolderViewPaned(nint obj) : SubClassWidgetInst<PanedHandle>(obj)
             EnableFolderViewActions(false);
         };
 
-        folderViewLeft.ID = 1;
-        folderViewRight.ID = 2;
-
         await Task.Delay(100);
         folderViewActive?.GrabFocus();
         IActionMap.GetAction("down").SetEnabled(true);

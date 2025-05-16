@@ -6,7 +6,7 @@ using Commander;
 using Commander.Settings;
 using Commander.UI;
 
-
+// TODO on sort changed: send Event when sorted
 // TODO extended rename
 
 // TODO Exif date times: via data binding

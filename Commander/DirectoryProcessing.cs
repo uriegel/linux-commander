@@ -81,16 +81,6 @@ record DirectoryItem(
             false,
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
             info.LastWriteTime);
-    //     public static DirectoryItem? CreateMaybeFileItem(FileInfo info)
-    //         => info.Exists
-    //             ? new(
-    //                 info.Name,
-    //                 info.Length,
-    //                 false,
-    //   //              Directory.GetIconPath(info),
-    //                 (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
-    //                 info.LastWriteTime)
-    //             : null;
     public DateTime? GetDateTime()
         => ExifData != null && ExifData.DateTime.HasValue
             ? ExifData.DateTime
