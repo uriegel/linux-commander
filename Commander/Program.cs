@@ -9,6 +9,8 @@ using Commander.UI;
 
 // TODO extended rename
 
+// TODO Exif date times: via data binding
+
 // TODO pathEdit: when path is too long, it is not ellipsized: Custom Control containing entry and label
 
 // TODO Pdf viewer: PdViewer in WebWindowNetCore

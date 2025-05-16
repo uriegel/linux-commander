@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using Commander.DataContexts;
 using Commander.Enums;
@@ -111,7 +112,21 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 Title = "Neuer Name",
                 Resizeable = true,
                 OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End).MarginEnd(3),
-                OnLabelBind = i => i.RenameName ?? ""
+                OnItemBind = (l, item) =>
+                {
+                    var label = l.GetChild<LabelHandle>();
+                    item.RenameLabel = label;
+                    label.Set(item.RenameName ?? "");
+                    item.PropertyChanged += RenameNameUpdate;
+                    //Console.WriteLine($"Labelbind: {item.Name}");
+                },
+                OnItemUnbind = (l, item) =>
+                {
+                    var label = l.GetChild<LabelHandle>();
+                    item.RenameLabel = null;
+                    item.PropertyChanged -= RenameNameUpdate;
+                    //Console.WriteLine($"Label unbind: {item.Name}");
+                }
             });
         }
         if (res == null && extendedRename != null)
@@ -219,7 +234,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         folderView.SelectToEnd();
         SetExtendedRenameNames();
     }
-
 
     #endregion
 
@@ -351,6 +365,12 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         });
     }
 
+    static void RenameNameUpdate(object? obj, PropertyChangedEventArgs e)
+    {
+        if (obj is DirectoryItem item)
+            item?.RenameLabel?.Set(item.RenameName ?? "");
+    }
+
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
     {
         var box = listItem.GetChild<BoxHandle>();
@@ -444,7 +464,6 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             var index = extendedRename.StartIndex;
             foreach (var selItem in GetSelectedItems())
                 selItem.RenameName = $"{extendedRename.Prefix}{index++}";
-            FolderViewPaned.Instance.GetFolderView(id)?.InvalidateView();
         }
     }
 

@@ -1,4 +1,6 @@
+using System.ComponentModel;
 using Commander.Enums;
+using GtkDotNet.SafeHandles;
 
 namespace Commander;
 
@@ -37,10 +39,21 @@ record DirectoryItem(
     bool IsDirectory,
     bool IsHidden,
     DateTime? Time
-)
+) : INotifyPropertyChanged
 {
     public ExifData? ExifData { get; set; }
-    public string? RenameName { get; set; }
+    public string? RenameName
+    {
+        get => field;
+        set
+        {
+            field = value;
+            OnChanged(nameof(RenameName));
+        }
+    }
+    public LabelHandle? RenameLabel { get; set; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public static DirectoryItem CreateParentItem()
         => new(
@@ -82,6 +95,8 @@ record DirectoryItem(
         => ExifData != null && ExifData.DateTime.HasValue
             ? ExifData.DateTime
             : Time;
+
+    void OnChanged(string name) => PropertyChanged?.Invoke(this, new(name));
 };
 
 record DirFileInfo(
