@@ -20,6 +20,7 @@ class FolderView : ColumnViewSubClassed
     {
         MultiSelection = true;
         OnSelectionChanged = SelectionChanged;
+        OnSortChanging = SortChanging;
         controller = new(this);
 
         Handle.AddController(EventControllerKey.New().OnKeyPressed((chr, modifiers) =>
@@ -360,6 +361,8 @@ class FolderView : ColumnViewSubClassed
         Context.SelectedFiles = controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
         CheckCurrentChanged(controller.GetFocusedItemPos());
     }
+
+    void SortChanging() => controller.OnSortChanging();
 
     void FocusEnter() => OnFocusEnter?.Invoke(this, EventArgs.Empty);
 

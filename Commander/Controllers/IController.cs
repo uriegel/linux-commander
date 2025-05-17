@@ -24,6 +24,7 @@ interface IController : IDisposable
     Task<bool> ExtendedRename(FolderView folderView);
     Task<bool> CreateFolder();
     Task<bool> CopyItems(string? targetPath, bool move);
+    void OnSortChanging() {}
     
     Task<string?> OnActivate(int pos);
 

@@ -216,6 +216,12 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     public void SelectToStart(FolderView folderView) => folderView.SelectToStart();
     public void SelectToEnd(FolderView folderView) => folderView.SelectToEnd();
 
+    public async void OnSortChanging()
+    {
+        await Task.Delay(500);
+        SetExtendedRenameNames();
+    }
+
     #endregion
 
     public DirectoryController(FolderView folderView) : base(folderView.GetSelectionModel())

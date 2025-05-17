@@ -108,6 +108,8 @@ class FolderController
     public int OnSelectionChanged(nint model, int pos, int count, bool mouseButton, bool mouseButtonCtrl)
         => controller.OnSelectionChanged(model, pos, count, mouseButton, mouseButtonCtrl);
 
+    public void OnSortChanging() => controller.OnSortChanging();
+
     public void SelectAll() => controller.SelectAll(folderView);
     public void SelectNone() => controller.SelectNone(folderView);
     public void SelectCurrent() => controller.SelectCurrent(folderView);
