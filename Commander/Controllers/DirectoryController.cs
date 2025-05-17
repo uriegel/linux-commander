@@ -394,7 +394,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             : null;
     }
 
-    bool Filter(DirectoryItem item)
+    static bool Filter(DirectoryItem item)
         => (!item.IsHidden || Actions.Instance.ShowHidden)
             && (MainContext.Instance.Restriction == null
                 || item.Name.StartsWith(MainContext.Instance.Restriction, StringComparison.CurrentCultureIgnoreCase));
