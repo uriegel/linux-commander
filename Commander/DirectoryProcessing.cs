@@ -42,7 +42,10 @@ record DirectoryItem(
     DateTime? Time
 ) : INotifyPropertyChanged
 {
-    public ExifData? ExifData 
+    public DirectoryItem CloneItem()
+        => new(Kind, Name, Size, IsDirectory, IsHidden, Time);
+
+    public ExifData? ExifData
     {
         get => field;
         set
