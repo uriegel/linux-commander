@@ -58,6 +58,7 @@ class FolderController
             folderView.Context.CurrentFiles = Actions.Instance.ShowHidden ? controller.Files + controller.Files : controller.Files;
             folderView.Context.CurrentPath = controller.CurrentPath;
             folderView.OnPathChanged(saveHistory ? CurrentPath : null);
+            folderView.InvalidateFocus();
         }
         catch (UnauthorizedAccessException uae)
         {

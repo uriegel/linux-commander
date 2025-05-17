@@ -38,8 +38,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         var result = await Task.Factory.StartNew(() => DirectoryProcessing.GetFiles(path));
         var oldPath = CurrentPath;
         CurrentPath = result.Path;
-        StartExifResolving(result.Items, folderView);
         Insert(result.Items);
+        StartExifResolving(result.Items, folderView);
         Directories = result.DirCount;
         Files = result.FileCount;
         HiddenDirectories = result.HiddenDirCount;
@@ -245,7 +245,17 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 Resizeable = true,
                 OnSort = OnTimeSort,
                 OnItemSetup = () => Label.New().HAlign(Align.Start).Ellipsize(EllipsizeMode.End),
-                OnItemBind = OnTimeBind
+                OnItemBind = (listItem, item) =>
+                {
+                    item.TimeLabel = listItem.GetChild<LabelHandle>();
+                    OnTimeBind(item.TimeLabel, item);
+                    item.PropertyChanged += TimeUpdate;
+                },
+                OnItemUnbind = (listItem, item) =>
+                {
+                    item.TimeLabel = null;
+                    item.PropertyChanged -= TimeUpdate;
+                }
             },
             new()
             {
@@ -339,14 +349,14 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             finally
             {
                 folderView.Context.BackgroundAction = BackgroundAction.None;
-                folderView.InvalidateView();
+                folderView.InvalidateFocus();
             }
         });
     }
 
     static void RenameNameUpdate(object? obj, PropertyChangedEventArgs e)
     {
-        if (obj is DirectoryItem item)
+        if (e.PropertyName == nameof(DirectoryItem.RenameName) && obj is DirectoryItem item)
             item?.RenameLabel?.Set(item.RenameName ?? "");
     }
 
@@ -366,14 +376,19 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         box?.GetParent<WidgetHandle>()?.GetParent().AddCssClass("hiddenItem", item.IsHidden);
     }
 
-    static void OnTimeBind(ListItemHandle listItem, DirectoryItem item)
+    static void TimeUpdate(object? obj, PropertyChangedEventArgs e)
     {
-        var label = listItem.GetChild<LabelHandle>();
-        label?.Set(
+        if (e.PropertyName == nameof(DirectoryItem.ExifData) && obj is DirectoryItem item && item.TimeLabel != null)
+            OnTimeBind(item.TimeLabel, item);
+    }
+
+    static void OnTimeBind(LabelHandle label, DirectoryItem item)
+    {
+        label.Set(
             item.ExifData?.DateTime.HasValue == true
-            ? item.ExifData.DateTime.Value.ToString()?[..^3] 
+            ? item.ExifData.DateTime.Value.ToString()?[..^3]
             : (item.Time.HasValue ? item.Time.Value.ToString()?[..^3] : ""));
-        label?.AddCssClass("exif", item.ExifData?.DateTime != null);
+        label.AddCssClass("exif", item.ExifData?.DateTime != null);
     }
 
     static int? OnFolderOrParentSort(DirectoryItem a, DirectoryItem b, bool desc)
