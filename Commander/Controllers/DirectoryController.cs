@@ -374,8 +374,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     async Task RunExtendedRename()
     {
-        var response = await AlertDialog.PresentAsync("Umbennenen?", "Erweiterte Umbenennungen starten?");
-        if (response == "ok")
+        var items = GetSelectedItems().ToArray();
+        if (items.Length > 0 && await AlertDialog.PresentAsync("Umbennenen?", "Erweiterte Umbenennungen starten?") == "ok")
         {
 
         }
