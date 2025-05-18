@@ -485,7 +485,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 item.RenameName = null;
             var index = extendedRename.StartIndex;
             foreach (var selItem in GetSelectedItems().Where(n => !n.IsDirectory))
-                selItem.RenameName = $"{extendedRename.Prefix}{index++}{selItem.Name.GetFileExtension()}";
+                selItem.RenameName = $"{extendedRename.Prefix}{index++.ToString().PadLeft(extendedRename.Digits, '0')}{selItem.Name.GetFileExtension()}";
         }
     }
 
