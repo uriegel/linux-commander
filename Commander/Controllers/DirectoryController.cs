@@ -186,7 +186,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         if (extendedRename != null && pos > 0 && GetSelectedItems().Any() && MainContext.Instance.Restriction == null)
         {
             await RunExtendedRename();
-            return null;
+            return CurrentPath;
         }
         var item = GetItem(pos);
         if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
@@ -373,7 +373,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             item?.RenameLabel?.Set(item.RenameName ?? "");
     }
 
-    async Task RunExtendedRename()
+    async Task<bool> RunExtendedRename()
     {
         var renameItems = GetSelectedItems().ToArray();
         if (renameItems.Length > 0 && await AlertDialog.PresentAsync("Umbenennen", "Erweiterte Umbenennungen starten?") == "ok")
@@ -386,11 +386,28 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                             .Select(n => selectedIndexes.ContainsKey(n.i) ? n.n.RenameName ?? "" : n.n.Name ?? "");
             if (items.ToImmutableDictionary(n => n).Count == items.Count())
             {
-
+                foreach (var item in renameItems)
+                {
+                    var file = CurrentPath.AppendPath(item.Name);
+                    var target = CurrentPath.AppendPath(RENAMING + item.RenameName);
+                    File.Move(file, target);
+                }
+                foreach (var item in renameItems)
+                {
+                    var file = CurrentPath.AppendPath(RENAMING + item.RenameName);
+                    var target = CurrentPath.AppendPath(item.RenameName);
+                    File.Move(file, target);
+                }
+                return true;
             }
             else
+            {
                 MainContext.Instance.ErrorText = "Dateinamen nicht eindeutig";
+                return false;
+            }
         }
+        else
+            return false;
     }
 
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
@@ -488,6 +505,8 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 selItem.RenameName = $"{extendedRename.Prefix}{index++.ToString().PadLeft(extendedRename.Digits, '0')}{selItem.Name.GetFileExtension()}";
         }
     }
+
+    const string RENAMING = "__RENAMING__";
 
     CancellationTokenSource cancellation = new();
 
