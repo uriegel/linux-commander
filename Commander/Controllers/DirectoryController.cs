@@ -180,21 +180,26 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
             return false.ToAsync();
     }
 
-    public Task<string?> OnActivate(int pos)
+    public async Task<string?> OnActivate(int pos)
     {
+        if (extendedRename != null)
+        {
+            await RunExtendedRename();
+            return (string?)null;
+        }
         var item = GetItem(pos);
         if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
             if (CurrentPath != "/" || item.Kind != ItemKind.Parent)
-                return ((string?)Path.Combine(CurrentPath, item.Name)).ToAsync();
+                return Path.Combine(CurrentPath, item.Name);
             else
-                return ((string?)"root").ToAsync();
+                return "root";
         else if (item != null && item.Kind == ItemKind.Item)
         {
             StartItem(item.Name);
-            return ((string?)null).ToAsync();
+            return null;
         }
         else
-            return ((string?)null).ToAsync();
+            return null;
     }
 
     public bool CheckRestriction(string searchKey)
@@ -365,6 +370,15 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
     {
         if (e.PropertyName == nameof(DirectoryItem.RenameName) && obj is DirectoryItem item)
             item?.RenameLabel?.Set(item.RenameName ?? "");
+    }
+
+    async Task RunExtendedRename()
+    {
+        var response = await AlertDialog.PresentAsync("Umbennenen?", "Erweiterte Umbenennungen starten?");
+        if (response == "ok")
+        {
+
+        }
     }
 
     static void OnIconNameBind(ListItemHandle listItem, DirectoryItem item)
