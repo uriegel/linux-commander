@@ -186,7 +186,7 @@ class RemoteController : ControllerBase<DirectoryItem>, IController
             var dirs = selectionModel.GetItems<DirectoryItem>().Where(n => n.Name == "..").Count();
             model.UnselectRange(0, dirs);
         }
-        return GetSelectedItemsIndices().Count();
+        return GetSelectedItemsIndexes().Count();
     }
 
     public async Task<bool> Rename()

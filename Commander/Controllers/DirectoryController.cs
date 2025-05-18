@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics;
 using Commander.DataContexts;
@@ -182,10 +183,10 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     public async Task<string?> OnActivate(int pos)
     {
-        if (extendedRename != null)
+        if (extendedRename != null && pos > 0 && GetSelectedItems().Any() && MainContext.Instance.Restriction == null)
         {
             await RunExtendedRename();
-            return (string?)null;
+            return null;
         }
         var item = GetItem(pos);
         if (item != null && (item.Kind == ItemKind.Folder || item.Kind == ItemKind.Parent))
@@ -212,7 +213,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
         if (MainContext.Instance.Restriction == null)
             model.UnselectRange(0, 1);
         SetExtendedRenameNames();
-        return GetSelectedItemsIndices().Count();
+        return GetSelectedItemsIndexes().Count();
     }
 
     public void SelectAll(FolderView folderView) => folderView.SelectAll();
@@ -374,10 +375,21 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
 
     async Task RunExtendedRename()
     {
-        var items = GetSelectedItems().ToArray();
-        if (items.Length > 0 && await AlertDialog.PresentAsync("Umbennenen?", "Erweiterte Umbenennungen starten?") == "ok")
+        var renameItems = GetSelectedItems().ToArray();
+        if (renameItems.Length > 0 && await AlertDialog.PresentAsync("Umbenennen", "Erweiterte Umbenennungen starten?") == "ok")
         {
 
+            var selectedIndexes = GetSelectedItemsIndexes().ToImmutableDictionary(n => n);
+            var items = Items()
+                            .Select((n, i) => (n, i))
+                            .Where(n => n.n.IsDirectory == false)
+                            .Select(n => selectedIndexes.ContainsKey(n.i) ? n.n.RenameName ?? "" : n.n.Name ?? "");
+            if (items.ToImmutableDictionary(n => n).Count == items.Count())
+            {
+
+            }
+            else
+                MainContext.Instance.ErrorText = "Dateinamen nicht eindeutig";
         }
     }
 
@@ -473,7 +485,7 @@ class DirectoryController : ControllerBase<DirectoryItem>, IController, IDisposa
                 item.RenameName = null;
             var index = extendedRename.StartIndex;
             foreach (var selItem in GetSelectedItems().Where(n => !n.IsDirectory))
-                selItem.RenameName = $"{extendedRename.Prefix}{index++}";
+                selItem.RenameName = $"{extendedRename.Prefix}{index++}{selItem.Name.GetFileExtension()}";
         }
     }
 

@@ -11,7 +11,7 @@ abstract class ControllerBase<T> : Controller<T>
     public ControllerBase() {}
     public ControllerBase(SelectionHandle selectionModel) => this.selectionModel = selectionModel;
 
-    protected IEnumerable<int> GetSelectedItemsIndices()
+    protected IEnumerable<int> GetSelectedItemsIndexes()
     {
         if (selectionModel == null)
             yield break;
@@ -30,7 +30,7 @@ abstract class ControllerBase<T> : Controller<T>
     protected IEnumerable<T> GetSelectedItems(int? focusedItemPos = null)
     {
         var items = selectionModel != null
-            ? GetSelectedItemsIndices()
+            ? GetSelectedItemsIndexes()
                 .SelectFilterNull(selectionModel.GetItem<T>)
             : [];
         if (items.Any())
