@@ -5,6 +5,7 @@ using WebServerLight;
 using Commander;
 using Commander.Settings;
 using Commander.UI;
+using WebServerLight.Routing;
 
 // TODO pathEdit: when path is too long, it is not ellipsized: Custom Control containing entry and label
 
@@ -31,7 +32,9 @@ using Commander.UI;
             .New()
             .Http(20000)
             .WebsiteFromResource()
-            .Get(WebRequests.OnGet)
+            .Route(MethodRoute
+                .New(Method.Get)
+                .Request(WebRequests.OnGet))
             .UseRange()
             .Build();
     server.Start();
