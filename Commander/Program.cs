@@ -28,7 +28,7 @@ using WebServerLight.Routing;
     Gtk.ShowDiagnostics();
 
     var server =
-        ServerBuilder
+        WebServer
             .New()
             .Http(20000)
             .WebsiteFromResource()
