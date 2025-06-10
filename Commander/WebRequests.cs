@@ -30,7 +30,7 @@ static class WebRequests
                 if (mime != MimeTypes.TextPlain || !file.IsBinary())
                     await request.SendAsync(file, file.Length, mime == MimeTypes.TextPlain ? MimeTypes.TextPlain + "; charset=utf-8" : mime);
                 else
-                    await request.Send404();
+                    await request.Send404Async();
 
                 return true;
             }
