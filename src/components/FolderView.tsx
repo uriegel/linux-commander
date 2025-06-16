@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type SelectableItem, type VirtualTableHandle } from "virtual-table-react"
-import { init } from "../requests/requests"
+import { changePath } from "../requests/requests"
 
 export type FolderViewHandle = {
     id: string
@@ -42,7 +42,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     
     useEffect(() => {
         const callInit = async () => {
-            const result = await init({})
+            const result = await changePath({path: "root"})
             console.log("init", result)
         }
         callInit()

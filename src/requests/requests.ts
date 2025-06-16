@@ -1,15 +1,15 @@
 interface RequestType {}
 interface ResponseType {}
 
-interface Init extends RequestType  {
+interface ChangePath extends RequestType  {
+    path: string
+}
+
+interface ChangePathResponse extends ResponseType  {
     path?: string
 }
 
-interface InitResponse extends ResponseType  {
-    path?: string
-}
-
-export const init = getJsonPost<Init, InitResponse>("init")
+export const changePath = getJsonPost<ChangePath, ChangePathResponse>("init")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  
