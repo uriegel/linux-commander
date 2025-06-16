@@ -25,34 +25,23 @@ using WebServerLight.Routing;
 
 // TODO Dont copy directory from remote
 {
-    Gtk.ShowDiagnostics();
-
     var server =
         WebServer
             .New()
             .Http(20000)
             .WebsiteFromResource()
-            .Route(MethodRoute
-                .New(Method.Get)
-                .Request(WebRequests.OnGet))
+            // .Route(MethodRoute
+            //     .New(Method.Get)
+            //     .Request(WebRequests.OnGet))
             .UseRange()
             .Build();
     server.Start();
-
-    Gtk.ShowDiagnostics();
 
     using var app = Application
         .NewAdwaita(Globals.AppId)
             .OnActivate(app =>
                 app
                 .SubClass(ManagedAdwApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
-                .SubClass(new FolderViewPanedClass(p => new FolderViewPaned(p)))
-                .SubClass(new FolderViewClass())
-                .SubClass(new ConflictViewClass())
-                .SubClass(new ConflictDialogClass())
-                .SubClass(new AlertDialogClass())
-                .SubClass(ProgressControl.Subclass())
-                .SubClass(ProgressSpinner.Subclass())
                 .ManagedAdwApplicationWindow()
                 .SaveBounds(600, 800)
                 .Show());
