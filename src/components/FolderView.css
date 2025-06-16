@@ -1,0 +1,56 @@
+body {
+    --drag-highlight: rgb(185, 255, 255);
+}
+
+.folder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s;
+}
+
+.tableContainer {
+    flex-grow: 1;
+    position: relative;
+}
+
+.dragStarted {
+    filter: blur(1px);
+}
+
+.dragging {
+    background-color: var(--drag-highlight);
+}
+
+.pathInput {
+    margin-right: 3px;
+    border-style: none;
+    width: calc(100% - 6px);
+    outline-style: none;
+    font-family: sans-serif;
+    font-size: 100%;
+    color: var(--vtr-color);
+    background-color: var(--light-background-color);    
+}
+
+tr .exif {
+    color: var(--exif-color);
+}
+
+tr.isSelected .exif {
+    color: var(--selected-exif-color);
+}
+
+tr.notMounted, tr.hidden {
+    Opacity: 0.5;
+}
+
+tr.disabled {
+    Opacity: 0.4;
+}
+
+tr.notRunning svg {
+    Opacity: 0.4;
+}
