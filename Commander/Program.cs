@@ -4,6 +4,8 @@ using WebServerLight;
 
 using Commander.Settings;
 using Commander.UI;
+using WebServerLight.Routing;
+using Commander;
 
 // TODO Commander scaffold with GTK4 theme
 
@@ -30,9 +32,13 @@ using Commander.UI;
             .New()
             .Http(20000)
             .WebsiteFromResource()
-            // .Route(MethodRoute
-            //     .New(Method.Get)
-            //     .Request(WebRequests.OnGet))
+            .Route(MethodRoute
+                .New(Method.Post)
+                .Add(PathRoute
+                    .New("/request")
+                    .Request(Requests.Process)))
+            .AddAllowedOrigin("http://localhost:5173")                    
+            .AccessControlMaxAge(TimeSpan.FromMinutes(5))
             .UseRange()
             .Build();
     server.Start();
