@@ -2,10 +2,10 @@
 using GtkDotNet.Controls;
 using WebServerLight;
 
-using Commander;
 using Commander.Settings;
 using Commander.UI;
-using WebServerLight.Routing;
+
+// TODO Commander scaffold with GTK4 theme
 
 // TODO pathEdit: when path is too long, it is not ellipsized: Custom Control containing entry and label
 
