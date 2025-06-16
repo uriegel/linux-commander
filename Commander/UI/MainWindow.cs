@@ -1,3 +1,4 @@
+using System.Drawing;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -21,8 +22,12 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
         Handle.InitTemplate();
 
         var webView = MainWindowHandle.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("viewer");
-        //webView.LoadUri("http://localhost:5173");
+#if DEBUG
+        webView.LoadUri("http://localhost:5173");
+#else
         webView.LoadUri("http://localhost:20000");
+#endif        
+        webView.BackgroundColor(Color.Transparent);
     }
 
     public class MainWindowClass()
