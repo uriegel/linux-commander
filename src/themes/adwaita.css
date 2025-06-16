@@ -1,0 +1,120 @@
+@media (prefers-color-scheme: light) {
+    :root .adwaitaTheme {
+        --color: black;
+        --scaffolding-background-color: #ebebeb;
+        --svg-image-path-color: black;
+        --restriction-background-color: white;
+        --exif-color: darkblue;
+        --selected-exif-color: yellow;
+        
+        --vtr-background-color: transparent;
+        --vtr-selected-background-color: #3584e4;
+        --vtr-scrollbar-grip-active-color: var(--vtr-selected-background-color);
+        --vtr-caption-color: #737373;
+        --vtr-caption-background-color: var(--scaffolding-background-color);
+        --vtr-caption-background-hover-color: #e2e2e2;
+        --vtr-caption-separator-color: var(--vtr-caption-color);
+
+        --vsr-grip-color: var(--scaffolding-background-color);
+        --vsr-grip-width: 2px;
+        --vsr-grip-padding: 3px;
+
+        --mbr-menubar-background-color: var(--scaffolding-background-color);
+        --mbr-menubar-submenu-background-color: var(--scaffolding-background-color);
+        --mbr-menubar-selected-background-color: var(--vtr-selected-background-color);
+
+        --wdr-main-background-color: #f6f5f4;
+        --wdr-buttons-gap: 0px;
+        --wdr-buttons-float: none;
+        --wdr-button-background-color: #f6f5f4;
+        --wdr-button-color: black;
+        --wdr-button-hover-background-color: white;
+        --wdr-button-active-background-color: #d6d1cd;   
+        --wdr-button-margin: 20px 0px 0px 0px;
+        --wdr-button-flexgrow: 1;
+        --wdr-button-marginleft: 0px;
+        --wdr-button-focus-color: blue;    
+        --wdr-button-cornerradius: 0px;
+        --wdr-button-left-cornerradius: var(--wdr-button-buttomradius);
+        --wdr-button-right-cornerradius: var(--wdr-button-buttomradius);
+        --wdr-button-bordercolor: lightgray;
+        --wdr-button-borderstyle: solid;
+        --wdr-button-borderwidth: 1px 0px 1px 1px;
+        --wdr-button-first-borderwidth: 0px;
+        --wdr-button-buttomradius: 5px;
+        --wdr-button-padding: 10px 50px;
+        --wdr-button-outlinestyle: dotted;
+        --wdr-button-outlineoffset: -2px;
+        --wdr-input-selection-color: var(--vtr-selected-background-color);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root .adwaitaTheme {
+        --color: lightgray;
+        background-color: #2f2f2f; 
+        --drag-highlight: darkgreen;
+        --scaffolding-background-color: #262626;
+        --svg-image-path-color: var(--color);
+        --restriction-background-color: var(--scaffolding-background-color);
+        --exif-color: rgb(255, 255, 173);
+        --selected-exif-color: yellow;
+        
+        --vtr-color: white;
+        --vtr-background-color: transparent;
+        --vtr-selected-background-color: #3584e4;
+        --vtr-scrollbar-grip-active-color: var(--vtr-selected-background-color);
+        --vtr-caption-color: #ddd;
+        --vtr-caption-background-color: #353535;
+        --vtr-caption-background-hover-color: #464646;
+        --vtr-caption-separator-color: var(--scaffolding-background-color);
+    
+        --vsr-grip-color : var(--scaffolding-background-color);
+        --vsr-grip-hover-color : #383838;
+        --vsr-grip-active-color : #585858;    
+        --vsr-grip-width: 2px;
+        --vsr-grip-padding: 3px;
+    
+        --mbr-menubar-color: white;
+        --mbr-menubar-background-color: var(--scaffolding-background-color);
+        --mbr-menubar-submenu-background-color: var(--scaffolding-background-color);
+        --mbr-menubar-selected-background-color: var(--vtr-selected-background-color);
+        --mbr-menubar-hover-color: darkblue;
+        --mbr-menubar-border-color: rgb(70, 70, 70);
+        --mbr-menubar-shadow-color: rgba(148, 148, 148, 0.2);
+        --mbr-menubar-selected-color: white;
+        --mbr-menubar-selected-background-color: var(--vtr-selected-background-color);
+        --mbr-menubar-separator-color: rgb(70, 70, 70);
+    
+        --wdr-main-color: white;
+        --wdr-main-background-color: #353535;
+        --wdr-buttons-gap: 0px;
+        --wdr-buttons-float: none;
+        --wdr-button-background-color: #353535;
+        --wdr-button-color: white;
+        --wdr-button-hover-background-color: #4b4b4b;
+        --wdr-button-active-background-color: #242424;   
+        --wdr-button-margin: 20px 0px 0px 0px;
+        --wdr-button-flexgrow: 1;
+        --wdr-button-marginleft: 0px;
+        --wdr-button-focus-color: rgb(126, 126, 126);    
+        --wdr-button-cornerradius: 0px;
+        --wdr-button-left-cornerradius: var(--wdr-button-buttomradius);
+        --wdr-button-right-cornerradius: var(--wdr-button-buttomradius);
+        --wdr-button-bordercolor: black;
+        --wdr-button-borderstyle: solid;
+        --wdr-button-borderwidth: 1px 0px 1px 1px;
+        --wdr-button-first-borderwidth: 0px;
+        --wdr-button-buttomradius: 5px;
+        --wdr-button-padding: 10px 50px;
+        --wdr-button-outlinestyle: dotted;
+        --wdr-button-outlineoffset: -2px;
+        --wdr-input-selection-color: var(--vtr-selected-background-color);
+    }   
+}
+
+.App.adwaitaTheme {
+    font-size: 80%;
+}
+
+ 

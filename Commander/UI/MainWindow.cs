@@ -21,7 +21,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
         Handle.InitTemplate();
 
         var webView = MainWindowHandle.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("viewer");
-        webView.LoadUri("http://localhost:5173");
+        //webView.LoadUri("http://localhost:5173");
+        webView.LoadUri("http://localhost:20000");
     }
 
     public class MainWindowClass()
