@@ -13,6 +13,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "view-split-react": "^1.2.0",
+    "virtual-table-react": "^10.10.0",
     "web-dialog-react": "^5.1.1"
   },
   "devDependencies": {

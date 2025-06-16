@@ -1,5 +1,6 @@
-import { forwardRef, useImperativeHandle } from "react"
+import { forwardRef, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
+import VirtualTable, { type SelectableItem, type VirtualTableHandle } from "virtual-table-react"
 
 export type FolderViewHandle = {
     id: string
@@ -9,6 +10,31 @@ interface FolderViewProp {
     id: string
 }
 
+export interface FolderViewItem extends SelectableItem {
+    name:         string
+    size?:        number
+    isParent?:    boolean
+    isDirectory?: boolean
+    // Root item
+    description?: string
+    mountPoint?:  string
+    isMounted?:   boolean
+    // FileSystem item
+    iconPath?:    string
+    time?:        string
+    // exifData?:    ExifData
+    isHidden?:    boolean
+    // Remotes item
+    ipAddress?:   string
+    isAndroid?:   boolean
+    isNew?: boolean
+    // ExtendedRename
+    newName?:     string|null
+    // Favorites
+    path?: string | null
+}
+
+
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     { id },
     ref) => {
@@ -17,18 +43,17 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         id
     }))
 
+    const virtualTable = useRef<VirtualTableHandle<FolderViewItem>>(null)
+    const [items, setStateItems] = useState([] as FolderViewItem[])
+
     return (
-        <div>EinFolderView</div>
-        // <div className={`folder${dragging ? " dragging" : ""}`} onFocus={onFocusChanged}
-        //     onDragEnter={isWindows() ? onDragEnter : undefined} onDragOver={isWindows() ? onDragOver : undefined}
-        //     onDragLeave={isWindows() ? onDragLeave : undefined} onDrop={isWindows() ? onDrop : undefined}>
-        //     <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} />
-        //     <div className={`tableContainer${dragStarted ? " dragStarted" : ""}`} onKeyDown={onKeyDown} >
-        //         <VirtualTable ref={virtualTable} items={items} onSort={onSort} onColumnWidths={onColumnWidths} onItemClick={onItemClick}
-        //             onDragStart={isWindows() ? onDragStart : undefined} onEnter={onEnter} onPosition={onPositionChanged} />
-        //     </div>
-        //     <RestrictionView items={items} ref={restrictionView} />
-        // </div>
+        <div className="folder">
+            {/* <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} /> */}
+            <div className="tableContainer" >
+                <VirtualTable ref={virtualTable} items={items} />
+            </div>
+            {/* <RestrictionView items={items} ref={restrictionView} /> */}
+        </div>
     )
 })
 

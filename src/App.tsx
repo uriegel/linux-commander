@@ -9,7 +9,7 @@ const App = () => {
 	const commander = useRef(null as CommanderHandle|null)
 
 	return (
-		<div className="adwaitaTheme" >
+		<div className="App adwaitaTheme" >
 			<WithDialog>
 				<Commander ref={commander} ></Commander>
 			</WithDialog>
