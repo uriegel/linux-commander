@@ -42,7 +42,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     
     useEffect(() => {
         const callInit = async () => {
-            const result = await changePath({path: "root"})
+            const result = await changePath({id, path: "root"})
             console.log("init", result)
         }
         callInit()

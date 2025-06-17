@@ -1,7 +1,8 @@
-interface RequestType {}
+interface RequestType { }
 interface ResponseType {}
 
 interface ChangePath extends RequestType  {
+    id: string,
     path: string
 }
 
@@ -9,7 +10,7 @@ interface ChangePathResponse extends ResponseType  {
     path?: string
 }
 
-export const changePath = getJsonPost<ChangePath, ChangePathResponse>("init")
+export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  
