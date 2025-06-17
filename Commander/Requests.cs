@@ -21,8 +21,7 @@ static class Requests
         if (data != null)
         {
             DetectController(data.Id, data.Path);
-            GetController(data.Id).ChangePath(data.Path);
-            var response = new ChangePathResult("der Pfad");
+            var response = GetController(data.Id).ChangePath(data.Path);
             await request.SendJsonAsync(response);
         }
         return true;
@@ -32,4 +31,6 @@ record ChangePathRequest(
     string Id,
     string Path
 );
-record ChangePathResult(string Path);
+record ChangePathResult(
+    string? Controller
+);

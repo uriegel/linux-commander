@@ -2,9 +2,11 @@ namespace Commander.Controllers;
 
 class RootController : IController
 {
-    public void ChangePath(string path)
+    public override string Id { get; } = "ROOT";
+
+    public override ChangePathResult ChangePath(string path)
     {
-        // TODO set columns (first time, when controller is changed, set flag initial on create)
+        return new(CheckInitial() ? Id : null);
         // TODO get root items
     }
 }

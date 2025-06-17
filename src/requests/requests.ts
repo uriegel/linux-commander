@@ -7,7 +7,7 @@ interface ChangePath extends RequestType  {
 }
 
 interface ChangePathResponse extends ResponseType  {
-    path?: string
+    controller?: string
 }
 
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")
