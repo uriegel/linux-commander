@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
 import { changePath as changePathRequest } from "../requests/requests"
@@ -53,6 +53,27 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const [items, setStateItems] = useState([] as FolderViewItem[])
 
     const controller = useRef<IController>(new Root())
+    const refItems = useRef(items) // TODO here or better in CS?
+
+
+    // TODO root icons from cs and GTK4
+    // TODO tab control and focus
+    // TODO statusbar in react
+    // TODO dirCount, fileCount in statusbar
+    // TODO actual item in statuc bar
+    // TODO enter => directoryController
+    // TODO getItems in DirectoryController
+
+    const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {
+        setStateItems(items)
+        refItems.current = items
+        //     if (dirCount != undefined || fileCount != undefined) {
+        //         itemCount.current = { dirCount: dirCount || 0, fileCount: fileCount || 0 }
+        //         onItemsChanged(itemCount.current)
+        //     }
+        // }, [onItemsChanged])
+    }, [])
+
 
     async function changePath(path: string) {
         const result = await changePathRequest({ id, path })
@@ -60,7 +81,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             controller.current = getController(result.controller)
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
         }
-        console.log("changePath", result)
+        setItems(result.items, result.dirCount, result.fileCount)
     }
 
     const getWidthsId = () => `${id}-${controller.current.id}-widths`

@@ -1,5 +1,5 @@
 import type { TableColumns } from "virtual-table-react"
-import { IconNameType, type IController } from "./controller"
+import { formatSize, IconNameType, type IController } from "./controller"
 import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
 
