@@ -3,7 +3,7 @@ namespace Commander.Controllers;
 abstract class Controller
 {
     public abstract string Id { get; }
-    public abstract ChangePathResult ChangePath(string path);
+    public abstract Task<ChangePathResult> ChangePathAsync(string path);
 
     protected bool CheckInitial()
     {

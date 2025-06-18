@@ -60,6 +60,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             controller.current = getController(result.controller)
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
         }
+        console.log("changePath", result)
     }
 
     const getWidthsId = () => `${id}-${controller.current.id}-widths`

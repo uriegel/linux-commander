@@ -21,7 +21,7 @@ static class Requests
         if (data != null)
         {
             DetectController(data.Id, data.Path);
-            var response = GetController(data.Id).ChangePath(data.Path);
+            var response = await GetController(data.Id).ChangePathAsync(data.Path);
             await request.SendJsonAsync(response);
         }
         return true;
