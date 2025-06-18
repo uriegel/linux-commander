@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Gtk4DotNet" Version="7.0.65-beta-65" />
-    <PackageReference Include="WebServerLight" Version="1.0.0" />
+    <PackageReference Include="WebServerLight" Version="1.0.2" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
   </ItemGroup>
 

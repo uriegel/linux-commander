@@ -22,7 +22,7 @@ static class Requests
         {
             DetectController(data.Id, data.Path);
             var response = await GetController(data.Id).ChangePathAsync(data.Path);
-            await request.SendJsonAsync(response);
+            await request.SendJsonAsync(response, response.GetType());
         }
         return true;
     }
@@ -34,8 +34,7 @@ record ChangePathRequest(
 record ChangePathResult(
     string? Controller,
     int DirCount,
-    int FileCount,
-    ViewItem[] Items
+    int FileCount
 );
 
 record ViewItem(

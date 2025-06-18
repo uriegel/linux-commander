@@ -42,7 +42,7 @@ class RootController : Controller
             DriveKind.Unknown);
 
         var items = ConcatEnumerables([home], mounted, [fav, remotes], unmounted).ToArray();
-        return new(CheckInitial() ? Id : null, items.Length, 0, items);
+        return new RootResult(CheckInitial() ? Id : null, items.Length, 0, items);
     }
 
     async Task<RootItem[]> GetRootItems()
@@ -121,6 +121,15 @@ enum DriveKind
     Vfat,
     Home,
 }
+
+record RootResult(
+    string? Controller,
+    int DirCount,
+    int FileCount,
+    RootItem[] Items
+)
+    : ChangePathResult(Controller, DirCount, FileCount);
+
 
 record RootItemOffer(RootItem RootItem, bool IsRoot);
 
