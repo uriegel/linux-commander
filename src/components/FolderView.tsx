@@ -1,7 +1,9 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
-import VirtualTable, { type SelectableItem, type VirtualTableHandle } from "virtual-table-react"
-import { changePath } from "../requests/requests"
+import VirtualTable, { type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
+import { changePath as changePathRequest } from "../requests/requests"
+import { getController, type IController } from "../controllers/controller"
+import { Root } from "../controllers/root"
 
 export type FolderViewHandle = {
     id: string
@@ -41,11 +43,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     ref) => {
     
     useEffect(() => {
-        const callInit = async () => {
-            const result = await changePath({id, path: "root"})
-            console.log("init", result)
-        }
-        callInit()
+        changePath("root")
     }, []) 
 
     useImperativeHandle(ref, () => ({
@@ -54,6 +52,28 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
     const virtualTable = useRef<VirtualTableHandle<FolderViewItem>>(null)
     const [items, setStateItems] = useState([] as FolderViewItem[])
+
+    const controller = useRef<IController>(new Root())
+
+    async function changePath(path: string) {
+        const result = await changePathRequest({ id, path })
+        if (result.controller) {
+            controller.current = getController(result.controller)
+            virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
+        }
+    }
+
+    const getWidthsId = () => `${id}-${controller.current.id}-widths`
+
+    const setWidths = (columns: TableColumns<FolderViewItem>) => {
+        const widthstr = localStorage.getItem(getWidthsId())
+        const widths = widthstr ? JSON.parse(widthstr) as number[] : null
+        return widths
+            ? {
+                ...columns, columns: columns.columns.map((n, i) => ({...n, width: widths![i]}))
+            }
+            : columns
+    }
 
     return (
         <div className="folder">

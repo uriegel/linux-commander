@@ -4,23 +4,23 @@ namespace Commander.Controllers;
 
 static class FolderController
 {
-    public static IController DetectController(string id, string path)
+    public static Controller DetectController(string id, string path)
         => controllers.AddOrUpdate(
             id,
             _ => CreateController(path),
             (_, controller) => SetController(controller, () => CreateController(path)));
 
-    public static IController GetController(string id) => controllers[id];
+    public static Controller GetController(string id) => controllers[id];
 
-    static IController SetController<T>(IController current, Func<T> factory)
-        where T : IController
+    static Controller SetController<T>(Controller current, Func<T> factory)
+        where T : Controller
     {
         if (current is not T)
             current = factory();
         return current;
     }
 
-    static IController CreateController(string path)
+    static Controller CreateController(string path)
         => path switch
         {
             //"fav" => new FavoritesController(folderView),
@@ -32,5 +32,5 @@ static class FolderController
             _ => new RootController()
         };
 
-    static readonly ConcurrentDictionary<string, IController> controllers = new();
+    static readonly ConcurrentDictionary<string, Controller> controllers = new();
 }

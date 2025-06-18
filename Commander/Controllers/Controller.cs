@@ -1,6 +1,6 @@
 namespace Commander.Controllers;
 
-abstract class IController
+abstract class Controller
 {
     public abstract string Id { get; }
     public abstract ChangePathResult ChangePath(string path);

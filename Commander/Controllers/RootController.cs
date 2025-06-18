@@ -1,6 +1,6 @@
 namespace Commander.Controllers;
 
-class RootController : IController
+class RootController : Controller
 {
     public override string Id { get; } = "ROOT";
 
