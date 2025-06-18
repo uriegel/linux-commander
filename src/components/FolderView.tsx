@@ -65,6 +65,11 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
     const getWidthsId = () => `${id}-${controller.current.id}-widths`
 
+    const onColumnWidths = (widths: number[]) => {
+        if (widths.length)
+            localStorage.setItem(getWidthsId(), JSON.stringify(widths))
+    }
+
     const setWidths = (columns: TableColumns<FolderViewItem>) => {
         const widthstr = localStorage.getItem(getWidthsId())
         const widths = widthstr ? JSON.parse(widthstr) as number[] : null
@@ -79,7 +84,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         <div className="folder">
             {/* <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} /> */}
             <div className="tableContainer" >
-                <VirtualTable ref={virtualTable} items={items} />
+                <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} />
             </div>
             {/* <RestrictionView items={items} ref={restrictionView} /> */}
         </div>

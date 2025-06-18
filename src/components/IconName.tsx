@@ -7,7 +7,6 @@ import Folder from "../svg/Folder"
 import Home from "../svg/Home"
 import New from "../svg/New"
 import Parent from "../svg/Parent"
-import Service from "../svg/Service"
 
 interface IconNameProps {
     namePart: string
@@ -30,8 +29,6 @@ const IconName = ({ namePart, type, iconPath }: IconNameProps) =>
         ? (<Remote />)
         : type == IconNameType.New
         ? (<New />)
-        : type == IconNameType.Service
-        ? (<Service />)
         : type == IconNameType.Favorite
         ? (<Favorite />)
         : (<Parent />)
