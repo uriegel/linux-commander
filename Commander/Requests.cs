@@ -32,5 +32,32 @@ record ChangePathRequest(
     string Path
 );
 record ChangePathResult(
-    string? Controller
+    string? Controller,
+    int DirCount,
+    int FileCount,
+    ViewItem[] Items
 );
+
+record ViewItem(
+    string Name,
+    long? Size,
+    bool? IsParent,
+    bool? IsDirectory
+);
+
+// export interface FolderViewItem extends SelectableItem {
+//     // FileSystem item
+//     iconPath?:    string
+//     time?:        string
+//     // exifData?:    ExifData
+//     isHidden?:    boolean
+//     // Remotes item
+//     ipAddress?:   string
+//     isAndroid?:   boolean
+//     isNew?: boolean
+//     // ExtendedRename
+//     newName?:     string|null
+//     // Favorites
+//     path?: string | null
+// }
+

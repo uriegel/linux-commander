@@ -37,7 +37,6 @@ export interface FolderViewItem extends SelectableItem {
     path?: string | null
 }
 
-
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     { id },
     ref) => {

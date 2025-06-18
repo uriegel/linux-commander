@@ -1,3 +1,5 @@
+import type { FolderViewItem } from "../components/FolderView"
+
 interface RequestType { }
 interface ResponseType {}
 
@@ -7,7 +9,10 @@ interface ChangePath extends RequestType  {
 }
 
 interface ChangePathResponse extends ResponseType  {
-    controller?: string
+    controller?: string,
+    dirCount: number,
+    fileCount: number,
+    items: FolderViewItem
 }
 
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")
