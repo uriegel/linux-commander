@@ -12,7 +12,7 @@ interface ChangePathResponse extends ResponseType  {
     controller?: string,
     dirCount: number,
     fileCount: number,
-    items: FolderViewItem
+    items: FolderViewItem[]
 }
 
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")

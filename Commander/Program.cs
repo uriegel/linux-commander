@@ -35,6 +35,11 @@ using Commander;
                 .Add(PathRoute
                     .New("/request")
                     .Request(Requests.Process)))
+            .Route(MethodRoute
+                .New(Method.Get)
+                .Add(PathRoute
+                    .New("/iconfromname")
+                    .Request(Requests.GetIconFromName)))
             .AddAllowedOrigin("http://localhost:5173")                    
             .AccessControlMaxAge(TimeSpan.FromMinutes(5))
             .UseRange()

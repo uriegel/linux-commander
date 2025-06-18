@@ -20,9 +20,11 @@ const IconName = ({ namePart, type, iconPath }: IconNameProps) =>
         : type == IconNameType.File
         ? (<img className="iconImage" src={`http://localhost:20000/commander/geticon?path=${iconPath}`} alt="" />)
         : type == IconNameType.Root
-        ? (<Drive />)
+        //? (<Drive />)
+        ? (<img className="image" src={`http://localhost:20000/iconfromname/drive-removable-media`} alt="" />)
         : type == IconNameType.Home
-        ? (<Home />)
+        //? (<Home />)
+        ? (<img className="image" src={`http://localhost:20000/iconfromname/user-home`} alt="" />)
         : type == IconNameType.Android
         ? (<Android />)
         : type == IconNameType.Remote

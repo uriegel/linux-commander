@@ -48,6 +48,12 @@
     <EmbeddedResource Include="./Resources/progresscontrol.ui">
       <LogicalName>progresscontrol</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/iconfromextension.py">
+      <LogicalName>iconfromextension</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/iconfromname.py">
+      <LogicalName>iconfromname</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="./Resources/style.css">
       <LogicalName>style</LogicalName>
     </EmbeddedResource>
