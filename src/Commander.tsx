@@ -4,6 +4,7 @@ import type { FolderViewHandle, FolderViewItem } from "./components/FolderView"
 import FolderView from "./components/FolderView"
 import './App.css'
 import './themes/adwaita.css'
+import "functional-extensions"
 import Statusbar from "./components/Statusbar"
 
 const ID_LEFT = "left"

@@ -18,6 +18,7 @@ interface ItemCount {
 
 interface FolderViewProp {
     id: string,
+    showHidden: boolean
     onFocus: () => void
     onItemChanged: (path: string, isDir: boolean, latitude?: number, longitude?: number) => void
     onItemsChanged: (count: ItemCount) => void
@@ -65,7 +66,7 @@ export type ExifData = {
 }
 
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
-    { id, onFocus, onItemChanged, onItemsChanged, onEnter },
+    { id, showHidden, onFocus, onItemChanged, onItemsChanged, onEnter },
     ref) => {
     
     useEffect(() => {
@@ -77,6 +78,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         setFocus() { virtualTable.current?.setFocus() },
         processEnter
     }))
+
+    const input = useRef<HTMLInputElement|null>(null)
 
     const virtualTable = useRef<VirtualTableHandle<FolderViewItem>>(null)
     const itemCount = useRef({ fileCount: 0, dirCount: 0 })
@@ -92,8 +95,6 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             item.isDirectory == true, item.exifData?.latitude, item.exifData?.longitude),
     [path, onItemChanged])         
 
-    // TODO getItems in DirectoryController
-
     const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {
         setStateItems(items)
         refItems.current = items
@@ -104,8 +105,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     }, [onItemsChanged])
 
 
-    async function changePath(path?: string, mount?: boolean) {
-        const result = await changePathRequest({ id, path, mount })
+    async function changePath(path?: string, showHidden?: boolean, mount?: boolean) {
+        const result = await changePathRequest({ id, path, showHidden, mount })
         if (result.controller) {
             controller.current = getController(result.controller)
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
@@ -118,15 +119,30 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const processEnter = async (item: FolderViewItem) => {
         var res = await controller.current.onEnter({ path, item })
         if (!res.processed)
-            changePath(res.pathToSet, res.mount) // TODO, showHidden, res.latestPath)
+            changePath(res.pathToSet, showHidden, res.mount) // TODO, res.latestPath)
    }
         // .map(res => {
-        //     if (!res.processed && res.pathToSet) 
+        //     if (!res.processed && res.pathToSet)
         //         changePath(id, res.pathToSet, showHidden, res.latestPath, res.mount)
         //     return nothing;
         // })
         // .match(() => {},
-        //     e => showError(e, setError))
+    //     e => showError(e, setError))
+    
+    const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPath(e.target.value)
+
+    const onInputKeyDown = (e: React.KeyboardEvent) => {
+        if (e.code == "Enter") {
+            changePath(path, showHidden)
+            virtualTable.current?.setFocus()
+            e.stopPropagation()
+            e.preventDefault()
+        }
+    }
+
+    const onInputFocus = (e: React.FocusEvent<HTMLInputElement>) => 
+        setTimeout(() => e.target.select())
+
 
     const getWidthsId = () => `${id}-${controller.current.id}-widths`
 
@@ -156,7 +172,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
     return (
         <div className="folder" onFocus={onFocusChanged}>
-            {/* <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} /> */}
+            <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} />
             <div className="tableContainer" >
                 <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} onEnter={onEnter} onPosition={onPositionChanged} />
             </div>

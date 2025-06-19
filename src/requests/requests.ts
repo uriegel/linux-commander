@@ -7,6 +7,7 @@ interface ChangePath extends RequestType  {
     id: string,
     path?: string
     mount?: boolean
+    showHidden?: boolean
 }
 
 interface ChangePathResponse extends ResponseType  {

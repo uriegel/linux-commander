@@ -10,6 +10,7 @@
     "copy": "cp dist/assets/*.js Commander/Resources/website/script.js && cp dist/assets/*.css Commander/Resources/website/style.css"
   },
   "dependencies": {
+    "functional-extensions": "^1.9.17",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "view-split-react": "^1.2.0",

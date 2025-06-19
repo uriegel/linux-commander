@@ -45,7 +45,7 @@ static class Requests
         var data = await request.DeserializeAsync<ChangePathRequest>();
         if (data != null)
         {
-            var path = data!.Mount ? data.Path.Mount() : data.Path;
+            var path = data.Mount ? data.Path.Mount() : data.Path;
             DetectController(data.Id, path);
             var response = await GetController(data.Id).ChangePathAsync(path);
             await request.SendJsonAsync(response, response.GetType());

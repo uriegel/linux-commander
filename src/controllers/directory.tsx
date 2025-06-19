@@ -18,15 +18,14 @@ export class Directory implements IController {
         }
     }
 
-    appendPath(_: string, subPath: string) {
-        return subPath
+    appendPath(path: string, subPath: string) {
+        return path + (path.endsWith('/') ? "" : '/') +subPath
     } 
 
     async onEnter(enterData: EnterData): Promise<OnEnterResult> {
         return {
             processed: false,
-            pathToSet: enterData.item.mountPoint || enterData.item.mountPoint!.length > 0 ? enterData.item.mountPoint : enterData.item.name,
-            mount: !enterData.item.mountPoint            
+            pathToSet: this.appendPath(enterData.path, enterData.item.name)
         }
     }
 
