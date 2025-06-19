@@ -18,6 +18,7 @@ interface ItemCount {
 interface FolderViewProp {
     id: string,
     onFocus: () => void
+    onItemChanged: (path: string, isDir: boolean, latitude?: number, longitude?: number) => void
     onItemsChanged: (count: ItemCount) => void
 }
 
@@ -43,7 +44,7 @@ export interface FolderViewItem extends SelectableItem {
     // FileSystem item
     iconPath?:    string
     time?:        string
-    // exifData?:    ExifData
+    exifData?:    ExifData
     isHidden?:    boolean
     // Remotes item
     ipAddress?:   string
@@ -55,8 +56,14 @@ export interface FolderViewItem extends SelectableItem {
     path?: string | null
 }
 
+export type ExifData = {
+    dateTime?: string 
+    latitude?: number
+    longitude?: number
+}
+
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
-    { id, onFocus, onItemsChanged },
+    { id, onFocus, onItemChanged, onItemsChanged },
     ref) => {
     
     useEffect(() => {
@@ -72,18 +79,17 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const itemCount = useRef({ fileCount: 0, dirCount: 0 })
 
     const [items, setStateItems] = useState([] as FolderViewItem[])
+    const [path, setPath] = useState("")
 
     const controller = useRef<IController>(new Root())
     const refItems = useRef(items) 
 
-    const onPositionChanged = useCallback((item: FolderViewItem) => {}
-    , [])         
-    //     (item: FolderViewItem) => onPathChanged(controller.current.appendPath(path, item.name),
-    //         item.isDirectory == true, item.exifData?.latitude, item.exifData?.longitude
-    // ), [path, onPathChanged])         
+    const onPositionChanged = useCallback((item: FolderViewItem) => 
+        onItemChanged(controller.current.appendPath(path, item.name),
+            item.isDirectory == true, item.exifData?.latitude, item.exifData?.longitude),
+    [path, onItemChanged])         
 
-
-    // TODO actual item in statuc bar
+    // TODO enter => mount drive
     // TODO enter => directoryController
     // TODO getItems in DirectoryController
 
@@ -103,6 +109,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             controller.current = getController(result.controller)
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
         }
+        if (result.path)
+            setPath(result.path)
         setItems(result.items, result.dirCount, result.fileCount)
     }
 
@@ -136,7 +144,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         <div className="folder" onFocus={onFocusChanged}>
             {/* <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} /> */}
             <div className="tableContainer" >
-                <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} />
+                <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} onPosition={onPositionChanged} />
             </div>
             {/* <RestrictionView items={items} ref={restrictionView} /> */}
         </div>

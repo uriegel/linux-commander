@@ -19,6 +19,7 @@ export enum IconNameType {
 export interface IController {
     id: string 
     getColumns(): TableColumns<FolderViewItem>
+    appendPath(path: string, subPath: string): string
 }
 
 export function getController(id: string): IController {

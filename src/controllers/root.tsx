@@ -19,6 +19,10 @@ export class Root implements IController {
         }
     }
 
+    appendPath(_: string, subPath: string) {
+        return subPath
+    } 
+
     constructor() {
         this.id = "ROOT"
     }

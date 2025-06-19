@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import ViewSplit from "view-split-react"
 import type { FolderViewHandle } from "./components/FolderView"
 import FolderView from "./components/FolderView"
@@ -41,13 +41,6 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	const [statusText, setStatusText] = useState<string | null>(null)
 	const [errorText, setErrorText] = useState<string | null>(null)
     
-	const FolderLeft = () => (
-		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemsChanged={setItemCount} />
-	)
-	const FolderRight = () => (
-		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemsChanged={setItemCount} />
-	)
-
 	const activeFolderId = useRef("left")
 //	const getActiveFolder = () => activeFolderId.current == ID_LEFT ? folderLeft.current : folderRight.current
 	const getInactiveFolder = () => activeFolderId.current == ID_LEFT ? folderRight.current : folderLeft.current
@@ -67,12 +60,25 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 		folderLeft.current?.setFocus()
 	}, [])
 
+	const onItemChanged = useCallback(
+		(path: string, isDirectory: boolean, latitude?: number, longitude?: number) => {
+			setItemProperty({ path, isDirectory, latitude, longitude })
+			console.log("Ja bin da", path, isDirectory)
+		}
+	, [])
 
 	const VerticalSplitView = () => (
 		<ViewSplit firstView={FolderLeft} secondView={FolderRight}></ViewSplit>
     )
     
-    const ViewerView = () => {
+	const FolderLeft = () => (
+		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemChanged={onItemChanged} onItemsChanged={setItemCount} />
+	)
+	const FolderRight = () => (
+		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemChanged={onItemChanged} onItemsChanged={setItemCount} />
+	)
+
+	const ViewerView = () => {
         return <div>Der Viewer</div>
 		// const ext = path
 		// 			.path
