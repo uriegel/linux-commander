@@ -30,6 +30,14 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
         webView.BackgroundColor(Color.Transparent);
     }
 
+    protected override void Initialize()
+    {
+        Handle.AddActions(
+            [
+                new("devtools", () => Requests.SendMenuCommand("DevTools"), "<Ctrl><Shift>I")
+            ]);
+    }
+
     public class MainWindowClass()
         : SubClass<AdwApplicationWindowHandle>(GTypeEnum.AdwApplicationWindow, "MainWindow", p => new MainWindow(p))
     { }

@@ -1,5 +1,5 @@
 import type { TableColumns } from "virtual-table-react"
-import { formatSize, IconNameType, type IController } from "./controller"
+import { formatSize, IconNameType, type EnterData, type IController, type OnEnterResult } from "./controller"
 import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
 
@@ -22,6 +22,10 @@ export class Root implements IController {
     appendPath(_: string, subPath: string) {
         return subPath
     } 
+
+    async onEnter(data: EnterData): Promise<OnEnterResult> {
+        return { processed: true }
+    }
 
     constructor() {
         this.id = "ROOT"

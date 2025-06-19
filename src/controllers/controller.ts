@@ -1,6 +1,7 @@
-import type { TableColumns } from "virtual-table-react"
+import type { SpecialKeys, TableColumns } from "virtual-table-react"
 import { Root } from "./root"
 import type { FolderViewItem } from "../components/FolderView"
+import type { DialogHandle } from "web-dialog-react"
 
 export enum IconNameType {
     Parent,
@@ -16,10 +17,24 @@ export enum IconNameType {
     Favorite
 }
 
+export interface OnEnterResult {
+    processed: boolean
+    pathToSet?: string
+    latestPath?: string
+    mount?: boolean
+}
+
+export interface EnterData {
+    path: string,
+    item: FolderViewItem, 
+    //setError: (e: string)=>void
+}
+
 export interface IController {
     id: string 
     getColumns(): TableColumns<FolderViewItem>
     appendPath(path: string, subPath: string): string
+    onEnter: (data: EnterData) => Promise<OnEnterResult> 
 }
 
 export function getController(id: string): IController {

@@ -31,6 +31,15 @@ static class Requests
         return true;
     }
 
+    public static void WebSocket(IWebSocket webSocket)
+        => Requests.webSocket = webSocket;
+
+    public static async void SendMenuCommand(string id)
+    {
+        if (webSocket != null)
+            await webSocket.SendJson(new MenuCommand(id));    
+    }
+    
     static async Task<bool> ChangePath(IRequest request)
     {
         var data = await request.DeserializeAsync<ChangePathRequest>();
@@ -75,6 +84,8 @@ static class Requests
         }
         return new MemoryStream(Encoding.UTF8.GetBytes(text));
     }
+
+    static IWebSocket? webSocket;
 }
 record ChangePathRequest(
     string Id,
@@ -91,6 +102,10 @@ record ViewItem(
     long? Size,
     bool? IsParent,
     bool? IsDirectory
+);
+
+record MenuCommand(
+    string CmdId
 );
 
 // export interface FolderViewItem extends SelectableItem {

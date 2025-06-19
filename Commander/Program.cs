@@ -40,8 +40,9 @@ using Commander;
                 .Add(PathRoute
                     .New("/iconfromname")
                     .Request(Requests.GetIconFromName)))
-            .AddAllowedOrigin("http://localhost:5173")                    
+            .AddAllowedOrigin("http://localhost:5173")
             .AccessControlMaxAge(TimeSpan.FromMinutes(5))
+            .WebSocket(Requests.WebSocket)
             .UseRange()
             .Build();
     server.Start();

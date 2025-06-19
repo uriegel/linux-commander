@@ -8,6 +8,7 @@ import { Root } from "../controllers/root"
 export type FolderViewHandle = {
     id: string
     setFocus: () => void
+    processEnter: (item: FolderViewItem)=>Promise<void>
 }
 
 interface ItemCount {
@@ -20,6 +21,7 @@ interface FolderViewProp {
     onFocus: () => void
     onItemChanged: (path: string, isDir: boolean, latitude?: number, longitude?: number) => void
     onItemsChanged: (count: ItemCount) => void
+    onEnter: (item: FolderViewItem) => void
 }
 
 enum DriveKind {
@@ -63,7 +65,7 @@ export type ExifData = {
 }
 
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
-    { id, onFocus, onItemChanged, onItemsChanged },
+    { id, onFocus, onItemChanged, onItemsChanged, onEnter },
     ref) => {
     
     useEffect(() => {
@@ -73,6 +75,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     useImperativeHandle(ref, () => ({
         id,
         setFocus() { virtualTable.current?.setFocus() },
+        processEnter
     }))
 
     const virtualTable = useRef<VirtualTableHandle<FolderViewItem>>(null)
@@ -89,8 +92,10 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             item.isDirectory == true, item.exifData?.latitude, item.exifData?.longitude),
     [path, onItemChanged])         
 
-    // TODO enter => mount drive
+    // TODO enter => ctrl shift i in DEBUG shows DevTools
+    // TODO Disable context menu
     // TODO enter => directoryController
+    // TODO enter => mount drive
     // TODO getItems in DirectoryController
 
     const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {
@@ -103,7 +108,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     }, [onItemsChanged])
 
 
-    async function changePath(path: string) {
+    async function changePath(path?: string) {
         const result = await changePathRequest({ id, path })
         if (result.controller) {
             controller.current = getController(result.controller)
@@ -113,6 +118,19 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             setPath(result.path)
         setItems(result.items, result.dirCount, result.fileCount)
     }
+
+    const processEnter = async (item: FolderViewItem) => {
+        var res = await controller.current.onEnter({ path, item })
+        if (!res.processed)
+            changePath(res.pathToSet) // TODO, showHidden, res.latestPath, res.mount)
+    }
+        // .map(res => {
+        //     if (!res.processed && res.pathToSet) 
+        //         changePath(id, res.pathToSet, showHidden, res.latestPath, res.mount)
+        //     return nothing;
+        // })
+        // .match(() => {},
+        //     e => showError(e, setError))
 
     const getWidthsId = () => `${id}-${controller.current.id}-widths`
 
@@ -144,7 +162,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         <div className="folder" onFocus={onFocusChanged}>
             {/* <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} /> */}
             <div className="tableContainer" >
-                <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} onPosition={onPositionChanged} />
+                <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} onEnter={onEnter} onPosition={onPositionChanged} />
             </div>
             {/* <RestrictionView items={items} ref={restrictionView} /> */}
         </div>

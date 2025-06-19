@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import ViewSplit from "view-split-react"
-import type { FolderViewHandle } from "./components/FolderView"
+import type { FolderViewHandle, FolderViewItem } from "./components/FolderView"
 import FolderView from "./components/FolderView"
 import './App.css'
 import './themes/adwaita.css'
@@ -42,7 +42,7 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	const [errorText, setErrorText] = useState<string | null>(null)
     
 	const activeFolderId = useRef("left")
-//	const getActiveFolder = () => activeFolderId.current == ID_LEFT ? folderLeft.current : folderRight.current
+	const getActiveFolder = () => activeFolderId.current == ID_LEFT ? folderLeft.current : folderRight.current
 	const getInactiveFolder = () => activeFolderId.current == ID_LEFT ? folderRight.current : folderLeft.current
 
 	const onFocusLeft = () => activeFolderId.current = ID_LEFT
@@ -61,21 +61,23 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	}, [])
 
 	const onItemChanged = useCallback(
-		(path: string, isDirectory: boolean, latitude?: number, longitude?: number) => {
+		(path: string, isDirectory: boolean, latitude?: number, longitude?: number) => 
 			setItemProperty({ path, isDirectory, latitude, longitude })
-			console.log("Ja bin da", path, isDirectory)
-		}
 	, [])
+
+	const onEnter = (item: FolderViewItem) => {
+		getActiveFolder()?.processEnter(item)
+	}
 
 	const VerticalSplitView = () => (
 		<ViewSplit firstView={FolderLeft} secondView={FolderRight}></ViewSplit>
     )
     
 	const FolderLeft = () => (
-		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemChanged={onItemChanged} onItemsChanged={setItemCount} />
+		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemChanged={onItemChanged} onItemsChanged={setItemCount} onEnter={onEnter} />
 	)
 	const FolderRight = () => (
-		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemChanged={onItemChanged} onItemsChanged={setItemCount} />
+		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemChanged={onItemChanged} onItemsChanged={setItemCount} onEnter={onEnter} />
 	)
 
 	const ViewerView = () => {
