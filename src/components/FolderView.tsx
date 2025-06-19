@@ -114,6 +114,10 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         if (result.path)
             setPath(result.path)
         setItems(result.items, result.dirCount, result.fileCount)
+        
+        
+        
+        virtualTable.current?.setInitialPosition(0, result.items.length)
     }
 
     const processEnter = async (item: FolderViewItem) => {
