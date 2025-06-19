@@ -7,7 +7,6 @@ using CsTools.Extensions;
 using Commander.Settings;
 using CsTools;
 using System.Text;
-using GtkDotNet;
 
 namespace Commander;
 

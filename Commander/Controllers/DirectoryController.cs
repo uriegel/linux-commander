@@ -41,6 +41,7 @@ record DirectoryItem(
     string Name,
     long Size,
     bool IsDirectory,
+    bool isParent,
     bool IsHidden,
     DateTime? Time
 )
@@ -50,6 +51,7 @@ record DirectoryItem(
             "..",
             -1,
             true,
+            true,
             false,
             null);
 
@@ -58,6 +60,7 @@ record DirectoryItem(
             info.Name,
             -1,
             true,
+            false,
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
             info.LastWriteTime);
 
@@ -65,6 +68,7 @@ record DirectoryItem(
         => new(
             info.Name,
             info.Length,
+            false,
             false,
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
             info.LastWriteTime);
