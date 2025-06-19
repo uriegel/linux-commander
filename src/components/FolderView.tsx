@@ -92,7 +92,6 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             item.isDirectory == true, item.exifData?.latitude, item.exifData?.longitude),
     [path, onItemChanged])         
 
-    // TODO enter => directoryController
     // TODO getItems in DirectoryController
 
     const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {

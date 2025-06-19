@@ -1,7 +1,7 @@
-import type { SpecialKeys, TableColumns } from "virtual-table-react"
+import type { TableColumns } from "virtual-table-react"
 import { Root } from "./root"
 import type { FolderViewItem } from "../components/FolderView"
-import type { DialogHandle } from "web-dialog-react"
+import { Directory } from "./directory"
 
 export enum IconNameType {
     Parent,
@@ -38,7 +38,9 @@ export interface IController {
 }
 
 export function getController(id: string): IController {
-    return new Root()
+    return id == "ROOT"
+        ? new Root()
+        : new Directory()
 }
 
 export const formatSize = (num?: number) => {
