@@ -23,8 +23,12 @@ export class Root implements IController {
         return subPath
     } 
 
-    async onEnter(data: EnterData): Promise<OnEnterResult> {
-        return { processed: true }
+    async onEnter(enterData: EnterData): Promise<OnEnterResult> {
+        return {
+            processed: false,
+            pathToSet: enterData.item.mountPoint || enterData.item.mountPoint!.length > 0 ? enterData.item.mountPoint : enterData.item.name,
+            mount: !enterData.item.mountPoint            
+        }
     }
 
     constructor() {

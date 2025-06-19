@@ -93,7 +93,6 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     [path, onItemChanged])         
 
     // TODO enter => directoryController
-    // TODO enter => mount drive
     // TODO getItems in DirectoryController
 
     const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {
@@ -106,8 +105,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     }, [onItemsChanged])
 
 
-    async function changePath(path?: string) {
-        const result = await changePathRequest({ id, path })
+    async function changePath(path?: string, mount?: boolean) {
+        const result = await changePathRequest({ id, path, mount })
         if (result.controller) {
             controller.current = getController(result.controller)
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
@@ -120,8 +119,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const processEnter = async (item: FolderViewItem) => {
         var res = await controller.current.onEnter({ path, item })
         if (!res.processed)
-            changePath(res.pathToSet) // TODO, showHidden, res.latestPath, res.mount)
-    }
+            changePath(res.pathToSet, res.mount) // TODO, showHidden, res.latestPath)
+   }
         // .map(res => {
         //     if (!res.processed && res.pathToSet) 
         //         changePath(id, res.pathToSet, showHidden, res.latestPath, res.mount)

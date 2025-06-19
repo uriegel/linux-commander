@@ -7,6 +7,7 @@ using CsTools.Extensions;
 using Commander.Settings;
 using CsTools;
 using System.Text;
+using GtkDotNet;
 
 namespace Commander;
 
@@ -45,8 +46,9 @@ static class Requests
         var data = await request.DeserializeAsync<ChangePathRequest>();
         if (data != null)
         {
-            DetectController(data.Id, data.Path);
-            var response = await GetController(data.Id).ChangePathAsync(data.Path);
+            var path = data!.Mount ? data.Path.Mount() : data.Path;
+            DetectController(data.Id, path);
+            var response = await GetController(data.Id).ChangePathAsync(path);
             await request.SendJsonAsync(response, response.GetType());
         }
         return true;
@@ -89,7 +91,9 @@ static class Requests
 }
 record ChangePathRequest(
     string Id,
-    string Path
+    string Path,
+    bool Mount
+
 );
 record ChangePathResult(
     string? Controller,

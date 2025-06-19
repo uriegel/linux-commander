@@ -6,6 +6,7 @@ interface ResponseType {}
 interface ChangePath extends RequestType  {
     id: string,
     path?: string
+    mount?: boolean
 }
 
 interface ChangePathResponse extends ResponseType  {
