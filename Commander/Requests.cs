@@ -23,11 +23,10 @@ static class Requests
 
     public static async Task<bool> GetIconFromName(IRequest request)
     {
-        var script = IconFromNameScript();
-        var iconfile = (await RunAsync("python3", $"{script} {request.SubPath}")).Trim();
-        using var file = File.OpenRead(iconfile);
-        var stream = iconfile.Contains("symbolic") ? WithSymbolicTheme(file) : file as Stream;
-        await request.SendAsync(stream, stream.Length, iconfile.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) ? "image/svg+xml" : "image/png");
+        var iconfile = await IconFromName(request.SubPath ?? "emtpy");
+        using var file = File.OpenRead(iconfile!);
+        var stream = iconfile?.Contains("symbolic") == true ? WithSymbolicTheme(file) : file as Stream;
+        await request.SendAsync(stream, stream.Length, iconfile?.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) == true ? "image/svg+xml" : "image/png");
         return true;
     }
 
@@ -38,6 +37,14 @@ static class Requests
     {
         if (webSocket != null)
             await webSocket.SendJson(new MenuCommand(id));    
+    }
+
+    static Func<string, Task<string?>> IconFromName { get; } = MemoizeAsync<string>(IconFromNameInit, false);
+
+    static async Task<string?> IconFromNameInit(string iconName, string? oldValue)
+    {
+        var script = IconFromNameScript();
+        return (await RunAsync("python3", $"{script} {iconName}")).Trim();
     }
     
     static async Task<bool> ChangePath(IRequest request)
@@ -96,6 +103,7 @@ record ChangePathRequest(
 );
 record ChangePathResult(
     string? Controller,
+    string Path,
     int DirCount,
     int FileCount
 );

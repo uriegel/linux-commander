@@ -41,7 +41,7 @@ record DirectoryItem(
     string Name,
     long Size,
     bool IsDirectory,
-    bool isParent,
+    bool IsParent,
     bool IsHidden,
     DateTime? Time
 )
@@ -86,4 +86,4 @@ record GetFilesResult(
     int FileCount,
     DirectoryItem[] Items
 )
-    : ChangePathResult(Controller, DirCount, FileCount);
+    : ChangePathResult(Controller, Path, DirCount, FileCount);
