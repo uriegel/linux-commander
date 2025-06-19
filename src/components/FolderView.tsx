@@ -7,6 +7,7 @@ import { Root } from "../controllers/root"
 
 export type FolderViewHandle = {
     id: string
+    setFocus: () => void
 }
 
 interface ItemCount {
@@ -16,6 +17,7 @@ interface ItemCount {
 
 interface FolderViewProp {
     id: string,
+    onFocus: () => void
     onItemsChanged: (count: ItemCount) => void
 }
 
@@ -54,7 +56,7 @@ export interface FolderViewItem extends SelectableItem {
 }
 
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
-    { id, onItemsChanged },
+    { id, onFocus, onItemsChanged },
     ref) => {
     
     useEffect(() => {
@@ -62,7 +64,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     }, []) 
 
     useImperativeHandle(ref, () => ({
-        id
+        id,
+        setFocus() { virtualTable.current?.setFocus() },
     }))
 
     const virtualTable = useRef<VirtualTableHandle<FolderViewItem>>(null)
@@ -73,8 +76,13 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const controller = useRef<IController>(new Root())
     const refItems = useRef(items) 
 
+    const onPositionChanged = useCallback((item: FolderViewItem) => {}
+    , [])         
+    //     (item: FolderViewItem) => onPathChanged(controller.current.appendPath(path, item.name),
+    //         item.isDirectory == true, item.exifData?.latitude, item.exifData?.longitude
+    // ), [path, onPathChanged])         
 
-    // TODO tab control and focus
+
     // TODO actual item in statuc bar
     // TODO enter => directoryController
     // TODO getItems in DirectoryController
@@ -115,8 +123,17 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             : columns
     }
 
+    const onFocusChanged = useCallback(() => {
+        onFocus()
+        const pos = virtualTable.current?.getPosition() ?? 0
+        const item = pos < items.length ? items[pos] : null 
+        if (item)
+            onPositionChanged(item)
+        onItemsChanged(itemCount.current)
+    }, [items, onFocus, onPositionChanged, onItemsChanged]) 
+
     return (
-        <div className="folder">
+        <div className="folder" onFocus={onFocusChanged}>
             {/* <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} /> */}
             <div className="tableContainer" >
                 <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} />

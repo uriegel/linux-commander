@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from "react"
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
 import ViewSplit from "view-split-react"
 import type { FolderViewHandle } from "./components/FolderView"
 import FolderView from "./components/FolderView"
@@ -18,7 +18,7 @@ interface ItemProperty {
 
 
 export type CommanderHandle = {
-//    onKeyDown: (evt: React.KeyboardEvent)=>void
+    onKeyDown: (evt: React.KeyboardEvent)=>void
 }
 
 type CommanderProps = {
@@ -29,7 +29,7 @@ type CommanderProps = {
 const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 
     useImperativeHandle(ref, () => ({
-        //onKeyDown
+        onKeyDown
     }))
 
 	const folderLeft = useRef<FolderViewHandle>(null)
@@ -42,11 +42,30 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	const [errorText, setErrorText] = useState<string | null>(null)
     
 	const FolderLeft = () => (
-		<FolderView ref={folderLeft} id={ID_LEFT} onItemsChanged={setItemCount} />
+		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemsChanged={setItemCount} />
 	)
 	const FolderRight = () => (
-		<FolderView ref={folderRight} id={ID_RIGHT} onItemsChanged={setItemCount} />
+		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemsChanged={setItemCount} />
 	)
+
+	const activeFolderId = useRef("left")
+//	const getActiveFolder = () => activeFolderId.current == ID_LEFT ? folderLeft.current : folderRight.current
+	const getInactiveFolder = () => activeFolderId.current == ID_LEFT ? folderRight.current : folderLeft.current
+
+	const onFocusLeft = () => activeFolderId.current = ID_LEFT
+	const onFocusRight = () => activeFolderId.current = ID_RIGHT
+
+	const onKeyDown = (evt: React.KeyboardEvent) => {
+		if (evt.code == "Tab" && !evt.shiftKey) {
+			getInactiveFolder()?.setFocus()
+			evt.preventDefault()
+			evt.stopPropagation()
+		}
+	}
+
+	useEffect(() => {
+		folderLeft.current?.setFocus()
+	}, [])
 
 
 	const VerticalSplitView = () => (

@@ -8,8 +8,11 @@ const App = () => {
 
 	const commander = useRef(null as CommanderHandle|null)
 
+	const onKeyDown = (evt: React.KeyboardEvent) =>
+		commander.current?.onKeyDown(evt)
+
 	return (
-		<div className="App adwaitaTheme" >
+		<div className="App adwaitaTheme" onKeyDown={onKeyDown}>
 			<WithDialog>
 				<Commander ref={commander} ></Commander>
 			</WithDialog>
