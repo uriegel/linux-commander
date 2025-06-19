@@ -1,5 +1,5 @@
 import type { TableColumns } from "virtual-table-react"
-import { formatSize, IconNameType, type EnterData, type IController, type OnEnterResult } from "./controller"
+import { formatDateTime, formatSize, IconNameType, type EnterData, type IController, type OnEnterResult } from "./controller"
 import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
 
@@ -9,10 +9,9 @@ export class Directory implements IController {
     getColumns(): TableColumns<FolderViewItem> {
         return {
             columns: [
-                { name: "Name" },
-                { name: "Was ist das" },
-                { name: "Mountpoint" },
-                { name: "Größe", isRightAligned: true }
+    	        { name: "Name", isSortable: true, subColumn: "Erw." },
+		        { name: "Datum", isSortable: true },
+                { name: "Größe", isSortable: true, isRightAligned: true }
             ],
             getRowClasses,
             renderRow
@@ -40,21 +39,19 @@ const REMOTES = "remotes"
 const FAVORITES = "fav"
 
 const getRowClasses = (item: FolderViewItem) => 
-    item.isMounted == false
-        ? ["notMounted"]
-        : []
+	item.isHidden
+		? ["hidden"]
+		: []
 
 const renderRow = (item: FolderViewItem) => [
-    (<IconName namePart={item.name} type={
-        item.name == '~'
-        ? IconNameType.Home
-        : item.name == REMOTES
-        ? IconNameType.Remote
-        : item.name == FAVORITES
-        ? IconNameType.Favorite
-        : item.isEjectable ? IconNameType.RootEjectable : IconNameType.Root
-    } />),
-    item.description ?? "",
-    item.mountPoint ?? "",
-    formatSize(item.size)
+	(<IconName namePart={item.name} type={
+			item.isParent
+			? IconNameType.Parent
+			: item.isDirectory
+			? IconNameType.Folder
+			: IconNameType.File}
+		iconPath={item.iconPath} />),
+	(<span className={item.exifData?.dateTime ? "exif" : "" } >{formatDateTime(item?.exifData?.dateTime ?? item?.time)}</span>),
+	formatSize(item.size)
 ]
+
