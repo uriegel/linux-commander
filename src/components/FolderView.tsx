@@ -9,8 +9,22 @@ export type FolderViewHandle = {
     id: string
 }
 
+interface ItemCount {
+    fileCount: number
+    dirCount: number
+}
+
 interface FolderViewProp {
-    id: string
+    id: string,
+    onItemsChanged: (count: ItemCount) => void
+}
+
+enum DriveKind {
+    Unknown,
+    Ext4,
+    Ntfs,
+    Vfat,
+    Home,
 }
 
 export interface FolderViewItem extends SelectableItem {
@@ -21,7 +35,9 @@ export interface FolderViewItem extends SelectableItem {
     // Root item
     description?: string
     mountPoint?:  string
-    isMounted?:   boolean
+    isMounted?: boolean
+    isEjectable?: boolean
+    driveKind?: DriveKind
     // FileSystem item
     iconPath?:    string
     time?:        string
@@ -38,7 +54,7 @@ export interface FolderViewItem extends SelectableItem {
 }
 
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
-    { id },
+    { id, onItemsChanged },
     ref) => {
     
     useEffect(() => {
@@ -50,16 +66,15 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     }))
 
     const virtualTable = useRef<VirtualTableHandle<FolderViewItem>>(null)
+    const itemCount = useRef({ fileCount: 0, dirCount: 0 })
+
     const [items, setStateItems] = useState([] as FolderViewItem[])
 
     const controller = useRef<IController>(new Root())
-    const refItems = useRef(items) // TODO here or better in CS?
+    const refItems = useRef(items) 
 
 
-    // TODO root icons from cs and GTK4
     // TODO tab control and focus
-    // TODO statusbar in react
-    // TODO dirCount, fileCount in statusbar
     // TODO actual item in statuc bar
     // TODO enter => directoryController
     // TODO getItems in DirectoryController
@@ -67,12 +82,11 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {
         setStateItems(items)
         refItems.current = items
-        //     if (dirCount != undefined || fileCount != undefined) {
-        //         itemCount.current = { dirCount: dirCount || 0, fileCount: fileCount || 0 }
-        //         onItemsChanged(itemCount.current)
-        //     }
-        // }, [onItemsChanged])
-    }, [])
+        if (dirCount != undefined || fileCount != undefined) {
+            itemCount.current = { dirCount: dirCount || 0, fileCount: fileCount || 0 }
+            onItemsChanged(itemCount.current)
+        }
+    }, [onItemsChanged])
 
 
     async function changePath(path: string) {

@@ -5,6 +5,7 @@ import type { FolderViewItem } from "../components/FolderView"
 export enum IconNameType {
     Parent,
     Root,
+    RootEjectable,
     Home,
     Folder,
     File,

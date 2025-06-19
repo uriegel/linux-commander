@@ -1,0 +1,26 @@
+.statusbar {
+    padding: 3px;
+    color: var(--color);
+    border-top-width: 1px;
+    border-top-color: var(--scaffolding-background-color);
+    border-top-style: solid;    
+    display: flex;
+}
+
+.statusbar.error {
+    color: white;
+    background-color: red;
+}
+
+.statusbar.status {
+    color: white;
+    background-color: var(--vtr-selected-background-color);
+}
+
+.fill {
+    flex-grow: 1;
+}
+
+.lastStatus {
+    margin: 0 10px;
+}

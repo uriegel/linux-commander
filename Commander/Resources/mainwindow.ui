@@ -56,68 +56,6 @@
                 <property name="visible">true</property>
               </object>            
             </child>
-            <child>
-              <object class="GtkActionBar" id="actionBar">
-                <property name="vexpand">False</property>
-                <child>
-                  <object class="GtkBox">
-                    <child> 
-                      <object class="GtkLabel" id="statusText">
-                        <property name="hexpand">False</property>
-                        <property name="ellipsize">end</property>
-                      </object>
-                    </child>
-                    <child> 
-                      <object class="GtkLabel" id="selectedItemsText">
-                        <property name="hexpand">False</property>
-                        <property name="ellipsize">end</property>
-                      </object>
-                    </child>
-                    <child> 
-                      <object class="GtkLabel" id="restrictionText">
-                        <property name="hexpand">False</property>
-                        <property name="ellipsize">end</property>
-                      </object>
-                    </child>
-                    <child> 
-                      <object class="GtkLabel" id="backgroundActionText">
-                        <property name="hexpand">False</property>
-                        <property name="hexpand">False</property>
-                        <property name="ellipsize">end</property>
-                      </object>
-                    </child>
-                    <child> 
-                      <object class="GtkLabel">
-                        <property name="hexpand">True</property>
-                      </object>
-                    </child>
-                    <child> 
-                      <object class="GtkLabel" id="labelDirs">
-                        <property name="hexpand">False</property>
-                      </object>
-                    </child>
-                    <child> 
-                      <object class="GtkLabel">
-                        <property name="hexpand">False</property>
-                        <property name="label"> Verz.</property>
-                      </object>
-                    </child>
-                    <child> 
-                      <object class="GtkLabel" id="labelFiles">
-                        <property name="margin-start">5</property>
-                        <property name="hexpand">False</property>
-                      </object>
-                    </child>
-                    <child> 
-                      <object class="GtkLabel">
-                        <property name="hexpand">False</property>
-                        <property name="label"> Dateien</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
           </object>
         </child>
       </object>

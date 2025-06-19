@@ -24,6 +24,9 @@ export class Root implements IController {
     }
 }
 
+const REMOTES = "remotes"
+const FAVORITES = "fav"
+
 const getRowClasses = (item: FolderViewItem) => 
     item.isMounted == false
         ? ["notMounted"]
@@ -33,11 +36,11 @@ const renderRow = (item: FolderViewItem) => [
     (<IconName namePart={item.name} type={
         item.name == '~'
         ? IconNameType.Home
-        // : item.name == REMOTES
-        // ? IconNameType.Remote
-        // : item.name == FAVORITES
-        // ? IconNameType.Favorite
-        : IconNameType.Root
+        : item.name == REMOTES
+        ? IconNameType.Remote
+        : item.name == FAVORITES
+        ? IconNameType.Favorite
+        : item.isEjectable ? IconNameType.RootEjectable : IconNameType.Root
     } />),
     item.description ?? "",
     item.mountPoint ?? "",

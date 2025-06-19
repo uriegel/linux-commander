@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 Commander/bin
 Commander/obj
+Commander/Resources/website/script.js
+Commander/Resources/website/style.css

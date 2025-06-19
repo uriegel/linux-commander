@@ -4,9 +4,17 @@ import type { FolderViewHandle } from "./components/FolderView"
 import FolderView from "./components/FolderView"
 import './App.css'
 import './themes/adwaita.css'
+import Statusbar from "./components/Statusbar"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
+
+interface ItemProperty {
+	path: string
+	latitude?: number 
+	longitude?: number
+	isDirectory: boolean
+}
 
 
 export type CommanderHandle = {
@@ -27,13 +35,17 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	const folderLeft = useRef<FolderViewHandle>(null)
 	const folderRight = useRef<FolderViewHandle>(null)
 
-    const [showViewer, setShowViewer] = useState(false)    
+	const [showViewer, setShowViewer] = useState(false)    
+	const [itemProperty, setItemProperty] = useState<ItemProperty>({ path: "", latitude: undefined, longitude: undefined, isDirectory: false })
+	const [itemCount, setItemCount] = useState({ dirCount: 0, fileCount: 0 })
+	const [statusText, setStatusText] = useState<string | null>(null)
+	const [errorText, setErrorText] = useState<string | null>(null)
     
 	const FolderLeft = () => (
-		<FolderView ref={folderLeft} id={ID_LEFT} />
+		<FolderView ref={folderLeft} id={ID_LEFT} onItemsChanged={setItemCount} />
 	)
 	const FolderRight = () => (
-		<FolderView ref={folderRight} id={ID_RIGHT} />
+		<FolderView ref={folderRight} id={ID_RIGHT} onItemsChanged={setItemCount} />
 	)
 
 
@@ -68,8 +80,13 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 		// 	: (<div></div>)
 	}
 
-    return (
-        <ViewSplit isHorizontal={true} firstView={VerticalSplitView} secondView={ViewerView} initialWidth={30} secondVisible={showViewer} />    )
+	return (
+		<>
+			<ViewSplit isHorizontal={true} firstView={VerticalSplitView} secondView={ViewerView} initialWidth={30} secondVisible={showViewer} />
+			<Statusbar path={itemProperty.path} dirCount={itemCount.dirCount} fileCount={itemCount.fileCount}
+					errorText={errorText} setErrorText={setErrorText} statusText={statusText} />		
+		</>
+	)
 })
 
     export default Commander

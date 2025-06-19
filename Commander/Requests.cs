@@ -6,6 +6,7 @@ using static Commander.Controllers.FolderController;
 using CsTools.Extensions;
 using Commander.Settings;
 using CsTools;
+using System.Text;
 
 namespace Commander;
 
@@ -23,9 +24,10 @@ static class Requests
     public static async Task<bool> GetIconFromName(IRequest request)
     {
         var script = IconFromNameScript();
-        var iconfile = (await RunAsync("python", $"{script} {request.SubPath}")).Trim();
+        var iconfile = (await RunAsync("python3", $"{script} {request.SubPath}")).Trim();
         using var file = File.OpenRead(iconfile);
-        await request.SendAsync(file, file.Length, iconfile.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) ? "image/svg+xml" : "image/png");
+        var stream = iconfile.Contains("symbolic") ? WithSymbolicTheme(file) : file as Stream;
+        await request.SendAsync(stream, stream.Length, iconfile.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) ? "image/svg+xml" : "image/png");
         return true;
     }
 
@@ -54,6 +56,24 @@ static class Requests
         using var file = File.Create(filename);
         res?.CopyTo(file);
         return filename;
+    }
+
+    static MemoryStream WithSymbolicTheme(FileStream input)
+    {
+        var text = new StreamReader(input).ReadToEnd();
+        var pos = 0;
+        while (true)
+        {
+            var fillPos = text.IndexOf("fill=\"", pos) + 6;
+            if (fillPos == -1)
+                break;
+            var posEnd = text.IndexOf('\"', fillPos + 1);
+            var newText = string.Concat(text.AsSpan(0, fillPos), "#888", text.AsSpan(posEnd));
+            text = newText;
+            pos = fillPos;
+            break;
+        }
+        return new MemoryStream(Encoding.UTF8.GetBytes(text));
     }
 }
 record ChangePathRequest(
