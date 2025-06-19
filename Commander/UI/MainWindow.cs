@@ -21,20 +21,21 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
         MainWindowHandle = Handle;
         Handle.InitTemplate();
 
-        var webView = MainWindowHandle.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("viewer");
+        webView = MainWindowHandle.GetTemplateChild<WebViewHandle, ApplicationWindowHandle>("webview");
+        webView.DisableContextMenu();
+        webView.BackgroundColor(Color.Transparent);
 #if DEBUG
         webView.LoadUri("http://localhost:5173");
 #else
         webView.LoadUri("http://localhost:20000");
 #endif        
-        webView.BackgroundColor(Color.Transparent);
     }
 
     protected override void Initialize()
     {
         Handle.AddActions(
             [
-                new("devtools", () => Requests.SendMenuCommand("DevTools"), "<Ctrl><Shift>I")
+                new("devtools", ShowDevTools, "<Ctrl><Shift>I")
             ]);
     }
 
@@ -43,4 +44,20 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
     { }
 
     protected override AdwApplicationWindowHandle CreateHandle(nint obj) => new(obj);
+
+    void ShowDevTools()
+    {
+        var inspector = webView.GetInspector();
+        inspector.Show();
+        webView.GrabFocus();
+        DetachInspector();
+
+        async void DetachInspector()
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(600));
+            inspector.Detach();
+        }
+   }
+
+    WebViewHandle webView = new();
 }

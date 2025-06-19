@@ -41,7 +41,7 @@
               </object>
             </child>
             <child>
-              <object class="WebKitWebView" id="viewer">
+              <object class="WebKitWebView" id="webview">
                 <property name="vexpand">True</property>
                 <property name="camera-capture-state">active</property>
                 <property name="display-capture-state">active</property>

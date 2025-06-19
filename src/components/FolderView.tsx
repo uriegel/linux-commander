@@ -92,8 +92,6 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             item.isDirectory == true, item.exifData?.latitude, item.exifData?.longitude),
     [path, onItemChanged])         
 
-    // TODO enter => ctrl shift i in DEBUG shows DevTools
-    // TODO Disable context menu
     // TODO enter => directoryController
     // TODO enter => mount drive
     // TODO getItems in DirectoryController
