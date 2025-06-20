@@ -19,7 +19,7 @@ class RootController : Controller
         var home = new RootItem(
             "~",
             "home",
-            0,
+            -1,
             CsTools.Directory.GetHomeDir(),
             true,
             false,
@@ -27,7 +27,7 @@ class RootController : Controller
         var fav = new RootItem(
             "fav",
             "Favoriten",
-            0,
+            -1,
             "fav",
             true,
             false,
@@ -35,7 +35,7 @@ class RootController : Controller
         var remotes = new RootItem(
             "remotes",
             "Zugriff auf entfernte Geräte",
-            0,
+            -1,
             "remotes",
             true,
             false,

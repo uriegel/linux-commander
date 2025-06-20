@@ -1,6 +1,7 @@
 import { IconNameType } from "../controllers/controller"
 import Android from "../svg/Android"
 import New from "../svg/New"
+import "./IconName.css"
 
 interface IconNameProps {
     namePart: string
@@ -12,7 +13,7 @@ const IconName = ({ namePart, type, iconPath }: IconNameProps) =>
     (<span> { type == IconNameType.Folder
         ? (<img className="image" src={`http://localhost:20000/iconfromname/folder-open`} alt="" />)
         : type == IconNameType.File
-        ? (<img className="iconImage" src={`http://localhost:20000/commander/geticon?path=${iconPath}`} alt="" />)
+        ? (<img className="iconImage" src={`http://localhost:20000/iconfromextension/${iconPath}`} alt="" />)
         : type == IconNameType.Root
         ? (<img className="image" src={`http://localhost:20000/iconfromname/drive-removable-media`} alt="" />)
         : type == IconNameType.RootEjectable

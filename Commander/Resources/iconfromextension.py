@@ -9,6 +9,7 @@ def get_icon_path(extension, size=16):
     if type_:
         icon = Gio.content_type_get_icon(type_)
         theme = Gtk.IconTheme.get_default()
-        info = theme.choose_icon(icon.get_names(), size, Gtk.IconLookupFlags.NO_SVG)
+        #info = theme.choose_icon(icon.get_names(), size, Gtk.IconLookupFlags.NO_SVG)
+        info = theme.choose_icon(icon.get_names(), size, 0)
         return info.get_filename()
 print(get_icon_path(sys.argv[1]))

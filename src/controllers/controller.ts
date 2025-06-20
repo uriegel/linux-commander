@@ -45,6 +45,8 @@ export function getController(id: string): IController {
 
 export const formatSize = (num?: number) => {
     if (!num)
+        return "0"
+    if (num == -1)
         return ""
     let sizeStr = num.toString()
     const sep = '.'

@@ -24,40 +24,43 @@ using Commander;
 // TODO Android range
 
 // TODO Dont copy directory from remote
-{
-    var server =
-        WebServer
-            .New()
-            .Http(20000)
-            .WebsiteFromResource()
-            .Route(MethodRoute
-                .New(Method.Post)
-                .Add(PathRoute
-                    .New("/request")
-                    .Request(Requests.Process)))
-            .Route(MethodRoute
-                .New(Method.Get)
-                .Add(PathRoute
-                    .New("/iconfromname")
-                    .Request(Requests.GetIconFromName)))
-            .AddAllowedOrigin("http://localhost:5173")
-            .AccessControlMaxAge(TimeSpan.FromMinutes(5))
-            .WebSocket(Requests.WebSocket)
-            .UseRange()
-            .Build();
-    server.Start();
+var server =
+    WebServer
+        .New()
+        .Http(20000)
+        .WebsiteFromResource()
+        .Route(MethodRoute
+            .New(Method.Post)
+            .Add(PathRoute
+                .New("/request")
+                .Request(Requests.Process)))
+        .Route(MethodRoute
+            .New(Method.Get)
+            .Add(PathRoute
+                .New("/iconfromname")
+                .Request(Requests.GetIconFromName))
+            .Add(PathRoute
+                .New("/iconfromextension")
+                .Request(Requests.GetIconFromExtension)))
+        .AddAllowedOrigin("http://localhost:5173")
+        .AccessControlMaxAge(TimeSpan.FromMinutes(5))
+        .WebSocket(Requests.WebSocket)
+        .UseRange()
+        .Build();
+server.Start();
 
-    using var app = Application
-        .NewAdwaita(Globals.AppId)
-            .OnActivate(app =>
-                app
-                .SubClass(ManagedAdwApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
-                .ManagedAdwApplicationWindow()
-                .SaveBounds(600, 800)
-                .Show());
-    app.Run(0, IntPtr.Zero);
-}
+using var app = Application
+    .NewAdwaita(Globals.AppId)
+        .OnActivate(app =>
+            app
+            .SubClass(ManagedAdwApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
+            .ManagedAdwApplicationWindow()
+            .SaveBounds(600, 800)
+            .Show());
+app.Run(0, IntPtr.Zero);
 
-Gtk.ShowDiagnostics();
+server.Stop();
+
+
 
 

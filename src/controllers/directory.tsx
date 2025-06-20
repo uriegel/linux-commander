@@ -2,6 +2,7 @@ import type { TableColumns } from "virtual-table-react"
 import { formatDateTime, formatSize, IconNameType, type EnterData, type IController, type OnEnterResult } from "./controller"
 import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
+import "../extensions/extensions"
 
 export class Directory implements IController {
     id: string
@@ -18,8 +19,8 @@ export class Directory implements IController {
         }
     }
 
-    appendPath(path: string, subPath: string) {
-        return path + (path.endsWith('/') ? "" : '/') +subPath
+    appendPath(path: string, subPath: string)  {
+        return path.appendPath(subPath)
     } 
 
     async onEnter(enterData: EnterData): Promise<OnEnterResult> {
@@ -49,7 +50,7 @@ const renderRow = (item: FolderViewItem) => [
 			: item.isDirectory
 			? IconNameType.Folder
 			: IconNameType.File}
-		iconPath={item.iconPath} />),
+		iconPath={item.name.getExtension()} />),
 	(<span className={item.exifData?.dateTime ? "exif" : "" } >{formatDateTime(item?.exifData?.dateTime ?? item?.time)}</span>),
 	formatSize(item.size)
 ]

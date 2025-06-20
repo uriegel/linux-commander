@@ -1,12 +1,12 @@
+using System.Text;
+using CsTools;
+using CsTools.Extensions;
 using WebServerLight;
+using Commander.Settings;
 
 using static CsTools.Functional.Memoization;
 using static CsTools.ProcessCmd;
 using static Commander.Controllers.FolderController;
-using CsTools.Extensions;
-using Commander.Settings;
-using CsTools;
-using System.Text;
 
 namespace Commander;
 
@@ -31,6 +31,16 @@ static class Requests
         return true;
     }
 
+    public static async Task<bool> GetIconFromExtension(IRequest request)
+    {
+        var iconfile = await IconFromExtension(request.SubPath ?? "xxx");
+        using var file = File.OpenRead(iconfile!);
+        var stream = iconfile?.Contains("symbolic") == true ? WithSymbolicTheme(file) : file as Stream;
+        // TODO request.AddResponseHeader("Expires", (DateTime.UtcNow + TimeSpan.FromHours(1)).ToString("r"));
+        await request.SendAsync(stream, stream.Length, iconfile?.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) == true ? "image/svg+xml" : "image/png");
+        return true;
+    }
+    
     public static void WebSocket(IWebSocket webSocket)
         => Requests.webSocket = webSocket;
 
@@ -41,13 +51,20 @@ static class Requests
     }
 
     static Func<string, Task<string?>> IconFromName { get; } = MemoizeAsync<string>(IconFromNameInit, false);
+    static Func<string, Task<string?>> IconFromExtension { get; } = MemoizeAsync<string>(IconFromExtensionInit, false);
 
     static async Task<string?> IconFromNameInit(string iconName, string? oldValue)
     {
         var script = IconFromNameScript();
         return (await RunAsync("python3", $"{script} {iconName}")).Trim();
     }
-    
+
+    static async Task<string?> IconFromExtensionInit(string iconName, string? oldValue)
+    {
+        var script = IconFromExtensionScript();
+        return (await RunAsync("python3", $"{script} {iconName.WhiteSpaceToNull() ?? "xxx"}")).Trim();
+    }
+        
     static async Task<bool> ChangePath(IRequest request)
     {
         var data = await request.DeserializeAsync<ChangePathRequest>();
@@ -62,6 +79,7 @@ static class Requests
     }
 
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
+    static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
 
     static string IconFromNameScriptInit()
     {
@@ -76,6 +94,19 @@ static class Requests
         return filename;
     }
 
+    static string IconFromExtensionScriptInit()
+    {
+        var res = Resources.Get("iconfromextension");
+        var filename = Environment
+            .GetFolderPath(Environment.SpecialFolder.ApplicationData)
+            .AppendPath(Globals.AppId)
+            .SideEffect(d => d.EnsureDirectoryExists())
+            .AppendPath("iconfromextension.py");
+        using var file = File.Create(filename);
+        res?.CopyTo(file);
+        return filename;
+    }
+    
     static MemoryStream WithSymbolicTheme(FileStream input)
     {
         var text = new StreamReader(input).ReadToEnd();
@@ -122,8 +153,6 @@ record MenuCommand(
 
 // export interface FolderViewItem extends SelectableItem {
 //     // FileSystem item
-//     iconPath?:    string
-//     time?:        string
 //     // exifData?:    ExifData
 //     isHidden?:    boolean
 //     // Remotes item

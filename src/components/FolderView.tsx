@@ -45,7 +45,6 @@ export interface FolderViewItem extends SelectableItem {
     isEjectable?: boolean
     driveKind?: DriveKind
     // FileSystem item
-    iconPath?:    string
     time?:        string
     exifData?:    ExifData
     isHidden?:    boolean
