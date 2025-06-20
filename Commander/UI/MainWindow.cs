@@ -35,7 +35,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
     {
         Handle.AddActions(
             [
-                new("devtools", ShowDevTools, "<Ctrl><Shift>I")
+                new("devtools", ShowDevTools, "<Ctrl><Shift>I"),
+                new("refresh", () => Requests.SendMenuCommand("refresh"), "<Ctrl>R")
             ]);
     }
 
@@ -57,7 +58,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
             await Task.Delay(TimeSpan.FromMilliseconds(600));
             inspector.Detach();
         }
-   }
+    }
 
     WebViewHandle webView = new();
 }

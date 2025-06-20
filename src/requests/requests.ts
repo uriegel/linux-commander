@@ -1,5 +1,11 @@
 import type { FolderViewItem } from "../components/FolderView"
 
+
+
+
+
+import "./events" // TODO remove
+
 interface RequestType { }
 interface ResponseType {}
 
@@ -37,8 +43,3 @@ function getJsonPost<RequestType, ResponseType>(method: string): (request: Reque
     return (request: RequestType) => jsonPost(method, request)
 }
 
-const ws = new WebSocket("ws://localhost:20000/events")
-ws.onopen = () => console.log("Web socket opened")
-ws.onmessage = evt => console.log("Web socket msg", evt.data, evt)
-ws.onerror = err => console.log("Web socket error", err)
-ws.onclose = () => console.log("Web socket closed")
