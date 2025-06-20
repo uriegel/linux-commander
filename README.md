@@ -1,7 +1,6 @@
 # commander
 A Norton Commander clone based on Web Components and C# (.NET 9)
 
-// TODO refresh (goto pos 0)
 // TODO show hidden  (goto pos 0)
 // TODO backlog history
 // TODO restriction

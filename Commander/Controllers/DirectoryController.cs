@@ -28,7 +28,7 @@ class DirectoryController : Controller
                         .Select(DirectoryItem.CreateFileItem)]));
 
         GetFilesResult MakeFilesResult(DirFileInfo dirFileInfo)
-            => new(Id, info.FullName, dirFileInfo.Directories.Length, dirFileInfo.Files.Length, [
+            => new(CheckInitial() ? Id : null, info.FullName, dirFileInfo.Directories.Length, dirFileInfo.Files.Length, [
                 DirectoryItem.CreateParentItem(),
                 .. dirFileInfo.Directories,
                 .. dirFileInfo.Files]);

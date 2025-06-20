@@ -59,8 +59,7 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 
 	const onMenuAction = useCallback(async (key: string) => {
 		if (key == "refresh")
-			console.log("onMenuAction", "refresh")
-			//getActiveFolder()?.refresh()
+			getActiveFolder()?.refresh()
 	}, [])
 
 	useEffect(() => {

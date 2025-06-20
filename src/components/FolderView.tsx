@@ -8,7 +8,8 @@ import { Root } from "../controllers/root"
 export type FolderViewHandle = {
     id: string
     setFocus: () => void
-    processEnter: (item: FolderViewItem)=>Promise<void>
+    processEnter: (item: FolderViewItem) => Promise<void>
+    refresh: ()=>void
 }
 
 interface ItemCount {
@@ -75,7 +76,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     useImperativeHandle(ref, () => ({
         id,
         setFocus() { virtualTable.current?.setFocus() },
-        processEnter
+        processEnter,
+        refresh
     }))
 
     const input = useRef<HTMLInputElement|null>(null)
@@ -128,6 +130,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         if (!res.processed)
             changePath(res.pathToSet, showHidden, res.mount, res.latestPath)
     }
+
+    const refresh = () => changePath(path, showHidden)
     
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPath(e.target.value)
 
