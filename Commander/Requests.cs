@@ -36,7 +36,7 @@ static class Requests
         var iconfile = await IconFromExtension(request.SubPath ?? "xxx");
         using var file = File.OpenRead(iconfile!);
         var stream = iconfile?.Contains("symbolic") == true ? WithSymbolicTheme(file) : file as Stream;
-        // TODO request.AddResponseHeader("Expires", (DateTime.UtcNow + TimeSpan.FromHours(1)).ToString("r"));
+        request.AddResponseHeader("Expires", (DateTime.UtcNow + TimeSpan.FromHours(1)).ToString("r"));
         await request.SendAsync(stream, stream.Length, iconfile?.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) == true ? "image/svg+xml" : "image/png");
         return true;
     }

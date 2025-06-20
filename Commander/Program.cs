@@ -7,23 +7,6 @@ using Commander.UI;
 using WebServerLight.Routing;
 using Commander;
 
-// TODO pathEdit: when path is too long, it is not ellipsized: Custom Control containing entry and label
-
-// TODO Pdf viewer: PdViewer in WebWindowNetCore
-// TODO Pdf viewer: PdViewer in Gtk4DotNet
-// TODO Pdf viewer
-// TODO Text viewer/editor
-// TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
-
-// TODO Drag n drop
-
-// TODO When item is opened wait till process stops and refresh item
-
-// TODO Rename remote
-
-// TODO Android range
-
-// TODO Dont copy directory from remote
 var server =
     WebServer
         .New()
