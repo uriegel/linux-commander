@@ -1,9 +1,10 @@
 # commander
 A Norton Commander clone based on Web Components and C# (.NET 9)
 
-// TODO when goto parent select last path
-// TODO save last path
 // TODO show hidden
+// TODO refresh
+// TODO backlog history
+// TODO restriction
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large
 

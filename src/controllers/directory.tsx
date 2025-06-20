@@ -24,9 +24,11 @@ export class Directory implements IController {
     } 
 
     async onEnter(enterData: EnterData): Promise<OnEnterResult> {
+        
         return {
             processed: false,
-            pathToSet: this.appendPath(enterData.path, enterData.item.name)
+            pathToSet: this.appendPath(enterData.path, enterData.item.name),
+            latestPath: enterData.item.isParent ? enterData.path.extractSubPath() : undefined 
         }
     }
 

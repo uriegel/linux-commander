@@ -69,7 +69,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     ref) => {
     
     useEffect(() => {
-        changePath("root")
+        changePath(localStorage.getItem(`${id}-lastPath`) ?? "root", false)
     }, []) 
 
     useImperativeHandle(ref, () => ({
@@ -104,7 +104,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     }, [onItemsChanged])
 
 
-    async function changePath(path?: string, showHidden?: boolean, mount?: boolean) {
+    async function changePath(path?: string, showHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem)=>boolean) {
         const result = await changePathRequest({ id, path, showHidden, mount })
         if (result.controller) {
             controller.current = getController(result.controller)
@@ -113,24 +113,21 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         if (result.path)
             setPath(result.path)
         setItems(result.items, result.dirCount, result.fileCount)
-        
-        
-        
-        virtualTable.current?.setInitialPosition(0, result.items.length)
+        const pos = latestPath
+                    ? result.items.findIndex(n => n.name == latestPath)
+                    : checkPosition
+                    ? result.items.findIndex(n => checkPosition(n))
+                    : 0        
+        virtualTable.current?.setInitialPosition(pos, result.items.length)
+        if (result.path)
+            localStorage.setItem(`${id}-lastPath`, result.path)
     }
 
     const processEnter = async (item: FolderViewItem) => {
         var res = await controller.current.onEnter({ path, item })
         if (!res.processed)
-            changePath(res.pathToSet, showHidden, res.mount) // TODO, res.latestPath)
-   }
-        // .map(res => {
-        //     if (!res.processed && res.pathToSet)
-        //         changePath(id, res.pathToSet, showHidden, res.latestPath, res.mount)
-        //     return nothing;
-        // })
-        // .match(() => {},
-    //     e => showError(e, setError))
+            changePath(res.pathToSet, showHidden, res.mount, res.latestPath)
+    }
     
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPath(e.target.value)
 
