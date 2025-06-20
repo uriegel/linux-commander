@@ -1,4 +1,4 @@
-import { share } from 'rxjs/operators'
+import { filter, map, share } from 'rxjs/operators'
 import { webSocket } from "rxjs/webSocket"
 
 type WebSocketMsg = {
@@ -9,6 +9,9 @@ type WebSocketMsg = {
 const socket = webSocket<WebSocketMsg>('ws://localhost:20000/events')
 
 const commanderEvents = socket.pipe(share())
+export const cmdEvents = socket
+                    .pipe(filter(n => n.method == "cmd"))
+                    .pipe(map(n => n.cmd || ""))
 
 commanderEvents.subscribe({
     next: message => console.log('Received:', message),

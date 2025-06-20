@@ -47,7 +47,7 @@ static class Requests
     public static async void SendMenuCommand(string id)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new MenuCommand(id));    
+            await webSocket.SendJson(new WebSocketMsg("cmd", id));    
     }
 
     static Func<string, Task<string?>> IconFromName { get; } = MemoizeAsync<string>(IconFromNameInit, false);
@@ -147,9 +147,10 @@ record ViewItem(
     bool? IsDirectory
 );
 
-record MenuCommand(
-    string CmdId
-);
+
+record WebSocketMsg(
+    string Method,
+    string? Cmd);
 
 // export interface FolderViewItem extends SelectableItem {
 //     // FileSystem item

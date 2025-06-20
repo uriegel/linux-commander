@@ -1,11 +1,12 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import ViewSplit from "view-split-react"
-import type { FolderViewHandle, FolderViewItem } from "./components/FolderView"
-import FolderView from "./components/FolderView"
-import './App.css'
-import './themes/adwaita.css'
+import type { FolderViewHandle, FolderViewItem } from "./FolderView"
+import FolderView from "./FolderView"
+import '../App.css'
+import '../themes/adwaita.css'
 import "functional-extensions"
-import Statusbar from "./components/Statusbar"
+import Statusbar from "./Statusbar"
+import { cmdEvents } from "../requests/events"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
@@ -16,7 +17,6 @@ interface ItemProperty {
 	longitude?: number
 	isDirectory: boolean
 }
-
 
 export type CommanderHandle = {
     onKeyDown: (evt: React.KeyboardEvent)=>void
@@ -57,8 +57,19 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 		}
 	}
 
+	const onMenuAction = useCallback(async (key: string) => {
+		if (key == "refresh")
+			console.log("onMenuAction", "refresh")
+			//getActiveFolder()?.refresh()
+	}, [])
+
 	useEffect(() => {
 		folderLeft.current?.setFocus()
+	}, [])
+
+	useEffect(() => {
+		const subscription = cmdEvents.subscribe(onMenuAction)
+		return () => subscription.unsubscribe()
 	}, [])
 
 	const onItemChanged = useCallback(

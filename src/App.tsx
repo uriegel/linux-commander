@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import './App.css'
-import Commander, { type CommanderHandle } from './Commander'
+import Commander, { type CommanderHandle } from './components/Commander'
 import './themes/adwaita.css'
 import WithDialog from 'web-dialog-react'
 

@@ -1,11 +1,5 @@
 import type { FolderViewItem } from "../components/FolderView"
 
-
-
-
-
-import "./events" // TODO remove
-
 interface RequestType { }
 interface ResponseType {}
 
