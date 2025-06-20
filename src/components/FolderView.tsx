@@ -9,7 +9,9 @@ export type FolderViewHandle = {
     id: string
     setFocus: ()=>void
     processEnter: (item: FolderViewItem)=>Promise<void>
-    refresh: (forceShowHidden?: boolean)=>void
+    refresh: (forceShowHidden?: boolean) => void
+    getPath: () => string
+    changePath: (path: string) => void
 }
 
 interface ItemCount {
@@ -77,7 +79,9 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         id,
         setFocus() { virtualTable.current?.setFocus() },
         processEnter,
-        refresh
+        refresh,
+        getPath() { return path },
+        changePath
     }))
 
     const input = useRef<HTMLInputElement|null>(null)
@@ -106,8 +110,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     }, [onItemsChanged])
 
 
-    async function changePath(path?: string, showHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem)=>boolean) {
-        const result = await changePathRequest({ id, path, showHidden, mount })
+    async function changePath(path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem)=>boolean) {
+        const result = await changePathRequest({ id, path, showHidden: forceShowHidden === undefined ? showHidden : forceShowHidden, mount })
         if (result.controller) {
             controller.current = getController(result.controller)
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))

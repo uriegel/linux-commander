@@ -59,8 +59,16 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	}
 
 	const onMenuAction = useCallback(async (key: string) => {
-		if (key == "refresh")
-			getActiveFolder()?.refresh()
+		switch (key) {
+			case "refresh":
+				getActiveFolder()?.refresh()
+				break
+			case "adaptpath":
+				var path = getActiveFolder()?.getPath()
+				if (path)
+					getInactiveFolder()?.changePath(path)
+				break
+		}
 	}, [])
 
 	const onMenuToggleAction = useCallback(async (msg: CmdToggleMsg) => {

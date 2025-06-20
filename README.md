@@ -1,7 +1,7 @@
 # commander
 A Norton Commander clone based on Web Components and C# (.NET 9)
 
-// TODO adapt path F9
+// TODO Cancel getFiles (test with Task.delay(10000))
 // TODO GetExifData
 // TODO backlog history
 // TODO restriction
