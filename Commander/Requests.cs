@@ -26,6 +26,7 @@ static class Requests
         var iconfile = await IconFromName(request.SubPath ?? "emtpy");
         using var file = File.OpenRead(iconfile!);
         var stream = iconfile?.Contains("symbolic") == true ? WithSymbolicTheme(file) : file as Stream;
+        request.AddResponseHeader("Expires", (DateTime.UtcNow + TimeSpan.FromHours(1)).ToString("r"));
         await request.SendAsync(stream, stream.Length, iconfile?.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) == true ? "image/svg+xml" : "image/png");
         return true;
     }
