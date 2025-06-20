@@ -1,7 +1,8 @@
 # commander
 A Norton Commander clone based on Web Components and C# (.NET 9)
 
-// TODO show hidden  (goto pos 0)
+// TODO adapt path F9
+// TODO GetExifData
 // TODO backlog history
 // TODO restriction
 // TODO root detect new drives/removed drives

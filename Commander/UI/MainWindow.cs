@@ -36,7 +36,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
         Handle.AddActions(
             [
                 new("devtools", ShowDevTools, "<Ctrl><Shift>I"),
-                new("refresh", () => Requests.SendMenuCommand("refresh"), "<Ctrl>R")
+                new("refresh", () => Requests.SendMenuCommand("refresh"), "<Ctrl>R"),
+                new("showhidden", false, show => Requests.SendMenuCheck("showhidden", show), "<Ctrl>H")
             ]);
     }
 

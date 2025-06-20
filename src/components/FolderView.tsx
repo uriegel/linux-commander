@@ -7,9 +7,9 @@ import { Root } from "../controllers/root"
 
 export type FolderViewHandle = {
     id: string
-    setFocus: () => void
-    processEnter: (item: FolderViewItem) => Promise<void>
-    refresh: ()=>void
+    setFocus: ()=>void
+    processEnter: (item: FolderViewItem)=>Promise<void>
+    refresh: (forceShowHidden?: boolean)=>void
 }
 
 interface ItemCount {
@@ -70,7 +70,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     ref) => {
     
     useEffect(() => {
-        changePath(localStorage.getItem(`${id}-lastPath`) ?? "root", false)
+        changePath(localStorage.getItem(`${id}-lastPath`) ?? "root", false, false)
     }, []) 
 
     useImperativeHandle(ref, () => ({
@@ -131,7 +131,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             changePath(res.pathToSet, showHidden, res.mount, res.latestPath)
     }
 
-    const refresh = () => changePath(path, showHidden)
+    const refresh = (forceShowHidden?: boolean) => changePath(path, forceShowHidden || (forceShowHidden === false ? false : showHidden))
     
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPath(e.target.value)
 

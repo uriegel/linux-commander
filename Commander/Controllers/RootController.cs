@@ -10,7 +10,7 @@ class RootController : Controller
 {
     public override string Id { get; } = "ROOT";
 
-    public override async Task<ChangePathResult> ChangePathAsync(string path)
+    public override async Task<ChangePathResult> ChangePathAsync(string path, bool _)
     {
         var rootItems = await GetRootItems();
         var mounted = rootItems.Where(n => n.IsMounted);

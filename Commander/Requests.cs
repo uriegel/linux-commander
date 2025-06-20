@@ -47,9 +47,14 @@ static class Requests
     public static async void SendMenuCommand(string id)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("cmd", id));    
+            await webSocket.SendJson(new WebSocketMsg("cmd", id, null));    
     }
 
+    public static async void SendMenuCheck(string id, bool check)
+    {
+        if (webSocket != null)
+            await webSocket.SendJson(new WebSocketMsg("cmdtoggle", id, check));    
+    }
     static Func<string, Task<string?>> IconFromName { get; } = MemoizeAsync<string>(IconFromNameInit, false);
     static Func<string, Task<string?>> IconFromExtension { get; } = MemoizeAsync<string>(IconFromExtensionInit, false);
 
@@ -72,7 +77,7 @@ static class Requests
         {
             var path = data.Mount ? data.Path.Mount() : data.Path;
             DetectController(data.Id, path);
-            var response = await GetController(data.Id).ChangePathAsync(path);
+            var response = await GetController(data.Id).ChangePathAsync(path, data.ShowHidden);
             await request.SendJsonAsync(response, response.GetType());
         }
         return true;
@@ -130,7 +135,8 @@ static class Requests
 record ChangePathRequest(
     string Id,
     string Path,
-    bool Mount
+    bool Mount,
+    bool ShowHidden
 
 );
 record ChangePathResult(
@@ -150,12 +156,12 @@ record ViewItem(
 
 record WebSocketMsg(
     string Method,
-    string? Cmd);
+    string? Cmd,
+    bool? Checked);
 
 // export interface FolderViewItem extends SelectableItem {
 //     // FileSystem item
 //     // exifData?:    ExifData
-//     isHidden?:    boolean
 //     // Remotes item
 //     ipAddress?:   string
 //     isAndroid?:   boolean

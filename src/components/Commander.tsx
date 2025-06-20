@@ -6,7 +6,7 @@ import '../App.css'
 import '../themes/adwaita.css'
 import "functional-extensions"
 import Statusbar from "./Statusbar"
-import { cmdEvents } from "../requests/events"
+import { cmdEvents, cmdToggleEvents, type CmdToggleMsg } from "../requests/events"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
@@ -37,6 +37,7 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	const folderRight = useRef<FolderViewHandle>(null)
 
 	const [showViewer, setShowViewer] = useState(false)    
+	const [showHidden, setShowHidden] = useState(false)
 	const [itemProperty, setItemProperty] = useState<ItemProperty>({ path: "", latitude: undefined, longitude: undefined, isDirectory: false })
 	const [itemCount, setItemCount] = useState({ dirCount: 0, fileCount: 0 })
 	const [statusText, setStatusText] = useState<string | null>(null)
@@ -62,13 +63,26 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 			getActiveFolder()?.refresh()
 	}, [])
 
+	const onMenuToggleAction = useCallback(async (msg: CmdToggleMsg) => {
+		if (msg.cmd == "showhidden") {
+			setShowHidden(msg.checked)
+			folderLeft.current?.refresh(msg.checked)
+			folderRight.current?.refresh(msg.checked)
+		}
+
+	}, [])
+
 	useEffect(() => {
 		folderLeft.current?.setFocus()
 	}, [])
 
 	useEffect(() => {
 		const subscription = cmdEvents.subscribe(onMenuAction)
-		return () => subscription.unsubscribe()
+		const subscriptionToggle = cmdToggleEvents.subscribe(onMenuToggleAction)
+			return () => {
+				subscriptionToggle.unsubscribe()
+				subscription.unsubscribe()
+			}
 	}, [])
 
 	const onItemChanged = useCallback(
@@ -85,10 +99,12 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
     )
     
 	const FolderLeft = () => (
-		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemChanged={onItemChanged} onItemsChanged={setItemCount} onEnter={onEnter} />
+		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemChanged={onItemChanged} onItemsChanged={setItemCount}
+			onEnter={onEnter} showHidden={showHidden} />
 	)
 	const FolderRight = () => (
-		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemChanged={onItemChanged} onItemsChanged={setItemCount} onEnter={onEnter} />
+		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemChanged={onItemChanged} onItemsChanged={setItemCount}
+			onEnter={onEnter} showHidden={showHidden}/>
 	)
 
 	const ViewerView = () => {

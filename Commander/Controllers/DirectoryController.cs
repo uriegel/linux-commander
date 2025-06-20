@@ -6,24 +6,27 @@ class DirectoryController : Controller
 {
     public override string Id { get; } = "DIRECTORY";
 
-    public override Task<ChangePathResult> ChangePathAsync(string path)
+    public override Task<ChangePathResult> ChangePathAsync(string path, bool showHidden)
     {
         cancellation.Cancel();
         cancellation = new();
-        var result = GetFiles(path);
+        var result = GetFiles(path, showHidden);
         return (result as ChangePathResult).ToAsync();
     }
 
-    public GetFilesResult GetFiles(string path)
+    public GetFilesResult GetFiles(string path, bool showHidden)
     {
+        Console.WriteLine($"Achtung {showHidden}");
         var info = new DirectoryInfo(path);
         return MakeFilesResult(new DirFileInfo(
                     [.. info
                         .GetDirectories()
+                        .Where(n => showHidden || (n.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         .OrderBy(n => n.Name)
                         .Select(DirectoryItem.CreateDirItem)],
                     [.. info
                         .GetFiles()
+                        .Where(n => showHidden || (n.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
                         .OrderBy(n => n.Name)
                         .Select(DirectoryItem.CreateFileItem)]));
 
