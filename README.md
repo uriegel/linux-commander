@@ -11,9 +11,10 @@ react-devtools
 ```
 
 ```
-// TODO GetExifData
+// TODO Sorting 
+// TODO GetExifData: change items (with sorting)
+// TODO restriction (restrict also after ExifData arrived)
 // TODO backlog history
-// TODO restriction
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large
 
