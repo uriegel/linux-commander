@@ -138,13 +138,14 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         }
         if (result.path)
             setPath(result.path)
-        setItems(result.items, result.dirCount, result.fileCount)
+        const newItems = controller.current.sort(result.items, sortIndex.current, sortDescending.current)
+        setItems(newItems, result.dirCount, result.fileCount)
         const pos = latestPath
-                    ? result.items.findIndex(n => n.name == latestPath)
+                    ? newItems.findIndex(n => n.name == latestPath)
                     : checkPosition
-                    ? result.items.findIndex(n => checkPosition(n))
+                    ? newItems.findIndex(n => checkPosition(n))
                     : 0        
-        virtualTable.current?.setInitialPosition(pos, result.items.length)
+        virtualTable.current?.setInitialPosition(pos, newItems.length)
         if (result.path)
             localStorage.setItem(`${id}-lastPath`, result.path)
     }

@@ -22,9 +22,7 @@ export type CommanderHandle = {
     onKeyDown: (evt: React.KeyboardEvent)=>void
 }
 
-type CommanderProps = {
-//    isMaximized: boolean
-}
+type CommanderProps = {}
 
 
 const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {

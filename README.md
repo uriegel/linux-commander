@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Sorting: refresh with sorting, show hidden with sorting
 // TODO GetExifData: change items (with sorting)
 // TODO restriction (restrict also after ExifData arrived)
 // TODO backlog history
