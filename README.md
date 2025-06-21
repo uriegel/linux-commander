@@ -1,7 +1,6 @@
 # commander
 A Norton Commander clone based on Web Components and C# (.NET 9)
 
-// TODO WebSockets cmd: per cmd one msgtype
 // TODO GetExifData: staus bar text per folder
 // TODO backlog history
 // TODO restriction

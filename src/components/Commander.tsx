@@ -85,7 +85,7 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	}, [])
 
 	useEffect(() => {
-		const subscription = cmdEvents.subscribe(onMenuAction)
+		const subscription = cmdEvents.subscribe(m => onMenuAction(m!.cmd))
 		const subscriptionToggle = cmdToggleEvents.subscribe(onMenuToggleAction)
 			return () => {
 				subscriptionToggle.unsubscribe()

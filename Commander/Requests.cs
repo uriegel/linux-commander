@@ -47,19 +47,19 @@ static class Requests
     public static async void SendMenuCommand(string id)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("cmd", id, null, null, null, null));    
+            await webSocket.SendJson(new WebSocketMsg("cmd", new(id), null, null));    
     }
 
     public static async void SendMenuCheck(string id, bool check)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("cmdtoggle", id, check, null, null, null)); 
+            await webSocket.SendJson(new WebSocketMsg("cmdtoggle", null, new(id, check), null)); 
     }
 
     public static async void SendStatusBarInfo(string id, int requestId, string? text)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("status", id, null, id, requestId, text)); 
+            await webSocket.SendJson(new WebSocketMsg("status", null, null, new(id, requestId, text))); 
     }
 
     static Func<string, Task<string?>> IconFromName { get; } = MemoizeAsync<string>(IconFromNameInit, false);
@@ -165,10 +165,15 @@ record ViewItem(
 
 record WebSocketMsg(
     string Method,
-    string? Cmd,
-    bool? Checked,
-    string? FolderId,
-    int? RequestId,
+    CmdMsg? CmdMsg,
+    CmdToggleMsg? CmdToggleMsg,
+    StatusMsg? StatusMsg);
+
+record CmdMsg(string Cmd);
+record CmdToggleMsg(string Cmd, bool Checked);
+record StatusMsg(
+    string FolderId,
+    int RequestId,
     string? Text);
 
 // export interface FolderViewItem extends SelectableItem {
