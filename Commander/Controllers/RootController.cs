@@ -131,7 +131,7 @@ record RootResult(
     int FileCount,
     RootItem[] Items
 )
-    : ChangePathResult(Cancelled, Controller, Path, DirCount, FileCount);
+    : ChangePathResult(Cancelled, 0, Controller, Path, DirCount, FileCount);
 
 
 record RootItemOffer(RootItem RootItem, bool IsRoot);

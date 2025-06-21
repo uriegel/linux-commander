@@ -6,10 +6,19 @@ export type CmdToggleMsg = {
     checked: boolean
 }
 
+export type StatusMsg = {
+    folderId: string,
+    requestId: number,
+    text?: string
+}
+
 type WebSocketMsg = {
-    method: "cmd"|"cmdtoggle"
+    method: "cmd"|"cmdtoggle"|"status"
     cmd?: string
-    checked?: boolean
+    checked?: boolean,
+    folderId: string,
+    requestId?: number,
+    text?: string
 }
 
 const socket = webSocket<WebSocketMsg>('ws://localhost:20000/events').pipe(share())
@@ -24,6 +33,17 @@ export const cmdToggleEvents = socket
                         cmd: n.cmd || "",
                         checked: n.checked === true
                     })))
+
+export const statusEvents = socket
+                    .pipe(filter(n => n.method == "status"))
+                    .pipe(map(n => ({
+                        folderId: n.folderId || "",
+                        requestId: n.requestId || -1,
+                        text: n.text
+                    })))
+
+
+statusEvents.subscribe((n: StatusMsg) => console.log("Status", n))                    
 
 socket.subscribe({
     error: err => console.error('Subscription error:', err),

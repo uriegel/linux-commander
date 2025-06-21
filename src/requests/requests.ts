@@ -3,15 +3,16 @@ import type { FolderViewItem } from "../components/FolderView"
 interface RequestType { }
 interface ResponseType {}
 
-interface ChangePath extends RequestType  {
+interface ChangePath extends RequestType {
     id: string,
     path?: string
     mount?: boolean
     showHidden?: boolean
 }
 
-interface ChangePathResponse extends ResponseType  {
+interface ChangePathResponse extends ResponseType {
     cancelled?: boolean
+    id: number
     controller?: string,
     dirCount: number,
     fileCount: number,

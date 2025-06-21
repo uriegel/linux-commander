@@ -6,19 +6,21 @@ class DirectoryController(string folderId) : Controller(folderId)
 
     public override async Task<ChangePathResult> ChangePathAsync(string path, bool showHidden)
     {
+        var changePathId = Interlocked.Increment(ref ChangePathSeed);
         try
         {
             var cancellation = Cancellations.ChangePathCancellation(FolderId);
-            var result = await Task.Run(() => GetFiles(path, showHidden, cancellation));
+            var result = await Task.Run(() => GetFiles(path, showHidden, changePathId, cancellation));
+            GetExifData(changePathId, cancellation);
             return result;
         }
         catch (OperationCanceledException)
         {
-            return new ChangePathResult(true, null, "", 0, 0);
+            return new ChangePathResult(true, changePathId, null, "", 0, 0);
         }
     }
 
-    GetFilesResult GetFiles(string path, bool showHidden, CancellationToken cancellation)
+    GetFilesResult GetFiles(string path, bool showHidden, int changePathId, CancellationToken cancellation)
     {
         var info = new DirectoryInfo(path);
         cancellation.ThrowIfCancellationRequested();
@@ -35,11 +37,34 @@ class DirectoryController(string folderId) : Controller(folderId)
                         .Select(DirectoryItem.CreateFileItem)]));
 
         GetFilesResult MakeFilesResult(DirFileInfo dirFileInfo)
-            => new(null, CheckInitial() ? Id : null, info.FullName, dirFileInfo.Directories.Length, dirFileInfo.Files.Length, [
+            => new(null, changePathId, CheckInitial() ? Id : null, info.FullName, dirFileInfo.Directories.Length, dirFileInfo.Files.Length, [
                 DirectoryItem.CreateParentItem(),
                 .. dirFileInfo.Directories,
                 .. dirFileInfo.Files]);
     }
+
+    async void GetExifData(int changePathId, CancellationToken cancellation)
+    {
+        try
+        {
+            await Task.Run(() =>
+            {
+                Requests.SendStatusBarInfo(FolderId, changePathId, "Ermittle EXIF-Informationen...");
+                for (var i = 0; i < 20; i++)
+                {
+                    Thread.Sleep(250);
+                    cancellation.ThrowIfCancellationRequested();
+                }
+                Requests.SendStatusBarInfo(FolderId, changePathId, null);
+            }, cancellation);
+        }
+        catch
+        { 
+            Requests.SendStatusBarInfo(FolderId, changePathId, null);
+        }
+    }
+
+    public static int ChangePathSeed = 0;
 }
 
 record DirectoryItem(
@@ -86,10 +111,11 @@ record DirFileInfo(
 
 record GetFilesResult(
     bool? Cancelled,
+    int Id,
     string? Controller,
     string Path,
     int DirCount,
     int FileCount,
     DirectoryItem[] Items
 )
-    : ChangePathResult(Cancelled, Controller, Path, DirCount, FileCount);
+    : ChangePathResult(Cancelled, Id, Controller, Path, DirCount, FileCount);

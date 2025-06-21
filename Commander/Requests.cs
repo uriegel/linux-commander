@@ -47,14 +47,21 @@ static class Requests
     public static async void SendMenuCommand(string id)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("cmd", id, null));    
+            await webSocket.SendJson(new WebSocketMsg("cmd", id, null, null, null, null));    
     }
 
     public static async void SendMenuCheck(string id, bool check)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("cmdtoggle", id, check));    
+            await webSocket.SendJson(new WebSocketMsg("cmdtoggle", id, check, null, null, null)); 
     }
+
+    public static async void SendStatusBarInfo(string id, int requestId, string? text)
+    {
+        if (webSocket != null)
+            await webSocket.SendJson(new WebSocketMsg("status", id, null, id, requestId, text)); 
+    }
+
     static Func<string, Task<string?>> IconFromName { get; } = MemoizeAsync<string>(IconFromNameInit, false);
     static Func<string, Task<string?>> IconFromExtension { get; } = MemoizeAsync<string>(IconFromExtensionInit, false);
 
@@ -141,6 +148,7 @@ record ChangePathRequest(
 );
 record ChangePathResult(
     bool? Cancelled,
+    int Id,
     string? Controller,
     string Path,
     int DirCount,
@@ -158,7 +166,10 @@ record ViewItem(
 record WebSocketMsg(
     string Method,
     string? Cmd,
-    bool? Checked);
+    bool? Checked,
+    string? FolderId,
+    int? RequestId,
+    string? Text);
 
 // export interface FolderViewItem extends SelectableItem {
 //     // FileSystem item
