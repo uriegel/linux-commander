@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
-import VirtualTable, { type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
+import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
 import { changePath as changePathRequest } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
@@ -91,6 +91,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
     const virtualTable = useRef<VirtualTableHandle<FolderViewItem>>(null)
     const itemCount = useRef({ fileCount: 0, dirCount: 0 })
+    const sortIndex = useRef(0)
+    const sortDescending = useRef(false)
 
     const [items, setStateItems] = useState([] as FolderViewItem[])
     const [path, setPath] = useState("")
@@ -169,6 +171,14 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const onInputFocus = (e: React.FocusEvent<HTMLInputElement>) => 
         setTimeout(() => e.target.select())
 
+    const onSort = async (sort: OnSort) => {
+        sortIndex.current = sort.isSubColumn ? 10 : sort.column
+        sortDescending.current = sort.isDescending
+        const newItems = controller.current.sort(items, sortIndex.current, sortDescending.current)
+        setItems(newItems)
+        const name = items[virtualTable.current?.getPosition() ?? 0].name
+        virtualTable.current?.setPosition(newItems.findIndex(n => n.name == name))
+    }
 
     const getWidthsId = () => `${id}-${controller.current.id}-widths`
 
@@ -200,7 +210,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         <div className="folder" onFocus={onFocusChanged}>
             <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} />
             <div className="tableContainer" >
-                <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} onEnter={onEnter} onPosition={onPositionChanged} />
+                <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} onEnter={onEnter} onPosition={onPositionChanged} onSort={onSort} />
             </div>
             {/* <RestrictionView items={items} ref={restrictionView} /> */}
         </div>

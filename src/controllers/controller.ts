@@ -35,6 +35,7 @@ export interface IController {
     getColumns(): TableColumns<FolderViewItem>
     appendPath(path: string, subPath: string): string
     onEnter: (data: EnterData) => Promise<OnEnterResult> 
+    sort: (items: FolderViewItem[], sortIndex: number, sortDescending: boolean) => FolderViewItem[]
 }
 
 export function getController(id: string): IController {
@@ -79,4 +80,14 @@ export function formatDateTime(dateStr?: string) {
         return ''
     const date = Date.parse(dateStr)
     return dateFormat.format(date) + " " + timeFormat.format(date)  
+}
+
+export type SortFunction = (a: FolderViewItem, b: FolderViewItem) => number
+
+export const sortItems = (folderItemArray: FolderViewItem[], sortFunction?: SortFunction, sortDirs?: boolean) => {
+    const unsortedDirs = folderItemArray.filter(n => n.isDirectory || n.isParent)
+    const dirs = sortDirs ? unsortedDirs.sort((a, b) => a.name.localeCompare(b.name)) : unsortedDirs
+    let files = folderItemArray.filter(n => !n.isDirectory) 
+    files = sortFunction ? files.sort(sortFunction) : files
+    return dirs.concat(files)
 }

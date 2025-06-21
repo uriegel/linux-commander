@@ -31,6 +31,8 @@ export class Root implements IController {
         }
     }
 
+    sort(items: FolderViewItem[]) { return items }
+
     constructor() {
         this.id = "ROOT"
     }
