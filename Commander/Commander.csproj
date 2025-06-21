@@ -57,27 +57,6 @@
     <EmbeddedResource Include="./Resources/style.css">
       <LogicalName>style</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="../website/styles/style.css">
-      <LogicalName>/styles/style.css</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="../website/styles/imageviewer.css">
-      <LogicalName>/styles/imageviewer.css</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="../website/styles/trackviewer.css">
-      <LogicalName>/styles/trackviewer.css</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="../website/script/script.js">
-      <LogicalName>/script/script.js</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="../website/script/globals.js">
-      <LogicalName>/script/globals.js</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="../website/script/imageviewer.js">
-      <LogicalName>/script/imageviewer.js</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="../website/script/trackviewer.js">
-      <LogicalName>/script/trackviewer.js</LogicalName>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

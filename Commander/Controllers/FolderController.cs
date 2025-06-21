@@ -7,8 +7,8 @@ static class FolderController
     public static Controller DetectController(string id, string path)
         => controllers.AddOrUpdate(
             id,
-            _ => CreateController(path),
-            (_, controller) => SetController(controller, path, () => CreateController(path)));
+            _ => CreateController(id, path),
+            (_, controller) => SetController(controller, path, () => CreateController(id, path)));
 
     public static Controller GetController(string id) => controllers[id];
 
@@ -33,16 +33,16 @@ static class FolderController
         };
 
 
-    static Controller CreateController(string path)
+    static Controller CreateController(string folderId, string path)
         => path switch
         {
             //"fav" => new FavoritesController(folderView),
             //"remotes" => SetController(() => new RemotesController(folderView)),
-            "root" => new RootController(),
-            "/.." => new RootController(),
-            "" => new RootController(),
+            "root" => new RootController(folderId),
+            "/.." => new RootController(folderId),
+            "" => new RootController(folderId),
             //_ when path.StartsWith("remote") => SetController(() => new RemoteController(folderView)),
-            _ => new DirectoryController()
+            _ => new DirectoryController(folderId)
         };
 
     static readonly ConcurrentDictionary<string, Controller> controllers = new();

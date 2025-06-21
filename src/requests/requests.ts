@@ -11,6 +11,7 @@ interface ChangePath extends RequestType  {
 }
 
 interface ChangePathResponse extends ResponseType  {
+    cancelled?: boolean
     controller?: string,
     dirCount: number,
     fileCount: number,

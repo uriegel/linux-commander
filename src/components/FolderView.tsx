@@ -112,6 +112,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
     async function changePath(path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem)=>boolean) {
         const result = await changePathRequest({ id, path, showHidden: forceShowHidden === undefined ? showHidden : forceShowHidden, mount })
+        if (result.cancelled)
+            return
         if (result.controller) {
             controller.current = getController(result.controller)
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))

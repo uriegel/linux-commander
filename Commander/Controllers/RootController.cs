@@ -6,12 +6,13 @@ using static CsTools.Extensions.Core;
 
 namespace Commander.Controllers;
 
-class RootController : Controller
+class RootController(string folderId) : Controller(folderId)
 {
     public override string Id { get; } = "ROOT";
 
     public override async Task<ChangePathResult> ChangePathAsync(string path, bool _)
     {
+        var cancellation = Cancellations.ChangePathCancellation(FolderId);
         var rootItems = await GetRootItems();
         var mounted = rootItems.Where(n => n.IsMounted);
         var unmounted = rootItems.Where(n => !n.IsMounted);
@@ -42,7 +43,7 @@ class RootController : Controller
             DriveKind.Unknown);
 
         var items = ConcatEnumerables([home], mounted, [fav, remotes], unmounted).ToArray();
-        return new RootResult(CheckInitial() ? Id : null, "root", items.Length, 0, items);
+        return new RootResult(null, CheckInitial() ? Id : null, "root", items.Length, 0, items);
     }
 
     async Task<RootItem[]> GetRootItems()
@@ -123,13 +124,14 @@ enum DriveKind
 }
 
 record RootResult(
+    bool? Cancelled,
     string? Controller,
     string Path,
     int DirCount,
     int FileCount,
     RootItem[] Items
 )
-    : ChangePathResult(Controller, Path, DirCount, FileCount);
+    : ChangePathResult(Cancelled, Controller, Path, DirCount, FileCount);
 
 
 record RootItemOffer(RootItem RootItem, bool IsRoot);

@@ -140,6 +140,7 @@ record ChangePathRequest(
 
 );
 record ChangePathResult(
+    bool? Cancelled,
     string? Controller,
     string Path,
     int DirCount,

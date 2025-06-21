@@ -1,23 +1,27 @@
-using CsTools.Extensions;
-
 namespace Commander.Controllers;
 
-class DirectoryController : Controller
+class DirectoryController(string folderId) : Controller(folderId)
 {
     public override string Id { get; } = "DIRECTORY";
 
-    public override Task<ChangePathResult> ChangePathAsync(string path, bool showHidden)
+    public override async Task<ChangePathResult> ChangePathAsync(string path, bool showHidden)
     {
-        cancellation.Cancel();
-        cancellation = new();
-        var result = GetFiles(path, showHidden);
-        return (result as ChangePathResult).ToAsync();
+        try
+        {
+            var cancellation = Cancellations.ChangePathCancellation(FolderId);
+            var result = await Task.Run(() => GetFiles(path, showHidden, cancellation));
+            return result;
+        }
+        catch (OperationCanceledException)
+        {
+            return new ChangePathResult(true, null, "", 0, 0);
+        }
     }
 
-    public GetFilesResult GetFiles(string path, bool showHidden)
+    GetFilesResult GetFiles(string path, bool showHidden, CancellationToken cancellation)
     {
-        Console.WriteLine($"Achtung {showHidden}");
         var info = new DirectoryInfo(path);
+        cancellation.ThrowIfCancellationRequested();
         return MakeFilesResult(new DirFileInfo(
                     [.. info
                         .GetDirectories()
@@ -31,13 +35,11 @@ class DirectoryController : Controller
                         .Select(DirectoryItem.CreateFileItem)]));
 
         GetFilesResult MakeFilesResult(DirFileInfo dirFileInfo)
-            => new(CheckInitial() ? Id : null, info.FullName, dirFileInfo.Directories.Length, dirFileInfo.Files.Length, [
+            => new(null, CheckInitial() ? Id : null, info.FullName, dirFileInfo.Directories.Length, dirFileInfo.Files.Length, [
                 DirectoryItem.CreateParentItem(),
                 .. dirFileInfo.Directories,
                 .. dirFileInfo.Files]);
     }
-
-    CancellationTokenSource cancellation = new();
 }
 
 record DirectoryItem(
@@ -83,10 +85,11 @@ record DirFileInfo(
 );
 
 record GetFilesResult(
+    bool? Cancelled,
     string? Controller,
     string Path,
     int DirCount,
     int FileCount,
     DirectoryItem[] Items
 )
-    : ChangePathResult(Controller, Path, DirCount, FileCount);
+    : ChangePathResult(Cancelled, Controller, Path, DirCount, FileCount);
