@@ -7,7 +7,7 @@ export interface StatusbarProps {
     fileCount: number
     errorText: string | null
     setErrorText: (text: string | null) => void
-    statusText: string | null
+    statusText?: string
 }
 
 const Statusbar = ({ path, dirCount, fileCount, errorText, setErrorText, statusText  }: StatusbarProps) => {
@@ -22,11 +22,11 @@ const Statusbar = ({ path, dirCount, fileCount, errorText, setErrorText, statusT
     }, [errorText, setErrorText])
 
     const getClasses = () => ["statusbar", errorText
-                                                ? "error"
-                                                : statusText
-                                                ? "status"
-                                                : null]
-                                                    .join(' ')
+                                            ? "error"
+                                            : statusText
+                                            ? "status"
+                                            : null]
+                                                .join(' ')
     return (
         <div className={getClasses()}>
             { errorText

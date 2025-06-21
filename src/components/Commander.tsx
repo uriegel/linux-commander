@@ -40,15 +40,16 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	const [showHidden, setShowHidden] = useState(false)
 	const [itemProperty, setItemProperty] = useState<ItemProperty>({ path: "", latitude: undefined, longitude: undefined, isDirectory: false })
 	const [itemCount, setItemCount] = useState({ dirCount: 0, fileCount: 0 })
-	const [statusText, setStatusText] = useState<string | null>(null)
+	const [statusTextLeft, setStatusTextLeft] = useState<string | undefined>(undefined)
+	const [statusTextRight, setStatusTextRight] = useState<string | undefined>(undefined)
 	const [errorText, setErrorText] = useState<string | null>(null)
     
-	const activeFolderId = useRef("left")
-	const getActiveFolder = () => activeFolderId.current == ID_LEFT ? folderLeft.current : folderRight.current
-	const getInactiveFolder = () => activeFolderId.current == ID_LEFT ? folderRight.current : folderLeft.current
+	const [activeFolderId, setActiveFolderId] = useState(ID_LEFT)
+	const getActiveFolder = () => activeFolderId == ID_LEFT ? folderLeft.current : folderRight.current
+	const getInactiveFolder = () => activeFolderId == ID_LEFT ? folderRight.current : folderLeft.current
 
-	const onFocusLeft = () => activeFolderId.current = ID_LEFT
-	const onFocusRight = () => activeFolderId.current = ID_RIGHT
+	const onFocusLeft = () => setActiveFolderId(ID_LEFT)
+	const onFocusRight = () => setActiveFolderId(ID_RIGHT)
 
 	const onKeyDown = (evt: React.KeyboardEvent) => {
 		if (evt.code == "Tab" && !evt.shiftKey) {
@@ -87,10 +88,10 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	useEffect(() => {
 		const subscription = cmdEvents.subscribe(m => onMenuAction(m!.cmd))
 		const subscriptionToggle = cmdToggleEvents.subscribe(onMenuToggleAction)
-			return () => {
-				subscriptionToggle.unsubscribe()
-				subscription.unsubscribe()
-			}
+		return () => {
+			subscriptionToggle.unsubscribe()
+			subscription.unsubscribe()
+		}
 	}, [])
 
 	const onItemChanged = useCallback(
@@ -108,12 +109,16 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
     
 	const FolderLeft = () => (
 		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemChanged={onItemChanged} onItemsChanged={setItemCount}
-			onEnter={onEnter} showHidden={showHidden} />
+			onEnter={onEnter} showHidden={showHidden} setStatusText={setStatusTextLeft} />
 	)
 	const FolderRight = () => (
 		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemChanged={onItemChanged} onItemsChanged={setItemCount}
-			onEnter={onEnter} showHidden={showHidden}/>
+			onEnter={onEnter} showHidden={showHidden} setStatusText={setStatusTextRight} />
 	)
+
+	const getStatusText = useCallback(() => 
+		activeFolderId == ID_LEFT ? statusTextLeft : statusTextRight
+	, [activeFolderId, statusTextLeft, statusTextRight])
 
 	const ViewerView = () => {
         return <div>Der Viewer</div>
@@ -146,7 +151,7 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 		<>
 			<ViewSplit isHorizontal={true} firstView={VerticalSplitView} secondView={ViewerView} initialWidth={30} secondVisible={showViewer} />
 			<Statusbar path={itemProperty.path} dirCount={itemCount.dirCount} fileCount={itemCount.fileCount}
-					errorText={errorText} setErrorText={setErrorText} statusText={statusText} />		
+					errorText={errorText} setErrorText={setErrorText} statusText={getStatusText()} />		
 		</>
 	)
 })

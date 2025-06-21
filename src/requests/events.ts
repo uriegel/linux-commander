@@ -34,8 +34,6 @@ export const statusEvents = socket
                     .pipe(filter(n => n.method == "status"))
                     .pipe(map(n => n.statusMsg!))
 
-statusEvents.subscribe((n: StatusMsg) => console.log("Status", n))                    
-
 socket.subscribe({
     error: err => console.error('Subscription error:', err),
     complete: () => console.log('WebSocket connection closed'),

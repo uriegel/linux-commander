@@ -1,7 +1,17 @@
 # commander
 A Norton Commander clone based on Web Components and C# (.NET 9)
 
-// TODO GetExifData: staus bar text per folder
+## React dev tools
+```
+sudo npm install -g react-devtools
+```
+In terminal:
+```
+react-devtools
+```
+
+```
+// TODO GetExifData
 // TODO backlog history
 // TODO restriction
 // TODO root detect new drives/removed drives
@@ -17,3 +27,4 @@ A Norton Commander clone based on Web Components and C# (.NET 9)
 // TODO Rename remote
 // TODO Android range
 // TODO Dont copy directory from remote
+```

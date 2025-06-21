@@ -4,6 +4,8 @@ import VirtualTable, { type SelectableItem, type TableColumns, type VirtualTable
 import { changePath as changePathRequest } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
+import { statusEvents } from "../requests/events"
+import { filter } from "rxjs/operators"
 
 export type FolderViewHandle = {
     id: string
@@ -24,8 +26,9 @@ interface FolderViewProp {
     showHidden: boolean
     onFocus: () => void
     onItemChanged: (path: string, isDir: boolean, latitude?: number, longitude?: number) => void
-    onItemsChanged: (count: ItemCount) => void
-    onEnter: (item: FolderViewItem) => void
+    onItemsChanged: (count: ItemCount)=>void
+    onEnter: (item: FolderViewItem)=>void
+    setStatusText: (text?: string)=>void
 }
 
 enum DriveKind {
@@ -68,7 +71,7 @@ export type ExifData = {
 }
 
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
-    { id, showHidden, onFocus, onItemChanged, onItemsChanged, onEnter },
+    { id, showHidden, onFocus, onItemChanged, onItemsChanged, onEnter, setStatusText },
     ref) => {
     
     useEffect(() => {
@@ -94,6 +97,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
     const controller = useRef<IController>(new Root())
     const refItems = useRef(items) 
+    const changePathId = useRef(-1)
 
     const onPositionChanged = useCallback((item: FolderViewItem) => 
         onItemChanged(controller.current.appendPath(path, item.name),
@@ -109,6 +113,18 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         }
     }, [onItemsChanged])
 
+
+    useEffect(() => {
+        const subscription = statusEvents
+            .pipe(filter(n => n.folderId == id))
+            .subscribe(m => {
+                if (changePathId.current <= m.requestId) {
+                    setStatusText(m!.text)
+                    changePathId.current = m.requestId
+                }
+            })
+        return () => subscription.unsubscribe()
+    }, [id])
 
     async function changePath(path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem)=>boolean) {
         const result = await changePathRequest({ id, path, showHidden: forceShowHidden === undefined ? showHidden : forceShowHidden, mount })
