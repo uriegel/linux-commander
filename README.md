@@ -11,7 +11,10 @@ react-devtools
 ```
 
 ```
-// TODO Selection control from menu?
+// TODO DeleteItems
+// TODO CreateFolder
+// TODO Rename
+// TODO Copy
 
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large

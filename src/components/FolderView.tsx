@@ -16,6 +16,9 @@ export type FolderViewHandle = {
     refresh: (forceShowHidden?: boolean) => void
     getPath: () => string
     changePath: (path: string) => void
+    insertSelection: () => void
+    selectAll: () => void
+    selectNone: () => void
 }
 
 interface ItemCount {
@@ -130,7 +133,10 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         processEnter,
         refresh,
         getPath() { return path },
-        changePath
+        changePath,
+        insertSelection,
+        selectAll,
+        selectNone
     }))
 
     const input = useRef<HTMLInputElement | null>(null)
@@ -213,24 +219,15 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
     const onKeyDown = async (evt: React.KeyboardEvent) => {
         switch (evt.code) {
-            case "Insert":
-                if (controller.current.itemsSelectable) {
-                    setItems(items.map((n, i) => i != virtualTable.current?.getPosition() ? n : toggleSelection(n)))
-                    virtualTable.current?.setPosition(virtualTable.current.getPosition() + 1)
-                    controller.current.onSelectionChanged(items)
-                    evt.preventDefault()
-                    evt.stopPropagation()
-                }
-                break
             case "Home":
-                if (controller.current.itemsSelectable) 
+                if (evt.shiftKey && controller.current.itemsSelectable) 
                     setItems(items.map((n, i) => setSelection(n, i <= (virtualTable.current?.getPosition() ?? 0))))
                 controller.current.onSelectionChanged(items)
                 evt.preventDefault()
                 evt.stopPropagation()
                 break
             case "End":
-                if (controller.current.itemsSelectable) 
+                if (evt.shiftKey && controller.current.itemsSelectable) 
                     setItems(items.map((n, i) => setSelection(n, i >= (virtualTable.current?.getPosition() ?? 0))))
                 controller.current.onSelectionChanged(items)                    
                 evt.preventDefault()
@@ -271,6 +268,27 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         }
     }
 
+    const insertSelection = () => {
+        if (controller.current.itemsSelectable) {
+            setItems(items.map((n, i) => i != virtualTable.current?.getPosition() ? n : toggleSelection(n)))
+            virtualTable.current?.setPosition(virtualTable.current.getPosition() + 1)
+            controller.current.onSelectionChanged(items)
+        }
+    }
+
+    const selectAll = () => {
+        if (controller.current.itemsSelectable) {
+            setItems(items.map((n) => setSelection(n, true)))
+            controller.current.onSelectionChanged(items)
+        }
+    }
+
+    const selectNone = () => {
+        if (controller.current.itemsSelectable) {
+            setItems(items.map((n) => setSelection(n, false)))
+            controller.current.onSelectionChanged(items)
+        }
+    }
     const onSort = async (sort: OnSort) => {
         sortIndex.current = sort.isSubColumn ? 10 : sort.column
         sortDescending.current = sort.isDescending

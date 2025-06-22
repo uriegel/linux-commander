@@ -1,7 +1,7 @@
 import 'leaflet/dist/leaflet.css'
 import './TrackViewer.css'
 import useResizeObserver from '@react-hook/resize-observer'
-import { Map as LMap } from "leaflet"
+import { Map as LMap, type LatLngExpression } from "leaflet"
 import { MapContainer, Marker, Polyline, TileLayer } from 'react-leaflet'
 import { useEffect, useRef, useState } from 'react'
 
@@ -48,7 +48,7 @@ const TrackViewer = ({ path }: TrackViewerProps) => {
     
     useEffect(() => {
 
-        async function getTrack(path: string): Promise<TrackInfo|null> {
+        async function getTrack(path: string) {
             try {
                 const response = await fetch(`http://localhost:20000/gettrack${path}`)
                 const track = await response.json() as TrackInfo

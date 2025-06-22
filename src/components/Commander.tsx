@@ -86,6 +86,15 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 						? PreviewMode.Both
 						: PreviewMode.Default)			
 				break
+			case "insert":
+				getActiveFolder()?.insertSelection()
+				break
+			case "selectall":
+				getActiveFolder()?.selectAll()
+				break
+			case "selectnone":
+				getActiveFolder()?.selectNone()
+				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer])
 

@@ -41,6 +41,9 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("showhidden", false, show => Requests.SendMenuCheck("showhidden", show), "<Ctrl>H"),
                 new("toggleViewMode", () => Requests.SendMenuCommand("togglepreview"), "<Ctrl>F3"),
                 new("showpreview", false, show => Requests.SendMenuCheck("showpreview", show), "F3"),
+                new("selectcurrent", () => Requests.SendMenuCommand("insert"), "Insert"),
+                new("selectall", () => Requests.SendMenuCommand("selectall"), "KP_Add"),
+                new("selectnone", () => Requests.SendMenuCommand("selectnone"), "KP_Subtract")
             ]);
     }
 

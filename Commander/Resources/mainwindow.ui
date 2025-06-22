@@ -127,7 +127,7 @@
         <attribute name="label">_Selektion</attribute>
         <section>
           <item>
-            <attribute name="label">Selektiere markierten Eintrag</attribute>
+            <attribute name="label">Selektion des markierten Eintrags wechseln</attribute>
             <attribute name="action">win.selectcurrent</attribute>
           </item>
         </section>          
