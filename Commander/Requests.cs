@@ -7,6 +7,7 @@ using Commander.Settings;
 using static CsTools.Functional.Memoization;
 using static CsTools.ProcessCmd;
 using static Commander.Controllers.FolderController;
+using Commander.Controllers;
 
 namespace Commander;
 
@@ -47,19 +48,25 @@ static class Requests
     public static async void SendMenuCommand(string id)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("cmd", new(id), null, null));    
+            await webSocket.SendJson(new WebSocketMsg("cmd", new(id), null, null, null));    
     }
 
     public static async void SendMenuCheck(string id, bool check)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("cmdtoggle", null, new(id, check), null)); 
+            await webSocket.SendJson(new WebSocketMsg("cmdtoggle", null, new(id, check), null, null)); 
     }
 
     public static async void SendStatusBarInfo(string id, int requestId, string? text)
     {
         if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("status", null, null, new(id, requestId, text))); 
+            await webSocket.SendJson(new WebSocketMsg("status", null, null, new(id, requestId, text), null)); 
+    }
+
+    public static async void SendExifInfo(string id, int requestId, DirectoryItem[] items)
+    {
+        if (webSocket != null)
+            await webSocket.SendJson(new WebSocketMsg("exifinfo", null, null, null, new(id, requestId, items))); 
     }
 
     static Func<string, Task<string?>> IconFromName { get; } = MemoizeAsync<string>(IconFromNameInit, false);
@@ -167,7 +174,8 @@ record WebSocketMsg(
     string Method,
     CmdMsg? CmdMsg,
     CmdToggleMsg? CmdToggleMsg,
-    StatusMsg? StatusMsg);
+    StatusMsg? StatusMsg,
+    ExifMsg? ExifMsg);
 
 record CmdMsg(string Cmd);
 record CmdToggleMsg(string Cmd, bool Checked);
@@ -175,10 +183,13 @@ record StatusMsg(
     string FolderId,
     int RequestId,
     string? Text);
+record ExifMsg(
+    string FolderId,
+    int RequestId,
+    DirectoryItem[] Items);
 
 // export interface FolderViewItem extends SelectableItem {
 //     // FileSystem item
-//     // exifData?:    ExifData
 //     // Remotes item
 //     ipAddress?:   string
 //     isAndroid?:   boolean

@@ -4,7 +4,7 @@ import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type
 import { changePath as changePathRequest } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
-import { statusEvents } from "../requests/events"
+import { exifDataEvents, statusEvents } from "../requests/events"
 import { filter } from "rxjs/operators"
 
 export type FolderViewHandle = {
@@ -115,7 +115,6 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         }
     }, [onItemsChanged])
 
-
     useEffect(() => {
         const subscription = statusEvents
             .pipe(filter(n => n.folderId == id))
@@ -128,7 +127,21 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         return () => subscription.unsubscribe()
     }, [id])
 
-    async function changePath(path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem)=>boolean) {
+    useEffect(() => {
+        const subscription = exifDataEvents
+            .pipe(filter(n => n.folderId == id))
+            .subscribe(m => {
+                if (changePathId.current <= m.requestId) {
+                    const newItems = controller.current.sort(m!.items, sortIndex.current, sortDescending.current)
+                    setItems(newItems)
+
+                    changePathId.current = m.requestId
+                }
+            })
+        return () => subscription.unsubscribe()
+    }, [id])
+
+    async function changePath(path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem) => boolean) {
         const result = await changePathRequest({ id, path, showHidden: forceShowHidden === undefined ? showHidden : forceShowHidden, mount })
         if (result.cancelled)
             return

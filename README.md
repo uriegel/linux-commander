@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO GetExifData: change items (with sorting)
 // TODO restriction (restrict also after ExifData arrived)
 // TODO backlog history
 // TODO root detect new drives/removed drives

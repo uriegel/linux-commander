@@ -1,3 +1,5 @@
+using CsTools.Extensions;
+
 namespace Commander.Controllers;
 
 class DirectoryController(string folderId) : Controller(folderId)
@@ -11,7 +13,7 @@ class DirectoryController(string folderId) : Controller(folderId)
         {
             var cancellation = Cancellations.ChangePathCancellation(FolderId);
             var result = await Task.Run(() => GetFiles(path, showHidden, changePathId, cancellation));
-            GetExifData(changePathId, cancellation);
+            GetExifData(changePathId, result.Items, path, cancellation);
             return result;
         }
         catch (OperationCanceledException)
@@ -43,23 +45,32 @@ class DirectoryController(string folderId) : Controller(folderId)
                 .. dirFileInfo.Files]);
     }
 
-    async void GetExifData(int changePathId, CancellationToken cancellation)
+    async void GetExifData(int changePathId, DirectoryItem[] items, string path, CancellationToken cancellation)
     {
         try
         {
+            bool changed = false;
             await Task.Run(() =>
             {
                 Requests.SendStatusBarInfo(FolderId, changePathId, "Ermittle EXIF-Informationen...");
-                for (var i = 0; i < 20; i++)
+                foreach (var item in items
+                                        .Where(item => !cancellation.IsCancellationRequested
+                                                && (item.Name.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase)
+                                                    || item.Name.EndsWith(".jpeg", StringComparison.InvariantCultureIgnoreCase)
+                                                    || item.Name.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase))))
                 {
-                    Thread.Sleep(250);
                     cancellation.ThrowIfCancellationRequested();
+                    item.ExifData = ExifReader.GetExifData(path.AppendPath(item.Name));
+                    if (item.ExifData != null)
+                        changed = true;
                 }
-                Requests.SendStatusBarInfo(FolderId, changePathId, null);
+                if (changed)
+                    Requests.SendExifInfo(FolderId, changePathId, items);        
             }, cancellation);
         }
-        catch
-        { 
+        catch { }
+        finally
+        {
             Requests.SendStatusBarInfo(FolderId, changePathId, null);
         }
     }
@@ -76,6 +87,8 @@ record DirectoryItem(
     DateTime? Time
 )
 {
+    public ExifData? ExifData { get; set; }
+
     public static DirectoryItem CreateParentItem()
         => new(
             "..",
