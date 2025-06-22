@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO restriction (restrict also after ExifData arrived)
 // TODO backlog history
 // TODO Image Viewer 
 // TODO Video/Audio Viewer 
