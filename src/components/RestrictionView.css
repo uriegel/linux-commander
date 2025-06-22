@@ -1,0 +1,23 @@
+.restriction {
+    width: 0%;
+    opacity: 0;
+    bottom: 10px;
+    height: 18px;
+    position: absolute;
+    left: 5px;
+    border-width: 1px;
+    border-radius: 5px;
+    padding: 1px 3px;
+    border-style: solid;
+    border-color: gray;
+    outline-style: none;
+    color: var(--vtr-color);
+    background-color: var(--restriction-background-color);
+    box-shadow: 3px 5px 12px 3px rgba(136, 136, 136, 0.55);
+    transition: opacity 0.5s, width 0.5s;
+}
+
+.restriction.show {
+    width: 70%;
+    opacity: 1;
+}

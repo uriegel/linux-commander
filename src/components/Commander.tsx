@@ -22,10 +22,9 @@ export type CommanderHandle = {
     onKeyDown: (evt: React.KeyboardEvent)=>void
 }
 
-type CommanderProps = {}
+// TODO type CommanderProps = {}
 
-
-const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
+const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 
     useImperativeHandle(ref, () => ({
         onKeyDown
@@ -43,9 +42,6 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 	const [errorText, setErrorText] = useState<string | null>(null)
     
 	const [activeFolderId, setActiveFolderId] = useState(ID_LEFT)
-	const getActiveFolder = () => activeFolderId == ID_LEFT ? folderLeft.current : folderRight.current
-	const getInactiveFolder = () => activeFolderId == ID_LEFT ? folderRight.current : folderLeft.current
-
 	const onFocusLeft = () => setActiveFolderId(ID_LEFT)
 	const onFocusRight = () => setActiveFolderId(ID_RIGHT)
 
@@ -57,18 +53,22 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 		}
 	}
 
+	const getActiveFolder = useCallback(() => activeFolderId == ID_LEFT ? folderLeft.current : folderRight.current, [activeFolderId])
+	const getInactiveFolder = useCallback(() => activeFolderId == ID_LEFT ? folderRight.current : folderLeft.current, [activeFolderId])
+
 	const onMenuAction = useCallback(async (key: string) => {
 		switch (key) {
 			case "refresh":
 				getActiveFolder()?.refresh()
 				break
-			case "adaptpath":
-				var path = getActiveFolder()?.getPath()
+			case "adaptpath": {
+				const path = getActiveFolder()?.getPath()
 				if (path)
 					getInactiveFolder()?.changePath(path)
 				break
+			}
 		}
-	}, [])
+	}, [getActiveFolder, getInactiveFolder])
 
 	const onMenuToggleAction = useCallback(async (msg: CmdToggleMsg) => {
 		if (msg.cmd == "showhidden") {
@@ -90,7 +90,7 @@ const Commander = forwardRef<CommanderHandle, CommanderProps>(({}, ref) => {
 			subscriptionToggle.unsubscribe()
 			subscription.unsubscribe()
 		}
-	}, [])
+	}, [onMenuAction, onMenuToggleAction])
 
 	const onItemChanged = useCallback(
 		(path: string, isDirectory: boolean, latitude?: number, longitude?: number) => 

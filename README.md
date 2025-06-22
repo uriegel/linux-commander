@@ -13,12 +13,16 @@ react-devtools
 ```
 // TODO restriction (restrict also after ExifData arrived)
 // TODO backlog history
+// TODO Image Viewer 
+// TODO Video/Audio Viewer 
+// TODO Pdf viewer
+// TODO Pdf viewer: PdViewer in WebWindowNetCore
+// TODO Pdf viewer: PdViewer in Gtk4DotNet
+// TODO Selection control from menu?
+
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large
 
-// TODO Pdf viewer: PdViewer in WebWindowNetCore
-// TODO Pdf viewer: PdViewer in Gtk4DotNet
-// TODO Pdf viewer
 // TODO Text viewer/editor
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...
 

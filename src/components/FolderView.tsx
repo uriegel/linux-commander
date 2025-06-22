@@ -6,6 +6,7 @@ import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
 import { filter } from "rxjs/operators"
+import RestrictionView, { type RestrictionViewHandle } from "./RestrictionView"
 
 export type FolderViewHandle = {
     id: string
@@ -74,9 +75,49 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     { id, showHidden, onFocus, onItemChanged, onItemsChanged, onEnter, setStatusText },
     ref) => {
     
-    useEffect(() => {
-        changePath(localStorage.getItem(`${id}-lastPath`) ?? "root", false, false)
-    }, []) 
+    const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {
+        setStateItems(items)
+        refItems.current = items
+        if (dirCount != undefined || fileCount != undefined) {
+            itemCount.current = { dirCount: dirCount || 0, fileCount: fileCount || 0 }
+            onItemsChanged(itemCount.current)
+        }
+    }, [onItemsChanged])
+
+    const getWidthsId = useCallback(() => `${id}-${controller.current.id}-widths`, [id])
+
+    const setWidths = useCallback((columns: TableColumns<FolderViewItem>) => {
+        const widthstr = localStorage.getItem(getWidthsId())
+        const widths = widthstr ? JSON.parse(widthstr) as number[] : null
+        return widths
+            ? {
+                ...columns, columns: columns.columns.map((n, i) => ({...n, width: widths![i]}))
+            }
+            : columns
+    }, [getWidthsId])
+
+    const changePath = useCallback(async (path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem) => boolean) => {
+        const result = await changePathRequest({ id, path, showHidden: forceShowHidden === undefined ? showHidden : forceShowHidden, mount })
+        if (result.cancelled)
+            return
+        restrictionView.current?.reset()
+        if (result.controller) {
+            controller.current = getController(result.controller)
+            virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
+        }
+        if (result.path)
+            setPath(result.path)
+        const newItems = controller.current.sort(result.items, sortIndex.current, sortDescending.current)
+        setItems(newItems, result.dirCount, result.fileCount)
+        const pos = latestPath
+                    ? newItems.findIndex(n => n.name == latestPath)
+                    : checkPosition
+                    ? newItems.findIndex(n => checkPosition(n))
+                    : 0        
+        virtualTable.current?.setInitialPosition(pos, newItems.length)
+        if (result.path)
+            localStorage.setItem(`${id}-lastPath`, result.path)
+    }, [id, setItems, setWidths, showHidden])
 
     useImperativeHandle(ref, () => ({
         id,
@@ -87,7 +128,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         changePath
     }))
 
-    const input = useRef<HTMLInputElement|null>(null)
+    const input = useRef<HTMLInputElement | null>(null)
+    const restrictionView = useRef<RestrictionViewHandle>(null)
 
     const virtualTable = useRef<VirtualTableHandle<FolderViewItem>>(null)
     const itemCount = useRef({ fileCount: 0, dirCount: 0 })
@@ -106,14 +148,9 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             item.isDirectory == true, item.exifData?.latitude, item.exifData?.longitude),
     [path, onItemChanged])         
 
-    const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {
-        setStateItems(items)
-        refItems.current = items
-        if (dirCount != undefined || fileCount != undefined) {
-            itemCount.current = { dirCount: dirCount || 0, fileCount: fileCount || 0 }
-            onItemsChanged(itemCount.current)
-        }
-    }, [onItemsChanged])
+    useEffect(() => {
+        changePath(localStorage.getItem(`${id}-lastPath`) ?? "root", false, false)
+    }, [changePath, id]) 
 
     useEffect(() => {
         const subscription = statusEvents
@@ -125,7 +162,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
                 }
             })
         return () => subscription.unsubscribe()
-    }, [id])
+    }, [setStatusText, id])
 
     useEffect(() => {
         const subscription = exifDataEvents
@@ -134,37 +171,14 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
                 if (changePathId.current <= m.requestId) {
                     const newItems = controller.current.sort(m!.items, sortIndex.current, sortDescending.current)
                     setItems(newItems)
-
                     changePathId.current = m.requestId
                 }
             })
         return () => subscription.unsubscribe()
-    }, [id])
-
-    async function changePath(path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem) => boolean) {
-        const result = await changePathRequest({ id, path, showHidden: forceShowHidden === undefined ? showHidden : forceShowHidden, mount })
-        if (result.cancelled)
-            return
-        if (result.controller) {
-            controller.current = getController(result.controller)
-            virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
-        }
-        if (result.path)
-            setPath(result.path)
-        const newItems = controller.current.sort(result.items, sortIndex.current, sortDescending.current)
-        setItems(newItems, result.dirCount, result.fileCount)
-        const pos = latestPath
-                    ? newItems.findIndex(n => n.name == latestPath)
-                    : checkPosition
-                    ? newItems.findIndex(n => checkPosition(n))
-                    : 0        
-        virtualTable.current?.setInitialPosition(pos, newItems.length)
-        if (result.path)
-            localStorage.setItem(`${id}-lastPath`, result.path)
-    }
+    }, [id, setItems])
 
     const processEnter = async (item: FolderViewItem) => {
-        var res = await controller.current.onEnter({ path, item })
+        const res = await controller.current.onEnter({ path, item })
         if (!res.processed)
             changePath(res.pathToSet, showHidden, res.mount, res.latestPath)
     }
@@ -185,6 +199,72 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const onInputFocus = (e: React.FocusEvent<HTMLInputElement>) => 
         setTimeout(() => e.target.select())
 
+    const setSelection = (item: FolderViewItem, set: boolean) => {
+        if (!item.isParent && !item.isNew)
+            item.isSelected = set
+        return item
+    }
+
+    const onKeyDown = async (evt: React.KeyboardEvent) => {
+        switch (evt.code) {
+            case "Insert":
+                if (controller.current.itemsSelectable) {
+                    setItems(items.map((n, i) => i != virtualTable.current?.getPosition() ? n : toggleSelection(n)))
+                    virtualTable.current?.setPosition(virtualTable.current.getPosition() + 1)
+                    controller.current.onSelectionChanged(items)
+                    evt.preventDefault()
+                    evt.stopPropagation()
+                }
+                break
+            case "Home":
+                if (controller.current.itemsSelectable) 
+                    setItems(items.map((n, i) => setSelection(n, i <= (virtualTable.current?.getPosition() ?? 0))))
+                controller.current.onSelectionChanged(items)
+                evt.preventDefault()
+                evt.stopPropagation()
+                break
+            case "End":
+                if (controller.current.itemsSelectable) 
+                    setItems(items.map((n, i) => setSelection(n, i >= (virtualTable.current?.getPosition() ?? 0))))
+                controller.current.onSelectionChanged(items)                    
+                evt.preventDefault()
+                evt.stopPropagation()
+                break
+            case "Space": {
+                const ri = restrictionView.current?.checkKey(" ")
+                if (ri) {
+                    virtualTable.current?.setPosition(0)
+                    setItems(ri)
+                } else if (controller.current.itemsSelectable)
+                    setItems(items.map((n, i) => i != virtualTable.current?.getPosition() ? n : toggleSelection(n)))
+                controller.current.onSelectionChanged(items)
+                evt.preventDefault()
+                evt.stopPropagation()
+                break
+            }
+            case "Escape":
+                if (!checkRestricted(evt.key)) {
+                    if (controller.current.itemsSelectable) 
+                        setItems(items.map((n) => setSelection(n, false)))
+                    controller.current.onSelectionChanged(items)                    
+                }
+                break                
+            // case "Delete":
+            //     deleteItems()
+            //     break
+            case "Backspace":
+                if (!checkRestricted(evt.key)) {
+                    // const path = history.current?.get(evt.shiftKey)
+                    // if (path)
+                    //     changePath(id, path, showHidden, undefined, undefined, true)
+                }
+                break
+            default:
+                checkRestricted(evt.key)
+                break
+        }
+    }
+
     const onSort = async (sort: OnSort) => {
         sortIndex.current = sort.isSubColumn ? 10 : sort.column
         sortDescending.current = sort.isDescending
@@ -194,21 +274,25 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         virtualTable.current?.setPosition(newItems.findIndex(n => n.name == name))
     }
 
-    const getWidthsId = () => `${id}-${controller.current.id}-widths`
+    const checkRestricted = (key: string) => {
+        const restrictedItems = restrictionView.current?.checkKey(key)
+        if (restrictedItems) {
+            virtualTable.current?.setPosition(0)
+            setItems(restrictedItems)
+            return true
+        } else
+            return false
+    }
+
+    const toggleSelection = (item: FolderViewItem) => {
+        if (!item.isParent && !item.isNew)
+            item.isSelected = !item.isSelected
+        return item
+    }
 
     const onColumnWidths = (widths: number[]) => {
         if (widths.length)
             localStorage.setItem(getWidthsId(), JSON.stringify(widths))
-    }
-
-    const setWidths = (columns: TableColumns<FolderViewItem>) => {
-        const widthstr = localStorage.getItem(getWidthsId())
-        const widths = widthstr ? JSON.parse(widthstr) as number[] : null
-        return widths
-            ? {
-                ...columns, columns: columns.columns.map((n, i) => ({...n, width: widths![i]}))
-            }
-            : columns
     }
 
     const onFocusChanged = useCallback(() => {
@@ -223,10 +307,10 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     return (
         <div className="folder" onFocus={onFocusChanged}>
             <input ref={input} className="pathInput" spellCheck={false} value={path} onChange={onInputChange} onKeyDown={onInputKeyDown} onFocus={onInputFocus} />
-            <div className="tableContainer" >
+            <div className="tableContainer" onKeyDown={onKeyDown} >
                 <VirtualTable ref={virtualTable} items={items} onColumnWidths={onColumnWidths} onEnter={onEnter} onPosition={onPositionChanged} onSort={onSort} />
             </div>
-            {/* <RestrictionView items={items} ref={restrictionView} /> */}
+            <RestrictionView items={items} ref={restrictionView} />
         </div>
     )
 })

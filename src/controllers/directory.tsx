@@ -57,14 +57,18 @@ export class Directory implements IController {
             : undefined
     }
 
+    itemsSelectable: boolean
+
+    onSelectionChanged() {}
 
     constructor() {
         this.id = "ROOT"
+        this.itemsSelectable = true
     }
 }
 
-const REMOTES = "remotes"
-const FAVORITES = "fav"
+// TODO const REMOTES = "remotes"
+// TODO const FAVORITES = "fav"
 
 const getRowClasses = (item: FolderViewItem) => 
 	item.isHidden

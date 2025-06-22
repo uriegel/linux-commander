@@ -33,8 +33,13 @@ export class Root implements IController {
 
     sort(items: FolderViewItem[]) { return items }
 
+    itemsSelectable: boolean
+
+    onSelectionChanged() {}
+
     constructor() {
         this.id = "ROOT"
+        this.itemsSelectable = false
     }
 }
 

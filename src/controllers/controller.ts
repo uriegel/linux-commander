@@ -36,6 +36,8 @@ export interface IController {
     appendPath(path: string, subPath: string): string
     onEnter: (data: EnterData) => Promise<OnEnterResult> 
     sort: (items: FolderViewItem[], sortIndex: number, sortDescending: boolean) => FolderViewItem[]
+    itemsSelectable: boolean
+    onSelectionChanged: (items: FolderViewItem[]) => void 
 }
 
 export function getController(id: string): IController {
