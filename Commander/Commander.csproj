@@ -27,6 +27,12 @@
     <EmbeddedResource Include="./Resources/website/style.css">
       <LogicalName>/style.css</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/website/marker-icon.png">
+      <LogicalName>/marker-icon.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="./Resources/website/marker-shadow.png">
+      <LogicalName>/marker-shadow.png</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="./Resources/mainwindow.ui">
       <LogicalName>mainwindow</LogicalName>
     </EmbeddedResource>
