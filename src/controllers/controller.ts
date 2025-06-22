@@ -46,6 +46,11 @@ export function getController(id: string): IController {
         : new Directory()
 }
 
+export const getViewerPath = (path: string) => 
+    path.startsWith("remote")
+    ? `http://${path.stringBetween("/", "/")}:8080/getfile/${path.substringAfter("/").substringAfter("/")}`
+    : `http://localhost:20000/commander/file?path=${path}`
+
 export const formatSize = (num?: number) => {
     if (!num)
         return "0"

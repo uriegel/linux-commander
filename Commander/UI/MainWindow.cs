@@ -38,7 +38,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("devtools", ShowDevTools, "<Ctrl><Shift>I"),
                 new("adaptpath", () => Requests.SendMenuCommand("adaptpath"), "F9"),
                 new("refresh", () => Requests.SendMenuCommand("refresh"), "<Ctrl>R"),
-                new("showhidden", false, show => Requests.SendMenuCheck("showhidden", show), "<Ctrl>H")
+                new("showhidden", false, show => Requests.SendMenuCheck("showhidden", show), "<Ctrl>H"),
+                new("showpreview", false, show => Requests.SendMenuCheck("showpreview", show), "F3"),
             ]);
     }
 

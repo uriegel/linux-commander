@@ -7,6 +7,7 @@ import '../themes/adwaita.css'
 import "functional-extensions"
 import Statusbar from "./Statusbar"
 import { cmdEvents, cmdToggleEvents, type CmdToggleMsg } from "../requests/events"
+import PictureViewer from "./PictureViewer"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
@@ -21,8 +22,6 @@ interface ItemProperty {
 export type CommanderHandle = {
     onKeyDown: (evt: React.KeyboardEvent)=>void
 }
-
-// TODO type CommanderProps = {}
 
 const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 
@@ -71,12 +70,16 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 	}, [getActiveFolder, getInactiveFolder])
 
 	const onMenuToggleAction = useCallback(async (msg: CmdToggleMsg) => {
-		if (msg.cmd == "showhidden") {
-			setShowHidden(msg.checked)
-			folderLeft.current?.refresh(msg.checked)
-			folderRight.current?.refresh(msg.checked)
+		switch (msg.cmd) {
+			case "showhidden": 
+				setShowHidden(msg.checked)
+				folderLeft.current?.refresh(msg.checked)
+				folderRight.current?.refresh(msg.checked)
+				break
+			case "showpreview":
+				setShowViewer(msg.checked)
+				break
 		}
-
 	}, [])
 
 	useEffect(() => {
@@ -119,15 +122,14 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 	, [activeFolderId, statusTextLeft, statusTextRight])
 
 	const ViewerView = () => {
-        return <div>Der Viewer</div>
-		// const ext = path
-		// 			.path
-		// 			.getExtension()
-		// 			.toLocaleLowerCase()
+		const ext = itemProperty
+					.path
+					.getExtension()
+					.toLocaleLowerCase()
 		
-		// return ext == ".jpg" || ext == ".png"
+		return ext == ".jpg" || ext == ".png"
 		// 	? previewMode == PreviewMode.Default
-		// 		? (<PictureViewer path={path.path} latitude={path.latitude} longitude={path.longitude} />)
+		 		? (<PictureViewer path={itemProperty.path} latitude={itemProperty.latitude} longitude={itemProperty.longitude} />)
 		// 		: previewMode == PreviewMode.Location && path.latitude && path.longitude
 		// 		? (<LocationViewer latitude={path.latitude} longitude={path.longitude} />)
 		// 		: path.latitude && path.longitude
@@ -142,7 +144,7 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 		// 	? (<FileViewer path={path.path} />)
 		// 	: ext == ".gpx"
 		// 	? (<TrackViewer path={path.path} />)
-		// 	: (<div></div>)
+		 	: (<div></div>)
 	}
 
 	return (
