@@ -9,6 +9,7 @@ import Statusbar from "./Statusbar"
 import { cmdEvents, cmdToggleEvents, type CmdToggleMsg } from "../requests/events"
 import PictureViewer from "./PictureViewer"
 import LocationViewer from "./LocationViewer"
+import FileViewer from "./FileViewer"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
@@ -157,9 +158,9 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 			:(<PictureViewer path={itemProperty.path} latitude={itemProperty.latitude} longitude={itemProperty.longitude} />)
 		// 	: ext == ".mp3" || ext == ".mp4" || ext == ".mkv" || ext == ".wav"
 		// 	? (<MediaPlayer path={path.path} />)
-		// 	: ext == ".pdf"
-		// 	? (<FileViewer path={path.path} />)
-		// 	: ext == ".gpx"
+		 	: ext == ".pdf"
+		 	? (<FileViewer path={itemProperty.path} />)
+		 //	: ext == ".gpx"
 		// 	? (<TrackViewer path={path.path} />)
 		 	: (<div></div>)
 	}

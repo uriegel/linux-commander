@@ -42,7 +42,7 @@ static class Requests
         return true;
     }
 
-    public static async Task<bool> GetPictureFile(IRequest request)
+    public static async Task<bool> GetFile(IRequest request)
     {
         if (request.SubPath == null)
             return false;
@@ -79,8 +79,15 @@ static class Requests
 
     public static async void SendExifInfo(string id, int requestId, DirectoryItem[] items)
     {
-        if (webSocket != null)
-            await webSocket.SendJson(new WebSocketMsg("exifinfo", null, null, null, new(id, requestId, items))); 
+        try
+        {
+            if (webSocket != null)
+                await webSocket.SendJson(new WebSocketMsg("exifinfo", null, null, null, new(id, requestId, items)));
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error sending exif info: {ex}");
+        }
     }
 
     static Func<string, Task<string?>> IconFromName { get; } = MemoizeAsync<string>(IconFromNameInit, false);

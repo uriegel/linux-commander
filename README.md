@@ -12,9 +12,6 @@ react-devtools
 
 ```
 // TODO Video/Audio Viewer 
-// TODO Pdf viewer
-// TODO Pdf viewer: PdViewer in WebWindowNetCore
-// TODO Pdf viewer: PdViewer in Gtk4DotNet
 // TODO TrackViewer
 // TODO Selection control from menu?
 
