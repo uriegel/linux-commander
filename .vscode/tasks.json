@@ -4,6 +4,10 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "buildReact",
+            "type": "npm",
+            "script": "build",
+        }, {
             "label": "build",
             "command": "dotnet",
             "type": "shell",
@@ -32,6 +36,25 @@
               "kind": "build"
             },
             "problemMatcher": ["$tsc"]
-          }
+        },  {
+            "label": "buildCsRelease",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "publish",
+                "-c",
+                "Release",
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        }, {
+            "label": "buildRelease",
+            "group": "build",
+            "dependsOrder": "sequence",
+            "dependsOn": ["buildReact", "buildCsRelease"]
+        }
     ]
 }

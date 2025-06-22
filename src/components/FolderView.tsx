@@ -33,13 +33,15 @@ interface FolderViewProp {
     setStatusText: (text?: string)=>void
 }
 
-enum DriveKind {
-    Unknown,
-    Ext4,
-    Ntfs,
-    Vfat,
-    Home,
+const DriveKind = {
+    Unknown: 'Unknown',
+    Ext4: 'Ext4',
+    Ntfs: 'Ntfs',
+    Vfat: 'Vfat',
+    Home: 'Home',
 }
+
+type DriveKind = (typeof DriveKind)[keyof typeof DriveKind]
 
 export interface FolderViewItem extends SelectableItem {
     name:         string
