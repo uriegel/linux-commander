@@ -55,6 +55,15 @@ static class Requests
         else
             return false;
     }
+
+    public static async Task<bool> GetTrack(IRequest request)
+    {
+        if (request.SubPath == null)
+            return false;
+        var track = TrackInfo.Get("/" + request.SubPath);
+        await request.SendJsonAsync(track);
+        return true;
+    }
     
     public static void WebSocket(IWebSocket webSocket)
         => Requests.webSocket = webSocket;

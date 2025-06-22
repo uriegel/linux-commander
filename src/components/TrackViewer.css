@@ -1,0 +1,26 @@
+.trackView {
+    display: flex;
+    flex-direction: column;
+    position: relative
+}
+
+.track {
+    flex-grow: 1;
+}
+
+.trackPopup {
+    position: absolute;
+    right: 3px;
+    background-color: rgba(240, 248, 255, 0.6);
+    text-align: end;
+    padding: 5px;    
+    z-index: 20000;
+}
+.bottom {
+    bottom: 20px;
+    background-color: rgb(240, 248, 255);
+}
+
+.button {
+    cursor: pointer;
+}

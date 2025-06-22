@@ -27,9 +27,10 @@ var server =
                 .Request(Requests.GetIconFromExtension))
             .Add(PathRoute
                 .New("/getfile")
-                .Add(MethodRoute
-                    .New(Method.Get)
-                    .Request(Requests.GetFile))))
+                .Request(Requests.GetFile))
+            .Add(PathRoute
+                .New("/gettrack")
+                .Request(Requests.GetTrack)))
         .AddAllowedOrigin("http://localhost:5173")
         .AccessControlMaxAge(TimeSpan.FromMinutes(5))
         .WebSocket(Requests.WebSocket)

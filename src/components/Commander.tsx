@@ -11,6 +11,7 @@ import PictureViewer from "./PictureViewer"
 import LocationViewer from "./LocationViewer"
 import FileViewer from "./FileViewer"
 import MediaPlayer from "./MediaPlayer"
+import TrackViewer from "./TrackViewer"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
@@ -161,8 +162,8 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 		 	? (<MediaPlayer path={itemProperty.path} />)
 		 	: ext == ".pdf"
 		 	? (<FileViewer path={itemProperty.path} />)
-		 //	: ext == ".gpx"
-		// 	? (<TrackViewer path={path.path} />)
+		 	: ext == ".gpx"
+		 	? (<TrackViewer path={itemProperty.path} />)
 		 	: (<div></div>)
 	}
 
