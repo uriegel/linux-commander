@@ -3,19 +3,20 @@ import { Root } from "./root"
 import type { FolderViewItem } from "../components/FolderView"
 import { Directory } from "./directory"
 
-export enum IconNameType {
-    Parent,
-    Root,
-    RootEjectable,
-    Home,
-    Folder,
-    File,
-    Remote,
-    Android,
-    New,
-    Service,
-    Favorite
+export const IconNameType = {
+    Parent: 'Parent',
+    Root: 'Root',
+    RootEjectable: 'RootEjectable',
+    Home: 'Home',
+    Folder: 'Folder',
+    File: 'File',
+    Remote: 'Remote',
+    Android: 'Android',
+    New: 'New',
+    Service: 'Service',
+    Favorite: 'Favorite'
 }
+export type IconNameType = (typeof IconNameType)[keyof typeof IconNameType]
 
 export interface OnEnterResult {
     processed: boolean

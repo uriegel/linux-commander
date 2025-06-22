@@ -8,9 +8,17 @@ import "functional-extensions"
 import Statusbar from "./Statusbar"
 import { cmdEvents, cmdToggleEvents, type CmdToggleMsg } from "../requests/events"
 import PictureViewer from "./PictureViewer"
+import LocationViewer from "./LocationViewer"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
+
+const PreviewMode = {
+    Default: 'Default',
+    Location: 'Location',
+    Both: 'Both'
+}
+type PreviewMode = (typeof PreviewMode)[keyof typeof PreviewMode]
 
 interface ItemProperty {
 	path: string
@@ -39,6 +47,7 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 	const [statusTextLeft, setStatusTextLeft] = useState<string | undefined>(undefined)
 	const [statusTextRight, setStatusTextRight] = useState<string | undefined>(undefined)
 	const [errorText, setErrorText] = useState<string | null>(null)
+	const [previewMode, setPreviewMode] = useState(PreviewMode.Default)
     
 	const [activeFolderId, setActiveFolderId] = useState(ID_LEFT)
 	const onFocusLeft = () => setActiveFolderId(ID_LEFT)
@@ -66,8 +75,16 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 					getInactiveFolder()?.changePath(path)
 				break
 			}
+			case "togglepreview":
+				if (showViewer)
+					setPreviewMode(previewMode == PreviewMode.Default
+						? PreviewMode.Location
+						: previewMode == PreviewMode.Location
+						? PreviewMode.Both
+						: PreviewMode.Default)			
+				break
 		}
-	}, [getActiveFolder, getInactiveFolder])
+	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer])
 
 	const onMenuToggleAction = useCallback(async (msg: CmdToggleMsg) => {
 		switch (msg.cmd) {
@@ -128,16 +145,16 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 					.toLocaleLowerCase()
 		
 		return ext == ".jpg" || ext == ".png" || ext == ".jpeg"
-		// 	? previewMode == PreviewMode.Default
-		 		? (<PictureViewer path={itemProperty.path} latitude={itemProperty.latitude} longitude={itemProperty.longitude} />)
-		// 		: previewMode == PreviewMode.Location && path.latitude && path.longitude
-		// 		? (<LocationViewer latitude={path.latitude} longitude={path.longitude} />)
-		// 		: path.latitude && path.longitude
-		// 		? <div className='bothViewer'>
-		// 				<PictureViewer path={path.path} latitude={path.latitude} longitude={path.longitude} />
-		// 				<LocationViewer latitude={path.latitude} longitude={path.longitude} />
-		// 			</div>	
-		// 		:(<PictureViewer path={path.path} latitude={path.latitude} longitude={path.longitude} />)
+		 	? previewMode == PreviewMode.Default
+			? (<PictureViewer path={itemProperty.path} latitude={itemProperty.latitude} longitude={itemProperty.longitude} />)
+			: previewMode == PreviewMode.Location && itemProperty.latitude && itemProperty.longitude
+			? (<LocationViewer latitude={itemProperty.latitude} longitude={itemProperty.longitude} />)
+			: itemProperty.latitude && itemProperty.longitude
+			? <div className='bothViewer'>
+					<PictureViewer path={itemProperty.path} latitude={itemProperty.latitude} longitude={itemProperty.longitude} />
+					<LocationViewer latitude={itemProperty.latitude} longitude={itemProperty.longitude} />
+				</div>	
+			:(<PictureViewer path={itemProperty.path} latitude={itemProperty.latitude} longitude={itemProperty.longitude} />)
 		// 	: ext == ".mp3" || ext == ".mp4" || ext == ".mkv" || ext == ".wav"
 		// 	? (<MediaPlayer path={path.path} />)
 		// 	: ext == ".pdf"

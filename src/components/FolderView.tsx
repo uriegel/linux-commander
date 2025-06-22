@@ -40,7 +40,6 @@ const DriveKind = {
     Vfat: 'Vfat',
     Home: 'Home',
 }
-
 type DriveKind = (typeof DriveKind)[keyof typeof DriveKind]
 
 export interface FolderViewItem extends SelectableItem {

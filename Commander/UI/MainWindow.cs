@@ -39,6 +39,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("adaptpath", () => Requests.SendMenuCommand("adaptpath"), "F9"),
                 new("refresh", () => Requests.SendMenuCommand("refresh"), "<Ctrl>R"),
                 new("showhidden", false, show => Requests.SendMenuCheck("showhidden", show), "<Ctrl>H"),
+                new("toggleViewMode", () => Requests.SendMenuCommand("togglepreview"), "<Ctrl>F3"),
                 new("showpreview", false, show => Requests.SendMenuCheck("showpreview", show), "F3"),
             ]);
     }
