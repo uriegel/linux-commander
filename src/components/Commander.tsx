@@ -10,6 +10,7 @@ import { cmdEvents, cmdToggleEvents, type CmdToggleMsg } from "../requests/event
 import PictureViewer from "./PictureViewer"
 import LocationViewer from "./LocationViewer"
 import FileViewer from "./FileViewer"
+import MediaPlayer from "./MediaPlayer"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
@@ -156,8 +157,8 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 					<LocationViewer latitude={itemProperty.latitude} longitude={itemProperty.longitude} />
 				</div>	
 			:(<PictureViewer path={itemProperty.path} latitude={itemProperty.latitude} longitude={itemProperty.longitude} />)
-		// 	: ext == ".mp3" || ext == ".mp4" || ext == ".mkv" || ext == ".wav"
-		// 	? (<MediaPlayer path={path.path} />)
+		 	: ext == ".mp3" || ext == ".mp4" || ext == ".mkv" || ext == ".wav"
+		 	? (<MediaPlayer path={itemProperty.path} />)
 		 	: ext == ".pdf"
 		 	? (<FileViewer path={itemProperty.path} />)
 		 //	: ext == ".gpx"
