@@ -49,7 +49,7 @@ export function getController(id: string): IController {
 export const getViewerPath = (path: string) => 
     path.startsWith("remote")
     ? `http://${path.stringBetween("/", "/")}:8080/getfile/${path.substringAfter("/").substringAfter("/")}`
-    : `http://localhost:20000/commander/file?path=${path}`
+    : `http://localhost:20000/getpicture${path}`
 
 export const formatSize = (num?: number) => {
     if (!num)

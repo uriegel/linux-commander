@@ -41,6 +41,20 @@ static class Requests
         await request.SendAsync(stream, stream.Length, iconfile?.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) == true ? "image/svg+xml" : "image/png");
         return true;
     }
+
+    public static async Task<bool> GetPictureFile(IRequest request)
+    {
+        if (request.SubPath == null)
+            return false;
+        using var pic = File.OpenRead("/" + request.SubPath);
+        if (pic != null)
+        {
+            await request.SendAsync(pic, pic.Length, MimeType.Get(request.SubPath.GetFileExtension()) ?? MimeTypes.ImageJpeg);
+            return true;
+        }
+        else
+            return false;
+    }
     
     public static void WebSocket(IWebSocket webSocket)
         => Requests.webSocket = webSocket;

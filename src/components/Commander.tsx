@@ -127,7 +127,7 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 					.getExtension()
 					.toLocaleLowerCase()
 		
-		return ext == ".jpg" || ext == ".png"
+		return ext == ".jpg" || ext == ".png" || ext == ".jpeg"
 		// 	? previewMode == PreviewMode.Default
 		 		? (<PictureViewer path={itemProperty.path} latitude={itemProperty.latitude} longitude={itemProperty.longitude} />)
 		// 		: previewMode == PreviewMode.Location && path.latitude && path.longitude

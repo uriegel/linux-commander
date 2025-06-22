@@ -17,7 +17,7 @@ const PictureViewer = ({ path, latitude, longitude }: PictureViewerProps) => {
     return (
         <div className='viewer'>
             <img className='viewerImg'
-                src={`${getViewerPath(path)}${path.startsWith("remote") ? '?' : '&'}nochache=${nocache.current++}`} alt="kein Bild gefunden" />
+                src={`${getViewerPath(path)}?nochache=${nocache.current++}`} alt="kein Bild gefunden" />
         </div>
     )
 }
