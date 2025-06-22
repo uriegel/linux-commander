@@ -7,6 +7,7 @@ import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
 import { filter } from "rxjs/operators"
 import RestrictionView, { type RestrictionViewHandle } from "./RestrictionView"
+import { initializeHistory } from "../history"
 
 export type FolderViewHandle = {
     id: string
@@ -96,7 +97,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             : columns
     }, [getWidthsId])
 
-    const changePath = useCallback(async (path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, checkPosition?: (checkItem: FolderViewItem) => boolean) => {
+    const changePath = useCallback(async (path?: string, forceShowHidden?: boolean, mount?: boolean, latestPath?: string, fromBacklog?: boolean, checkPosition?: (checkItem: FolderViewItem) => boolean) => {
         const result = await changePathRequest({ id, path, showHidden: forceShowHidden === undefined ? showHidden : forceShowHidden, mount })
         if (result.cancelled)
             return
@@ -115,8 +116,11 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
                     ? newItems.findIndex(n => checkPosition(n))
                     : 0        
         virtualTable.current?.setInitialPosition(pos, newItems.length)
-        if (result.path)
+        if (result.path) {
             localStorage.setItem(`${id}-lastPath`, result.path)
+            if (!fromBacklog)
+                history.current.set(result.path)
+        }
     }, [id, setItems, setWidths, showHidden])
 
     useImperativeHandle(ref, () => ({
@@ -135,6 +139,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const itemCount = useRef({ fileCount: 0, dirCount: 0 })
     const sortIndex = useRef(0)
     const sortDescending = useRef(false)
+    const history = useRef(initializeHistory())
 
     const [items, setStateItems] = useState([] as FolderViewItem[])
     const [path, setPath] = useState("")
@@ -254,9 +259,9 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             //     break
             case "Backspace":
                 if (!checkRestricted(evt.key)) {
-                    // const path = history.current?.get(evt.shiftKey)
-                    // if (path)
-                    //     changePath(id, path, showHidden, undefined, undefined, true)
+                    const path = history.current?.get(evt.shiftKey)
+                    if (path)
+                        changePath(path, showHidden, undefined, undefined, true)
                 }
                 break
             default:

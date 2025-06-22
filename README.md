@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO backlog history
 // TODO Image Viewer 
 // TODO Video/Audio Viewer 
 // TODO Pdf viewer
