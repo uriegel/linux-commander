@@ -18,6 +18,7 @@ static class Requests
         return request.SubPath switch
         {
             "changepath" => await ChangePath(request),
+            "preparecopy" => await PrepareCopy(request),
             _ => false
         };
     }
@@ -127,6 +128,19 @@ static class Requests
         return true;
     }
 
+    static async Task<bool> PrepareCopy(IRequest request)
+    {
+        var data = await request.DeserializeAsync<PrepareCopyRequest>();
+        //if (data != null)
+        // {
+        //     var path = data.Mount ? data.Path.Mount() : data.Path;
+        //     DetectController(data.Id, path);
+        //     var response = await GetController(data.Id).ChangePathAsync(path, data.ShowHidden);
+        //     await request.SendJsonAsync(response, response.GetType());
+        // }
+        return true;
+    }
+    
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
     static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
 
@@ -190,6 +204,14 @@ record ChangePathResult(
     string Path,
     int DirCount,
     int FileCount
+);
+
+record PrepareCopyRequest(
+    string Id,
+    string Path,
+    string TargetPath,
+    bool Move
+//    FolderViewItem[] Items
 );
 
 record ViewItem(

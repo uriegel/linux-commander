@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
-import { changePath as changePathRequest } from "../requests/requests"
+import { changePath as changePathRequest, prepareCopy } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
@@ -19,6 +19,7 @@ export type FolderViewHandle = {
     insertSelection: () => void
     selectAll: () => void
     selectNone: () => void
+    copyItems: (inactiveFolder: FolderViewHandle, move: boolean)=>Promise<void>
 }
 
 interface ItemCount {
@@ -136,7 +137,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         changePath,
         insertSelection,
         selectAll,
-        selectNone
+        selectNone,
+        copyItems
     }))
 
     const input = useRef<HTMLInputElement | null>(null)
@@ -289,6 +291,11 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             controller.current.onSelectionChanged(items)
         }
     }
+
+    const copyItems = async (inactiveFolder: FolderViewHandle, move: boolean) => {
+        var prepareResult = prepareCopy({ id, move, path, targetPath: inactiveFolder.getPath(), items: getSelectedItems() })
+    }
+
     const onSort = async (sort: OnSort) => {
         sortIndex.current = sort.isSubColumn ? 10 : sort.column
         sortDescending.current = sort.isDescending
@@ -296,6 +303,16 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         setItems(newItems)
         const name = items[virtualTable.current?.getPosition() ?? 0].name
         virtualTable.current?.setPosition(newItems.findIndex(n => n.name == name))
+    }
+
+    const getSelectedItems = () => {
+
+        const checkParent = (item: FolderViewItem) => !item.isParent ? item : null
+
+        const selected = items.filter(n => n.isSelected)
+        return selected.length > 0
+            ? selected
+            : [checkParent(items[virtualTable.current?.getPosition() ?? 0])].filter(n => n != null) as FolderViewItem[]
     }
 
     const checkRestricted = (key: string) => {

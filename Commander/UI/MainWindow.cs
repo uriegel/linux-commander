@@ -43,7 +43,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("showpreview", false, show => Requests.SendMenuCheck("showpreview", show), "F3"),
                 new("selectcurrent", () => Requests.SendMenuCommand("insert"), "Insert"),
                 new("selectall", () => Requests.SendMenuCommand("selectall"), "KP_Add"),
-                new("selectnone", () => Requests.SendMenuCommand("selectnone"), "KP_Subtract")
+                new("selectnone", () => Requests.SendMenuCommand("selectnone"), "KP_Subtract"),
+                new("copy", () => Requests.SendMenuCommand("copy"), "F5")
             ]);
     }
 

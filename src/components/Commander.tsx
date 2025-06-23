@@ -95,6 +95,12 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 			case "selectnone":
 				getActiveFolder()?.selectNone()
 				break
+			case "copy": {
+					var other = getInactiveFolder()
+					if (other)
+						getActiveFolder()?.copyItems(other, false)
+				}
+				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer])
 

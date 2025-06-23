@@ -17,7 +17,20 @@ interface ChangePathResponse {
     path?: string
 }
 
+interface PrepareCopy {
+    id: string,
+    path: string,
+    targetPath: string,
+    move: boolean,
+    items: FolderViewItem[] 
+}
+
+interface PrepareCopyResponse {
+    id: string,
+}
+
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")
+export const prepareCopy = getJsonPost<PrepareCopy, PrepareCopyResponse>("preparecopy")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  
