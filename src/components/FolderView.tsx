@@ -293,7 +293,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     }
 
     const copyItems = async (inactiveFolder: FolderViewHandle, move: boolean) => {
-        var prepareResult = prepareCopy({ id, move, path, targetPath: inactiveFolder.getPath(), items: getSelectedItems() })
+        const prepareResult = prepareCopy({ id, move, path, targetPath: inactiveFolder.getPath(), items: getSelectedItems() })
     }
 
     const onSort = async (sort: OnSort) => {
