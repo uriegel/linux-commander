@@ -1,4 +1,5 @@
 using System.Drawing;
+using CsTools.Extensions;
 using GtkDotNet;
 using GtkDotNet.Controls;
 using GtkDotNet.SafeHandles;
@@ -33,6 +34,11 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
 
     protected override void Initialize()
     {
+        Handle.DataContext(MainContext.Instance);
+        Handle.GetTemplateChild<BannerHandle, ApplicationWindowHandle>("banner")
+            .Binding("revealed", nameof(MainContext.ErrorText), BindingFlags.Default, v => v != null)
+            .Binding("title", nameof(MainContext.ErrorText), BindingFlags.Default)
+            .SideEffect(b => b.OnButtonClicked(() => b.SetRevealed(false)));
         Handle.AddActions(
             [
                 new("devtools", ShowDevTools, "<Ctrl><Shift>I"),

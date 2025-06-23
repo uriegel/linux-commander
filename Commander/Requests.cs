@@ -131,13 +131,11 @@ static class Requests
     static async Task<bool> PrepareCopy(IRequest request)
     {
         var data = await request.DeserializeAsync<PrepareCopyRequest>();
-        //if (data != null)
-        // {
-        //     var path = data.Mount ? data.Path.Mount() : data.Path;
-        //     DetectController(data.Id, path);
-        //     var response = await GetController(data.Id).ChangePathAsync(path, data.ShowHidden);
-        //     await request.SendJsonAsync(response, response.GetType());
-        // }
+        if (data != null)
+        {
+            var response = await GetController(data.Id).PrepareCopy(data);
+            await request.SendJsonAsync(response, response.GetType());
+        }
         return true;
     }
     
@@ -210,9 +208,11 @@ record PrepareCopyRequest(
     string Id,
     string Path,
     string TargetPath,
-    bool Move
-//    FolderViewItem[] Items
+    bool Move,
+    DirectoryItem[] Items
 );
+
+record PrepareCopyResult();
 
 record ViewItem(
     string Name,

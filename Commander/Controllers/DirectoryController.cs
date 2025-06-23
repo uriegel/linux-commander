@@ -1,4 +1,7 @@
+using Commander.UI;
 using CsTools.Extensions;
+
+using static System.Console;
 
 namespace Commander.Controllers;
 
@@ -16,10 +19,73 @@ class DirectoryController(string folderId) : Controller(folderId)
             GetExifData(changePathId, result.Items, path, cancellation);
             return result;
         }
+        catch (UnauthorizedAccessException uae)
+        {
+            OnError(uae);
+            MainContext.Instance.ErrorText = "Kein Zugriff";
+            return new ChangePathResult(true, changePathId, null, "", 0, 0);
+        }
+        catch (DirectoryNotFoundException dnfe)
+        {
+            OnError(dnfe);
+            MainContext.Instance.ErrorText = "Pfad nicht gefunden";
+            return new ChangePathResult(true, changePathId, null, "", 0, 0);
+        }
+        // catch (RequestException re) when (re.CustomRequestError == CustomRequestError.ConnectionError)
+        // {
+        //     OnError(re);
+        //     MainContext.Instance.ErrorText = "Die Verbindung zum Gerät konnte nicht aufgebaut werden";
+        //     return new ChangePathResult(true, changePathId, null, "", 0, 0);
+        // }
+        // catch (RequestException re) when (re.CustomRequestError == CustomRequestError.NameResolutionError)
+        // {
+        //     OnError(re);
+        //     MainContext.Instance.ErrorText = "Der Netzwerkname des Gerätes konnte nicht ermittelt werden";
+        //     return new ChangePathResult(true, changePathId, null, "", 0, 0);
+        // }
         catch (OperationCanceledException)
         {
             return new ChangePathResult(true, changePathId, null, "", 0, 0);
         }
+        catch (Exception e)
+        {
+            OnError(e);
+            MainContext.Instance.ErrorText = "Ordner konnte nicht gewechselt werden";
+            return new ChangePathResult(true, changePathId, null, "", 0, 0);
+        }
+
+        void OnError(Exception e)
+        {
+            Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
+        }
+    }
+
+    public override async Task<PrepareCopyResult> PrepareCopy(PrepareCopyRequest data)
+    {
+        if ((data.TargetPath.StartsWith('/') != true && data.TargetPath?.StartsWith("remote/") != true)
+        || string.Compare(data.Path, data.TargetPath, StringComparison.CurrentCultureIgnoreCase) == 0
+        || data.Items.Length == 0)
+            return null;
+
+        var copyProcessor = new CopyProcessor(data.Path, data.TargetPath, GetSelectedItemsType(data.Items), data.Items);
+        return await copyProcessor.PrepareCopy(data.Move);
+    }
+
+    public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
+    {
+        var dirs = items.Count(n => n.IsDirectory);
+        var files = items.Count(n => !n.IsDirectory);
+        return dirs > 1 && files == 0
+            ? SelectedItemsType.Folders
+            : dirs == 0 && files > 1
+            ? SelectedItemsType.Files
+            : dirs == 1 && files == 0
+            ? SelectedItemsType.Folder
+            : dirs == 0 && files == 1
+            ? SelectedItemsType.File
+            : dirs + files > 0
+            ? SelectedItemsType.Both
+            : SelectedItemsType.None;
     }
 
     GetFilesResult GetFiles(string path, bool showHidden, int changePathId, CancellationToken cancellation)
@@ -65,7 +131,7 @@ class DirectoryController(string folderId) : Controller(folderId)
                         changed = true;
                 }
                 if (changed)
-                    Requests.SendExifInfo(FolderId, changePathId, items);        
+                    Requests.SendExifInfo(FolderId, changePathId, items);
             }, cancellation);
         }
         catch { }
@@ -110,6 +176,15 @@ record DirectoryItem(
     public static DirectoryItem CreateFileItem(FileInfo info)
         => new(
             info.Name,
+            info.Length,
+            false,
+            false,
+            (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
+            info.LastWriteTime);
+
+    public static DirectoryItem CreateCopyFileItem(string name, FileInfo info)
+        => new(
+            name,
             info.Length,
             false,
             false,
