@@ -212,7 +212,11 @@ record PrepareCopyRequest(
     DirectoryItem[] Items
 );
 
-record PrepareCopyResult();
+record PrepareCopyResult(
+    SelectedItemsType SelectedItemsType,
+    long TotalSize
+
+);
 
 record ViewItem(
     string Name,

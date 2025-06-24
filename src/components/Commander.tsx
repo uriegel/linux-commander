@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef, useState } from "react"
 import ViewSplit from "view-split-react"
 import type { FolderViewHandle, FolderViewItem } from "./FolderView"
 import FolderView from "./FolderView"
@@ -12,6 +12,7 @@ import LocationViewer from "./LocationViewer"
 import FileViewer from "./FileViewer"
 import MediaPlayer from "./MediaPlayer"
 import TrackViewer from "./TrackViewer"
+import { DialogContext } from "web-dialog-react"
 
 const ID_LEFT = "left"
 const ID_RIGHT = "right"
@@ -56,6 +57,8 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 	const onFocusLeft = () => setActiveFolderId(ID_LEFT)
 	const onFocusRight = () => setActiveFolderId(ID_RIGHT)
 
+	const dialog = useContext(DialogContext)
+
 	const onKeyDown = (evt: React.KeyboardEvent) => {
 		if (evt.code == "Tab" && !evt.shiftKey) {
 			getInactiveFolder()?.setFocus()
@@ -98,11 +101,11 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 			case "copy": {
 					const other = getInactiveFolder()
 					if (other)
-						getActiveFolder()?.copyItems(other, false)
+						getActiveFolder()?.copyItems(other, false, dialog, getActiveFolder()?.id == ID_LEFT)
 				}
 				break
 		}
-	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer])
+	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer, dialog])
 
 	const onMenuToggleAction = useCallback(async (msg: CmdToggleMsg) => {
 		switch (msg.cmd) {

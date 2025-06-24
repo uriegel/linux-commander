@@ -1,13 +1,14 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
-import { changePath as changePathRequest, prepareCopy } from "../requests/requests"
+import { changePath as changePathRequest, prepareCopy, SelectedItemsType } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
 import { filter } from "rxjs/operators"
 import RestrictionView, { type RestrictionViewHandle } from "./RestrictionView"
 import { initializeHistory } from "../history"
+import { Slide, type DialogHandle } from "web-dialog-react"
 
 export type FolderViewHandle = {
     id: string
@@ -19,7 +20,7 @@ export type FolderViewHandle = {
     insertSelection: () => void
     selectAll: () => void
     selectNone: () => void
-    copyItems: (inactiveFolder: FolderViewHandle, move: boolean)=>Promise<void>
+    copyItems: (inactiveFolder: FolderViewHandle, move: boolean, dialog: DialogHandle, fromLeft: boolean)=>Promise<void>
 }
 
 interface ItemCount {
@@ -292,8 +293,26 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         }
     }
 
-    const copyItems = async (inactiveFolder: FolderViewHandle, move: boolean) => {
-        const prepareResult = prepareCopy({ id, move, path, targetPath: inactiveFolder.getPath(), items: getSelectedItems() })
+    const copyItems = async (inactiveFolder: FolderViewHandle, move: boolean, dialog: DialogHandle, fromLeft: boolean) => {
+        const prepareResult = await prepareCopy({ id, move, path, targetPath: inactiveFolder.getPath(), items: getSelectedItems() })
+        console.log("prepareResult", prepareResult)
+        if (prepareResult.selectedItemsType == SelectedItemsType.None)
+            return
+
+        await dialog.show({
+            //text: `${text} (${totalSize?.byteCountToString()})`,   
+            text: "Willste kopieten=?",
+            slide: fromLeft ? Slide.Left : Slide.Right,
+            //extension: conflictItems.length ? CopyConflicts : undefined,
+            //extensionProps: conflictItems, 
+            //fullscreen: conflictItems.length > 0,
+            //btnYes: conflictItems.length > 0,
+            //btnNo: conflictItems.length > 0,
+            btnOk: true,  //conflictItems.length == 0,
+            btnCancel: true,
+            //defBtnYes: !defNo && conflictItems.length > 0,
+            //defBtnNo: defNo
+        })
     }
 
     const onSort = async (sort: OnSort) => {

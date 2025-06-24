@@ -54,21 +54,17 @@ class DirectoryController(string folderId) : Controller(folderId)
             return new ChangePathResult(true, changePathId, null, "", 0, 0);
         }
 
-        void OnError(Exception e)
-        {
-            Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
-        }
+        static void OnError(Exception e) => Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
     }
 
-    public override async Task<PrepareCopyResult> PrepareCopy(PrepareCopyRequest data)
+    public override Task<PrepareCopyResult> PrepareCopy(PrepareCopyRequest data)
     {
         if ((data.TargetPath.StartsWith('/') != true && data.TargetPath?.StartsWith("remote/") != true)
         || string.Compare(data.Path, data.TargetPath, StringComparison.CurrentCultureIgnoreCase) == 0
         || data.Items.Length == 0)
-            return null;
-
+            return new PrepareCopyResult(SelectedItemsType.None, 0).ToAsync();
         var copyProcessor = new CopyProcessor(data.Path, data.TargetPath, GetSelectedItemsType(data.Items), data.Items);
-        return await copyProcessor.PrepareCopy(data.Move);
+        return Task.Run(() => copyProcessor.PrepareCopy(data.Move));
     }
 
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)

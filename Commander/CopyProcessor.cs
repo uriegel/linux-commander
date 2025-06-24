@@ -16,12 +16,13 @@ enum SelectedItemsType
 class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType selectedItemsType, DirectoryItem[] selectedItems)
 {
 
-    public Task<PrepareCopyResult> PrepareCopy(bool move)
+    public PrepareCopyResult PrepareCopy(bool move)
     {
         var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
         var copyItems = MakeCopyItems(MakeSourceCopyItems(selectedItems, sourcePath), targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
-        return null;
+        var size = copyItems.Aggregate(0L, (s, n) => s + n.Source.Size);
+        return new(selectedItemsType, size);
     }
 
     protected virtual CopyItem[] MakeCopyItems(IEnumerable<DirectoryItem> items, string targetPath)
