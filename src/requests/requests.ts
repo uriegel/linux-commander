@@ -25,7 +25,7 @@ interface PrepareCopy {
     items: FolderViewItem[] 
 }
 
-interface PrepareCopyResponse {
+export interface PrepareCopyResponse {
     selectedItemsType: SelectedItemsType,
     totalSize: number
 }

@@ -301,7 +301,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
         await dialog.show({
             //text: `${text} (${totalSize?.byteCountToString()})`,   
-            text: "Willste kopieten=?",
+            text: controller.current.getCopyText(prepareResult, move),
             slide: fromLeft ? Slide.Left : Slide.Right,
             //extension: conflictItems.length ? CopyConflicts : undefined,
             //extensionProps: conflictItems, 

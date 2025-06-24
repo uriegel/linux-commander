@@ -35,7 +35,9 @@ export class Root implements IController {
 
     itemsSelectable: boolean
 
-    onSelectionChanged() {}
+    onSelectionChanged() { }
+    
+    getCopyText() { return ""}
 
     constructor() {
         this.id = "ROOT"

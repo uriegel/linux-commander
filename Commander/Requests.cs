@@ -215,7 +215,6 @@ record PrepareCopyRequest(
 record PrepareCopyResult(
     SelectedItemsType SelectedItemsType,
     long TotalSize
-
 );
 
 record ViewItem(

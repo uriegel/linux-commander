@@ -2,6 +2,7 @@ import type { TableColumns } from "virtual-table-react"
 import { Root } from "./root"
 import type { FolderViewItem } from "../components/FolderView"
 import { Directory } from "./directory"
+import type { PrepareCopyResponse } from "../requests/requests"
 
 export const IconNameType = {
     Parent: 'Parent',
@@ -39,6 +40,7 @@ export interface IController {
     sort: (items: FolderViewItem[], sortIndex: number, sortDescending: boolean) => FolderViewItem[]
     itemsSelectable: boolean
     onSelectionChanged: (items: FolderViewItem[]) => void 
+    getCopyText: (prepareCopy: PrepareCopyResponse, move: boolean)=>string
 }
 
 export function getController(id: string): IController {

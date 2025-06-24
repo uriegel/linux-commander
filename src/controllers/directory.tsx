@@ -3,6 +3,7 @@ import { formatDateTime, formatSize, IconNameType, sortItems, type EnterData, ty
 import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
 import "../extensions/extensions"
+import { SelectedItemsType, type PrepareCopyResponse } from "../requests/requests"
 
 export class Directory implements IController {
     id: string
@@ -59,7 +60,20 @@ export class Directory implements IController {
 
     itemsSelectable: boolean
 
-    onSelectionChanged() {}
+    onSelectionChanged() { }
+    
+    getCopyText(prepareCopy: PrepareCopyResponse, move: boolean) {
+        const copyAction = `${move ? "verschieben" : " kopieren"} (${prepareCopy.totalSize.byteCountToString()})`
+        return prepareCopy.selectedItemsType == SelectedItemsType.File
+            ? `Möchtest Du die Datei ${copyAction}?`
+            : prepareCopy.selectedItemsType == SelectedItemsType.Folder
+            ? `Möchtest Du das Verzeichnis ${copyAction}?`
+            : prepareCopy.selectedItemsType == SelectedItemsType.Files
+            ? `Möchtest Du die Dateien ${copyAction}?`
+            : prepareCopy.selectedItemsType == SelectedItemsType.Folders
+            ? `Möchtest Du die Verzeichnisse ${copyAction}?`
+            : `Möchtest Du die Einträge ${copyAction}?`
+    }
 
     constructor() {
         this.id = "ROOT"
