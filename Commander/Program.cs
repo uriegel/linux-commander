@@ -43,6 +43,8 @@ using var app = Application
         .OnActivate(app =>
             app
             .SubClass(ManagedAdwApplicationWindowClass.Register(p => new MainWindow(p), "mainwindow"))
+            .SubClass(ProgressControl.Subclass())
+            .SubClass(ProgressSpinner.Subclass())
             .ManagedAdwApplicationWindow()
             .SaveBounds(600, 800)
             .Show());

@@ -1,6 +1,8 @@
 using Commander.Controllers;
 using Commander.UI;
+using CsTools;
 using CsTools.Extensions;
+using GtkDotNet;
 
 namespace Commander;
 
@@ -14,11 +16,11 @@ enum SelectedItemsType
     Both
 }
 
-class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType selectedItemsType, DirectoryItem[] selectedItems)
+class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType selectedItemsType, DirectoryItem[] selectedItems, bool move)
 {
     public static CopyProcessor? Current { get; private set; }
 
-    public PrepareCopyResult PrepareCopy(bool move)
+    public PrepareCopyResult PrepareCopy()
     {
         if (Current != null)
         {
@@ -27,10 +29,10 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
         }
         Current = this;
         var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
-        var copyItems = MakeCopyItems(MakeSourceCopyItems(selectedItems, sourcePath), targetPath);
+        copyItems = MakeCopyItems(MakeSourceCopyItems(selectedItems, sourcePath), targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
-        var size = copyItems.Aggregate(0L, (s, n) => s + n.Source.Size);
-        return new(selectedItemsType, size);
+        copySize = copyItems.Sum(n => n.Source.Size);
+        return new(selectedItemsType, copySize);
     }
 
     public async Task<CopyResult> Copy(CopyRequest data)
@@ -39,11 +41,28 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
         {
             if (data.Cancelled)
                 return new CopyResult(true);
-            else
-                return new CopyResult(false);
+
+            var index = 0;
+            var cancellation = ProgressContext.Instance.Start(move ? "Verschieben" : "Kopieren", copySize, copyItems.Length);
+            var buffer = new byte[15000];
+            foreach (var item in copyItems)
+            {
+                if (cancellation.IsCancellationRequested)
+                    throw new TaskCanceledException();
+                ProgressContext.Instance.SetNewFileProgress(item.Source.Name, item.Source.Size, ++index);
+                // if (move)
+                //     await MoveItem(item, cancellation);
+                //else
+                    await CopyItem(item, buffer, cancellation);
+            }
+
+            // if (move)
+            //     dirs.DeleteEmptyDirectories(sourcePath);
+            return new CopyResult(false);
         }
         finally
         {
+            ProgressContext.Instance.Stop();
             Current = null;
         }
     }
@@ -67,6 +86,38 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
                         .Where(n => !n.IsDirectory)
                         .SelectFilterNull(n => ValidateFile(n.Name, sourcePath));
         return dirs.Concat(files);
+    }
+
+    protected virtual async Task CopyItem(CopyItem item, byte[] buffer, CancellationToken cancellation)
+    {
+        var newFileName = targetPath.AppendPath(item.Source.Name);
+        var tmpNewFileName = targetPath.AppendPath(item.Source.Name + TMP_POSTFIX);
+        using var source = File.OpenRead(sourcePath.AppendPath(item.Source.Name)).WithProgress(ProgressContext.Instance.SetProgress);
+        using var target = File.Create(tmpNewFileName.EnsureFileDirectoryExists());
+        while (true)
+        {
+            if (cancellation.IsCancellationRequested)
+            {
+                try
+                {
+                    File.Delete(tmpNewFileName);
+                }
+                catch { }
+                throw new TaskCanceledException();
+            }
+
+            var read = await source.ReadAsync(buffer, cancellation);
+            if (read == 0)
+                break;
+            await target.WriteAsync(buffer.AsMemory(0, Math.Min(read, buffer.Length)), cancellation);
+        }
+        await Gtk.Dispatch(() =>
+        {
+            using var gsf = GFile.New(sourcePath.AppendPath(item.Source.Name));
+            using var gtf = GFile.New(tmpNewFileName);
+            gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
+        });
+        File.Move(tmpNewFileName, newFileName, true);
     }
 
     static IEnumerable<DirectoryItem> Flatten(string item, string sourcePath)
@@ -93,6 +144,11 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
             return null;
         return DirectoryItem.CreateFileItem(info);
     }
+
+    const string TMP_POSTFIX = "-tmp-commander";
+
+    CopyItem[] copyItems = [];
+    long copySize;
 }
 
 record CopyItem(DirectoryItem Source, DirectoryItem? Target);

@@ -18,13 +18,13 @@
                 <property name="action-name">win.showpreview</property>
               </object>
             </child>
-            <!-- <child type="end">
+            <child type="end">
               <object class="ProgressControl" id="progress-revealer">
                 <property name="transition-type">slide-left</property>
                 <child>
                 </child>
               </object>
-            </child> -->
+            </child>
           </object>
         </child>
         <child>
