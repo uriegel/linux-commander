@@ -36,6 +36,7 @@ interface Copy {
 }
 
 interface CopyResponse {
+    cancelled: boolean
 }
 
 export const SelectedItemsType = {

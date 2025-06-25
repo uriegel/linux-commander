@@ -296,8 +296,9 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
     const copyItems = async (inactiveFolder: FolderViewHandle, move: boolean, dialog: DialogHandle, fromLeft: boolean) => {
         const prepareResult = await prepareCopy({ id, move, path, targetPath: inactiveFolder.getPath(), items: getSelectedItems() })
         console.log("prepareResult", prepareResult)
-        if (prepareResult.selectedItemsType == SelectedItemsType.None)
+        if (prepareResult.selectedItemsType == SelectedItemsType.None) 
             return
+        
 
         const res = await dialog.show({
             //text: `${text} (${totalSize?.byteCountToString()})`,   

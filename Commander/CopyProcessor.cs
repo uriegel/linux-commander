@@ -1,4 +1,5 @@
 using Commander.Controllers;
+using Commander.UI;
 using CsTools.Extensions;
 
 namespace Commander;
@@ -20,8 +21,10 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
     public PrepareCopyResult PrepareCopy(bool move)
     {
         if (Current != null)
-            // TODO Anzeige: Es ist bereits ein Kopiervorgang am Laufen!
+        {
+            MainContext.Instance.ErrorText = "Es ist bereits ein Kopiervorgang am Laufen!";
             return new(SelectedItemsType.None, 0);
+        }
         Current = this;
         var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
         var copyItems = MakeCopyItems(MakeSourceCopyItems(selectedItems, sourcePath), targetPath);
@@ -35,9 +38,9 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
         try
         {
             if (data.Cancelled)
-                return null;
+                return new CopyResult(true);
             else
-                return null;
+                return new CopyResult(false);
         }
         finally
         {

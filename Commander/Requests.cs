@@ -232,6 +232,7 @@ record PrepareCopyResult(
 record CopyRequest(string Id, bool Cancelled);
 
 record CopyResult(
+    bool Cancelled
 );
 
 record ViewItem(
