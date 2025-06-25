@@ -28,7 +28,6 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
             return new(SelectedItemsType.None, 0);
         }
         Current = this;
-        var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
         copyItems = MakeCopyItems(MakeSourceCopyItems(selectedItems, sourcePath), targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         copySize = copyItems.Sum(n => n.Source.Size);
@@ -50,14 +49,17 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
                 if (cancellation.IsCancellationRequested)
                     throw new TaskCanceledException();
                 ProgressContext.Instance.SetNewFileProgress(item.Source.Name, item.Source.Size, ++index);
-                // if (move)
-                //     await MoveItem(item, cancellation);
-                //else
+                if (move)
+                    await MoveItem(item, cancellation);
+                else
                     await CopyItem(item, buffer, cancellation);
             }
 
-            // if (move)
-            //     dirs.DeleteEmptyDirectories(sourcePath);
+            if (move)
+            {
+                var dirs = move ? selectedItems.Where(n => n.IsDirectory).Select(n => n.Name) : [];
+                dirs.DeleteEmptyDirectories(sourcePath);
+            }
             return new CopyResult(false);
         }
         finally
@@ -120,6 +122,14 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
         File.Move(tmpNewFileName, newFileName, true);
     }
 
+    Task MoveItem(CopyItem item, CancellationToken cancellation)
+        => Gtk.Dispatch(async () =>
+        {
+            using var file = GFile.New(sourcePath.AppendPath(item.Source.Name));
+            await file.MoveAsync(targetPath.AppendPath(item.Source.Name).EnsureFileDirectoryExists(),
+                                FileCopyFlags.Overwrite, true, (c, t) => ProgressContext.Instance.SetProgress(t, c), cancellation);
+        });
+
     static IEnumerable<DirectoryItem> Flatten(string item, string sourcePath)
     {
         var info = new DirectoryInfo(sourcePath.AppendPath(item));
@@ -152,3 +162,42 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
 }
 
 record CopyItem(DirectoryItem Source, DirectoryItem? Target);
+
+static partial class Extensions
+{
+    public static void DeleteEmptyDirectories(this IEnumerable<string> dirs, string path)
+    {
+        foreach (var dir in dirs)
+        {
+            var dirToCheck = path.AppendPath(dir);
+            if (dirToCheck.IsDirectoryEmpty())
+            {
+                try
+                {
+                    System.IO.Directory.Delete(dirToCheck, true);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Konnte Ausgangsverzeicnis nicht löschen: {e}");
+                }
+            }
+        }
+    }
+
+    static bool IsDirectoryEmpty(this string dir)
+    {
+        var info = new DirectoryInfo(dir);
+        if (info.GetFiles().Length != 0)
+            return false;
+
+        var dirs = info
+            .GetDirectories()
+            .Select(n => n.FullName);
+        foreach (var subDir in dirs)
+        {
+            if (!subDir.IsDirectoryEmpty())
+                return false;
+        }
+        return true;
+    }
+}

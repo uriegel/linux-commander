@@ -104,6 +104,12 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 						getActiveFolder()?.copyItems(other, false, dialog, getActiveFolder()?.id == ID_LEFT)
 				}
 				break
+			case "move": {
+					const other = getInactiveFolder()
+					if (other)
+						getActiveFolder()?.copyItems(other, true, dialog, getActiveFolder()?.id == ID_LEFT)
+				}
+				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer, dialog])
 

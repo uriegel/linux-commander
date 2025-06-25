@@ -16,7 +16,7 @@ react-devtools
 // TODO Background action from ProgressContext
 // TODO cancel in ProgressControl with cancellation
 // TODO cancel: text in statusbar (blue)
-// TODO Move
+// TODO Conflict dialog
 // TODO DeleteItems
 // TODO CreateFolder
 // TODO Rename
