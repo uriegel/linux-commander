@@ -22,9 +22,9 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
 
     public PrepareCopyResult PrepareCopy()
     {
-        if (Current != null)
+        if (ProgressContext.Instance.IsRunning || Current != null)
         {
-            MainContext.Instance.ErrorText = "Es ist bereits ein Kopiervorgang am Laufen!";
+            MainContext.Instance.ErrorText = "Es ist bereits eine Aktion am Laufen";
             return new(SelectedItemsType.None, 0);
         }
         Current = this;
@@ -41,8 +41,9 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
             if (data.Cancelled)
                 return new CopyResult(true);
 
+            ProgressContext.Instance.SetRunning();
             var index = 0;
-            var cancellation = ProgressContext.Instance.Start(move ? "Verschieben" : "Kopieren", copySize, copyItems.Length);
+            var cancellation = ProgressContext.Instance.Start(data.Id, move ? "Verschieben" : "Kopieren", copySize, copyItems.Length);
             var buffer = new byte[15000];
             foreach (var item in copyItems)
             {
@@ -62,9 +63,15 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
             }
             return new CopyResult(false);
         }
+        catch (UnauthorizedAccessException)
+        {
+            MainContext.Instance.ErrorText = "Zugriff verweigert";
+            return new CopyResult(false);
+        }
         finally
         {
             ProgressContext.Instance.Stop();
+            ProgressContext.Instance.SetRunning(false);
             Current = null;
         }
     }

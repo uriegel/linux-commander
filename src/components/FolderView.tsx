@@ -299,7 +299,6 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         if (prepareResult.selectedItemsType == SelectedItemsType.None) 
             return
         
-
         const res = await dialog.show({
             //text: `${text} (${totalSize?.byteCountToString()})`,   
             text: controller.current.getCopyText(prepareResult, move),

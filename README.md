@@ -11,10 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Copy: Error in banner
-// TODO Background action from ProgressContext
-// TODO cancel in ProgressControl with cancellation
-// TODO cancel: text in statusbar (blue)
 // TODO Conflict dialog
 // TODO DeleteItems
 // TODO CreateFolder

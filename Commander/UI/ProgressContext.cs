@@ -7,7 +7,7 @@ namespace Commander.UI;
 class ProgressContext : INotifyPropertyChanged
 {
     public static ProgressContext Instance = new();
-    
+
     public static object GetTotalFraction(object? progress)
     {
         var cp = progress as CopyProgress;
@@ -37,8 +37,8 @@ class ProgressContext : INotifyPropertyChanged
     public void SetRunning(bool running = true)
     {
         IsRunning = running;
-//        MainContext.Instance.InfoText = null;  
-    } 
+        Requests.SendStatusBarInfo(Instance.folderId, 100_000, null);
+    }
 
     public static bool CanClose()
     {
@@ -78,9 +78,10 @@ class ProgressContext : INotifyPropertyChanged
 
     public bool IsRunning { get; private set; }
 
-    public CancellationToken Start(string title, long totalSize, int count, bool deleteAction = false)
+    public CancellationToken Start(string folderId, string title, long totalSize, int count, bool deleteAction = false)
     {
         cts?.Cancel();
+        this.folderId = folderId;
         DeleteAction = deleteAction;
         startTime = DateTime.Now;
         cts = new CancellationTokenSource();
@@ -137,10 +138,9 @@ class ProgressContext : INotifyPropertyChanged
 
     public static void Cancel()
     {
-//        MainContext.Instance.InfoText = Instance.DeleteAction ? "Löschvorgang wird abgebrochen..." : "Kopiervorgang wird abgebrochen...";
+        Requests.SendStatusBarInfo(Instance.folderId, 100_000, Instance.DeleteAction ? "Löschvorgang wird abgebrochen..." : "Kopiervorgang wird abgebrochen...");
         Instance.cts?.Cancel();
         Instance.CopyProgress = null;
-//        FolderViewPaned.Instance.GetActiveFolderView()?.GrabFocus();
     }
 
     public void SetProgress(long totalSize, long size)
@@ -182,6 +182,8 @@ class ProgressContext : INotifyPropertyChanged
 
     CancellationTokenSource? cts;
     DateTime startTime = DateTime.Now;
+
+    string folderId = string.Empty;
 }
 
 record CopyProgress(
