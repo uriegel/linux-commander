@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Refresh target (also source in move)
 // TODO Copy: Error in banner
 // TODO Background action from ProgressContext
 // TODO cancel in ProgressControl with cancellation

@@ -314,7 +314,14 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             //defBtnYes: !defNo && conflictItems.length > 0,
             //defBtnNo: defNo
         })
-        await copy({id, cancelled: res.result == ResultType.Cancel})
+        const result = await copy({ id, cancelled: res.result == ResultType.Cancel })
+        console.log("Feddisch", result)
+        if (!result.cancelled) {
+            inactiveFolder.refresh()
+            if (move)
+                refresh()
+        }
+        
     }
 
     const onSort = async (sort: OnSort) => {

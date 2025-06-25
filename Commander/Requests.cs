@@ -146,7 +146,7 @@ static class Requests
         if (data != null)
         {
             var response = await GetController(data.Id).Copy(data);
-        //     await request.SendJsonAsync(response, response.GetType());
+            await request.SendJsonAsync(response, response.GetType());
         }
         return true;
     }
