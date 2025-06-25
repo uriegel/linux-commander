@@ -67,6 +67,11 @@ class DirectoryController(string folderId) : Controller(folderId)
         return Task.Run(() => copyProcessor.PrepareCopy(data.Move));
     }
 
+    public override Task<CopyResult> Copy()
+    {
+        return null;
+    }
+
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
     {
         var dirs = items.Count(n => n.IsDirectory);

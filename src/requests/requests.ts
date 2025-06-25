@@ -30,6 +30,13 @@ export interface PrepareCopyResponse {
     totalSize: number
 }
 
+interface Copy {
+    id: string
+}
+
+interface CopyResponse {
+}
+
 export const SelectedItemsType = {
     None: 0,
     Folder: 1,
@@ -42,6 +49,7 @@ export type SelectedItemsType = (typeof SelectedItemsType)[keyof typeof Selected
 
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")
 export const prepareCopy = getJsonPost<PrepareCopy, PrepareCopyResponse>("preparecopy")
+export const copy = getJsonPost<Copy, CopyResponse>("copy")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  

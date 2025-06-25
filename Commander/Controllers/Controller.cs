@@ -6,6 +6,7 @@ abstract class Controller(string folderId)
     public abstract string Id { get; }
     public abstract Task<ChangePathResult> ChangePathAsync(string path, bool showHidden);
     public virtual Task<PrepareCopyResult> PrepareCopy(PrepareCopyRequest data) => throw new NotImplementedException();
+    public virtual Task<CopyResult> Copy() => throw new NotImplementedException();
 
     protected bool CheckInitial()
     {

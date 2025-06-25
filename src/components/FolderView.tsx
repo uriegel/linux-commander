@@ -1,14 +1,14 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
-import { changePath as changePathRequest, prepareCopy, SelectedItemsType } from "../requests/requests"
+import { changePath as changePathRequest, copy, prepareCopy, SelectedItemsType } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
 import { filter } from "rxjs/operators"
 import RestrictionView, { type RestrictionViewHandle } from "./RestrictionView"
 import { initializeHistory } from "../history"
-import { Slide, type DialogHandle } from "web-dialog-react"
+import { ResultType, Slide, type DialogHandle } from "web-dialog-react"
 
 export type FolderViewHandle = {
     id: string
@@ -299,7 +299,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         if (prepareResult.selectedItemsType == SelectedItemsType.None)
             return
 
-        await dialog.show({
+        var res = await dialog.show({
             //text: `${text} (${totalSize?.byteCountToString()})`,   
             text: controller.current.getCopyText(prepareResult, move),
             slide: fromLeft ? Slide.Left : Slide.Right,
@@ -313,6 +313,9 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             //defBtnYes: !defNo && conflictItems.length > 0,
             //defBtnNo: defNo
         })
+        if (res.result == ResultType.Cancel)
+            return
+        await copy({id})
     }
 
     const onSort = async (sort: OnSort) => {

@@ -19,6 +19,7 @@ static class Requests
         {
             "changepath" => await ChangePath(request),
             "preparecopy" => await PrepareCopy(request),
+            "copy" => await Copy(request),
             _ => false
         };
     }
@@ -139,6 +140,17 @@ static class Requests
         return true;
     }
     
+    static async Task<bool> Copy(IRequest request)
+    {
+        var data = await request.DeserializeAsync<CopyRequest>();
+        if (data != null)
+        {
+            var response = await GetController(data.Id).Copy();
+        //     await request.SendJsonAsync(response, response.GetType());
+        }
+        return true;
+    }
+
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
     static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
 
@@ -217,13 +229,15 @@ record PrepareCopyResult(
     long TotalSize
 );
 
+record CopyRequest(string Id);
+record CopyResult();
+
 record ViewItem(
     string Name,
     long? Size,
     bool? IsParent,
     bool? IsDirectory
 );
-
 
 record WebSocketMsg(
     string Method,
