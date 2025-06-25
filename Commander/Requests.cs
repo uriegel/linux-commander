@@ -145,7 +145,7 @@ static class Requests
         var data = await request.DeserializeAsync<CopyRequest>();
         if (data != null)
         {
-            var response = await GetController(data.Id).Copy();
+            var response = await GetController(data.Id).Copy(data);
         //     await request.SendJsonAsync(response, response.GetType());
         }
         return true;
@@ -229,8 +229,10 @@ record PrepareCopyResult(
     long TotalSize
 );
 
-record CopyRequest(string Id);
-record CopyResult();
+record CopyRequest(string Id, bool Cancelled);
+
+record CopyResult(
+);
 
 record ViewItem(
     string Name,

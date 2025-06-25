@@ -299,7 +299,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         if (prepareResult.selectedItemsType == SelectedItemsType.None)
             return
 
-        var res = await dialog.show({
+        const res = await dialog.show({
             //text: `${text} (${totalSize?.byteCountToString()})`,   
             text: controller.current.getCopyText(prepareResult, move),
             slide: fromLeft ? Slide.Left : Slide.Right,
@@ -313,9 +313,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             //defBtnYes: !defNo && conflictItems.length > 0,
             //defBtnNo: defNo
         })
-        if (res.result == ResultType.Cancel)
-            return
-        await copy({id})
+        await copy({id, cancelled: res.result == ResultType.Cancel})
     }
 
     const onSort = async (sort: OnSort) => {

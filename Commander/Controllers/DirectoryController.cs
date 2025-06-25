@@ -67,10 +67,7 @@ class DirectoryController(string folderId) : Controller(folderId)
         return Task.Run(() => copyProcessor.PrepareCopy(data.Move));
     }
 
-    public override Task<CopyResult> Copy()
-    {
-        return null;
-    }
+    public override Task<CopyResult> Copy(CopyRequest copyRequest) => CopyProcessor.Current?.Copy(copyRequest) ?? new CopyResult().ToAsync();
 
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
     {
