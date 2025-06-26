@@ -9,7 +9,7 @@ import { filter } from "rxjs/operators"
 import RestrictionView, { type RestrictionViewHandle } from "./RestrictionView"
 import { initializeHistory } from "../history"
 import { ResultType, Slide, type DialogHandle } from "web-dialog-react"
-import CopyConflicts from "./dialogparts/CopyConflicts"
+import CopyConflicts, { type ConflictItem } from "./dialogparts/CopyConflicts"
 
 export type FolderViewHandle = {
     id: string
@@ -310,7 +310,14 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             text: controller.current.getCopyText(prepareResult, move),
             slide: fromLeft ? Slide.Left : Slide.Right,
             extension: prepareResult.conflicts.length ? CopyConflicts : undefined,
-            extensionProps: prepareResult.conflicts, 
+            extensionProps: prepareResult.conflicts.map(n => ({
+                name: n.source.name,
+                iconPath: n.source.name,
+                size: n.source.size,
+                time: n.source.time,
+                targetSize: n.target.size,
+                targetTime: n.target.time
+            }) as ConflictItem), 
             fullscreen: prepareResult.conflicts.length > 0,
             btnYes: prepareResult.conflicts.length > 0,
             btnNo: prepareResult.conflicts.length > 0,

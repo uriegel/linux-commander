@@ -11,9 +11,10 @@ react-devtools
 ```
 
 ```
-// TODO Conflict dialog: CopyItem => ConflictItem
+// TODO Copy: attributes are not copied for all files
+// TODO Conflict dialog: check subPath
 // TODO Conflict dialog: check def
-// TODO Conflict dialog: adapt Capitel
+// TODO Conflict dialog: adapt Capitel text
 // TODO DeleteItems
 // TODO CreateFolder
 // TODO Rename
