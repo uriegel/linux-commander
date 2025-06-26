@@ -20,6 +20,7 @@ static class Requests
             "changepath" => await ChangePath(request),
             "preparecopy" => await PrepareCopy(request),
             "copy" => await Copy(request),
+            "delete" => await Delete(request),
             _ => false
         };
     }
@@ -151,6 +152,17 @@ static class Requests
         return true;
     }
 
+    static async Task<bool> Delete(IRequest request)
+    {
+        var data = await request.DeserializeAsync<DeleteRequest>();
+        if (data != null)
+        {
+            var response = await GetController(data.Id).Delete(data);
+            await request.SendJsonAsync(response, response.GetType());
+        }
+        return true;
+    }
+
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
     static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
 
@@ -238,6 +250,12 @@ record CopyRequest(
 
 record CopyResult(
     bool Cancelled
+);
+
+record DeleteRequest(
+    string Id,
+    string Path,
+    DirectoryItem[] Items
 );
 
 record ViewItem(

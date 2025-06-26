@@ -69,6 +69,11 @@ class DirectoryController(string folderId) : Controller(folderId)
 
     public override Task<CopyResult> Copy(CopyRequest copyRequest) => CopyProcessor.Current?.Copy(copyRequest) ?? new CopyResult(true).ToAsync();
 
+    public override async Task<NoneResult> Delete(DeleteRequest deleteRequest)
+    {
+        return new();
+    }
+
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
     {
         var dirs = items.Count(n => n.IsDirectory);

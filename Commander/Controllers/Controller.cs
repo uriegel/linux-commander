@@ -7,6 +7,7 @@ abstract class Controller(string folderId)
     public abstract Task<ChangePathResult> ChangePathAsync(string path, bool showHidden);
     public virtual Task<PrepareCopyResult> PrepareCopy(PrepareCopyRequest data) => throw new NotImplementedException();
     public virtual Task<CopyResult> Copy(CopyRequest copyRequest) => throw new NotImplementedException();
+    public virtual Task<NoneResult> Delete(DeleteRequest deleteRequest) => throw new NotImplementedException();
 
     protected bool CheckInitial()
     {
@@ -21,3 +22,5 @@ abstract class Controller(string folderId)
 
     bool initial = true;
 }
+
+record NoneResult();

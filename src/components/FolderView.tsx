@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
-import { changePath as changePathRequest, copy, prepareCopy, SelectedItemsType } from "../requests/requests"
+import { changePath as changePathRequest, copy, deleteRequest, prepareCopy, SelectedItemsType } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
@@ -21,7 +21,8 @@ export type FolderViewHandle = {
     insertSelection: () => void
     selectAll: () => void
     selectNone: () => void
-    copyItems: (inactiveFolder: FolderViewHandle, move: boolean, dialog: DialogHandle, fromLeft: boolean)=>Promise<void>
+    copyItems: (inactiveFolder: FolderViewHandle, move: boolean, dialog: DialogHandle, fromLeft: boolean) => Promise<void>
+    deleteItems: ()=>Promise<void>
 }
 
 interface ItemCount {
@@ -140,7 +141,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         insertSelection,
         selectAll,
         selectNone,
-        copyItems
+        copyItems,
+        deleteItems
     }))
 
     const input = useRef<HTMLInputElement | null>(null)
@@ -256,9 +258,9 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
                     controller.current.onSelectionChanged(items)                    
                 }
                 break                
-            // case "Delete":
-            //     deleteItems()
-            //     break
+            case "Delete":
+                deleteItems()
+                break
             case "Backspace":
                 if (!checkRestricted(evt.key)) {
                     const path = history.current?.get(evt.shiftKey)
@@ -334,6 +336,10 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
                 refresh()
         }
         
+    }
+
+    const deleteItems = async () => {
+        await deleteRequest({ id, path, items: getSelectedItems() })
     }
 
     const onSort = async (sort: OnSort) => {

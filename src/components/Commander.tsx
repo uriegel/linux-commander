@@ -110,6 +110,9 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 						getActiveFolder()?.copyItems(other, true, dialog, getActiveFolder()?.id == ID_LEFT)
 				}
 				break
+			case "delete":
+				getActiveFolder()?.deleteItems()
+				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer, dialog])
 
