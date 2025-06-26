@@ -6,6 +6,7 @@ declare global {
         getExtension(): string
         extractSubPath(): string
         getParentPath(): string
+        getFileName(): string
     }
 }
 
@@ -22,6 +23,14 @@ String.prototype.getParentPath = function (): string {
     return this.length > 1 && (this.charAt(this.length - 1) == "/" || this.charAt(this.length - 1) == "\\")
         ? this.substring(0, this.substring(0, this.length - 1).lastIndexOfAny(["/", "\\"]))
         : this.substring(0, this.lastIndexOfAny(["/", "\\"]))
+}
+
+String.prototype.getFileName = function (): string {
+    const pos = this.lastIndexOfAny(["/", "\\"])
+    return pos == -1
+        ? this as string
+        : this.substring(pos)
+    
 }
 
 String.prototype.appendPath = function (subPath: string): string {

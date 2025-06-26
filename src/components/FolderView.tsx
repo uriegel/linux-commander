@@ -311,7 +311,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             slide: fromLeft ? Slide.Left : Slide.Right,
             extension: prepareResult.conflicts.length ? CopyConflicts : undefined,
             extensionProps: prepareResult.conflicts.map(n => ({
-                name: n.source.name,
+                name: n.source.name.getFileName(),
+                subPath: n.source.name.getParentPath(),
                 iconPath: n.source.name,
                 size: n.source.size,
                 time: n.source.time,

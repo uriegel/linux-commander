@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Conflict dialog: check subPath
 // TODO Conflict dialog: check def
 // TODO Conflict dialog: adapt Capitel text
 // TODO DeleteItems
