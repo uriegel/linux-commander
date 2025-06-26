@@ -39,6 +39,7 @@ export interface CopyItem {
 interface Copy {
     id: string
     cancelled?: boolean
+    notOverwrite?: boolean
 }
 
 interface CopyResponse {

@@ -327,8 +327,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             defBtnYes: !defNo && prepareResult.conflicts.length > 0,
             defBtnNo: defNo
         })
-        const result = await copy({ id, cancelled: res.result == ResultType.Cancel })
-        console.log("Feddisch", result)
+        const result = await copy({ id, cancelled: res.result == ResultType.Cancel, notOverwrite: res.result == ResultType.No })
         if (!result.cancelled) {
             inactiveFolder.refresh()
             if (move)

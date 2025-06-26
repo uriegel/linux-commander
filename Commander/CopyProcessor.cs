@@ -45,7 +45,7 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
             var index = 0;
             var cancellation = ProgressContext.Instance.Start(data.Id, move ? "Verschieben" : "Kopieren", copySize, copyItems.Length);
             var buffer = new byte[15000];
-            foreach (var item in copyItems)
+            foreach (var item in data.NotOverwrite ? copyItems.Where(n => n.Target == null) : copyItems)
             {
                 if (cancellation.IsCancellationRequested)
                     throw new TaskCanceledException();

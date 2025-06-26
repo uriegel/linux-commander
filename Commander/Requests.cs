@@ -230,7 +230,11 @@ record PrepareCopyResult(
     CopyItem[] Conflicts
 );
 
-record CopyRequest(string Id, bool Cancelled);
+record CopyRequest(
+    string Id,
+    bool Cancelled,
+    bool NotOverwrite
+);
 
 record CopyResult(
     bool Cancelled
