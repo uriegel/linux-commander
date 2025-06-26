@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
-import { changePath as changePathRequest, copy, prepareCopy, SelectedItemsType, type CopyItem } from "../requests/requests"
+import { changePath as changePathRequest, copy, prepareCopy, SelectedItemsType } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
