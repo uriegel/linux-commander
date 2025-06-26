@@ -37,7 +37,8 @@ export class Root implements IController {
 
     onSelectionChanged() { }
     
-    getCopyText() { return ""}
+    getCopyText() { return "" }
+    getDeleteText() { return "" }
 
     constructor() {
         this.id = "ROOT"

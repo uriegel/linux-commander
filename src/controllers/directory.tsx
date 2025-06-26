@@ -77,6 +77,22 @@ export class Directory implements IController {
             : `Möchtest Du die Einträge ${copyAction}?`
     }
 
+    getDeleteText(items: FolderViewItem[]) { 
+        const dirs = items.filter(n => n.isDirectory).length
+        const files = items.filter(n => !n.isDirectory).length
+        return dirs > 0 && files > 0
+            ? "Möchtest Du die Dateien und Verzeichnisse löschen?"
+            : dirs == 1 && files == 0
+            ? "Möchtest Du das Verzsichnis löschen?"
+            : dirs == 0 && files == 1
+            ? "Möchtest Du die Datei löschen?"
+            : dirs > 1 && files == 0
+            ? "Möchtest Du die Verzeichnisse löschen?"
+            : dirs == 0 && files > 1
+            ? "Möchtest Du die Dateien löschen?"
+            : ""                
+    }   
+
     constructor() {
         this.id = "ROOT"
         this.itemsSelectable = true

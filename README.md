@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO DeleteItems: show dialog from react directrory copntroller
 // TODO DeleteItems: delete to waste basket
 // TODO CreateFolder
 // TODO Rename

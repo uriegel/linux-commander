@@ -21,8 +21,8 @@ export type FolderViewHandle = {
     insertSelection: () => void
     selectAll: () => void
     selectNone: () => void
-    copyItems: (inactiveFolder: FolderViewHandle, move: boolean, dialog: DialogHandle, fromLeft: boolean) => Promise<void>
-    deleteItems: ()=>Promise<void>
+    copyItems: (inactiveFolder: FolderViewHandle, move: boolean, fromLeft: boolean) => Promise<void>
+    deleteItems: (dialog: DialogHandle)=>Promise<void>
 }
 
 interface ItemCount {
@@ -37,7 +37,8 @@ interface FolderViewProp {
     onItemChanged: (path: string, isDir: boolean, latitude?: number, longitude?: number) => void
     onItemsChanged: (count: ItemCount)=>void
     onEnter: (item: FolderViewItem)=>void
-    setStatusText: (text?: string)=>void
+    setStatusText: (text?: string) => void
+    dialog: DialogHandle
 }
 
 const DriveKind = {
@@ -81,7 +82,7 @@ export type ExifData = {
 }
 
 const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
-    { id, showHidden, onFocus, onItemChanged, onItemsChanged, onEnter, setStatusText },
+    { id, showHidden, onFocus, onItemChanged, onItemsChanged, onEnter, setStatusText, dialog },
     ref) => {
     
     const setItems = useCallback((items: FolderViewItem[], dirCount?: number, fileCount?: number) => {
@@ -259,7 +260,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
                 }
                 break                
             case "Delete":
-                deleteItems()
+                deleteItems(dialog)
                 break
             case "Backspace":
                 if (!checkRestricted(evt.key)) {
@@ -296,7 +297,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         }
     }
 
-    const copyItems = async (inactiveFolder: FolderViewHandle, move: boolean, dialog: DialogHandle, fromLeft: boolean) => {
+    const copyItems = async (inactiveFolder: FolderViewHandle, move: boolean, fromLeft: boolean) => {
         const prepareResult = await prepareCopy({ id, move, path, targetPath: inactiveFolder.getPath(), items: getSelectedItems() })
         console.log("prepareResult", prepareResult)
         if (prepareResult.selectedItemsType == SelectedItemsType.None) 
@@ -335,11 +336,20 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             if (move)
                 refresh()
         }
-        
     }
 
-    const deleteItems = async () => {
-        await deleteRequest({ id, path, items: getSelectedItems() })
+    const deleteItems = async (dialog: DialogHandle) => {
+        const items = getSelectedItems()
+        if (!items)
+            return
+        const text = controller.current.getDeleteText(items)
+        const res = await dialog.show({
+            text,
+            btnOk: true,
+            btnCancel: true
+        })
+        if (res.result == ResultType.Ok)
+            await deleteRequest({ id, path, items: getSelectedItems() })
     }
 
     const onSort = async (sort: OnSort) => {

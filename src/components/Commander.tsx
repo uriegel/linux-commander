@@ -101,17 +101,17 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 			case "copy": {
 					const other = getInactiveFolder()
 					if (other)
-						getActiveFolder()?.copyItems(other, false, dialog, getActiveFolder()?.id == ID_LEFT)
+						getActiveFolder()?.copyItems(other, false, getActiveFolder()?.id == ID_LEFT)
 				}
 				break
 			case "move": {
 					const other = getInactiveFolder()
 					if (other)
-						getActiveFolder()?.copyItems(other, true, dialog, getActiveFolder()?.id == ID_LEFT)
+						getActiveFolder()?.copyItems(other, true, getActiveFolder()?.id == ID_LEFT)
 				}
 				break
 			case "delete":
-				getActiveFolder()?.deleteItems()
+				getActiveFolder()?.deleteItems(dialog)
 				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer, dialog])
@@ -157,11 +157,11 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
     
 	const FolderLeft = () => (
 		<FolderView ref={folderLeft} id={ID_LEFT} onFocus={onFocusLeft} onItemChanged={onItemChanged} onItemsChanged={setItemCount}
-			onEnter={onEnter} showHidden={showHidden} setStatusText={setStatusTextLeft} />
+			onEnter={onEnter} showHidden={showHidden} setStatusText={setStatusTextLeft} dialog={dialog} />
 	)
 	const FolderRight = () => (
 		<FolderView ref={folderRight} id={ID_RIGHT} onFocus={onFocusRight} onItemChanged={onItemChanged} onItemsChanged={setItemCount}
-			onEnter={onEnter} showHidden={showHidden} setStatusText={setStatusTextRight} />
+			onEnter={onEnter} showHidden={showHidden} setStatusText={setStatusTextRight} dialog={dialog} />
 	)
 
 	const getStatusText = useCallback(() => 

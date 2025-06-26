@@ -40,7 +40,8 @@ export interface IController {
     sort: (items: FolderViewItem[], sortIndex: number, sortDescending: boolean) => FolderViewItem[]
     itemsSelectable: boolean
     onSelectionChanged: (items: FolderViewItem[]) => void 
-    getCopyText: (prepareCopy: PrepareCopyResponse, move: boolean)=>string
+    getCopyText: (prepareCopy: PrepareCopyResponse, move: boolean) => string
+    getDeleteText: (items: FolderViewItem[])=>string
 }
 
 export function getController(id: string): IController {
