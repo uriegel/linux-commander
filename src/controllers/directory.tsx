@@ -64,7 +64,9 @@ export class Directory implements IController {
     
     getCopyText(prepareCopy: PrepareCopyResponse, move: boolean) {
         const copyAction = `${move ? "verschieben" : " kopieren"} (${prepareCopy.totalSize.byteCountToString()})`
-        return prepareCopy.selectedItemsType == SelectedItemsType.File
+        return prepareCopy.conflicts.length > 0
+            ? `Einträge überschreiben beim ${move ? "Verschieben" : " Kopieren"} (${prepareCopy.totalSize.byteCountToString()}?`
+            : prepareCopy.selectedItemsType == SelectedItemsType.File
             ? `Möchtest Du die Datei ${copyAction}?`
             : prepareCopy.selectedItemsType == SelectedItemsType.Folder
             ? `Möchtest Du das Verzeichnis ${copyAction}?`
