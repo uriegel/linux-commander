@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Copy: attributes are not copied for all files
 // TODO Conflict dialog: check subPath
 // TODO Conflict dialog: check def
 // TODO Conflict dialog: adapt Capitel text

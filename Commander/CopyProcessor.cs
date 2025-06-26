@@ -101,31 +101,34 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
     {
         var newFileName = targetPath.AppendPath(item.Source.Name);
         var tmpNewFileName = targetPath.AppendPath(item.Source.Name + TMP_POSTFIX);
-        using var source = File.OpenRead(sourcePath.AppendPath(item.Source.Name)).WithProgress(ProgressContext.Instance.SetProgress);
-        using var target = File.Create(tmpNewFileName.EnsureFileDirectoryExists());
-        while (true)
         {
-            if (cancellation.IsCancellationRequested)
+            using var source = File.OpenRead(sourcePath.AppendPath(item.Source.Name)).WithProgress(ProgressContext.Instance.SetProgress);
+            using var target = File.Create(tmpNewFileName.EnsureFileDirectoryExists());
+            while (true)
             {
-                try
+                if (cancellation.IsCancellationRequested)
                 {
-                    File.Delete(tmpNewFileName);
+                    try
+                    {
+                        File.Delete(tmpNewFileName);
+                    }
+                    catch { }
+                    throw new TaskCanceledException();
                 }
-                catch { }
-                throw new TaskCanceledException();
-            }
 
-            var read = await source.ReadAsync(buffer, cancellation);
-            if (read == 0)
-                break;
-            await target.WriteAsync(buffer.AsMemory(0, Math.Min(read, buffer.Length)), cancellation);
+                var read = await source.ReadAsync(buffer, cancellation);
+                if (read == 0)
+                    break;
+                await target.WriteAsync(buffer.AsMemory(0, Math.Min(read, buffer.Length)), cancellation);
+            }
         }
         await Gtk.Dispatch(() =>
-        {
-            using var gsf = GFile.New(sourcePath.AppendPath(item.Source.Name));
-            using var gtf = GFile.New(tmpNewFileName);
-            gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
-        });
+            {
+                using var gsf = GFile.New(sourcePath.AppendPath(item.Source.Name));
+                using var gtf = GFile.New(tmpNewFileName);
+                var res = gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
+                var ress = res;
+            });
         File.Move(tmpNewFileName, newFileName, true);
     }
 
