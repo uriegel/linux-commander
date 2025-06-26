@@ -27,7 +27,13 @@ interface PrepareCopy {
 
 export interface PrepareCopyResponse {
     selectedItemsType: SelectedItemsType,
-    totalSize: number
+    totalSize: number,
+    conflicts: CopyItem[]
+}
+
+export interface CopyItem {
+    source: FolderViewItem,
+    target: FolderViewItem
 }
 
 interface Copy {

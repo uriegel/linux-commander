@@ -226,7 +226,8 @@ record PrepareCopyRequest(
 
 record PrepareCopyResult(
     SelectedItemsType SelectedItemsType,
-    long TotalSize
+    long TotalSize,
+    CopyItem[] Conflicts
 );
 
 record CopyRequest(string Id, bool Cancelled);

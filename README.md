@@ -11,7 +11,9 @@ react-devtools
 ```
 
 ```
-// TODO Conflict dialog
+// TODO Conflict dialog: CopyItem => ConflictItem
+// TODO Conflict dialog: check def
+// TODO Conflict dialog: adapt Capitel
 // TODO DeleteItems
 // TODO CreateFolder
 // TODO Rename

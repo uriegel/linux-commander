@@ -1,0 +1,17 @@
+.equal {
+    opacity: 0.2;
+}
+.overwrite {
+    color: black;
+    background-color: lightgreen;
+}
+.notOverwrite {
+    color: white;
+    background-color: red;
+}
+.subPath {
+    margin-left: 20px;
+}
+.subPath.empty {
+    opacity: 0;
+}

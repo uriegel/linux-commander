@@ -25,13 +25,13 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
         if (ProgressContext.Instance.IsRunning || Current != null)
         {
             MainContext.Instance.ErrorText = "Es ist bereits eine Aktion am Laufen";
-            return new(SelectedItemsType.None, 0);
+            return new(SelectedItemsType.None, 0, []);
         }
         Current = this;
         copyItems = MakeCopyItems(MakeSourceCopyItems(selectedItems, sourcePath), targetPath);
         var conflicts = copyItems.Where(n => n.Target != null).ToArray();
         copySize = copyItems.Sum(n => n.Source.Size);
-        return new(selectedItemsType, copySize);
+        return new(selectedItemsType, copySize, conflicts);
     }
 
     public async Task<CopyResult> Copy(CopyRequest data)

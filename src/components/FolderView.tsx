@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
-import { changePath as changePathRequest, copy, prepareCopy, SelectedItemsType } from "../requests/requests"
+import { changePath as changePathRequest, copy, prepareCopy, SelectedItemsType, type CopyItem } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
@@ -9,6 +9,7 @@ import { filter } from "rxjs/operators"
 import RestrictionView, { type RestrictionViewHandle } from "./RestrictionView"
 import { initializeHistory } from "../history"
 import { ResultType, Slide, type DialogHandle } from "web-dialog-react"
+import CopyConflicts from "./dialogparts/CopyConflicts"
 
 export type FolderViewHandle = {
     id: string
@@ -298,20 +299,25 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         console.log("prepareResult", prepareResult)
         if (prepareResult.selectedItemsType == SelectedItemsType.None) 
             return
+
+        const defNo = prepareResult.conflicts.length > 0
+            && prepareResult
+                .conflicts
+                .filter(n => (n.source.time ?? "") < (n.target.time ?? ""))
+                .length > 0
         
         const res = await dialog.show({
-            //text: `${text} (${totalSize?.byteCountToString()})`,   
             text: controller.current.getCopyText(prepareResult, move),
             slide: fromLeft ? Slide.Left : Slide.Right,
-            //extension: conflictItems.length ? CopyConflicts : undefined,
-            //extensionProps: conflictItems, 
-            //fullscreen: conflictItems.length > 0,
-            //btnYes: conflictItems.length > 0,
-            //btnNo: conflictItems.length > 0,
-            btnOk: true,  //conflictItems.length == 0,
+            extension: prepareResult.conflicts.length ? CopyConflicts : undefined,
+            extensionProps: prepareResult.conflicts, 
+            fullscreen: prepareResult.conflicts.length > 0,
+            btnYes: prepareResult.conflicts.length > 0,
+            btnNo: prepareResult.conflicts.length > 0,
+            btnOk: prepareResult.conflicts.length == 0,
             btnCancel: true,
-            //defBtnYes: !defNo && conflictItems.length > 0,
-            //defBtnNo: defNo
+            defBtnYes: !defNo && prepareResult.conflicts.length > 0,
+            defBtnNo: defNo
         })
         const result = await copy({ id, cancelled: res.result == ResultType.Cancel })
         console.log("Feddisch", result)

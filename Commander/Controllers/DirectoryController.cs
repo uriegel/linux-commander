@@ -62,7 +62,7 @@ class DirectoryController(string folderId) : Controller(folderId)
         if ((data.TargetPath.StartsWith('/') != true && data.TargetPath?.StartsWith("remote/") != true)
         || string.Compare(data.Path, data.TargetPath, StringComparison.CurrentCultureIgnoreCase) == 0
         || data.Items.Length == 0)
-            return new PrepareCopyResult(SelectedItemsType.None, 0).ToAsync();
+            return new PrepareCopyResult(SelectedItemsType.None, 0, []).ToAsync();
         var copyProcessor = new CopyProcessor(data.Path, data.TargetPath, GetSelectedItemsType(data.Items), data.Items, data.Move);
         return Task.Run(() => copyProcessor.PrepareCopy());
     }
