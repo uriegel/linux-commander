@@ -13,6 +13,7 @@ react-devtools
 ```
 // TODO Conflict dialog: check def
 // TODO Conflict dialog: adapt Capitel text
+// TODO Conflict dialog: check overwrite yes/no
 // TODO DeleteItems
 // TODO CreateFolder
 // TODO Rename
