@@ -1,6 +1,6 @@
 using Commander.UI;
 using CsTools.Extensions;
-
+using GtkDotNet;
 using static System.Console;
 
 namespace Commander.Controllers;
@@ -69,9 +69,15 @@ class DirectoryController(string folderId) : Controller(folderId)
 
     public override Task<CopyResult> Copy(CopyRequest copyRequest) => CopyProcessor.Current?.Copy(copyRequest) ?? new CopyResult(true).ToAsync();
 
-    public override async Task<NoneResult> Delete(DeleteRequest deleteRequest)
+    public override async Task<DeleteResult> Delete(DeleteRequest deleteRequest)
     {
-        return new();
+        foreach (var item in deleteRequest.Items)
+        await Gtk.Dispatch(async () =>
+        {
+            using var file = GFile.New(deleteRequest.Path.AppendPath(item.Name));
+            await file.TrashAsync();
+        });
+        return new(true);
     }
 
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)

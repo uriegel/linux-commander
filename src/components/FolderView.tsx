@@ -348,8 +348,10 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             btnOk: true,
             btnCancel: true
         })
-        if (res.result == ResultType.Ok)
-            await deleteRequest({ id, path, items: getSelectedItems() })
+        if (res.result != ResultType.Ok) 
+            return
+        if (await deleteRequest({ id, path, items: getSelectedItems() }))
+            refresh()
     }
 
     const onSort = async (sort: OnSort) => {

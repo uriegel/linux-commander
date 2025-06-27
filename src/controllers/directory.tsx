@@ -83,7 +83,7 @@ export class Directory implements IController {
         return dirs > 0 && files > 0
             ? "Möchtest Du die Dateien und Verzeichnisse löschen?"
             : dirs == 1 && files == 0
-            ? "Möchtest Du das Verzsichnis löschen?"
+            ? "Möchtest Du das Verzeichnis löschen?"
             : dirs == 0 && files == 1
             ? "Möchtest Du die Datei löschen?"
             : dirs > 1 && files == 0

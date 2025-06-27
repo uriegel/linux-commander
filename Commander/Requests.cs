@@ -258,6 +258,8 @@ record DeleteRequest(
     DirectoryItem[] Items
 );
 
+record DeleteResult(bool Success);
+
 record ViewItem(
     string Name,
     long? Size,

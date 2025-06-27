@@ -42,14 +42,18 @@ interface Copy {
     notOverwrite?: boolean
 }
 
+interface CopyResponse {
+    cancelled: boolean
+}
+
 interface Delete {
     id: string
     path: string,
     items: FolderViewItem[]
 }
 
-interface CopyResponse {
-    cancelled: boolean
+interface DeleteResponse {
+    success: boolean
 }
 
 export const SelectedItemsType = {
@@ -65,7 +69,7 @@ export type SelectedItemsType = (typeof SelectedItemsType)[keyof typeof Selected
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")
 export const prepareCopy = getJsonPost<PrepareCopy, PrepareCopyResponse>("preparecopy")
 export const copy = getJsonPost<Copy, CopyResponse>("copy")
-export const deleteRequest = getJsonPost<Delete, void>("delete")
+export const deleteRequest = getJsonPost<Delete, DeleteResponse>("delete")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  
