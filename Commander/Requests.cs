@@ -21,6 +21,7 @@ static class Requests
             "preparecopy" => await PrepareCopy(request),
             "copy" => await Copy(request),
             "delete" => await Delete(request),
+            "createfolder" => await CreateFolder(request),
             _ => false
         };
     }
@@ -163,6 +164,17 @@ static class Requests
         return true;
     }
 
+    static async Task<bool> CreateFolder(IRequest request)
+    {
+        var data = await request.DeserializeAsync<CreateFolderRequest>();
+        if (data != null)
+        {
+            var response = await GetController(data.Id).CreateFolder(data);
+            await request.SendJsonAsync(response, response.GetType());
+        }
+        return true;
+    }
+
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
     static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
 
@@ -259,6 +271,14 @@ record DeleteRequest(
 );
 
 record DeleteResult(bool Success);
+
+record CreateFolderRequest(
+    string Id,
+    string Path,
+    string Name
+);
+
+record CreateFolderResult(bool Success);
 
 record ViewItem(
     string Name,

@@ -56,6 +56,16 @@ interface DeleteResponse {
     success: boolean
 }
 
+interface CreateFolder {
+    id: string
+    path: string,
+    name: string
+}
+
+interface CreateFolderResponse {
+    success: boolean
+}
+
 export const SelectedItemsType = {
     None: 0,
     Folder: 1,
@@ -70,6 +80,7 @@ export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepat
 export const prepareCopy = getJsonPost<PrepareCopy, PrepareCopyResponse>("preparecopy")
 export const copy = getJsonPost<Copy, CopyResponse>("copy")
 export const deleteRequest = getJsonPost<Delete, DeleteResponse>("delete")
+export const createFolderRequest = getJsonPost<CreateFolder, CreateFolderResponse>("createfolder")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  

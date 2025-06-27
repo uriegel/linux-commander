@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
-import { changePath as changePathRequest, copy, deleteRequest, prepareCopy, SelectedItemsType } from "../requests/requests"
+import { changePath as changePathRequest, copy, createFolderRequest, deleteRequest, prepareCopy, SelectedItemsType } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
@@ -22,7 +22,8 @@ export type FolderViewHandle = {
     selectAll: () => void
     selectNone: () => void
     copyItems: (inactiveFolder: FolderViewHandle, move: boolean, fromLeft: boolean) => Promise<void>
-    deleteItems: (dialog: DialogHandle)=>Promise<void>
+    deleteItems: (dialog: DialogHandle) => Promise<void>
+    createFolder: (dialog: DialogHandle) => Promise<void>
 }
 
 interface ItemCount {
@@ -143,7 +144,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         selectAll,
         selectNone,
         copyItems,
-        deleteItems
+        deleteItems,
+        createFolder
     }))
 
     const input = useRef<HTMLInputElement | null>(null)
@@ -202,7 +204,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             changePath(res.pathToSet, showHidden, res.mount, res.latestPath)
     }
 
-    const refresh = (forceShowHidden?: boolean) => changePath(path, forceShowHidden || (forceShowHidden === false ? false : showHidden))
+    const refresh = (forceShowHidden?: boolean, checkPosition?: (checkItem: FolderViewItem) => boolean) =>
+        changePath(path, forceShowHidden || (forceShowHidden === false ? false : showHidden), undefined, undefined, undefined, checkPosition)
     
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPath(e.target.value)
 
@@ -352,6 +355,21 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             return
         if (await deleteRequest({ id, path, items: getSelectedItems() }))
             refresh()
+    }
+
+    const createFolder = async (dialog: DialogHandle) => {
+        const selected = items[virtualTable.current?.getPosition() ?? 0]
+        const res = await dialog.show({
+            text: "Neuen Ordner anlegen",
+            inputText: !selected.isParent ? selected.name : "",
+            btnOk: true,
+            btnCancel: true,
+            defBtnOk: true
+        })
+        if (res.result != ResultType.Ok || !res.input) 
+            return
+        if (await createFolderRequest({ id, path, name: res.input }))
+            refresh(false, n => n.name == res.input)
     }
 
     const onSort = async (sort: OnSort) => {

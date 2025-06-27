@@ -113,6 +113,9 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 			case "delete":
 				getActiveFolder()?.deleteItems(dialog)
 				break
+			case "createfolder":
+				getActiveFolder()?.createFolder(dialog)
+				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer, dialog])
 

@@ -52,7 +52,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("selectnone", () => Requests.SendMenuCommand("selectnone"), "KP_Subtract"),
                 new("copy", () => Requests.SendMenuCommand("copy"), "F5"),
                 new("move", () => Requests.SendMenuCommand("move"), "F6"),
-                new("delete", () => Requests.SendMenuCommand("delete"))
+                new("delete", () => Requests.SendMenuCommand("delete")),
+                new("createfolder", () => Requests.SendMenuCommand("createfolder"), "F7")
             ]);
     }
 

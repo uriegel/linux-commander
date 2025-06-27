@@ -80,6 +80,12 @@ class DirectoryController(string folderId) : Controller(folderId)
         return new(true);
     }
 
+    public override Task<CreateFolderResult> CreateFolder(CreateFolderRequest createFolderRequest)
+    {
+        Directory.CreateDirectory(createFolderRequest.Path.AppendPath(createFolderRequest.Name));
+        return new CreateFolderResult(true).ToAsync();
+    }
+
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
     {
         var dirs = items.Count(n => n.IsDirectory);
