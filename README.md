@@ -11,23 +11,12 @@ react-devtools
 ```
 
 ```
-// TODO    static async Task<bool> Rename(IRequest request)
+// TODO Do not close when copy in progress
+
 // TODO Extended rename
 // TODO Favorites
 // TODO Remotes
 
-
-//TODO:
-//TODO    static async Task<bool> Rename(IRequest request)
-//TODO    {
-//TODO        var data = await request.DeserializeAsync<RenameRequest>();
-//TODO        if (data != null)
-//TODO        {
-//TODO            var response = await GetController(data.Id).Rename(data);
-//TODO            await request.SendJsonAsync(response, response.GetType());
-//TODO        }
-//TODO        return true;
-//TODO    }
 
 // TODO tsc without errors
 

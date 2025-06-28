@@ -118,84 +118,31 @@ static class Requests
         return (await RunAsync("python3", $"{script} {iconName.WhiteSpaceToNull() ?? "xxx"}")).Trim();
     }
         
-    static async Task<bool> ChangePath(IRequest request)
-    {
-        var data = await request.DeserializeAsync<ChangePathRequest>();
-        if (data != null)
+    static Task<bool> ChangePath(IRequest request)
+        => Request<ChangePathRequest, ChangePathResult>(request, n =>
         {
-            var path = data.Mount ? data.Path.Mount() : data.Path;
-            DetectController(data.Id, path);
-            var response = await GetController(data.Id).ChangePathAsync(path, data.ShowHidden);
-            await request.SendJsonAsync(response, response.GetType());
-        }
-        return true;
-    }
+            var path = n.Mount ? n.Path.Mount() : n.Path;
+            DetectController(n.Id, path);
+            return GetController(n.Id).ChangePathAsync(path, n.ShowHidden);
+        });
 
-    static async Task<bool> PrepareCopy(IRequest request)
-    {
-        var data = await request.DeserializeAsync<PrepareCopyRequest>();
-        if (data != null)
-        {
-            var response = await GetController(data.Id).PrepareCopy(data);
-            await request.SendJsonAsync(response, response.GetType());
-        }
-        return true;
-    }
+    static Task<bool> PrepareCopy(IRequest request)
+        => Request<PrepareCopyRequest, PrepareCopyResult>(request, n => GetController(n.Id).PrepareCopy(n));
     
-    static async Task<bool> Copy(IRequest request)
-    {
-        var data = await request.DeserializeAsync<CopyRequest>();
-        if (data != null)
-        {
-            var response = await GetController(data.Id).Copy(data);
-            await request.SendJsonAsync(response, response.GetType());
-        }
-        return true;
-    }
+    static Task<bool> Copy(IRequest request)
+        => Request<CopyRequest, CopyResult>(request, n => GetController(n.Id).Copy(n));
 
-    static async Task<bool> Delete(IRequest request)
-    {
-        var data = await request.DeserializeAsync<DeleteRequest>();
-        if (data != null)
-        {
-            var response = await GetController(data.Id).Delete(data);
-            await request.SendJsonAsync(response, response.GetType());
-        }
-        return true;
-    }
+    static Task<bool> Delete(IRequest request)
+        => Request<DeleteRequest, DeleteResult>(request, n => GetController(n.Id).Delete(n));
 
-    static async Task<bool> CreateFolder(IRequest request)
-    {
-        var data = await request.DeserializeAsync<CreateFolderRequest>();
-        if (data != null)
-        {
-            var response = await GetController(data.Id).CreateFolder(data);
-            await request.SendJsonAsync(response, response.GetType());
-        }
-        return true;
-    }
+    static Task<bool> CreateFolder(IRequest request)
+        => Request<CreateFolderRequest, CreateFolderResult>(request, n => GetController(n.Id).CreateFolder(n));
 
-    static async Task<bool> Rename(IRequest request)
-    {
-        var data = await request.DeserializeAsync<RenameRequest>();
-        if (data != null)
-        {
-            var response = await GetController(data.Id).Rename(data);
-            await request.SendJsonAsync(response, response.GetType());
-        }
-        return true;
-    }
+    static Task<bool> Rename(IRequest request)
+        => Request<RenameRequest, RenameResult>(request, n => GetController(n.Id).Rename(n));
 
-    static async Task<bool> OnEnter(IRequest request)
-    {
-        var data = await request.DeserializeAsync<OnEnterRequest>();
-        if (data != null)
-        {
-            var response = await GetController(data.Id).OnEnter(data);
-            await request.SendJsonAsync(response, response.GetType());
-        }
-        return true;
-    }
+    static Task<bool> OnEnter(IRequest request)
+        => Request<OnEnterRequest, OnEnterResult>(request, n => GetController(n.Id).OnEnter(n));
     
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
     static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
@@ -242,6 +189,18 @@ static class Requests
             break;
         }
         return new MemoryStream(Encoding.UTF8.GetBytes(text));
+    }
+
+    static async Task<bool> Request<TRequest, TResponse>(IRequest request, Func<TRequest, Task<TResponse>> onRequest)
+        where TResponse: class
+    {
+        var data = await request.DeserializeAsync<TRequest>();
+        if (data != null)
+        {
+            var response = await onRequest(data);
+            await request.SendJsonAsync(response, response.GetType());
+        }
+        return true;
     }
 
     static IWebSocket? webSocket;
