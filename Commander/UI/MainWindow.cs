@@ -55,7 +55,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("delete", () => Requests.SendMenuCommand("delete")),
                 new("createfolder", () => Requests.SendMenuCommand("createfolder"), "F7"),
                 new("renameascopy", () => Requests.SendMenuCommand("renameascopy"), "<Shift>F2"),
-                new("rename", () => Requests.SendMenuCommand("rename"), "F2")
+                new("rename", () => Requests.SendMenuCommand("rename"), "F2"),
+                new("openfolder", () => Requests.SendMenuCommand("openfolder"), "<Ctrl>Return")
             ]);
     }
 

@@ -109,6 +109,12 @@
             <attribute name="action">win.createfolder</attribute>
           </item>
         </section>
+        <section>
+          <item>
+            <attribute name="label">_Ordner öffnen</attribute>
+            <attribute name="action">win.openfolder</attribute>
+          </item>
+        </section>
       </submenu>
       <submenu>
         <attribute name="label">_Navigation</attribute>
