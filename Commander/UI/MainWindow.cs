@@ -53,7 +53,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("copy", () => Requests.SendMenuCommand("copy"), "F5"),
                 new("move", () => Requests.SendMenuCommand("move"), "F6"),
                 new("delete", () => Requests.SendMenuCommand("delete")),
-                new("createfolder", () => Requests.SendMenuCommand("createfolder"), "F7")
+                new("createfolder", () => Requests.SendMenuCommand("createfolder"), "F7"),
+                new("rename", () => Requests.SendMenuCommand("rename"), "F2")
             ]);
     }
 

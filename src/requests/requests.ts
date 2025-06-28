@@ -66,6 +66,17 @@ interface CreateFolderResponse {
     success: boolean
 }
 
+interface Rename {
+    id: string
+    path: string,
+    name: string,
+    newName: string
+}
+
+interface RenameResponse {
+    success: boolean
+}
+
 export const SelectedItemsType = {
     None: 0,
     Folder: 1,
@@ -81,6 +92,7 @@ export const prepareCopy = getJsonPost<PrepareCopy, PrepareCopyResponse>("prepar
 export const copy = getJsonPost<Copy, CopyResponse>("copy")
 export const deleteRequest = getJsonPost<Delete, DeleteResponse>("delete")
 export const createFolderRequest = getJsonPost<CreateFolder, CreateFolderResponse>("createfolder")
+export const renameRequest = getJsonPost<Rename, RenameResponse>("rename")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  

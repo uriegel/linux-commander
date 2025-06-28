@@ -86,6 +86,12 @@ class DirectoryController(string folderId) : Controller(folderId)
         return new CreateFolderResult(true).ToAsync();
     }
 
+    public override Task<RenameResult> Rename(RenameRequest rename)
+    {
+        Directory.Move(rename.Path.AppendPath(rename.Name), rename.Path.AppendPath(rename.NewName));
+        return new RenameResult(true).ToAsync();
+    }
+
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
     {
         var dirs = items.Count(n => n.IsDirectory);

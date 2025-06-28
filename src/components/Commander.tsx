@@ -116,6 +116,9 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 			case "createfolder":
 				getActiveFolder()?.createFolder(dialog)
 				break
+			case "rename":
+				getActiveFolder()?.rename(dialog)
+				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer, dialog])
 

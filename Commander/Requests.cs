@@ -14,17 +14,16 @@ namespace Commander;
 static class Requests
 {
     public static async Task<bool> Process(IRequest request)
-    {
-        return request.SubPath switch
+        => request.SubPath switch
         {
             "changepath" => await ChangePath(request),
             "preparecopy" => await PrepareCopy(request),
             "copy" => await Copy(request),
             "delete" => await Delete(request),
             "createfolder" => await CreateFolder(request),
+            "rename" => await Rename(request),
             _ => false
         };
-    }
 
     public static async Task<bool> GetIconFromName(IRequest request)
     {
@@ -175,6 +174,17 @@ static class Requests
         return true;
     }
 
+    static async Task<bool> Rename(IRequest request)
+    {
+        var data = await request.DeserializeAsync<RenameRequest>();
+        if (data != null)
+        {
+            var response = await GetController(data.Id).Rename(data);
+            await request.SendJsonAsync(response, response.GetType());
+        }
+        return true;
+    }
+
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
     static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
 
@@ -279,6 +289,15 @@ record CreateFolderRequest(
 );
 
 record CreateFolderResult(bool Success);
+
+record RenameRequest(
+    string Id,
+    string Path,
+    string Name,
+    string NewName
+);
+
+record RenameResult(bool Success);
 
 record ViewItem(
     string Name,
