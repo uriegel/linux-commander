@@ -58,6 +58,7 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("rename", () => Requests.SendMenuCommand("rename"), "F2"),
                 new("openfolder", () => Requests.SendMenuCommand("openfolder"), "<Ctrl>Return")
             ]);
+        Handle.OnClose(OnClose);
     }
 
     public class MainWindowClass()
@@ -65,6 +66,19 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
     { }
 
     protected override AdwApplicationWindowHandle CreateHandle(nint obj) => new(obj);
+
+    bool OnClose(WindowHandle _)
+    {
+        if (!ProgressContext.CanClose())
+        {
+            var wh = Handle.GetTemplateChild<RevealerHandle, ApplicationWindowHandle>("progress-revealer");
+            var progressControl = ProgressControl.GetInstance(wh);
+            progressControl.ShowPopover();
+            return true;
+        }
+        else
+            return false;
+    }
 
     void ShowDevTools()
     {

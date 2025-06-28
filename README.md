@@ -11,8 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Do not close when copy in progress
-
 // TODO Extended rename
 // TODO Favorites
 // TODO Remotes
