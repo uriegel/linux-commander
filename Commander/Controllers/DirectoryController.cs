@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Commander.UI;
 using CsTools.Extensions;
 using GtkDotNet;
@@ -93,6 +94,34 @@ class DirectoryController(string folderId) : Controller(folderId)
         else
             Directory.Move(rename.Path.AppendPath(rename.Name), rename.Path.AppendPath(rename.NewName));
         return new RenameResult(true).ToAsync();
+    }
+
+    public override async Task<OnEnterResult> OnEnter(OnEnterRequest rename)
+    {
+        var output = "";
+        using var proc = new Process()
+        {
+            StartInfo = new ProcessStartInfo()
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                FileName = "xdg-open",
+                Arguments = $"\"{rename.Path.AppendPath(rename.Name)}\"",
+            },
+            EnableRaisingEvents = true
+        };
+        proc.OutputDataReceived += (s, e) =>
+        {
+            if (e.Data != null)
+                output = e.Data;
+        };
+        proc.ErrorDataReceived += (s, e) => Error.WriteLine(e.Data);
+        proc.Start();
+        proc.BeginOutputReadLine();
+        proc.BeginErrorReadLine();
+        proc.EnableRaisingEvents = true;
+        await proc.WaitForExitAsync();
+        return new OnEnterResult(true);
     }
 
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)

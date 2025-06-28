@@ -22,6 +22,7 @@ static class Requests
             "delete" => await Delete(request),
             "createfolder" => await CreateFolder(request),
             "rename" => await Rename(request),
+            "onenter" => await OnEnter(request),
             _ => false
         };
 
@@ -185,6 +186,17 @@ static class Requests
         return true;
     }
 
+    static async Task<bool> OnEnter(IRequest request)
+    {
+        var data = await request.DeserializeAsync<OnEnterRequest>();
+        if (data != null)
+        {
+            var response = await GetController(data.Id).OnEnter(data);
+            await request.SendJsonAsync(response, response.GetType());
+        }
+        return true;
+    }
+    
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
     static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
 
@@ -299,6 +311,14 @@ record RenameRequest(
 );
 
 record RenameResult(bool Success);
+
+record OnEnterRequest(
+    string Id,
+    string Path,
+    string Name
+);
+
+record OnEnterResult(bool Success);
 
 record ViewItem(
     string Name,

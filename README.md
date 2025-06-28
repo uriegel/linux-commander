@@ -11,10 +11,26 @@ react-devtools
 ```
 
 ```
-// TODO open item
+// TODO open Nautilus: Strg+Enter
+// TODO    static async Task<bool> Rename(IRequest request)
 // TODO Extended rename
 // TODO Favorites
 // TODO Remotes
+
+
+//TODO:
+//TODO    static async Task<bool> Rename(IRequest request)
+//TODO    {
+//TODO        var data = await request.DeserializeAsync<RenameRequest>();
+//TODO        if (data != null)
+//TODO        {
+//TODO            var response = await GetController(data.Id).Rename(data);
+//TODO            await request.SendJsonAsync(response, response.GetType());
+//TODO        }
+//TODO        return true;
+//TODO    }
+
+// TODO tsc without errors
 
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large

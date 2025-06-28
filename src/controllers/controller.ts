@@ -27,6 +27,7 @@ export interface OnEnterResult {
 }
 
 export interface EnterData {
+    id?: string
     path: string,
     item: FolderViewItem, 
     //setError: (e: string)=>void

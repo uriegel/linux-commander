@@ -78,6 +78,16 @@ interface RenameResponse {
     success: boolean
 }
 
+interface OnEnter {
+    id: string
+    path: string,
+    name: string,
+}
+
+interface OnEnterResponse {
+    success: boolean
+}
+
 export const SelectedItemsType = {
     None: 0,
     Folder: 1,
@@ -94,6 +104,7 @@ export const copy = getJsonPost<Copy, CopyResponse>("copy")
 export const deleteRequest = getJsonPost<Delete, DeleteResponse>("delete")
 export const createFolderRequest = getJsonPost<CreateFolder, CreateFolderResponse>("createfolder")
 export const renameRequest = getJsonPost<Rename, RenameResponse>("rename")
+export const onEnter = getJsonPost<OnEnter, OnEnterResponse>("onenter")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  
