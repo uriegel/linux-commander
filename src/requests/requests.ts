@@ -71,6 +71,7 @@ interface Rename {
     path: string,
     name: string,
     newName: string
+    copy?: boolean
 }
 
 interface RenameResponse {

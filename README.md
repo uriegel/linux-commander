@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Create Copy
 // TODO open item
 // TODO Extended rename
 // TODO Favorites

@@ -24,7 +24,7 @@ export type FolderViewHandle = {
     copyItems: (inactiveFolder: FolderViewHandle, move: boolean, fromLeft: boolean) => Promise<void>
     deleteItems: (dialog: DialogHandle) => Promise<void>
     createFolder: (dialog: DialogHandle) => Promise<void>
-    rename: (dialog: DialogHandle) => Promise<void>
+    rename: (dialog: DialogHandle, copy?: boolean) => Promise<void>
 }
 
 interface ItemCount {
@@ -374,12 +374,12 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             refresh(false, n => n.name == res.input)
     }
 
-    const rename = async (dialog: DialogHandle) => {
+    const rename = async (dialog: DialogHandle, copy?: boolean) => {
         const selected = items[virtualTable.current?.getPosition() ?? 0]
-        if (selected.isParent)
+        if (selected.isParent || copy && selected.isDirectory)
             return
         const res = await dialog.show({
-            text: "Umbenennen",
+            text: copy ? "Kopie anlegen" : "Umbenennen",
             inputText: selected.name,
             btnOk: true,
             btnCancel: true,
@@ -387,7 +387,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         })
         if (res.result != ResultType.Ok || !res.input || selected.name == res.input) 
             return
-        if (await renameRequest({ id, path, name: selected.name, newName: res.input }))
+        if (await renameRequest({ id, path, name: selected.name, newName: res.input, copy }))
             refresh(false, n => n.name == res.input)
     }
 

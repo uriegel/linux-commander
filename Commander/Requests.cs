@@ -294,7 +294,8 @@ record RenameRequest(
     string Id,
     string Path,
     string Name,
-    string NewName
+    string NewName,
+    bool Copy
 );
 
 record RenameResult(bool Success);

@@ -88,7 +88,10 @@ class DirectoryController(string folderId) : Controller(folderId)
 
     public override Task<RenameResult> Rename(RenameRequest rename)
     {
-        Directory.Move(rename.Path.AppendPath(rename.Name), rename.Path.AppendPath(rename.NewName));
+        if (rename.Copy)
+            File.Copy(rename.Path.AppendPath(rename.Name), rename.Path.AppendPath(rename.NewName));
+        else
+            Directory.Move(rename.Path.AppendPath(rename.Name), rename.Path.AppendPath(rename.NewName));
         return new RenameResult(true).ToAsync();
     }
 
