@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO open Nautilus: Strg+Enter
 // TODO    static async Task<bool> Rename(IRequest request)
 // TODO Extended rename
 // TODO Favorites

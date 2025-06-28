@@ -1,7 +1,10 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
-import { changePath as changePathRequest, copy, createFolderRequest, deleteRequest, prepareCopy, renameRequest, SelectedItemsType } from "../requests/requests"
+import {
+    changePath as changePathRequest, copy, createFolderRequest, deleteRequest, prepareCopy, renameRequest,
+    SelectedItemsType, onEnter as onEnterRequest
+} from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
 import { exifDataEvents, statusEvents } from "../requests/events"
@@ -25,6 +28,7 @@ export type FolderViewHandle = {
     deleteItems: (dialog: DialogHandle) => Promise<void>
     createFolder: (dialog: DialogHandle) => Promise<void>
     rename: (dialog: DialogHandle, copy?: boolean) => Promise<void>
+    openFolder: () => Promise<void>
 }
 
 interface ItemCount {
@@ -147,7 +151,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         copyItems,
         deleteItems,
         createFolder,
-        rename
+        rename,
+        openFolder
     }))
 
     const input = useRef<HTMLInputElement | null>(null)
@@ -389,6 +394,13 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             return
         if (await renameRequest({ id, path, name: selected.name, newName: res.input, copy }))
             refresh(false, n => n.name == res.input)
+    }
+
+    const openFolder = async () => {
+        const selected = items[virtualTable.current?.getPosition() ?? 0]
+        if (selected.isParent || !selected.isDirectory)
+            return
+        await onEnterRequest({ id, path, name: selected.name })
     }
 
     const onSort = async (sort: OnSort) => {
