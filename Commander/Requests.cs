@@ -23,6 +23,7 @@ static class Requests
             "createfolder" => await CreateFolder(request),
             "rename" => await Rename(request),
             "onenter" => await OnEnter(request),
+            "onextendedrename" => await OnExtendedRename(request),
             _ => false
         };
 
@@ -143,6 +144,9 @@ static class Requests
 
     static Task<bool> OnEnter(IRequest request)
         => Request<OnEnterRequest, OnEnterResult>(request, n => GetController(n.Id).OnEnter(n));
+
+    static Task<bool> OnExtendedRename(IRequest request)
+        => Request<OnExtendedRenameRequest, OnExtendedRenameResult>(request, n => GetController(n.Id).OnExtendedRename(n));
     
     static Func<string> IconFromNameScript { get; } = Memoize(IconFromNameScriptInit);
     static Func<string> IconFromExtensionScript { get; } = Memoize(IconFromExtensionScriptInit);
@@ -279,6 +283,13 @@ record OnEnterRequest(
 
 record OnEnterResult(bool Success);
 
+record OnExtendedRenameRequest(
+    string Id,
+    string Path,
+    DirectoryItem[] Items
+);
+record OnExtendedRenameResult();
+
 record ViewItem(
     string Name,
     long? Size,
@@ -310,8 +321,6 @@ record ExifMsg(
 //     ipAddress?:   string
 //     isAndroid?:   boolean
 //     isNew?: boolean
-//     // ExtendedRename
-//     newName?:     string|null
 //     // Favorites
 //     path?: string | null
 // }

@@ -1,5 +1,15 @@
 import type { FolderViewItem } from "../components/FolderView"
 
+export const SelectedItemsType = {
+    None: 0,
+    Folder: 1,
+    Folders: 2,
+    File: 3,
+    Files: 4,
+    Both: 5
+}
+export type SelectedItemsType = (typeof SelectedItemsType)[keyof typeof SelectedItemsType]
+
 interface ChangePath {
     id: string,
     path?: string
@@ -88,15 +98,14 @@ interface OnEnterResponse {
     success: boolean
 }
 
-export const SelectedItemsType = {
-    None: 0,
-    Folder: 1,
-    Folders: 2,
-    File: 3,
-    Files: 4,
-    Both: 5
+interface OnRename {
+    id: string
+    path: string,
+    items: FolderViewItem[]
 }
-export type SelectedItemsType = (typeof SelectedItemsType)[keyof typeof SelectedItemsType]
+interface OnRenameResponse {
+
+}
 
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")
 export const prepareCopy = getJsonPost<PrepareCopy, PrepareCopyResponse>("preparecopy")
@@ -105,6 +114,7 @@ export const deleteRequest = getJsonPost<Delete, DeleteResponse>("delete")
 export const createFolderRequest = getJsonPost<CreateFolder, CreateFolderResponse>("createfolder")
 export const renameRequest = getJsonPost<Rename, RenameResponse>("rename")
 export const onEnter = getJsonPost<OnEnter, OnEnterResponse>("onenter")
+export const onExtendedRename = getJsonPost<OnRename, OnRenameResponse>("onextendedrename")
 
 function getJsonPost<RequestType, ResponseType>(method: string): (request: RequestType) => Promise<ResponseType> {
  

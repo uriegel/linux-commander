@@ -3,6 +3,7 @@ import type { FolderViewItem } from "../components/FolderView"
 import { Directory } from "./directory"
 import type { PrepareCopyResponse } from "../requests/requests"
 import type { TableColumns } from "virtual-table-react"
+import type { DialogHandle } from "web-dialog-react"
 
 export const IconNameType = {
     Parent: 'Parent',
@@ -30,6 +31,8 @@ export interface EnterData {
     id?: string
     path: string,
     item: FolderViewItem, 
+    selectedItems?: FolderViewItem[]
+    dialog?: DialogHandle
 }
 
 export interface IController {

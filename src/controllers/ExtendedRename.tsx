@@ -1,10 +1,11 @@
 import { ResultType, type DialogHandle } from "web-dialog-react";
 import { Directory, type ExtendedRenameProps } from "./directory";
 import ExtendedRenamePart from "../components/dialogparts/ExtendedRenamePart";
-import { formatDateTime, formatSize, IconNameType, type IController } from "./controller";
+import { formatDateTime, formatSize, IconNameType, type EnterData, type IController, type OnEnterResult } from "./controller";
 import type { TableColumns } from "virtual-table-react";
 import type { FolderViewItem } from "../components/FolderView";
 import IconName from "../components/IconName";
+import { onExtendedRename } from "../requests/requests";
 
 
 export const showExtendedRename = async (dialog: DialogHandle, currentController: IController) => {
@@ -58,6 +59,25 @@ export class ExtendedRename extends Directory {
         const sorted = super.sort(items, sortIndex == 0 ? 0 : sortIndex - 1, sortDescending)
         this.onSelectionChanged(sorted)
         return sorted
+    }
+
+    async onEnter(enterData: EnterData): Promise<OnEnterResult> {
+        return enterData.id && enterData.dialog && enterData.selectedItems?.find(n => n.newName)
+        ? this.onRename(enterData.id, enterData.path, enterData.selectedItems, enterData.dialog)
+        : super.onEnter(enterData)
+    }
+
+    async onRename(id: string, path: string, items: FolderViewItem[], dialog: DialogHandle) {
+        const res = await dialog.show({
+            text: "Umbenennungen starten?",
+            btnOk: true,
+            btnCancel: true
+        })
+        if (res.result == ResultType.Ok)
+            await onExtendedRename({ id, path, items })
+        return {
+            processed: true
+        }
     }
 
     constructor() {

@@ -124,6 +124,11 @@ class DirectoryController(string folderId) : Controller(folderId)
         return new OnEnterResult(true);
     }
 
+    public override Task<OnExtendedRenameResult> OnExtendedRename(OnExtendedRenameRequest rename)
+    {
+        return null;
+    }
+
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
     {
         var dirs = items.Count(n => n.IsDirectory);
@@ -203,7 +208,8 @@ record DirectoryItem(
     bool IsDirectory,
     bool IsParent,
     bool IsHidden,
-    DateTime? Time
+    DateTime? Time,
+    string? NewName
 )
 {
     public ExifData? ExifData { get; set; }
@@ -215,6 +221,7 @@ record DirectoryItem(
             true,
             true,
             false,
+            null, 
             null);
 
     public static DirectoryItem CreateDirItem(DirectoryInfo info)
@@ -224,7 +231,8 @@ record DirectoryItem(
             true,
             false,
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
-            info.LastWriteTime);
+            info.LastWriteTime, 
+            null);
 
     public static DirectoryItem CreateFileItem(FileInfo info)
         => new(
@@ -233,7 +241,8 @@ record DirectoryItem(
             false,
             false,
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
-            info.LastWriteTime);
+            info.LastWriteTime, 
+            null);
 
     public static DirectoryItem CreateCopyFileItem(string name, FileInfo info)
         => new(
@@ -242,7 +251,8 @@ record DirectoryItem(
             false,
             false,
             (info.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden,
-            info.LastWriteTime);
+            info.LastWriteTime, 
+            null);
 };
 
 record DirFileInfo(
