@@ -128,6 +128,9 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 			case "extendedrename":
 				getActiveFolder()?.extendedRename(dialog)
 				break
+			case "favorites":
+				getActiveFolder()?.showFavorites()
+				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer, dialog])
 

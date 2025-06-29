@@ -57,7 +57,8 @@ class MainWindow(nint obj) : ManagedAdwApplicationWindow(obj)
                 new("renameascopy", () => Requests.SendMenuCommand("renameascopy"), "<Shift>F2"),
                 new("extendedrename", () => Requests.SendMenuCommand("extendedrename"), "<Ctrl>F2"),
                 new("rename", () => Requests.SendMenuCommand("rename"), "F2"),
-                new("openfolder", () => Requests.SendMenuCommand("openfolder"), "<Ctrl>Return")
+                new("openfolder", () => Requests.SendMenuCommand("openfolder"), "<Ctrl>Return"),
+                new("favorites", () => Requests.SendMenuCommand("favorites"), "F1"),
             ]);
         Handle.OnClose(OnClose);
     }

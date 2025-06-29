@@ -26,6 +26,8 @@ export class Directory implements IController {
         }
     }
 
+    getItems(): FolderViewItem[] { throw "not implemented" }
+
     appendPath(path: string, subPath: string) {
         return path.appendPath(subPath)
     } 

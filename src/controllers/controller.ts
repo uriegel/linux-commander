@@ -4,6 +4,7 @@ import { Directory } from "./directory"
 import type { PrepareCopyResponse } from "../requests/requests"
 import type { TableColumns } from "virtual-table-react"
 import type { DialogHandle } from "web-dialog-react"
+import { Favorites } from "./favorites"
 
 export const IconNameType = {
     Parent: 'Parent',
@@ -46,11 +47,14 @@ export interface IController {
     onSelectionChanged: (items: FolderViewItem[]) => void 
     getCopyText: (prepareCopy: PrepareCopyResponse, move: boolean) => string
     getDeleteText: (items: FolderViewItem[]) => string
+    getItems: ()=>FolderViewItem[]
 }
 
 export function getController(id: string): IController {
     return id == "ROOT"
         ? new Root()
+        : id == "FAV"
+        ? new Favorites()
         : new Directory()
 }
 

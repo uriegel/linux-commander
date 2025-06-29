@@ -31,6 +31,7 @@ export type FolderViewHandle = {
     rename: (dialog: DialogHandle, copy?: boolean) => Promise<void>
     openFolder: () => Promise<void>
     extendedRename: (dialog: DialogHandle) => Promise<void>
+    showFavorites: () => Promise<void>
 }
 
 interface ItemCount {
@@ -125,7 +126,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         }
         if (result.path)
             setPath(result.path)
-        const newItems = controller.current.sort(result.items, sortIndex.current, sortDescending.current)
+        const items = result.items && result.items?.length > 0 ? result.items : controller.current.getItems()
+        const newItems = controller.current.sort(items, sortIndex.current, sortDescending.current)
         setItems(newItems, result.dirCount, result.fileCount)
         const pos = latestPath
                     ? newItems.findIndex(n => n.name == latestPath)
@@ -155,7 +157,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         createFolder,
         rename,
         openFolder,
-        extendedRename
+        extendedRename,
+        showFavorites
     }))
 
     const input = useRef<HTMLInputElement | null>(null)
@@ -410,6 +413,10 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
         }
         controller.current.onSelectionChanged(items)
+    }
+
+    const showFavorites = async () => {
+        await changePath("fav")
     }
 
     const openFolder = async () => {

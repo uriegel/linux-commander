@@ -23,7 +23,7 @@ interface ChangePathResponse {
     controller?: string,
     dirCount: number,
     fileCount: number,
-    items: FolderViewItem[],
+    items?: FolderViewItem[],
     path?: string
 }
 
