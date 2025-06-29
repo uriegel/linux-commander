@@ -73,7 +73,7 @@ export class Directory implements IController {
 
     itemsSelectable: boolean
 
-    onSelectionChanged() { }
+    onSelectionChanged(_: FolderViewItem[]) { }
     
     getCopyText(prepareCopy: PrepareCopyResponse, move: boolean) {
         const copyAction = `${move ? "verschieben" : " kopieren"} (${prepareCopy.totalSize.byteCountToString()})`

@@ -42,6 +42,24 @@ export class ExtendedRename extends Directory {
         }
     }
 
+    onSelectionChanged(items: FolderViewItem[]) { 
+        const prefix = localStorage.getItem("extendedRenamePrefix") ?? "Bild"
+        const digits = localStorage.getItem("extendedRenameDigits")?.parseInt() ?? 3
+        const startNumber = localStorage.getItem("extendedRenameStartNumber")?.parseInt() ?? 1
+        items.reduce((p, n) => {
+            n.newName = n.isSelected && !n.isDirectory
+                ? `${prefix}${p.toString().padStart(digits, '0')}.${n.name.split('.').pop()}`
+                : null
+            return p + (n.isSelected && !n.isDirectory ? 1 : 0)
+        }, startNumber)
+    }
+
+    sort(items: FolderViewItem[], sortIndex: number, sortDescending: boolean) {
+        const sorted = super.sort(items, sortIndex == 0 ? 0 : sortIndex - 1, sortDescending)
+        this.onSelectionChanged(sorted)
+        return sorted
+    }
+
     constructor() {
         super()
         this.id = "RENAME"

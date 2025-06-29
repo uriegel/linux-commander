@@ -407,6 +407,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             controller.current = newController
             virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
         }
+        controller.current.onSelectionChanged(items)
     }
 
     const openFolder = async () => {
