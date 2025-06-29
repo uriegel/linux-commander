@@ -5,6 +5,12 @@ import IconName from "../components/IconName"
 import "../extensions/extensions"
 import { onEnter, SelectedItemsType, type PrepareCopyResponse } from "../requests/requests"
 
+export interface ExtendedRenameProps {
+    prefix: string
+    digits: number
+    startNumber: number
+}
+
 export class Directory implements IController {
     id: string
 
@@ -15,12 +21,12 @@ export class Directory implements IController {
 		        { name: "Datum", isSortable: true },
                 { name: "Größe", isSortable: true, isRightAligned: true }
             ],
-            getRowClasses,
+            getRowClasses: this.getRowClasses,
             renderRow
         }
     }
 
-    appendPath(path: string, subPath: string)  {
+    appendPath(path: string, subPath: string) {
         return path.appendPath(subPath)
     } 
 
@@ -100,6 +106,12 @@ export class Directory implements IController {
             : ""                
     }   
 
+    getRowClasses(item: FolderViewItem) {
+        return item.isHidden
+            ? ["hidden"]
+            : []
+    }
+
     constructor() {
         this.id = "ROOT"
         this.itemsSelectable = true
@@ -108,11 +120,6 @@ export class Directory implements IController {
 
 // TODO const REMOTES = "remotes"
 // TODO const FAVORITES = "fav"
-
-const getRowClasses = (item: FolderViewItem) => 
-	item.isHidden
-		? ["hidden"]
-		: []
 
 const renderRow = (item: FolderViewItem) => [
 	(<IconName namePart={item.name} type={
@@ -125,4 +132,5 @@ const renderRow = (item: FolderViewItem) => [
 	(<span className={item.exifData?.dateTime ? "exif" : "" } >{formatDateTime(item?.exifData?.dateTime ?? item?.time)}</span>),
 	formatSize(item.size)
 ]
+
 

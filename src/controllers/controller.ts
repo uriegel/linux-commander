@@ -1,8 +1,8 @@
-import type { TableColumns } from "virtual-table-react"
 import { Root } from "./root"
 import type { FolderViewItem } from "../components/FolderView"
 import { Directory } from "./directory"
 import type { PrepareCopyResponse } from "../requests/requests"
+import type { TableColumns } from "virtual-table-react"
 
 export const IconNameType = {
     Parent: 'Parent',
@@ -30,7 +30,6 @@ export interface EnterData {
     id?: string
     path: string,
     item: FolderViewItem, 
-    //setError: (e: string)=>void
 }
 
 export interface IController {
@@ -42,7 +41,7 @@ export interface IController {
     itemsSelectable: boolean
     onSelectionChanged: (items: FolderViewItem[]) => void 
     getCopyText: (prepareCopy: PrepareCopyResponse, move: boolean) => string
-    getDeleteText: (items: FolderViewItem[])=>string
+    getDeleteText: (items: FolderViewItem[]) => string
 }
 
 export function getController(id: string): IController {

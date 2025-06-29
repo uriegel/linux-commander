@@ -12,11 +12,9 @@ react-devtools
 
 ```
 // TODO Extended rename
+// TODO Extended rename: don't save widths or as extendedRename
 // TODO Favorites
 // TODO Remotes
-
-
-// TODO tsc without errors
 
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large

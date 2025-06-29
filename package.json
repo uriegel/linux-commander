@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "lint": "tsc && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "build": "tsc && vite build && npm run copy",
+    "lint": "tsc --noEmit --project tsconfig.app.json && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "build": "tsc --build && vite build && npm run copy",
     "copy": "cp dist/assets/*.js Commander/Resources/website/script.js && cp dist/assets/*.css Commander/Resources/website/style.css"
   },
   "dependencies": {

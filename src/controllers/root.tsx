@@ -39,7 +39,7 @@ export class Root implements IController {
     
     getCopyText() { return "" }
     getDeleteText() { return "" }
-
+    
     constructor() {
         this.id = "ROOT"
         this.itemsSelectable = false

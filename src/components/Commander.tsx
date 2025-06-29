@@ -125,6 +125,9 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 			case "openfolder":
 				getActiveFolder()?.openFolder()
 				break
+			case "extendedrename":
+				getActiveFolder()?.extendedRename(dialog)
+				break
 		}
 	}, [getActiveFolder, getInactiveFolder, previewMode, showViewer, dialog])
 

@@ -13,6 +13,7 @@ import RestrictionView, { type RestrictionViewHandle } from "./RestrictionView"
 import { initializeHistory } from "../history"
 import { ResultType, Slide, type DialogHandle } from "web-dialog-react"
 import CopyConflicts, { type ConflictItem } from "./dialogparts/CopyConflicts"
+import { showExtendedRename } from "../controllers/ExtendedRename"
 
 export type FolderViewHandle = {
     id: string
@@ -29,6 +30,7 @@ export type FolderViewHandle = {
     createFolder: (dialog: DialogHandle) => Promise<void>
     rename: (dialog: DialogHandle, copy?: boolean) => Promise<void>
     openFolder: () => Promise<void>
+    extendedRename: (dialog: DialogHandle) => Promise<void>
 }
 
 interface ItemCount {
@@ -152,7 +154,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         deleteItems,
         createFolder,
         rename,
-        openFolder
+        openFolder,
+        extendedRename
     }))
 
     const input = useRef<HTMLInputElement | null>(null)
@@ -394,6 +397,16 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
             return
         if (await renameRequest({ id, path, name: selected.name, newName: res.input, copy }))
             refresh(false, n => n.name == res.input)
+    }
+
+    const extendedRename = async (dialog: DialogHandle) => {
+        restrictionView.current?.reset()
+        const newController = await showExtendedRename(dialog, controller.current)
+        if (newController) {
+            console.log("neuer")
+            controller.current = newController
+            virtualTable.current?.setColumns(setWidths(controller.current.getColumns()))
+        }
     }
 
     const openFolder = async () => {

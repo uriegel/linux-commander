@@ -73,11 +73,11 @@ class DirectoryController(string folderId) : Controller(folderId)
     public override async Task<DeleteResult> Delete(DeleteRequest deleteRequest)
     {
         foreach (var item in deleteRequest.Items)
-        await Gtk.Dispatch(async () =>
-        {
-            using var file = GFile.New(deleteRequest.Path.AppendPath(item.Name));
-            await file.TrashAsync();
-        });
+            await Gtk.Dispatch(async () =>
+            {
+                using var file = GFile.New(deleteRequest.Path.AppendPath(item.Name));
+                await file.TrashAsync();
+            });
         return new(true);
     }
 
