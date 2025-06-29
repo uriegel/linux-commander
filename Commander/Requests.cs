@@ -288,7 +288,7 @@ record OnExtendedRenameRequest(
     string Path,
     DirectoryItem[] Items
 );
-record OnExtendedRenameResult();
+record OnExtendedRenameResult(bool Success);
 
 record ViewItem(
     string Name,

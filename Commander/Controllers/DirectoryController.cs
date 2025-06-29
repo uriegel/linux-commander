@@ -125,9 +125,14 @@ class DirectoryController(string folderId) : Controller(folderId)
     }
 
     public override Task<OnExtendedRenameResult> OnExtendedRename(OnExtendedRenameRequest rename)
-    {
-        return null;
-    }
+        => Task.Run(() =>
+        {
+            foreach (var item in rename.Items)
+                Directory.Move(rename.Path.AppendPath(item.Name), rename.Path.AppendPath("__RENAMING__" + item.NewName));
+            foreach (var item in rename.Items)
+                Directory.Move(rename.Path.AppendPath("__RENAMING__" + item.NewName), rename.Path.AppendPath(item.NewName));
+            return new OnExtendedRenameResult(true);
+        });
 
     public static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
     {

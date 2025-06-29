@@ -104,7 +104,7 @@ interface OnRename {
     items: FolderViewItem[]
 }
 interface OnRenameResponse {
-
+    success: boolean
 }
 
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")

@@ -212,6 +212,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         const res = await controller.current.onEnter({ id, path, item, selectedItems: getSelectedItems(), dialog })
         if (!res.processed)
             changePath(res.pathToSet, showHidden, res.mount, res.latestPath)
+        if (res.refresh)
+            refresh()
     }
 
     const refresh = (forceShowHidden?: boolean, checkPosition?: (checkItem: FolderViewItem) => boolean) =>

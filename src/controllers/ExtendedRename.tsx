@@ -73,11 +73,14 @@ export class ExtendedRename extends Directory {
             btnOk: true,
             btnCancel: true
         })
-        if (res.result == ResultType.Ok)
-            await onExtendedRename({ id, path, items })
-        return {
-            processed: true
-        }
+        return (res.result == ResultType.Ok)
+            ? {
+                processed: true,
+                refresh: (await onExtendedRename({ id, path, items })).success 
+            }
+            : {
+                processed: true,
+            }
     }
 
     constructor() {

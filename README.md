@@ -11,13 +11,13 @@ react-devtools
 ```
 
 ```
-// TODO Extended rename
 // TODO Favorites
 // TODO Remotes
 
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large
 // TODO TrackViewer better overlays like latest Gtk4 Commander?
+// TODO adapt Dialog to Gtk4/adwaita
 
 // TODO Text viewer/editor
 // TODO Track viewer some inconsistencies like max velocity too high, trackpoints not containing data any more...

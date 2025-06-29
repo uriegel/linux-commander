@@ -25,6 +25,7 @@ export interface OnEnterResult {
     pathToSet?: string
     latestPath?: string
     mount?: boolean
+    refresh?: boolean
 }
 
 export interface EnterData {
