@@ -12,7 +12,6 @@ react-devtools
 
 ```
 // TODO Extended rename
-// TODO Extended rename: don't save widths or as extendedRename
 // TODO Favorites
 // TODO Remotes
 

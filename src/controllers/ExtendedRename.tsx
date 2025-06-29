@@ -41,6 +41,11 @@ export class ExtendedRename extends Directory {
             renderRow 
         }
     }
+
+    constructor() {
+        super()
+        this.id = "RENAME"
+    }
 }
 
 const renderRow = (item: FolderViewItem) => [

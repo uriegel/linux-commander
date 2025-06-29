@@ -113,7 +113,7 @@ export class Directory implements IController {
     }
 
     constructor() {
-        this.id = "ROOT"
+        this.id = "FILE"
         this.itemsSelectable = true
     }
 }
