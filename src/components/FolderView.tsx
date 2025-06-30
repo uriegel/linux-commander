@@ -360,8 +360,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         const items = getSelectedItems()
         if (!items)
             return
-        // TODO controller.current.delete with DeleteResult: deleted, when not set then deleteText is set
-        const deleteResult = controller.current.deleteItems(items)
+        const deleteResult = await controller.current.deleteItems(items, dialog)
         if (deleteResult.refresh)
             refresh()
         if (deleteResult.success)

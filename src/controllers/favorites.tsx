@@ -56,8 +56,23 @@ export class Favorites implements IController {
     onSelectionChanged() { }
     
     getCopyText() { return "" }
-    deleteItems(items: FolderViewItem[]) {
-        return { success: true }
+    
+    async deleteItems(items: FolderViewItem[], dialog: DialogHandle) {
+        const itemsToDelete = items.filter(n => !n.isNew && !n.isParent)
+        if (itemsToDelete.length == 0)
+            return { success: true }
+        const res = await dialog.show({
+		    text: `Möchtest Du ${itemsToDelete.length > 1 ? "die Favoriten" : "den Favoriten"} löschen?`,
+    		btnOk: true,
+	    	btnCancel: true,
+		    defBtnOk: true
+        })
+        if (res.result != ResultType.Ok)
+            return { success: true }
+        
+        const favs = this.getFavoriteItems().filter(x => !items.find(n => n.name == x.name))
+        localStorage.setItem("fav", JSON.stringify(favs))
+        return { success: true, refresh: true }
     }
 
     async createFavorite(dialog: DialogHandle, otherPath: string) {
@@ -85,7 +100,7 @@ export class Favorites implements IController {
     
     constructor() {
         this.id = "FAV"
-        this.itemsSelectable = false
+        this.itemsSelectable = true
     }
 }
 

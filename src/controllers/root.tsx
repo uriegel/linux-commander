@@ -40,7 +40,7 @@ export class Root implements IController {
     onSelectionChanged() { }
     
     getCopyText() { return "" }
-    deleteItems() { return { success: true }}
+    async deleteItems() { return { success: true }}
         
     constructor() {
         this.id = "ROOT"

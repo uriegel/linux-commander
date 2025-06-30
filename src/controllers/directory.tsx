@@ -92,8 +92,8 @@ export class Directory implements IController {
             : `Möchtest Du die Einträge ${copyAction}?`
     }
 
-    deleteItems(items: FolderViewItem[]) {
-        var deleteText = this.getDeleteText(items)
+    async deleteItems(items: FolderViewItem[]) {
+        const deleteText = this.getDeleteText(items)
         return deleteText
             ? ({
                 deleteText

@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Favorites: remove favorite
 // TODO Remotes
 
 // TODO root detect new drives/removed drives
