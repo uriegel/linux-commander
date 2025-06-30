@@ -35,6 +35,7 @@ export interface EnterData {
     item: FolderViewItem, 
     selectedItems?: FolderViewItem[]
     dialog?: DialogHandle
+    otherPath?: string
 }
 
 export interface IController {

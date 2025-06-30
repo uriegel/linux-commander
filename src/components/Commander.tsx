@@ -166,7 +166,7 @@ const Commander = forwardRef<CommanderHandle, object>((_, ref) => {
 	, [])
 
 	const onEnter = (item: FolderViewItem) => {
-		getActiveFolder()?.processEnter(item)
+		getActiveFolder()?.processEnter(item, getInactiveFolder()?.getPath())
 	}
 
 	const VerticalSplitView = () => (

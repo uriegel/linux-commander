@@ -11,8 +11,8 @@ react-devtools
 ```
 
 ```
-// TODO Favorites: onEnter: changePath to root, showDialog for new, changePAth to fav path
-// TODO Favorites: add favorite
+// TODO Favorites: remove favorite
+// TODO Favorites: add favorite: set name for favorite, path to path
 // TODO Remotes
 
 // TODO root detect new drives/removed drives

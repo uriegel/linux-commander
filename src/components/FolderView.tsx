@@ -18,7 +18,7 @@ import { showExtendedRename } from "../controllers/ExtendedRename"
 export type FolderViewHandle = {
     id: string
     setFocus: ()=>void
-    processEnter: (item: FolderViewItem)=>Promise<void>
+    processEnter: (item: FolderViewItem, otherPath?: string)=>Promise<void>
     refresh: (forceShowHidden?: boolean) => void
     getPath: () => string
     changePath: (path: string) => void
@@ -211,8 +211,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         return () => subscription.unsubscribe()
     }, [id, setItems])
 
-    const processEnter = async (item: FolderViewItem) => {
-        const res = await controller.current.onEnter({ id, path, item, selectedItems: getSelectedItems(), dialog })
+    const processEnter = async (item: FolderViewItem, otherPath?: string) => {
+        const res = await controller.current.onEnter({ id, path, item, selectedItems: getSelectedItems(), dialog, otherPath })
         if (!res.processed)
             changePath(res.pathToSet, showHidden, res.mount, res.latestPath)
         if (res.refresh)

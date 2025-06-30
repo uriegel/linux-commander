@@ -2,6 +2,7 @@ import type { TableColumns } from "virtual-table-react"
 import { IconNameType, type EnterData, type IController, type OnEnterResult } from "./controller"
 import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
+import { ResultType, type DialogHandle } from "web-dialog-react"
 
 export class Favorites implements IController {
     id: string
@@ -18,8 +19,7 @@ export class Favorites implements IController {
     }
 
     getItems(): FolderViewItem[] { 
-        const itemsStr = localStorage.getItem("fav")
-        const items = itemsStr ? JSON.parse(itemsStr) as FolderViewItem[] : []
+        const items = this.getFavoriteItems()
         return addParent(items)
             .concat({
                 name: "Favoriten hinzufügen...",
@@ -32,12 +32,21 @@ export class Favorites implements IController {
     } 
 
     async onEnter(enterData: EnterData): Promise<OnEnterResult> {
-        console.log("ernter", enterData)
-        return {
-            processed: false,
-            pathToSet: enterData.item.mountPoint || enterData.item.mountPoint!.length > 0 ? enterData.item.mountPoint : enterData.item.name,
-            mount: !enterData.item.mountPoint            
-        }
+        if (enterData.item.isParent)
+            return {
+                processed: false,
+                pathToSet: "root"
+            }
+        else if (enterData.item.isNew && enterData.dialog && enterData.otherPath && await this.createFavorite(enterData.dialog, enterData.otherPath))
+            return {
+                processed: true,
+                refresh: true
+            }
+        else
+            return {
+                processed: false,
+                pathToSet: enterData.item.name
+            }
     }
 
     sort(items: FolderViewItem[]) { return items }
@@ -48,6 +57,29 @@ export class Favorites implements IController {
     
     getCopyText() { return "" }
     getDeleteText() { return "" }
+
+    async createFavorite(dialog: DialogHandle, otherPath: string) {
+        const items = this.getFavoriteItems()
+        const result =
+            !items.find(n => n.name == otherPath) && (await dialog.show({
+                text: `'${otherPath}' als Favoriten hinzufügen?`,
+                btnOk: true,
+                btnCancel: true,
+                defBtnOk: true
+            }))?.result == ResultType.Ok
+        if (result && otherPath) {
+            const newItems = items.concat([{ name: otherPath }])
+            localStorage.setItem("fav", JSON.stringify(newItems))
+            return true
+        }
+        else
+            return false
+    }
+
+    getFavoriteItems() {
+        const itemsStr = localStorage.getItem("fav")
+        return itemsStr ? JSON.parse(itemsStr) as FolderViewItem[] : []
+    }
     
     constructor() {
         this.id = "FAV"
