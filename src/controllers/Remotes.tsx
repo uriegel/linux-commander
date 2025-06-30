@@ -59,6 +59,10 @@ export class Remotes implements IController {
     onSelectionChanged() { }
     
     getCopyText() { return "" }
+
+    async rename(dialog: DialogHandle, item: FolderViewItem) {
+        return this.createRemote(dialog, item)
+    }
     
     async deleteItems(items: FolderViewItem[], dialog: DialogHandle) {
         const itemsToDelete = items.filter(n => !n.isNew && !n.isParent)

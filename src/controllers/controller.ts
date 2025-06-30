@@ -55,7 +55,8 @@ export interface IController {
     onSelectionChanged: (items: FolderViewItem[]) => void 
     getCopyText: (prepareCopy: PrepareCopyResponse, move: boolean) => string
     deleteItems: (items: FolderViewItem[], dialog: DialogHandle) => Promise<DeleteResponse>
-    getItems: ()=>FolderViewItem[]
+    getItems: () => FolderViewItem[]
+    rename: (dialog: DialogHandle, item: FolderViewItem)=>Promise<boolean>
 }
 
 export function getController(id: string): IController {

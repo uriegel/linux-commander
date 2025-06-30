@@ -4,6 +4,7 @@ import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
 import "../extensions/extensions"
 import { onEnter, SelectedItemsType, type PrepareCopyResponse } from "../requests/requests"
+import type { DialogHandle } from "web-dialog-react"
 
 export interface ExtendedRenameProps {
     prefix: string
@@ -118,6 +119,8 @@ export class Directory implements IController {
             ? "Möchtest Du die Dateien löschen?"
             : ""                
     }   
+
+    async rename(_: DialogHandle, __: FolderViewItem) { return false }
 
     getRowClasses(item: FolderViewItem) {
         return item.isHidden

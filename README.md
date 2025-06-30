@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO Remotes: rename device
 // TODO Remote
 
 // TODO root detect new drives/removed drives

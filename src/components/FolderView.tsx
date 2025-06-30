@@ -395,6 +395,11 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         const selected = items[virtualTable.current?.getPosition() ?? 0]
         if (selected.isParent || copy && selected.isDirectory)
             return
+        if (controller.current?.id == "REMOTES") {
+            if (await controller.current.rename(dialog, selected)) 
+                refresh(false, n => n.name == res.input)
+            return
+        }
         const res = await dialog.show({
             text: copy ? "Kopie anlegen" : "Umbenennen",
             inputText: selected.name,

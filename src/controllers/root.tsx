@@ -4,6 +4,7 @@ import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
 import { REMOTES } from "./Remotes"
 import { FAVORITES } from "./favorites"
+import type { DialogHandle } from "web-dialog-react"
 
 export class Root implements IController {
     id: string
@@ -42,7 +43,9 @@ export class Root implements IController {
     onSelectionChanged() { }
     
     getCopyText() { return "" }
-    async deleteItems() { return { success: true }}
+    async deleteItems() { return { success: true } }
+    
+    async rename(_: DialogHandle, __: FolderViewItem) { return false }
         
     constructor() {
         this.id = "ROOT"

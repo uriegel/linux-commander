@@ -99,6 +99,8 @@ export class Favorites implements IController {
         const itemsStr = localStorage.getItem(FAVORITES)
         return itemsStr ? JSON.parse(itemsStr) as FolderViewItem[] : []
     }
+
+    async rename(_: DialogHandle, __: FolderViewItem) { return false }
     
     constructor() {
         this.id = "FAV"
