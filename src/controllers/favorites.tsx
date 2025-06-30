@@ -56,7 +56,9 @@ export class Favorites implements IController {
     onSelectionChanged() { }
     
     getCopyText() { return "" }
-    getDeleteText() { return "" }
+    deleteItems(items: FolderViewItem[]) {
+        return { success: true }
+    }
 
     async createFavorite(dialog: DialogHandle, otherPath: string) {
         const items = this.getFavoriteItems()

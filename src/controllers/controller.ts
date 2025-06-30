@@ -38,6 +38,12 @@ export interface EnterData {
     otherPath?: string
 }
 
+interface DeleteResponse {
+    success?: boolean,
+    deleteText?: string
+    refresh?: boolean
+}
+
 export interface IController {
     id: string 
     getColumns(): TableColumns<FolderViewItem>
@@ -47,7 +53,7 @@ export interface IController {
     itemsSelectable: boolean
     onSelectionChanged: (items: FolderViewItem[]) => void 
     getCopyText: (prepareCopy: PrepareCopyResponse, move: boolean) => string
-    getDeleteText: (items: FolderViewItem[]) => string
+    deleteItems: (items: FolderViewItem[]) => DeleteResponse
     getItems: ()=>FolderViewItem[]
 }
 

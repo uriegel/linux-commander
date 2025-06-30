@@ -40,8 +40,8 @@ export class Root implements IController {
     onSelectionChanged() { }
     
     getCopyText() { return "" }
-    getDeleteText() { return "" }
-    
+    deleteItems() { return { success: true }}
+        
     constructor() {
         this.id = "ROOT"
         this.itemsSelectable = false
