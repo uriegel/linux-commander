@@ -5,6 +5,7 @@ import type { PrepareCopyResponse } from "../requests/requests"
 import type { TableColumns } from "virtual-table-react"
 import type { DialogHandle } from "web-dialog-react"
 import { Favorites } from "./favorites"
+import { Remotes } from "./Remotes"
 
 export const IconNameType = {
     Parent: 'Parent',
@@ -62,6 +63,8 @@ export function getController(id: string): IController {
         ? new Root()
         : id == "FAV"
         ? new Favorites()
+        : id == "REMOTES"
+        ? new Remotes()
         : new Directory()
 }
 

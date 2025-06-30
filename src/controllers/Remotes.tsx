@@ -3,17 +3,18 @@ import { IconNameType, type EnterData, type IController, type OnEnterResult } fr
 import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
 import { ResultType, type DialogHandle } from "web-dialog-react"
+import RemoteDialog from "../components/dialogparts/RemoteDialog"
 
-export const FAVORITES = "fav"
+export const REMOTES = "remotes"
 
-export class Favorites implements IController {
+export class Remotes implements IController {
     id: string
 
     getColumns(): TableColumns<FolderViewItem> {
         return {
             columns: [
                 { name: "Name" },
-                { name: "Pfad" },
+                { name: "IP-Adresse" }
             ],
             getRowClasses: () => [],
             renderRow
@@ -21,10 +22,10 @@ export class Favorites implements IController {
     }
 
     getItems(): FolderViewItem[] { 
-        const items = this.getFavoriteItems()
+        const items = this.getRemoteItems()
         return addParent(items)
             .concat({
-                name: "Favoriten hinzufügen...",
+                name: "Entferntes Gerät hinzufügen...",
                 isNew: true
             })
     }
@@ -39,7 +40,7 @@ export class Favorites implements IController {
                 processed: false,
                 pathToSet: "root"
             }
-        else if (enterData.item.isNew && enterData.dialog && enterData.otherPath && await this.createFavorite(enterData.dialog, enterData.otherPath))
+        else if (enterData.item.isNew && enterData.dialog && await this.createRemote(enterData.dialog))
             return {
                 processed: true,
                 refresh: true
@@ -64,7 +65,7 @@ export class Favorites implements IController {
         if (itemsToDelete.length == 0)
             return { success: true }
         const res = await dialog.show({
-		    text: `Möchtest Du ${itemsToDelete.length > 1 ? "die Favoriten" : "den Favoriten"} löschen?`,
+		    text: `Möchtest Du ${itemsToDelete.length > 1 ? "die Geräte" : "das Gerät"} löschen?`,
     		btnOk: true,
 	    	btnCancel: true,
 		    defBtnOk: true
@@ -72,36 +73,45 @@ export class Favorites implements IController {
         if (res.result != ResultType.Ok)
             return { success: true }
         
-        const favs = this.getFavoriteItems().filter(x => !items.find(n => n.name == x.name))
-        localStorage.setItem("fav", JSON.stringify(favs))
+        const favs = this.getRemoteItems().filter(x => !items.find(n => n.name == x.name))
+        localStorage.setItem(REMOTES, JSON.stringify(favs))
         return { success: true, refresh: true }
     }
 
-    async createFavorite(dialog: DialogHandle, otherPath: string) {
-        const items = this.getFavoriteItems()
-        const result =
-            !items.find(n => n.name == otherPath) && (await dialog.show({
-                text: `'${otherPath}' als Favoriten hinzufügen?`,
-                btnOk: true,
-                btnCancel: true,
-                defBtnOk: true
-            }))?.result == ResultType.Ok
-        if (result && otherPath) {
-            const newItems = items.concat([{ name: otherPath }])
-            localStorage.setItem(FAVORITES, JSON.stringify(newItems))
+    async createRemote(dialog: DialogHandle, item?: FolderViewItem) {
+        let name = item?.name
+        let ipAddress = item?.ipAddress
+        let isAndroid = item?.isAndroid ?? true
+        const items = this.getRemoteItems().filter(n => n.name != item?.name)
+        const result = await dialog.show({
+            text: "Entferntes Gerät hinzufügen",
+            extension: RemoteDialog,
+            extensionProps: { name, ipAddress, isAndroid },
+            onExtensionChanged: (e: FolderViewItem) => {
+                name = e.name
+                ipAddress = e.ipAddress
+                isAndroid = e.isAndroid ?? false
+            },
+            btnOk: true,
+            btnCancel: true,
+            defBtnOk: true
+        })
+        if (name && result.result == ResultType.Ok ) {
+            const newItems = items.concat([{ name, ipAddress, isAndroid }])
+            localStorage.setItem(REMOTES, JSON.stringify(newItems))
             return true
         }
         else
             return false
     }
 
-    getFavoriteItems() {
-        const itemsStr = localStorage.getItem(FAVORITES)
+    getRemoteItems() {
+        const itemsStr = localStorage.getItem(REMOTES)
         return itemsStr ? JSON.parse(itemsStr) as FolderViewItem[] : []
     }
     
     constructor() {
-        this.id = "FAV"
+        this.id = "REMOTES"
         this.itemsSelectable = true
     }
 }
@@ -112,10 +122,12 @@ const renderRow = (item: FolderViewItem) => [
         ? IconNameType.Parent
         : item.isNew
         ? IconNameType.New
-        : IconNameType.Favorite}
+        : item.isAndroid
+        ? IconNameType.Android
+        : IconNameType.Remote}
         iconPath={item.name.getExtension()}
     />),
-    item.path ?? ""
+    item.ipAddress ?? ""
 ]
 
 export const addParent = (items: FolderViewItem[]) => 

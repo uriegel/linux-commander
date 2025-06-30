@@ -11,7 +11,8 @@ react-devtools
 ```
 
 ```
-// TODO Remotes
+// TODO Remotes: rename device
+// TODO Remote
 
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large

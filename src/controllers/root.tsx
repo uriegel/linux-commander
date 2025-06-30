@@ -2,6 +2,8 @@ import type { TableColumns } from "virtual-table-react"
 import { formatSize, IconNameType, type EnterData, type IController, type OnEnterResult } from "./controller"
 import type { FolderViewItem } from "../components/FolderView"
 import IconName from "../components/IconName"
+import { REMOTES } from "./Remotes"
+import { FAVORITES } from "./favorites"
 
 export class Root implements IController {
     id: string
@@ -47,9 +49,6 @@ export class Root implements IController {
         this.itemsSelectable = false
     }
 }
-
-const REMOTES = "remotes"
-const FAVORITES = "fav"
 
 const getRowClasses = (item: FolderViewItem) => 
     item.isMounted == false
