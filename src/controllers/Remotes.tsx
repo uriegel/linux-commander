@@ -48,7 +48,7 @@ export class Remotes implements IController {
         else
             return {
                 processed: false,
-                pathToSet: enterData.item.name
+                pathToSet: `remote/${enterData.item.ipAddress}`
             }
     }
 
