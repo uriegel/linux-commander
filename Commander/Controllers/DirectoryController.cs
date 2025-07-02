@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Commander.UI;
 using CsTools.Extensions;
 using GtkDotNet;
+
 using static System.Console;
 
 namespace Commander.Controllers;
@@ -32,18 +33,6 @@ class DirectoryController(string folderId) : Controller(folderId)
             MainContext.Instance.ErrorText = "Pfad nicht gefunden";
             return new ChangePathResult(true, changePathId, null, "", 0, 0);
         }
-        // catch (RequestException re) when (re.CustomRequestError == CustomRequestError.ConnectionError)
-        // {
-        //     OnError(re);
-        //     MainContext.Instance.ErrorText = "Die Verbindung zum Gerät konnte nicht aufgebaut werden";
-        //     return new ChangePathResult(true, changePathId, null, "", 0, 0);
-        // }
-        // catch (RequestException re) when (re.CustomRequestError == CustomRequestError.NameResolutionError)
-        // {
-        //     OnError(re);
-        //     MainContext.Instance.ErrorText = "Der Netzwerkname des Gerätes konnte nicht ermittelt werden";
-        //     return new ChangePathResult(true, changePathId, null, "", 0, 0);
-        // }
         catch (OperationCanceledException)
         {
             return new ChangePathResult(true, changePathId, null, "", 0, 0);
