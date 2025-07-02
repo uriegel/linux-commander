@@ -134,9 +134,6 @@ export class Directory implements IController {
     }
 }
 
-// TODO const REMOTES = "remotes"
-// TODO const FAVORITES = "fav"
-
 const renderRow = (item: FolderViewItem) => [
 	(<IconName namePart={item.name} type={
 			item.isParent

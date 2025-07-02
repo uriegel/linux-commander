@@ -33,7 +33,7 @@ class RemoteController(string folderId) : Controller(folderId)
                                     n.IsDirectory,
                                     false,
                                     n.IsHidden,
-                                    n.Time.FromUnixTime(),
+                                    n.Time.FromUnixTime().Pipe(n => n.Year == 1970 ? (DateTime?)null : n),
                                     null))))
                 .HttpGetOrThrowAsync())
                 .ToArray();

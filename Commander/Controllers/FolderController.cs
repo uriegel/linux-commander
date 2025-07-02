@@ -28,6 +28,7 @@ static class FolderController
             "" => typeof(RootController),
             "remotes" => typeof(RemotesController),
             "fav" => typeof(FavoritesController),
+            _ when path.StartsWith("remote") && path.EndsWith("..") && path[7 ..].Count(n => n == '/') == 1 => typeof(RemotesController),
             _ when path.StartsWith("remote") => typeof(RemoteController),
             _ => typeof(DirectoryController)
         };
@@ -41,6 +42,7 @@ static class FolderController
             "" => new RootController(folderId),
             "remotes" => new RemotesController(folderId),
             "fav" => new FavoritesController(folderId),
+            _ when path.StartsWith("remote") && path.EndsWith("..") && path[7 ..].Count(n => n == '/') == 1 => new RemotesController(folderId),
             _ when path.StartsWith("remote") => new RemoteController(folderId),
             _ => new DirectoryController(folderId)
         };

@@ -11,8 +11,9 @@ react-devtools
 ```
 
 ```
-// TODO Remote root  goto parent
-// TODO Remote root time is 1970
+// TODO create folder
+// TODO copy remote
+// TODO Remote delete items
 
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large
