@@ -8,6 +8,7 @@ using static CsTools.Functional.Memoization;
 using static CsTools.ProcessCmd;
 using static Commander.Controllers.FolderController;
 using Commander.Controllers;
+using Commander.Copy;
 
 namespace Commander;
 

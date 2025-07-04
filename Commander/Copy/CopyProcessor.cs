@@ -4,7 +4,7 @@ using CsTools;
 using CsTools.Extensions;
 using GtkDotNet;
 
-namespace Commander;
+namespace Commander.Copy;
 
 enum SelectedItemsType
 {
@@ -93,7 +93,7 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
                         .SelectMany(n => Flatten(n.Name, sourcePath));
         var files = items
                         .Where(n => !n.IsDirectory)
-                        .SelectFilterNull(n => ValidateFile(n.Name, sourcePath));
+                        .SelectFilterNull(n => ValidateFile(n, n.Name, sourcePath));
         return dirs.Concat(files);
     }
 
@@ -157,7 +157,7 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
         return dirs.Concat(files);
     }
 
-    static DirectoryItem? ValidateFile(string subPath, string path)
+    protected virtual DirectoryItem? ValidateFile(DirectoryItem item, string subPath, string path)
     {
         var info = new FileInfo(path.AppendPath(subPath));
         if (!info.Exists)

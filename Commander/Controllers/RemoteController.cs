@@ -1,3 +1,4 @@
+using Commander.Copy;
 using Commander.UI;
 using CsTools.Extensions;
 using CsTools.Functional;
@@ -67,6 +68,33 @@ class RemoteController(string folderId) : Controller(folderId)
 
         static void OnError(Exception e) => Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
     }
+
+    public override Task<PrepareCopyResult> PrepareCopy(PrepareCopyRequest data)
+    {
+        var items = data
+                        .Items
+                        .Where(n => !n.IsDirectory)
+                        .ToArray();
+        if ((data.TargetPath.StartsWith('/') != true && data.TargetPath?.StartsWith("remote/") != true)
+        || string.Compare(data.Path, data.TargetPath, StringComparison.CurrentCultureIgnoreCase) == 0
+        || items.Length == 0)
+            return new PrepareCopyResult(SelectedItemsType.None, 0, []).ToAsync();
+        var copyProcessor = new RemoteCopyProcessor(data.Path, data.TargetPath, GetSelectedItemsType(items), items, data.Move);
+        return Task.Run(copyProcessor.PrepareCopy);
+    }
+
+    public override Task<CopyResult> Copy(CopyRequest copyRequest) => CopyProcessor.Current?.Copy(copyRequest) ?? new CopyResult(true).ToAsync();
+
+    static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
+    {
+        var files = items.Count(n => !n.IsDirectory);
+        return files > 1
+            ? SelectedItemsType.Files
+            : files == 1
+            ? SelectedItemsType.File
+            : SelectedItemsType.None;
+    }
+
 
     public static int ChangePathSeed = 0;
 }

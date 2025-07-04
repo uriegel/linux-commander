@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Commander.Copy;
 using Commander.UI;
 using CsTools.Extensions;
 using GtkDotNet;
@@ -54,7 +55,7 @@ class DirectoryController(string folderId) : Controller(folderId)
         || data.Items.Length == 0)
             return new PrepareCopyResult(SelectedItemsType.None, 0, []).ToAsync();
         var copyProcessor = new CopyProcessor(data.Path, data.TargetPath, GetSelectedItemsType(data.Items), data.Items, data.Move);
-        return Task.Run(() => copyProcessor.PrepareCopy());
+        return Task.Run(copyProcessor.PrepareCopy);
     }
 
     public override Task<CopyResult> Copy(CopyRequest copyRequest) => CopyProcessor.Current?.Copy(copyRequest) ?? new CopyResult(true).ToAsync();

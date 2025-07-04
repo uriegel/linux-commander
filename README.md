@@ -11,9 +11,13 @@ react-devtools
 ```
 
 ```
-// TODO create folder
-// TODO copy remote
+// TODO copy remote with progress
+// TODO copy remote: conflicts
+// TODO copy to remote
+// TODO create remote folder
 // TODO Remote delete items
+
+// TODO ChangePath (especially remote path) can endure: show in status bar
 
 // TODO root detect new drives/removed drives
 // TODO Initial scrollbar in virtual table view to large
