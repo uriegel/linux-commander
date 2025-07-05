@@ -3,7 +3,9 @@ using Commander.UI;
 using CsTools.Extensions;
 using CsTools.Functional;
 using CsTools.HttpRequest;
+
 using static System.Console;
+using static CsTools.HttpRequest.Core;
 
 namespace Commander.Controllers;
 
@@ -85,6 +87,22 @@ class RemoteController(string folderId) : Controller(folderId)
 
     public override Task<CopyResult> Copy(CopyRequest copyRequest) => CopyProcessor.Current?.Copy(copyRequest) ?? new CopyResult(true).ToAsync();
 
+    public override async Task<CreateFolderResult> CreateFolder(CreateFolderRequest createFolderRequest)
+    {
+        try
+        {
+            await Request
+                .Run(createFolderRequest.Path.CombineRemotePath(createFolderRequest.Name).GetIpAndPath().PostCreateDirectory(), true)
+                .HttpGetOrThrowAsync();
+            return new CreateFolderResult(true);
+        }
+        catch (RequestException)
+        {
+            MainContext.Instance.ErrorText = "Der  Ordner konnte nicht angelegt werden";
+            return new CreateFolderResult(false);
+        }
+    }
+
     static SelectedItemsType GetSelectedItemsType(DirectoryItem[] items)
     {
         var files = items.Count(n => !n.IsDirectory);
@@ -123,6 +141,14 @@ static partial class Extensions
         => path.EndsWith("..")
             ? path.SubstringUntilLast('/').SubstringUntilLast('/')
             : path;
+
+    public static CsTools.HttpRequest.Settings PostCreateDirectory(this IpAndPath ipAndPath) 
+        => DefaultSettings with
+        {
+            Method = HttpMethod.Post,
+            BaseUrl = $"http://{ipAndPath.Ip}:8080",
+            Url = $"/createdirectory/{ipAndPath.Path}",
+        };    
 }
 
 record RemoteItem(
