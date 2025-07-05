@@ -73,6 +73,10 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
             MainContext.Instance.ErrorText = "Zugriff verweigert";
             return new CopyResult(false);
         }
+        catch
+        {
+            return new CopyResult(false);
+        }
         finally
         {
             ProgressContext.Instance.Stop();

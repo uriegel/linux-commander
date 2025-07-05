@@ -17,44 +17,62 @@ class RemoteCopyProcessor(string sourcePath, string targetPath, SelectedItemsTyp
 
     protected override async Task CopyItem(CopyItem item, byte[] buffer, CancellationToken cancellation)
     {
-        var newFileName = TargetPath.AppendPath(item.Source.Name);
-        var tmpNewFileName = TargetPath.AppendPath(item.Source.Name + TMP_POSTFIX);
-        long? lastWrite = null;        
-        var source = SourcePath.CombineRemotePath(item.Source.Name);
-        var msg = await Request
-            .Run(SourcePath.GetIpAndPath().GetFile(item.Source.Name), true)
-            .HttpGetOrThrowAsync();
-        var len = msg.Content.Headers.ContentLength;
         try
         {
-            using var target =
-                File
-                    .Create(tmpNewFileName.EnsureFileDirectoryExists())
-                    .WithProgress((t, c) => ProgressContext.Instance.SetProgress(len ?? t, c));
-            await msg
-                .CopyToStream(target, cancellation)
+            var newFileName = TargetPath.AppendPath(item.Source.Name);
+            var tmpNewFileName = TargetPath.AppendPath(item.Source.Name + TMP_POSTFIX);
+            long? lastWrite = null;
+            var source = SourcePath.CombineRemotePath(item.Source.Name);
+            var msg = await Request
+                .Run(SourcePath.GetIpAndPath().GetFile(item.Source.Name), true)
                 .HttpGetOrThrowAsync();
-            lastWrite = msg.GetHeaderLongValue("x-file-date");
-        }
-        catch
-        {
+            var len = msg.Content.Headers.ContentLength;
             try
             {
-                File.Delete(tmpNewFileName);
+                using var target =
+                    File
+                        .Create(tmpNewFileName.EnsureFileDirectoryExists())
+                        .WithProgress((t, c) => ProgressContext.Instance.SetProgress(len ?? t, c));
+                await msg
+                    .CopyToStream(target, cancellation)
+                    .HttpGetOrThrowAsync();
+                lastWrite = msg.GetHeaderLongValue("x-file-date");
             }
-            catch { }
+            catch
+            {
+                try
+                {
+                    File.Delete(tmpNewFileName);
+                }
+                catch { }
+                throw;
+            }
+            if (lastWrite.HasValue)
+                File.SetLastWriteTime(tmpNewFileName, lastWrite.Value.FromUnixTime());
+
+            await Gtk.Dispatch(() =>
+            {
+                using var gsf = GFile.New(SourcePath.AppendPath(item.Source.Name));
+                using var gtf = GFile.New(tmpNewFileName);
+                gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
+            });
+            File.Move(tmpNewFileName, newFileName, true);
+        }
+        catch (RequestException re) when (re.CustomRequestError == CustomRequestError.ConnectionError)
+        {
+            MainContext.Instance.ErrorText = "Die Verbindung zum Gerät konnte nicht aufgebaut werden";
             throw;
         }
-        if (lastWrite.HasValue)
-            File.SetLastWriteTime(tmpNewFileName, lastWrite.Value.FromUnixTime());
-
-        await Gtk.Dispatch(() =>
+        catch (RequestException re) when (re.CustomRequestError == CustomRequestError.NameResolutionError)
         {
-            using var gsf = GFile.New(SourcePath.AppendPath(item.Source.Name));
-            using var gtf = GFile.New(tmpNewFileName);
-            gsf.CopyAttributes(gtf, FileCopyFlags.Overwrite);
-        });
-        File.Move(tmpNewFileName, newFileName, true);
+            MainContext.Instance.ErrorText = "Der Netzwerkname des Gerätes konnte nicht ermittelt werden";
+            throw;
+        }
+        catch (RequestException)
+        {
+            MainContext.Instance.ErrorText = "Die Einträge konnten nicht vom entfernten Gerät geholt werden";
+            throw;
+        }
     }
 }
 
