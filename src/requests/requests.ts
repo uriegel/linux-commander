@@ -28,7 +28,7 @@ interface ChangePathResponse {
 }
 
 interface GetExtended { id: number, folderId: string }
-interface GetExtendedResponse {  }
+interface GetExtendedResponse { cancelled?: boolean }
 
 interface PrepareCopy {
     id: string,
