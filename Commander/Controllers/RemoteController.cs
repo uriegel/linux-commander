@@ -87,6 +87,33 @@ class RemoteController(string folderId) : Controller(folderId)
 
     public override Task<CopyResult> Copy(CopyRequest copyRequest) => CopyProcessor.Current?.Copy(copyRequest) ?? new CopyResult(true).ToAsync();
 
+    public override async Task<DeleteResult> Delete(DeleteRequest deleteRequest)
+    {
+        try
+        {
+            var cancellation = ProgressContext.Instance.Start(deleteRequest.Id, "Löschen", deleteRequest.Items.Length, deleteRequest.Items.Length, true);
+            var index = 0;
+            foreach (var item in deleteRequest.Items)
+            {
+                if (cancellation.IsCancellationRequested)
+                    throw new TaskCanceledException();
+                ProgressContext.Instance.SetNewFileProgress(item.Name, 1, ++index);
+                await Request
+                        .Run(deleteRequest.Path
+                        .CombineRemotePath(item.Name).GetIpAndPath()
+                        .DeleteItem())
+                        .HttpGetOrThrowAsync();
+                ProgressContext.Instance.SetProgress(1, 1);
+            }
+        }
+        finally
+        {
+            ProgressContext.Instance.Stop();
+        }
+
+        return new(true);
+    }
+
     public override async Task<CreateFolderResult> CreateFolder(CreateFolderRequest createFolderRequest)
     {
         try
@@ -142,12 +169,20 @@ static partial class Extensions
             ? path.SubstringUntilLast('/').SubstringUntilLast('/')
             : path;
 
-    public static CsTools.HttpRequest.Settings PostCreateDirectory(this IpAndPath ipAndPath) 
+    public static CsTools.HttpRequest.Settings PostCreateDirectory(this IpAndPath ipAndPath)
         => DefaultSettings with
         {
             Method = HttpMethod.Post,
             BaseUrl = $"http://{ipAndPath.Ip}:8080",
             Url = $"/createdirectory/{ipAndPath.Path}",
+        };    
+
+    public static CsTools.HttpRequest.Settings DeleteItem(this IpAndPath ipAndPath) 
+        => DefaultSettings with
+        {
+            Method = HttpMethod.Delete,
+            BaseUrl = $"http://{ipAndPath.Ip}:8080",
+            Url = $"/deletefile/{ipAndPath.Path}",
         };    
 }
 
