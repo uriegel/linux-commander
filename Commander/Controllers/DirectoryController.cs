@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Commander.Copy;
 using Commander.UI;
@@ -46,6 +47,13 @@ class DirectoryController(string folderId) : Controller(folderId)
         }
 
         static void OnError(Exception e) => Error.WriteLine($"Konnte Pfad nicht ändern: {e}");
+    }
+
+    public override Task<GetExtendedResult> GetExtended(int id)
+    {
+        if (extendedTasks.TryGetValue(id, out var tcs))
+            tcs.TrySetResult();
+        return new GetExtendedResult().ToAsync();
     }
 
     public override Task<PrepareCopyResult> PrepareCopy(PrepareCopyRequest data)
@@ -171,8 +179,9 @@ class DirectoryController(string folderId) : Controller(folderId)
     {
         try
         {
+            var extendedReady = WaitForExtendedDataRequest(changePathId);
             bool changed = false;
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 Requests.SendStatusBarInfo(FolderId, changePathId, "Ermittle EXIF-Informationen...");
                 foreach (var item in items
@@ -187,7 +196,10 @@ class DirectoryController(string folderId) : Controller(folderId)
                         changed = true;
                 }
                 if (changed)
+                {
+                    await extendedReady;
                     Requests.SendExifInfo(FolderId, changePathId, items);
+                }
             }, cancellation);
         }
         catch { }
@@ -197,7 +209,18 @@ class DirectoryController(string folderId) : Controller(folderId)
         }
     }
 
+    static Task WaitForExtendedDataRequest(int requestId)
+    {
+        var tcs = new TaskCompletionSource();
+        var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+        cancellation.Token.Register(() => tcs.TrySetCanceled());
+        extendedTasks.AddOrUpdate(requestId, tcs, (id, t) => tcs);
+        return tcs.Task;
+    }
+
     public static int ChangePathSeed = 0;
+
+    static readonly ConcurrentDictionary<int, TaskCompletionSource> extendedTasks = [];    
 }
 
 record DirectoryItem(

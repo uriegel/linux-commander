@@ -27,6 +27,9 @@ interface ChangePathResponse {
     path?: string
 }
 
+interface GetExtended { id: number, folderId: string }
+interface GetExtendedResponse {  }
+
 interface PrepareCopy {
     id: string,
     path: string,
@@ -108,6 +111,7 @@ interface OnRenameResponse {
 }
 
 export const changePath = getJsonPost<ChangePath, ChangePathResponse>("changepath")
+export const getExtended = getJsonPost<GetExtended, GetExtendedResponse>("getextended")
 export const prepareCopy = getJsonPost<PrepareCopy, PrepareCopyResponse>("preparecopy")
 export const copy = getJsonPost<Copy, CopyResponse>("copy")
 export const deleteRequest = getJsonPost<Delete, DeleteResponse>("delete")

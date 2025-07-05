@@ -18,6 +18,7 @@ static class Requests
         => request.SubPath switch
         {
             "changepath" => await ChangePath(request),
+            "getextended" => await GetExtended(request),
             "preparecopy" => await PrepareCopy(request),
             "copy" => await Copy(request),
             "delete" => await Delete(request),
@@ -128,6 +129,9 @@ static class Requests
             return GetController(n.Id).ChangePathAsync(path, n.ShowHidden);
         });
 
+    static Task<bool> GetExtended(IRequest request)
+        => Request<GetExtendedRequest, GetExtendedResult>(request, n => GetController(n.FolderId).GetExtended(n.Id));
+
     static Task<bool> PrepareCopy(IRequest request)
         => Request<PrepareCopyRequest, PrepareCopyResult>(request, n => GetController(n.Id).PrepareCopy(n));
     
@@ -225,6 +229,9 @@ record ChangePathResult(
     int DirCount,
     int FileCount
 );
+
+record GetExtendedRequest(int Id, string FolderId);
+record GetExtendedResult();
 
 record PrepareCopyRequest(
     string Id,

@@ -3,7 +3,8 @@ import './FolderView.css'
 import VirtualTable, { type OnSort, type SelectableItem, type TableColumns, type VirtualTableHandle } from "virtual-table-react"
 import {
     changePath as changePathRequest, copy, createFolderRequest, deleteRequest, prepareCopy, renameRequest,
-    SelectedItemsType, onEnter as onEnterRequest
+    SelectedItemsType, onEnter as onEnterRequest,
+    getExtended
 } from "../requests/requests"
 import { getController, type IController } from "../controllers/controller"
 import { Root } from "../controllers/root"
@@ -129,6 +130,7 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
         const items = result.items && result.items?.length > 0 ? result.items : controller.current.getItems()
         const newItems = controller.current.sort(items, sortIndex.current, sortDescending.current)
         setItems(newItems, result.dirCount, result.fileCount)
+        getExtended({ id: result.id, folderId: id })
         const pos = latestPath
                     ? newItems.findIndex(n => n.name == latestPath)
                     : checkPosition
