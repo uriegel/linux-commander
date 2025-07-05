@@ -11,7 +11,6 @@ react-devtools
 ```
 
 ```
-// TODO copy remote: conflicts
 // TODO copy to remote
 // TODO create remote folder
 // TODO Remote delete items
