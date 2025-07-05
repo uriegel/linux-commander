@@ -11,8 +11,7 @@ react-devtools
 ```
 
 ```
-// TODO copy to remote
-// TODO Remote delete items: progress and error handling
+// TODO Remote delete items:     progress and error handling
 
 // TODO ChangePath (especially remote path) can endure: show in status bar
 

@@ -81,7 +81,7 @@ class RemoteController(string folderId) : Controller(folderId)
         || string.Compare(data.Path, data.TargetPath, StringComparison.CurrentCultureIgnoreCase) == 0
         || items.Length == 0)
             return new PrepareCopyResult(SelectedItemsType.None, 0, []).ToAsync();
-        var copyProcessor = new RemoteCopyProcessor(data.Path, data.TargetPath, GetSelectedItemsType(items), items, data.Move);
+        var copyProcessor = new CopyFromRemoteProcessor(data.Path, data.TargetPath, GetSelectedItemsType(items), items, data.Move);
         return Task.Run(copyProcessor.PrepareCopy);
     }
 
