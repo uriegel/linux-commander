@@ -18,6 +18,9 @@ enum SelectedItemsType
 
 class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType selectedItemsType, DirectoryItem[] selectedItems, bool move)
 {
+    protected string SourcePath { get => sourcePath; }
+    protected string TargetPath { get => targetPath; }
+    
     public static CopyProcessor? Current { get; private set; }
 
     public PrepareCopyResult PrepareCopy()
@@ -165,7 +168,7 @@ class CopyProcessor(string sourcePath, string targetPath, SelectedItemsType sele
         return DirectoryItem.CreateFileItem(info);
     }
 
-    const string TMP_POSTFIX = "-tmp-commander";
+    protected const string TMP_POSTFIX = "-tmp-commander";
 
     CopyItem[] copyItems = [];
     long copySize;

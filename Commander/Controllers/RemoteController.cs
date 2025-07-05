@@ -110,6 +110,15 @@ static partial class Extensions
     public static JsonRequest GetRequest(this IpAndPath ipAndPath)
         => new($"http://{ipAndPath.Ip}:8080");
 
+    public static string CombineRemotePath(this string path, string subPath)
+        => path.EndsWith('/')
+            ? subPath.StartsWith('/')
+                ? path + subPath[1..]
+                : path + subPath
+            : subPath.StartsWith('/')
+                ? path + subPath
+                : path + '/' + subPath;
+
     public static string CheckParent(this string path)
         => path.EndsWith("..")
             ? path.SubstringUntilLast('/').SubstringUntilLast('/')
