@@ -186,7 +186,8 @@ const FolderView = forwardRef<FolderViewHandle, FolderViewProp>((
 
     useEffect(() => {
         changePath(localStorage.getItem(`${id}-lastPath`) ?? "root", false, false)
-    }, [changePath, id]) 
+        // eslint-disable-next-line react-hooks/exhaustive-deps        
+    }, []) 
 
     useEffect(() => {
         const subscription = statusEvents
