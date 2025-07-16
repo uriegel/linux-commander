@@ -197,7 +197,7 @@ static partial class Extensions
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Konnte Ausgangsverzeicnis nicht löschen: {e}");
+                    Console.WriteLine($"Konnte Ausgangsverzeichnis nicht löschen: {e}");
                 }
             }
         }
